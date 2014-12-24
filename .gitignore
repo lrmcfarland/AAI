@@ -1,0 +1,19 @@
+# Ignore these files 
+
+*.gignore
+
+# emacs backups
+*~
+
+# build output
+*.[oa]
+
+# dylib
+*.dylib
+
+# mac stuff
+.DS_Store
+
+# python cruft
+*.pyc
+
