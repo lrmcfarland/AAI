@@ -10,7 +10,7 @@ import time
 import unittest
 
 import coords
-import EcEqXforms
+import Transforms
 
 
 class TestEcEqXforms(unittest.TestCase):
@@ -20,15 +20,15 @@ class TestEcEqXforms(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5 # precision limited by LAMBDA-tools reporting
-        self.eceq_xform = EcEqXforms.EclipticEquitorialTransforms()
+        self.eceq_xform = Transforms.EclipticEquitorial()
 
     def getLatitude(self, a_point):
         """Return latitude of point"""
-        return EcEqXforms.EclipticEquitorialTransforms.theta2latitude(a_point)
+        return Transforms.Transforms.theta2latitude(a_point)
 
     def getLongitude(self, a_point):
         """Return longitude of point"""
-        return EcEqXforms.EclipticEquitorialTransforms.phi2longitude(a_point)
+        return Transforms.Transforms.phi2longitude(a_point)
 
 
     def test_first_point_of_Aries(self):

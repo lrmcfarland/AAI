@@ -2,4 +2,4 @@
 
 . ./setenv.sh
 
-python test_EcEqXforms.py "$@"
+python test_Transforms.py "$@"

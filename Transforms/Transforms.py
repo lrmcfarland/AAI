@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Transforming ecliptic and equitorial coordinates
+"""Transforms coordinates, Ecliptic, Equitorial and Horizontal
 
 Equitorial Coordinate System http://en.wikipedia.org/wiki/Equatorial_coordinate_system
     right ascension http://en.wikipedia.org/wiki/Right_ascension
@@ -21,73 +21,20 @@ See also:
 import math
 import coords
 
-class EclipticEquitorialTransforms(object):
+class Transforms(object):
+    """Base class for transforms
 
-    """Transforms Cartesian space vectors to/from equitorial/ecliptic coordinates
-
-    ASSUMES: The x-axis points to vernal equinox. Positive rotations are right hand rule,
-    Y x Z = X, i.e. counter clockwise looking down X.
+    Holds various static and class methods
     """
 
-    # x axis points to vernal equinox (the first point of Aries in this epoch)
-    equinox_axis = coords.rotator(coords.Ux)
-
-    # obliquiy of the ecliptic terms are from http://en.wikipedia.org/wiki/Axial_tilt
-    obe = list()
-    obe.append(coords.angle(23, 26, 21.45))
-    obe.append(coords.angle(-1)*coords.angle(0, 0, 46.815)) # TODO no unary minus in boost wrappers
-    obe.append(coords.angle(-1)*coords.angle(0, 0, 0.0006))
-    obe.append(coords.angle(0, 0, 0.00181))
-    # TODO more terms, updated
+    def __init__(self, *args, **kwargs):
+        # no instance data members so far.
+        super(Transforms, self).__init__(*args, **kwargs)
 
 
-    def eps(self, a_datetime):
-        """Calculates the obliquty of the ecliptic given the datetime"""
-        T = (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
-        the_eps = 0
-        for i in xrange(len(self.obe)):
-            the_eps += self.obe[i].value * math.pow(T, i)
-        return the_eps
-
-
-    def _xform(self, a_vector, a_datetime, a_direction):
-        """Transforms a vector ecliptic to/from equitorial/ecliptic coordinates.
-
-        Args:
-        a_vector: the vector to transform
-        a_datetime: the time of the transformation
-        a_direction: +1 to equitorial, -1 to ecliptic
-
-        Returns a vector in the transformed coordinates
-        """
-        if isinstance(a_vector, coords.spherical):
-            the_rotatee = coords.Cartesian(a_vector)
-        else:
-            the_rotatee = a_vector
-
-        the_rotated = self.equinox_axis.rotate(the_rotatee,
-                                               coords.angle(a_direction * self.eps(a_datetime)))
-
-        if isinstance(a_vector, coords.spherical):
-            return coords.spherical(the_rotated)
-        else:
-            return the_rotated
-
-
-    def toEcliptic(self, a_vector, a_datetime):
-        """Transforms a_vector from equitorial to ecliptic coordinates
-
-        Returns a Cartesian vector in eliptic coordinates
-        """
-        return self._xform(a_vector, a_datetime, -1.0)
-
-
-    def toEquitorial(self, a_vector, a_datetime):
-        """Transforms a_vector from ecliptic to equitorial coordinates
-
-        Returns a Cartesian vector in equitorial coordinates
-        """
-        return self._xform(a_vector, a_datetime, 1.0)
+    @classmethod
+    def JulianCentury(cls, a_datetime):
+        return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
 
 
     @staticmethod
@@ -105,11 +52,88 @@ class EclipticEquitorialTransforms(object):
             return coords.angle(an_angle.phi.value)
 
 
+class EclipticEquitorial(Transforms):
+
+    """Transforms 3D space vectors to/from ecliptic/equitorial coordinates
+
+    ASSUMES: The x-axis points to vernal equinox. Positive rotations are right hand rule,
+    Y x Z = X, i.e. counter clockwise looking down X.
+    """
+
+    # x axis points to vernal equinox (the first point of Aries in this epoch)
+    equinox_axis = coords.rotator(coords.Ux)
+
+    # obliquiy of the ecliptic terms are from http://en.wikipedia.org/wiki/Axial_tilt
+    obe = list()
+    obe.append(coords.angle(23, 26, 21.45))
+    obe.append(coords.angle(-1)*coords.angle(0, 0, 46.815)) # TODO no unary minus in boost wrappers
+    obe.append(coords.angle(-1)*coords.angle(0, 0, 0.0006))
+    obe.append(coords.angle(0, 0, 0.00181))
+    # TODO more terms, updated
+
+    def __init__(self, *args, **kwargs):
+        super(EclipticEquitorial, self).__init__(*args, **kwargs)
+
+
+    @classmethod
+    def eps(cls, a_datetime):
+        """Calculates the obliquty of the ecliptic given the datetime"""
+        T = cls.JulianCentury(a_datetime)
+        the_eps = 0
+        for i in xrange(len(cls.obe)):
+            the_eps += cls.obe[i].value * math.pow(T, i)
+        return the_eps
+
+
+    @classmethod
+    def _xform(cls, a_vector, a_datetime, a_direction):
+        """Transforms a vector ecliptic to/from equitorial/ecliptic coordinates.
+
+        Args:
+        a_vector: the vector to transform. May be Cartesian or spherical.
+        a_datetime: the time of the transformation
+        a_direction: +1 to equitorial, -1 to ecliptic
+
+        Returns a vector in the transformed coordinates
+        """
+        if isinstance(a_vector, coords.spherical):
+            the_rotatee = coords.Cartesian(a_vector)
+        else:
+            the_rotatee = a_vector
+
+        the_rotated = cls.equinox_axis.rotate(the_rotatee,
+                                              coords.angle(a_direction * cls.eps(a_datetime)))
+
+        if isinstance(a_vector, coords.spherical):
+            return coords.spherical(the_rotated)
+        else:
+            return the_rotated
+
+
+    @classmethod
+    def toEcliptic(cls, a_vector, a_datetime):
+        """Transforms a_vector from equitorial to ecliptic coordinates
+
+        Returns a Cartesian vector in eliptic coordinates
+        """
+        return cls._xform(a_vector, a_datetime, -1.0)
+
+
+    @classmethod
+    def toEquitorial(cls, a_vector, a_datetime):
+        """Transforms a_vector from ecliptic to equitorial coordinates
+
+        Returns a Cartesian vector in equitorial coordinates
+        """
+        return cls._xform(a_vector, a_datetime, 1.0)
+
+
+
 if __name__ == '__main__':
 
     # Actuals from http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
 
-    eceq_xform = EclipticEquitorialTransforms()
+    eceq_xform = EclipticEquitorial()
 
     j2000 = coords.datetime('2000-01-01T00:00:00')
 
@@ -161,6 +185,3 @@ if __name__ == '__main__':
     print 'latitude:', EclipticEquitorialTransforms.theta2latitude(some_point_eq),
     print 'longitude:', EclipticEquitorialTransforms.phi2longitude(some_point_eq)
     # latitude: -16:38:58.7528 longitude: 38:28:49.7868 Good
-
-
-
