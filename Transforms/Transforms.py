@@ -21,6 +21,9 @@ See also:
 import math
 import coords
 
+class Error(Exception):
+    pass
+
 class Transforms(object):
     """Base class for transforms
 
@@ -38,18 +41,26 @@ class Transforms(object):
 
 
     @staticmethod
-    def theta2latitude(an_angle):
+    def theta2latitude(a_point):
         """Converts spherical coordinate theta (angle to +z axis) to latitude/declination"""
-        return coords.angle(90 - an_angle.theta.value)
+
+        if not isinstance(a_point, coords.spherical):
+            raise Error('a coordinate must be an instance of coords.spherical')
+
+        return 90 - a_point.theta.value
 
 
     @staticmethod
-    def phi2longitude(an_angle):
+    def phi2longitude(a_point):
         """Converts spherical coordinate phi (angle to +x axis of projection in xy plane) to longitude"""
-        if an_angle.phi.value < 0:
-            return coords.angle(360 + an_angle.phi.value)
+
+        if not isinstance(a_point, coords.spherical):
+            raise Error('a coordinate must be an instance of coords.spherical')
+
+        if a_point.phi.value < 0:
+            return 360 + a_point.phi.value
         else:
-            return coords.angle(an_angle.phi.value)
+            return a_point.phi.value
 
 
 class EclipticEquitorial(Transforms):
