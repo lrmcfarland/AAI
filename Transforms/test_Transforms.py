@@ -1,9 +1,4 @@
-"""Unit tests for Ecliptic Equitorial Transforms
-
-
-Values checked against http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
-"""
-
+"""Unit tests for Right Ascension, declination, Ecliptic Equitorial Transforms"""
 
 import math
 import time
@@ -12,11 +7,48 @@ import unittest
 import coords
 import Transforms
 
+class TestTransforms(unittest.TestCase):
+    """Test RA declination transforms.
 
-class TestEcEqXforms(unittest.TestCase):
+    """
 
     def setUp(self):
+        """Set up test parameters."""
 
+        self.places = 5 # precision limited by LAMBDA-tools reporting
+        self.xforms = Transforms.Transforms()
+
+
+    def test_radec2spherical_1(self):
+        """Test RA 1, dec 0"""
+        some_point = self.xforms.radec2spherical(a_right_ascension=coords.angle(1),
+                                                 a_declination=coords.angle(0))
+
+        self.assertAlmostEqual(90, some_point.theta.value)
+        self.assertAlmostEqual(15, some_point.phi.value)
+        self.assertAlmostEqual(1, self.xforms.spherical2ra(some_point))
+
+
+    def test_radec2spherical_sirius(self):
+        """Test RA/dec of Sirius"""
+
+        some_point = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                                 a_declination=coords.angle(-16, 42, 58.017))
+
+        # TODO validate
+        self.assertAlmostEqual(106.71611583333333, some_point.theta.value)
+        self.assertAlmostEqual(101.28715541666668, some_point.phi.value)
+        self.assertAlmostEqual(6.752477027777778, self.xforms.spherical2ra(some_point))
+
+
+
+class TestEcEqXforms(unittest.TestCase):
+    """Test ecliptic equitorial coordinate transformations
+
+    Validated against: http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
+    """
+
+    def setUp(self):
         """Set up test parameters."""
 
         self.places = 5 # precision limited by LAMBDA-tools reporting
@@ -24,11 +56,11 @@ class TestEcEqXforms(unittest.TestCase):
 
     def getLatitude(self, a_point):
         """Return latitude of point"""
-        return Transforms.Transforms.theta2latitude(a_point)
+        return Transforms.Transforms.spherical2latitude(a_point)
 
     def getLongitude(self, a_point):
         """Return longitude of point"""
-        return Transforms.Transforms.phi2longitude(a_point)
+        return Transforms.Transforms.spherical2longitude(a_point)
 
 
     def test_first_point_of_Aries(self):

@@ -41,7 +41,7 @@ class Transforms(object):
 
 
     @staticmethod
-    def theta2latitude(a_point):
+    def spherical2latitude(a_point):
         """Converts spherical coordinate theta (angle to +z axis) to latitude/declination"""
 
         if not isinstance(a_point, coords.spherical):
@@ -51,7 +51,7 @@ class Transforms(object):
 
 
     @staticmethod
-    def phi2longitude(a_point):
+    def spherical2longitude(a_point):
         """Converts spherical coordinate phi (angle to +x axis of projection in xy plane) to longitude"""
 
         if not isinstance(a_point, coords.spherical):
@@ -61,6 +61,22 @@ class Transforms(object):
             return 360 + a_point.phi.value
         else:
             return a_point.phi.value
+
+
+    @classmethod
+    def spherical2ra(cls, a_point):
+        """Converts spherical coordinate phi (angle to +x axis of projection in xy plane) to right ascension"""
+
+        return cls.spherical2longitude(a_point)/15.0
+
+
+    @staticmethod
+    def radec2spherical(a_right_ascension, a_declination):
+        """returns a spherical coordinate with the given right ascension and declination"""
+
+        return coords.spherical(1, coords.angle(90.0) - a_declination,
+                                coords.angle(a_right_ascension.value * 15))
+
 
 
 class EclipticEquitorial(Transforms):
