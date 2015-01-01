@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""Transforms coordinates, Ecliptic, Equitorial and Horizontal
+"""Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
-Equitorial Coordinate System http://en.wikipedia.org/wiki/Equatorial_coordinate_system
+Equatorial Coordinate System http://en.wikipedia.org/wiki/Equatorial_coordinate_system
     right ascension http://en.wikipedia.org/wiki/Right_ascension
     declination http://en.wikipedia.org/wiki/Declination
 
@@ -40,6 +40,97 @@ class Transforms(object):
         return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
 
 
+    @classmethod
+    def GMST_APC(cls, a_datetime):
+        """Greenwich mean siderial time
+
+        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
+
+        2451545 == 2000-01-01T12:00:00
+
+        TODO not working
+
+        Returns TBD
+        """
+
+        print # linefeed
+        print # linefeed TODO rm
+        print 'current datetime', a_datetime
+
+        MJD = (a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate)/36525.0
+
+        print 'MJD', MJD # TODO rm
+
+        MJDo = math.floor(MJD)
+
+        print 'MJDo', MJDo # TODO rm
+
+        T = (a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate - 51544.5)/36525.0
+
+        print 'T', T # TODO rm
+
+        To  = math.floor(T)
+
+        print 'To', To # TODO rm
+
+        UT = (T - To) * 86400.0
+
+        print 'UT', UT # TODO rm
+
+        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0)
+
+        print 'gmst', gmst # TODO rm
+
+        gmst_degrees = coords.angle(gmst)
+        gmst_degrees.normalize(0, 360)
+
+        print 'gmst degrees', gmst_degrees # TODO rm
+
+        return gmst
+
+
+    @classmethod
+    def GMST_Wiki(cls, a_datetime):
+        """Greenwich mean siderial time
+
+        from http://en.wikipedia.org/wiki/Sidereal_time
+
+        TODO (from test_Transforms.py):
+        this shows increase in 15 degrees an hour,
+        normzlied as an angle looks similar a year later.
+
+        Returns GMST in hours
+        """
+
+        print # linefeed TODO rm
+        print 'current datetime', a_datetime
+
+        # TODO make static data member
+        J2000 = coords.datetime('2000-01-01T12:00:00') # starts at noon
+
+        D = a_datetime.toJulianDate() - J2000.toJulianDate()
+
+        print 'D', D # TODO rm
+
+        gmst_hours = 18.697374558 + 24.06570982441908 * D
+
+        print 'gmst hours', gmst_hours # TODO rm
+
+        gmst_degrees = 360.0 * gmst_hours / 24.0
+
+        print 'GMST wiki by degrees', gmst_degrees # TODO rm
+
+        gmst_angle = coords.angle(gmst_degrees)
+
+        print 'gmst_angle', gmst_angle.value
+
+        gmst_angle.normalize(0, 360)
+        print 'normalized', gmst_angle.value
+
+
+        return gmst_hours
+
+
     @staticmethod
     def spherical2latitude(a_point):
         """Converts spherical coordinate theta (angle to +z axis) to latitude/declination"""
@@ -71,17 +162,117 @@ class Transforms(object):
 
 
     @staticmethod
-    def radec2spherical(a_right_ascension, a_declination):
+    def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
         """returns a spherical coordinate with the given right ascension and declination"""
 
-        return coords.spherical(1, coords.angle(90.0) - a_declination,
+        return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
                                 coords.angle(a_right_ascension.value * 15))
 
 
 
-class EclipticEquitorial(Transforms):
+class Horizon(Transforms):
 
-    """Transforms 3D space vectors to/from ecliptic/equitorial coordinates
+    """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
+
+
+    """
+
+    horizon_axis = coords.rotator(coords.Uy)
+
+    def __init__(self, *args, **kwargs):
+        super(Horizon, self).__init__(*args, **kwargs)
+
+
+    @classmethod
+    def _xform_APC(cls, a_vector, an_observer, a_local_datetime, a_direction):
+        """Transforms a vector to/from equatorial/ecliptic coordinates.
+
+        TODO my implementation of this APC algorithm isn't working
+
+        Args:
+
+        a_vector: the vector to transform in theta (90 - declination),
+                  phi (RA * 15). See self.radec2spherical.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        a_local_datetime: local date and time of the observation.
+
+        a_direction: +1 to horizon, -1 from horizon
+
+        Returns a vector in the transformed coordinates
+
+        """
+
+        if not isinstance(a_vector, coords.spherical):
+            raise Error('vector must be in spherical coordinates') # TODO for now
+
+
+        gmst = Transforms.GMST_Wiki(a_local_datetime)
+
+        hour_angle = coords.angle(gmst + an_observer.phi.value - a_vector.phi.value)
+        hour_angle.normalize(0, 360)
+
+        the_local_vector = coords.spherical(a_vector.r, a_vector.theta, hour_angle)
+
+
+
+        the_rotatee = coords.Cartesian(the_local_vector)
+
+
+        the_rotated = cls.horizon_axis.rotate(the_rotatee,
+                                              coords.angle(a_direction * an_observer.theta.value))
+
+        return coords.spherical(the_rotated)
+
+
+    @classmethod
+    def toHorizon_APC(cls, a_vector, an_observer, a_local_datetime):
+        """Transforms an equatorial vector into one in the horizon coordinate system"""
+        return cls._xform_APC(a_vector, an_observer, a_local_datetime, 1.0)
+
+
+    @classmethod
+    def fromHorizon_APC(cls, a_vector, an_observer, a_local_datetime):
+        """Transforms a horizon vector into one in the equatorial coordinate system"""
+        return cls._xform_APC(a_vector, an_observer, a_local_datetime, -1.0)
+
+
+    @classmethod
+    def toHorizon(cls, a_vector, an_observer, a_local_datetime):
+        """Transforms a vector to/from equatorial/ecliptic coordinates.
+
+        from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+
+        Args:
+
+        a_vector: the vector to transform in theta (90 - declination),
+                  phi (RA * 15). See self.radec2spherical.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        a_local_datetime: local date and time of the observation.
+
+        a_direction: +1 to horizon, -1 from horizon
+
+        Returns a vector in the transformed coordinates
+
+        """
+
+        if not isinstance(a_vector, coords.spherical):
+            raise Error('vector must be in spherical coordinates') # TODO for now
+
+        # TODO positional astronomy
+
+
+
+class EclipticEquatorial(Transforms):
+
+    """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
     ASSUMES: The x-axis points to vernal equinox. Positive rotations are right hand rule,
     Y x Z = X, i.e. counter clockwise looking down X.
@@ -99,7 +290,7 @@ class EclipticEquitorial(Transforms):
     # TODO more terms, updated
 
     def __init__(self, *args, **kwargs):
-        super(EclipticEquitorial, self).__init__(*args, **kwargs)
+        super(EclipticEquatorial, self).__init__(*args, **kwargs)
 
 
     @classmethod
@@ -114,15 +305,16 @@ class EclipticEquitorial(Transforms):
 
     @classmethod
     def _xform(cls, a_vector, a_datetime, a_direction):
-        """Transforms a vector ecliptic to/from equitorial/ecliptic coordinates.
+        """Transforms a vector to/from equatorial/ecliptic coordinates.
 
         Args:
         a_vector: the vector to transform. May be Cartesian or spherical.
         a_datetime: the time of the transformation
-        a_direction: +1 to equitorial, -1 to ecliptic
+        a_direction: +1 to equatorial, -1 to ecliptic
 
         Returns a vector in the transformed coordinates
         """
+
         if isinstance(a_vector, coords.spherical):
             the_rotatee = coords.Cartesian(a_vector)
         else:
@@ -139,7 +331,7 @@ class EclipticEquitorial(Transforms):
 
     @classmethod
     def toEcliptic(cls, a_vector, a_datetime):
-        """Transforms a_vector from equitorial to ecliptic coordinates
+        """Transforms a_vector from equatorial to ecliptic coordinates
 
         Returns a Cartesian vector in eliptic coordinates
         """
@@ -147,10 +339,10 @@ class EclipticEquitorial(Transforms):
 
 
     @classmethod
-    def toEquitorial(cls, a_vector, a_datetime):
-        """Transforms a_vector from ecliptic to equitorial coordinates
+    def toEquatorial(cls, a_vector, a_datetime):
+        """Transforms a_vector from ecliptic to equatorial coordinates
 
-        Returns a Cartesian vector in equitorial coordinates
+        Returns a Cartesian vector in equatorial coordinates
         """
         return cls._xform(a_vector, a_datetime, 1.0)
 
@@ -160,7 +352,7 @@ if __name__ == '__main__':
 
     # Actuals from http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
 
-    eceq_xform = EclipticEquitorial()
+    eceq_xform = EclipticEquatorial()
 
     j2000 = coords.datetime('2000-01-01T00:00:00')
 
@@ -175,16 +367,16 @@ if __name__ == '__main__':
 
     some_point_ec = eceq_xform.toEcliptic(some_point, j2000)
     print 'Ecliptic(some point)', some_point_ec
-    print 'latitude:', EclipticEquitorialTransforms.theta2latitude(some_point_ec),
-    print 'longitude:', EclipticEquitorialTransforms.phi2longitude(some_point_ec)
+    print 'latitude:', EclipticEquatorialTransforms.theta2latitude(some_point_ec),
+    print 'longitude:', EclipticEquatorialTransforms.phi2longitude(some_point_ec)
     # latitude: -5:54:33.1307 longitude: 13:48:41.825 Good
 
     # Actual: Ecliptic  J2000 +00:00:00.00 Latitude(deg)   +15:00:00.00 Longitude(deg)
     #         Celestial J2000 +05:54:33.13 Latitude(deg)   +13:48:41.83 Longitude(deg)
-    some_point_eq = eceq_xform.toEquitorial(some_point, j2000)
-    print 'Equitorial(some point)', some_point_eq
-    print 'latitude:', EclipticEquitorialTransforms.theta2latitude(some_point_eq),
-    print 'longitude:', EclipticEquitorialTransforms.phi2longitude(some_point_eq)
+    some_point_eq = eceq_xform.toEquatorial(some_point, j2000)
+    print 'Equatorial(some point)', some_point_eq
+    print 'latitude:', EclipticEquatorialTransforms.theta2latitude(some_point_eq),
+    print 'longitude:', EclipticEquatorialTransforms.phi2longitude(some_point_eq)
     # latitude: 05:54:33.1307 longitude: 13:48:41.825 Good
 
 
@@ -201,14 +393,14 @@ if __name__ == '__main__':
 
     some_point_ec = eceq_xform.toEcliptic(some_point, j2015)
     print 'Ecliptic(some point)', some_point_ec
-    print 'latitude:', EclipticEquitorialTransforms.theta2latitude(some_point_ec),
-    print 'longitude:', EclipticEquitorialTransforms.phi2longitude(some_point_ec)
+    print 'latitude:', EclipticEquatorialTransforms.theta2latitude(some_point_ec),
+    print 'longitude:', EclipticEquatorialTransforms.phi2longitude(some_point_ec)
     # latitude: -39:07:20.0238 longitude: 14:49:5.73744 Good
 
     # Actual: Ecliptic  J2015 -30:00:00.00 Latitude(deg)   +30:00:00.00 Longitude(deg)
     #         Celestial J2015 -16:38:58.75 Latitude(deg)   +38:28:49.79 Longitude(deg)
-    some_point_eq = eceq_xform.toEquitorial(some_point, j2015)
-    print 'Equitorial(some point)', some_point_eq
-    print 'latitude:', EclipticEquitorialTransforms.theta2latitude(some_point_eq),
-    print 'longitude:', EclipticEquitorialTransforms.phi2longitude(some_point_eq)
+    some_point_eq = eceq_xform.toEquatorial(some_point, j2015)
+    print 'Equatorial(some point)', some_point_eq
+    print 'latitude:', EclipticEquatorialTransforms.theta2latitude(some_point_eq),
+    print 'longitude:', EclipticEquatorialTransforms.phi2longitude(some_point_eq)
     # latitude: -16:38:58.7528 longitude: 38:28:49.7868 Good
