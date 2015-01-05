@@ -3,7 +3,7 @@
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
 
-Siderial Time
+Sidereal Time
 
     http://aa.usno.navy.mil/faq/docs/GAST.php
     http://en.wikipedia.org/wiki/Sidereal_time
@@ -38,101 +38,12 @@ class Transforms(object):
     """
 
     J2000 = coords.datetime('2000-01-01T12:00:00') # starts at noon
-    siderial_day = coords.angle(23, 56, 4.0916)
+    sidereal_day = coords.angle(23, 56, 4.0916)
 
 
     def __init__(self, *args, **kwargs):
         # no instance data members so far.
         super(Transforms, self).__init__(*args, **kwargs)
-
-
-    @classmethod
-    def JulianCentury(cls, a_datetime):
-        return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
-
-
-    @classmethod
-    def GMST_APC(cls, a_datetime):
-        """Greenwich mean siderial time
-
-        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
-
-        2451545 == 2000-01-01T12:00:00
-        86400 = 60*60*24
-
-        TODO different from USNO by 2 degrees with kburnett data
-
-        Returns TBD
-        """
-
-        MJD = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
-        MJDo = math.floor(MJD)
-
-        T = (MJD - 51544.5)/36525.0
-        To = (MJDo - 51544.5)/36525.0
-
-        UT = (T - To) * 86400.0
-
-        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0)
-
-        gmst_degrees = coords.angle(gmst)
-        gmst_degrees.normalize(0, 360)
-
-        return gmst_degrees
-
-
-    @classmethod
-    def GMST_USNO_simplified(cls, a_datetime):
-        """Greenwich mean siderial time, simplified form
-
-        from: http://aa.usno.navy.mil/faq/docs/GAST.php
-              http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
-
-        see also http://en.wikipedia.org/wiki/Sidereal_time
-
-        Returns GMST in hours
-
-        TODO more complex version: GMST = 6.697374558 + 0.06570982441908 Do + 1.00273790935 H + 0.000026 T*T
-
-
-        TODO return angle or hours?
-        """
-
-        D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
-        gmst_hours = 18.697374558 + 24.06570982441908 * D
-        gmst_angle = coords.angle(gmst_hours)
-        gmst_angle.normalize(0, 24)
-
-        return gmst_angle
-
-
-
-    @classmethod
-    def GMST_USNO_simplified2(cls, a_datetime):
-        """Greenwich mean siderial time, simplified
-
-        This is the same as GMST_USNO but in degrees instead of hours,
-        i.e. the terms are the same but divided by 15.
-
-        from: http://www2.arnes.si/~gljsentvid10/sidereal.htm
-        Keith Burnett (kburnett@btinternet.com) - 29 Jan 2002
-        implementing Meeus formula 11.4
-
-        This works for test data given above.
-
-        Returns GMST in hours
-
-        TODO return degrees?
-        """
-
-        D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
-        gmst_degrees = 280.46061837 + 360.98564736629 * D
-        gmst_angle = coords.angle(gmst_degrees)
-        gmst_angle.normalize(0, 360)
-        gmst_hours = coords.angle(gmst_angle.value/15.0)
-
-        return gmst_hours
-
 
 
     @staticmethod
@@ -171,6 +82,92 @@ class Transforms(object):
 
         return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
                                 coords.angle(a_right_ascension.value * 15))
+
+    @classmethod
+    def JulianCentury(cls, a_datetime):
+        return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
+
+
+    @classmethod
+    def GMST_USNO_simplified(cls, a_datetime):
+        """Greenwich mean sidereal time, simplified form
+
+        from: http://aa.usno.navy.mil/faq/docs/GAST.php
+              http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+
+        see also http://en.wikipedia.org/wiki/Sidereal_time
+
+        Returns GMST in hours
+
+        TODO more complex version: GMST = 6.697374558 + 0.06570982441908 Do + 1.00273790935 H + 0.000026 T*T
+        """
+
+        D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
+        gmst = 18.697374558 + 24.06570982441908 * D # in hours
+        gmst_hours = coords.angle(gmst)
+        gmst_hours.normalize(0, 24)
+
+        return gmst_hours
+
+
+
+    @classmethod
+    def GMST_USNO_simplified2(cls, a_datetime):
+        """Greenwich mean sidereal time, simplified
+
+        This is the same as GMST_USNO but in degrees instead of hours,
+        i.e. the terms are the same but divided by 15.
+
+        from: http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        Keith Burnett (kburnett@btinternet.com) - 29 Jan 2002
+        implementing Meeus formula 11.4
+
+        This works for test data given above.
+
+        Returns GMST in hours
+        """
+
+        D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
+        gmst = 280.46061837 + 360.98564736629 * D # in degrees
+        gmst_angle = coords.angle(gmst)
+        gmst_angle.normalize(0, 360)
+        gmst_hours = coords.angle(gmst_angle.value/15.0)
+
+        return gmst_hours
+
+
+    @classmethod
+    def GMST_APC(cls, a_datetime):
+        """Greenwich mean sidereal time
+
+        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
+
+        TODO my implementation doesn't match USNO results
+        one day difference is much less than the expected 4 minutes
+
+        2451545 == 2000-01-01T12:00:00
+        86400 = 60*60*24
+
+        Returns GMST in hours
+        """
+
+        MJD = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
+        MJDo = math.floor(MJD)
+
+        T = (MJD - 51544.5)/36525.0
+        To = (MJDo - 51544.5)/36525.0
+
+        UT = (T - To) * 86400.0 # TODO cls.siderial_day.value?
+
+        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0)
+
+        # seconds
+
+        gmst_angle = coords.angle(0, 0, gmst)
+        gmst_angle.normalize(0, 360)
+        gmst_hours = coords.angle(gmst_angle.value/15.0)
+
+        return gmst_hours
 
 
 
@@ -295,7 +292,7 @@ class EclipticEquatorial(Transforms):
     # x axis points to vernal equinox (the first point of Aries in this epoch)
     equinox_axis = coords.rotator(coords.Ux)
 
-    # obliquiy of the ecliptic terms are from http://en.wikipedia.org/wiki/Axial_tilt
+    # obliquity of the ecliptic terms are from http://en.wikipedia.org/wiki/Axial_tilt
     obe = list()
     obe.append(coords.angle(23, 26, 21.45))
     obe.append(coords.angle(-1)*coords.angle(0, 0, 46.815)) # TODO no unary minus in boost wrappers
@@ -309,7 +306,7 @@ class EclipticEquatorial(Transforms):
 
     @classmethod
     def eps(cls, a_datetime):
-        """Calculates the obliquty of the ecliptic given the datetime"""
+        """Calculates the obliquity of the ecliptic given the datetime"""
         T = cls.JulianCentury(a_datetime)
         the_eps = 0
         for i in xrange(len(cls.obe)):
