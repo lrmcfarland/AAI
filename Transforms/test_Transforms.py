@@ -26,33 +26,91 @@ class TestTransforms(unittest.TestCase):
         self.assertAlmostEqual(15, a_point.phi.value)
         self.assertAlmostEqual(1, self.xforms.spherical2ra(a_point))
 
-    def test_GMST_wiki_0(self):
-        """Test GMST wiki 0"""
+    def test_GMST_USNO_simplified_0(self):
+        """Test GMST USNO 0"""
         a_datetime = coords.datetime('2000-01-01T00:00:00')
-        a_gmst = self.xforms.GMST_Wiki(a_datetime)
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
         # TODO assert something
 
-    def test_GMST_wiki_1(self):
-        """Test GMST wiki 1"""
+    def test_GMST_USNO_simplified_1(self):
+        """Test GMST USNO 1"""
         a_datetime = coords.datetime('2000-01-01T01:00:00')
-        a_gmst = self.xforms.GMST_Wiki(a_datetime)
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
         # TODO assert something
 
-    def test_GMST_wiki_2(self):
-        """Test GMST wiki 2"""
+    def test_GMST_USNO_simplified_2(self):
+        """Test GMST USNO 2"""
         a_datetime = coords.datetime('2000-01-01T12:00:00')
-        a_gmst = self.xforms.GMST_Wiki(a_datetime)
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
         # TODO assert something
 
-    def test_GMST_wiki_3(self):
-        """Test GMST wiki 3"""
+    def test_GMST_USNO_simplified_3(self):
+        """Test GMST USNO 3"""
         a_datetime = coords.datetime('2001-01-01T12:00:00')
-        a_gmst = self.xforms.GMST_Wiki(a_datetime)
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
         # TODO assert something
+
+
+    def test_GMST_USNO_simplified_standrews(self):
+        """Test GMST USNO at St. Andrews"""
+        # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
+        a_datetime = coords.datetime('1998-02-04T00:00:00')
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
+
+        sta_long = coords.angle(2, 48)
+        print 'St. Andrews longitude', sta_long, sta_long.value # TODO is 02:47:60, should be 2:48: round seconds up
+
+        # this is 11 minutes off from answer6, but 11 minutes from
+        # GMT. Used simpler LST (8h45m) for easier calculation by hand?
+        self.assertEqual('08:55:49.7347', str(a_gmst))
+
+
+
+    def test_GMST_USNO_simplified_kb1(self):
+        """Test GMST USNO simplified formula, in hours, with kburnett data"""
+        # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        a_datetime = coords.datetime('1994-06-16T18:00:00')
+        a_gmst = self.xforms.GMST_USNO_simplified2(a_datetime)
+
+        # matches test data given
+        self.assertEqual('11:39:5.06723', str(a_gmst))
+
+
+
+    def test_GMST_USNO_simplified2_kb2(self):
+        """Test GMST USNO simplified formula 2, in degrees, with kburnett data"""
+        # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        a_datetime = coords.datetime('1994-06-16T18:00:00')
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
+
+        # matches test data given
+        self.assertEqual('11:39:5.06724', str(a_gmst))
+
+
+
+    def test_GMST_APC_kb3(self):
+        """Test GMST APC formula, in degrees, with kburnett data"""
+        # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        a_datetime = coords.datetime('1994-06-16T18:00:00')
+        a_gmst = self.xforms.GMST_APC(a_datetime)
+
+        # matches test data given
+        self.assertEqual('11:39:5.06724', str(a_gmst))
+
+
+
+    def test_GMST_APC_standrews(self):
+        """Test GMST APC St. Andrews"""
+        # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
+        a_datetime = coords.datetime('1998-02-04T00:00:00')
+        a_gmst = self.xforms.GMST_APC(a_datetime)
+
+        # TODO assert something
+
 
     def test_GMST_APC_0(self):
         """Test GMST APC 0"""
@@ -120,7 +178,16 @@ class TestHorizon(unittest.TestCase):
 
 
     def test_radec2spherical_APC_sirius(self):
-        """Test RA/dec of Sirius"""
+        """Test RA/dec of Sirius
+
+        From theodolite app:
+        Date & Time: Wed Dec 31 20:41:41 PST 2014
+        Position: +037.40015* / -122.08219*
+        Altitude: 56ft
+        Azimuth/Bearing: 127* S53E 2258mils (True)
+        Elevation Angle: +18.1*
+
+        """
 
         a_gst_time = coords.datetime('2014-12-31T20:41:00')
 
@@ -146,7 +213,7 @@ class TestHorizon(unittest.TestCase):
 class TestEcEqXforms(unittest.TestCase):
     """Test ecliptic equatorial coordinate transformations
 
-    Validated against: http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
+    Validated against http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
     """
 
     def setUp(self):

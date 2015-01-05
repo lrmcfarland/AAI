@@ -2,6 +2,13 @@
 
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
+
+Siderial Time
+
+    http://aa.usno.navy.mil/faq/docs/GAST.php
+    http://en.wikipedia.org/wiki/Sidereal_time
+
+
 Equatorial Coordinate System http://en.wikipedia.org/wiki/Equatorial_coordinate_system
     right ascension http://en.wikipedia.org/wiki/Right_ascension
     declination http://en.wikipedia.org/wiki/Declination
@@ -30,6 +37,10 @@ class Transforms(object):
     Holds various static and class methods
     """
 
+    J2000 = coords.datetime('2000-01-01T12:00:00') # starts at noon
+    siderial_day = coords.angle(23, 56, 4.0916)
+
+
     def __init__(self, *args, **kwargs):
         # no instance data members so far.
         super(Transforms, self).__init__(*args, **kwargs)
@@ -47,88 +58,81 @@ class Transforms(object):
         from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
 
         2451545 == 2000-01-01T12:00:00
+        86400 = 60*60*24
 
-        TODO not working
+        TODO different from USNO by 2 degrees with kburnett data
 
         Returns TBD
         """
 
-        print # linefeed
-        print # linefeed TODO rm
-        print 'current datetime', a_datetime
-
-        MJD = (a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate)/36525.0
-
-        print 'MJD', MJD # TODO rm
-
+        MJD = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
         MJDo = math.floor(MJD)
 
-        print 'MJDo', MJDo # TODO rm
-
-        T = (a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate - 51544.5)/36525.0
-
-        print 'T', T # TODO rm
-
-        To  = math.floor(T)
-
-        print 'To', To # TODO rm
+        T = (MJD - 51544.5)/36525.0
+        To = (MJDo - 51544.5)/36525.0
 
         UT = (T - To) * 86400.0
 
-        print 'UT', UT # TODO rm
-
         gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0)
-
-        print 'gmst', gmst # TODO rm
 
         gmst_degrees = coords.angle(gmst)
         gmst_degrees.normalize(0, 360)
 
-        print 'gmst degrees', gmst_degrees # TODO rm
-
-        return gmst
+        return gmst_degrees
 
 
     @classmethod
-    def GMST_Wiki(cls, a_datetime):
-        """Greenwich mean siderial time
+    def GMST_USNO_simplified(cls, a_datetime):
+        """Greenwich mean siderial time, simplified form
 
-        from http://en.wikipedia.org/wiki/Sidereal_time
+        from: http://aa.usno.navy.mil/faq/docs/GAST.php
+              http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
 
-        TODO (from test_Transforms.py):
-        this shows increase in 15 degrees an hour,
-        normzlied as an angle looks similar a year later.
+        see also http://en.wikipedia.org/wiki/Sidereal_time
 
         Returns GMST in hours
+
+        TODO more complex version: GMST = 6.697374558 + 0.06570982441908 Do + 1.00273790935 H + 0.000026 T*T
+
+
+        TODO return angle or hours?
         """
 
-        print # linefeed TODO rm
-        print 'current datetime', a_datetime
-
-        # TODO make static data member
-        J2000 = coords.datetime('2000-01-01T12:00:00') # starts at noon
-
-        D = a_datetime.toJulianDate() - J2000.toJulianDate()
-
-        print 'D', D # TODO rm
-
+        D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
         gmst_hours = 18.697374558 + 24.06570982441908 * D
+        gmst_angle = coords.angle(gmst_hours)
+        gmst_angle.normalize(0, 24)
 
-        print 'gmst hours', gmst_hours # TODO rm
+        return gmst_angle
 
-        gmst_degrees = 360.0 * gmst_hours / 24.0
 
-        print 'GMST wiki by degrees', gmst_degrees # TODO rm
 
+    @classmethod
+    def GMST_USNO_simplified2(cls, a_datetime):
+        """Greenwich mean siderial time, simplified
+
+        This is the same as GMST_USNO but in degrees instead of hours,
+        i.e. the terms are the same but divided by 15.
+
+        from: http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        Keith Burnett (kburnett@btinternet.com) - 29 Jan 2002
+        implementing Meeus formula 11.4
+
+        This works for test data given above.
+
+        Returns GMST in hours
+
+        TODO return degrees?
+        """
+
+        D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
+        gmst_degrees = 280.46061837 + 360.98564736629 * D
         gmst_angle = coords.angle(gmst_degrees)
-
-        print 'gmst_angle', gmst_angle.value
-
         gmst_angle.normalize(0, 360)
-        print 'normalized', gmst_angle.value
-
+        gmst_hours = coords.angle(gmst_angle.value/15.0)
 
         return gmst_hours
+
 
 
     @staticmethod
@@ -174,6 +178,12 @@ class Horizon(Transforms):
 
     """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
+    See also:
+
+    http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
+    http://en.wikipedia.org/wiki/Equatorial_coordinate_system
+
+    http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
 
     """
 
@@ -210,14 +220,12 @@ class Horizon(Transforms):
             raise Error('vector must be in spherical coordinates') # TODO for now
 
 
-        gmst = Transforms.GMST_Wiki(a_local_datetime)
+        gmst = Transforms.GMST_USNO_simplified(a_local_datetime)
 
-        hour_angle = coords.angle(gmst + an_observer.phi.value - a_vector.phi.value)
+        hour_angle = coords.angle(gmst.value + an_observer.phi.value - a_vector.phi.value)
         hour_angle.normalize(0, 360)
 
         the_local_vector = coords.spherical(a_vector.r, a_vector.theta, hour_angle)
-
-
 
         the_rotatee = coords.Cartesian(the_local_vector)
 
@@ -276,6 +284,12 @@ class EclipticEquatorial(Transforms):
 
     ASSUMES: The x-axis points to vernal equinox. Positive rotations are right hand rule,
     Y x Z = X, i.e. counter clockwise looking down X.
+
+    See also:
+    http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+    http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
+    http://en.wikipedia.org/wiki/Axial_tilt
+
     """
 
     # x axis points to vernal equinox (the first point of Aries in this epoch)
