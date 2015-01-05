@@ -88,6 +88,7 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
         # matches test data given
+        # TODO rounding difference in seconds from above
         self.assertEqual('11:39:5.06724', str(a_gmst))
 
 
