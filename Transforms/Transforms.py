@@ -89,17 +89,53 @@ class Transforms(object):
 
 
     @classmethod
+    def GMST_USNO(cls, a_datetime):
+        """Greenwich mean sidereal time
+
+        from:
+            http://aa.usno.navy.mil/faq/docs/GAST.php
+            http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+
+        see also:
+            http://aa.usno.navy.mil/data/docs/JulianDate.php
+
+        returns GMST in hours
+        """
+
+        JD = a_datetime.toJulianDate()
+
+        # JDo is the Julian date of the previous midnight. Must end in 0.5
+        JDfloor = math.floor(JD)
+        if JD - JDfloor > 0.5:
+            JDo = JDfloor + 0.5
+        else:
+            JDo = JDfloor - 0.5
+
+        D = JD - a_datetime.J2000
+        Do = JDo - a_datetime.J2000
+        H = (JD - JDo)*24
+        T = D/36525
+
+        gmst = 6.697374558 + 0.06570982441908*Do + 1.00273790935*H + 0.000026*T*T
+
+        gmst_hours = coords.angle(gmst)
+        gmst_hours.normalize(0, 24)
+
+        return gmst_hours
+
+
+    @classmethod
     def GMST_USNO_simplified(cls, a_datetime):
         """Greenwich mean sidereal time, simplified form
 
-        from: http://aa.usno.navy.mil/faq/docs/GAST.php
-              http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+        from:
+            http://aa.usno.navy.mil/faq/docs/GAST.php
+            http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+
 
         see also http://en.wikipedia.org/wiki/Sidereal_time
 
         Returns GMST in hours
-
-        TODO more complex version: GMST = 6.697374558 + 0.06570982441908 Do + 1.00273790935 H + 0.000026 T*T
         """
 
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
@@ -108,7 +144,6 @@ class Transforms(object):
         gmst_hours.normalize(0, 24)
 
         return gmst_hours
-
 
 
     @classmethod
@@ -145,10 +180,15 @@ class Transforms(object):
         TODO my implementation doesn't match USNO results
         one day difference is much less than the expected 4 minutes
 
+        First term matches USNO with coefficients converteted to hours
+        (24110.54841/3600), others need further conversion?
+
+
         2451545 == 2000-01-01T12:00:00
         86400 = 60*60*24
 
         Returns GMST in hours
+
         """
 
         MJD = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
@@ -176,11 +216,9 @@ class Horizon(Transforms):
     """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
     See also:
-
-    http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
-    http://en.wikipedia.org/wiki/Equatorial_coordinate_system
-
-    http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+        http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
+        http://en.wikipedia.org/wiki/Equatorial_coordinate_system
+        http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
 
     """
 
@@ -283,9 +321,9 @@ class EclipticEquatorial(Transforms):
     Y x Z = X, i.e. counter clockwise looking down X.
 
     See also:
-    http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
-    http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
-    http://en.wikipedia.org/wiki/Axial_tilt
+        http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+        http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
+        http://en.wikipedia.org/wiki/Axial_tilt
 
     """
 

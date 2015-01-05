@@ -107,8 +107,89 @@ class TestTransforms(unittest.TestCase):
     # ----- Greenwich Mean Sidereal Time -----
     # ----------------------------------------
 
+    def test_GMST_USNO_J2000(self):
+        """Test GMST USNO J2000"""
+        a_datetime = coords.datetime(self.xforms.J2000)
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        self.assertEqual('18:41:50.5484', str(a_gmst))
+
+
+    def test_GMST_USNO_J2000_plus_day(self):
+        """Test GMST USNO J2000 plus a day"""
+        a_datetime_0 = coords.datetime(self.xforms.J2000)
+        a_gmst_0 = self.xforms.GMST_USNO_simplified(a_datetime_0)
+        a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
+        a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
+
+        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('18:45:47.1038', str(a_gmst_1))
+
+
+    def test_GMST_USNO_standrews(self):
+        """Test GMST USNO at St. Andrews"""
+        # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
+        a_datetime = coords.datetime('1998-02-04T00:00:00')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        sta_long = coords.angle(2, 48)
+        self.assertEqual('02:47:60', str(sta_long))
+        # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
+
+        # this is 11 minutes off from answer6, but 11 minutes from
+        # GMT. Used simpler LST (8h45m) for easier calculation by hand?
+        self.assertEqual('08:55:49.7347', str(a_gmst))
+
+
+    def test_GMST_USNO_kb(self):
+        """Test GMST USNO formula, in hours, with kburnett data"""
+        # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        a_datetime = coords.datetime('1994-06-16T18:00:00')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        # -0.00029 seconds different from given test data.
+        # This is higher precision.
+        self.assertEqual('11:39:5.06752', str(a_gmst))
+
+
+    def test_GMST_USNO_8am(self):
+        """Test GMST USNO 8 am"""
+        a_datetime = coords.datetime('2015-01-01T08:00:00')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        # TODO validate against something
+        self.assertEqual('14:42:37.9854', str(a_gmst))
+
+
+    def test_GMST_USNO_2pm(self):
+        """Test GMST USNO 2 pm"""
+        a_datetime = coords.datetime('2015-01-01T14:00:00')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        # TODO validate against something
+        self.assertEqual('20:43:37.1242', str(a_gmst))
+
+
+    def test_GMST_USNO_2pm_tz1(self):
+        """Test GMST USNO 2 pm timezone +1"""
+        a_datetime = coords.datetime('2015-01-01T14:00:00+0100')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        # TODO validate against something
+        self.assertEqual('21:43:46.9807', str(a_gmst))
+
+
+    def test_GMST_USNO_2pm_tzn1(self):
+        """Test GMST USNO 2 pm timezone -1"""
+        a_datetime = coords.datetime('2015-01-01T14:00:00-01:00')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        # TODO validate against something
+        self.assertEqual('19:43:27.2677', str(a_gmst))
+
+
     def test_GMST_USNO_simplified_J2000(self):
-        """Test GMST USNO J2000 noon"""
+        """Test GMST USNO simplified J2000 noon"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
         self.assertEqual('18:41:50.5484', str(a_gmst))
@@ -126,7 +207,7 @@ class TestTransforms(unittest.TestCase):
 
 
     def test_GMST_USNO_simplified_standrews(self):
-        """Test GMST USNO at St. Andrews"""
+        """Test GMST USNO simplified at St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
         a_datetime = coords.datetime('1998-02-04T00:00:00')
         a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
@@ -145,10 +226,10 @@ class TestTransforms(unittest.TestCase):
         """Test GMST USNO simplified formula, in hours, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
         a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST_USNO_simplified2(a_datetime)
+        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
-        # matches test data given
-        self.assertEqual('11:39:5.06723', str(a_gmst))
+        # -0.00001 seconds different from given test data
+        self.assertEqual('11:39:5.06724', str(a_gmst))
 
 
 
@@ -156,11 +237,10 @@ class TestTransforms(unittest.TestCase):
         """Test GMST USNO simplified formula 2, in degrees, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
         a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
+        a_gmst = self.xforms.GMST_USNO_simplified2(a_datetime)
 
-        # matches test data given
-        # TODO rounding difference in seconds from above
-        self.assertEqual('11:39:5.06724', str(a_gmst))
+        # matches test data given when rouded to 0.0001 places
+        self.assertEqual('11:39:5.06723', str(a_gmst))
 
 
 
