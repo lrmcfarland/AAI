@@ -286,25 +286,39 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
 
-class TestEquitorial2Horizon(unittest.TestCase):
+class TestEquitorialHorizon(unittest.TestCase):
     """Test horizon transforms"""
 
     def setUp(self):
         """Set up test parameters."""
 
         self.places = 5 # precision limited by LAMBDA-tools reporting
-        self.eq2hz_xforms = Transforms.Equitorial2Horizon()
+        self.eq2hz_xforms = Transforms.EquitorialHorizon()
 
 
-    def test_toHorizon_overhead(self):
+    def test_toHorizon_StA_overhead_0(self):
+        """Test to horizon transform overhead 0"""
+        an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(1),
+                                                      a_declination=coords.angle(10))
+
+        an_observer = coords.spherical(1, coords.latitude(10), coords.angle(15))
+        a_datetime = coords.datetime('2000-01-01T17:17:17.33')
+
+        hz_point = self.eq2hz_xforms.toHorizon_StA(an_object, an_observer, a_datetime)
+
+
+        # TODO validate something
+
+
+    def test_toHorizon_StA_overhead(self):
         """Test to horizon transform overhead"""
-        an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(18, 41, 50.5),
-                                                      a_declination=coords.angle(0))
+        an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(3),
+                                                      a_declination=coords.angle(40))
 
-        an_observer = coords.spherical(1, coords.latitude(23), coords.angle(0))
-        a_datetime = coords.datetime('2000-01-01T12:00:00')
+        an_observer = coords.spherical(1, coords.latitude(30), coords.angle(40))
+        a_datetime = coords.datetime('2000-01-01T17:17:17.33')
 
-        hz_point = self.eq2hz_xforms.toHorizon(an_object, an_observer, a_datetime)
+        hz_point = self.eq2hz_xforms.toHorizon_StA(an_object, an_observer, a_datetime)
 
 
         # TODO validate something
@@ -321,6 +335,16 @@ class TestEquitorial2Horizon(unittest.TestCase):
         Azimuth/Bearing: 127* S53E 2258mils (True)
         Elevation Angle: +18.1*
 
+        from http://www.convertalot.com/celestial_horizon_co-ordinates_calculator.html
+
+        azimuth: 127.59
+        altitude: 16.81
+
+        from http://www.stargazing.net/mas/al_az.htm
+
+        azimuth: 127* 24' 16"
+        altitude: 16* 41' 31"
+
         """
 
 
@@ -331,7 +355,7 @@ class TestEquitorial2Horizon(unittest.TestCase):
 
         a_datetime = coords.datetime('2014-12-31T20:41:00')
 
-        sirius_hz = self.eq2hz_xforms.toHorizon(sirius, an_observer, a_datetime)
+        sirius_hz = self.eq2hz_xforms.toHorizon_StA(sirius, an_observer, a_datetime)
 
         # TODO validate something
 

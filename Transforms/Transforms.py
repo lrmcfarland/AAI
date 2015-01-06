@@ -4,9 +4,9 @@
 
 Sidereal Time
 
-    http://aa.usno.navy.mil/faq/docs/GAST.php
     http://en.wikipedia.org/wiki/Sidereal_time
-
+    http://aa.usno.navy.mil/faq/docs/GAST.php
+    http://aa.usno.navy.mil/data/docs/JulianDate.php
 
 Equatorial Coordinate System http://en.wikipedia.org/wiki/Equatorial_coordinate_system
     right ascension http://en.wikipedia.org/wiki/Right_ascension
@@ -210,28 +210,36 @@ class Transforms(object):
 
 
 
-class Equitorial2Horizon(Transforms):
+class EquitorialHorizon(Transforms):
 
     """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
     See also:
         http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
+        http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+
         http://en.wikipedia.org/wiki/Equatorial_coordinate_system
         http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+
+        http://www.stargazing.net/mas/al_az.htm
+        http://stjarnhimlen.se/english.html
+
 
     """
 
     horizon_axis = coords.rotator(coords.Uy)
 
     def __init__(self, *args, **kwargs):
-        super(Equitorial2Horizon, self).__init__(*args, **kwargs)
+        super(EquitorialHorizon, self).__init__(*args, **kwargs)
 
 
     @classmethod
-    def toHorizon(cls, an_object, an_observer, a_local_datetime):
-        """Transforms a vector to/from equatorial/ecliptic coordinates.
+    def toHorizon_StA(cls, an_object, an_observer, a_local_datetime):
+        """Transforms a vector from equatorial to ecliptic coordinates.
 
         from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+
+        TODO: implementation not working
 
         Args:
 
@@ -244,10 +252,7 @@ class Equitorial2Horizon(Transforms):
 
         a_local_datetime: local date and time of the observation.
 
-        a_direction: +1 to horizon, -1 from horizon
-
-        Returns a vector in the transformed coordinates
-
+        Returns a spherical coordinate vector in the transformed coordinates
         """
 
         if not isinstance(an_object, coords.spherical):
@@ -258,44 +263,154 @@ class Equitorial2Horizon(Transforms):
 
         print # linefeed
 
-        print "an observers's theta (90 - latitude) =", an_observer.theta.value
-        print "an observers's phi (longitude -W/+E) =", an_observer.phi.value
-
         print "an object's theta (90 - declination) =", an_object.theta.value
         print "an object's phi (RA * 15) =", an_object.phi.value
 
+        print "an observers's theta (90 - latitude) =", an_observer.theta.value
+        print "an observers's phi (longitude -W/+E) =", an_observer.phi.value
+
         gmst = Transforms.GMST_USNO(a_local_datetime) # hours
 
-        print 'gmst', gmst # TODO rm
+        print 'gmst', gmst, gmst.value # TODO rm
 
         local_hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
 
         print 'local_hour_angle', local_hour_angle # TODO rm
 
+        print # linefeed
         print 'cos(90 - object declination)', math.cos(an_object.theta.radians)
-        print 'sin(90 - object declination)', math.sin(an_object.theta.radians)
+        print 'sin(object declination)     ', math.sin(math.pi/2 - an_object.theta.radians)
 
-        print 'cos(90 - observer latitude)', math.cos(an_observer.theta.radians)
-        print 'sin(90 - observer latitude)', math.sin(an_observer.theta.radians)
+        print # linefeed
+        print 'sin(90 - object declination)', math.sin(an_object.theta.radians)
+        print 'cos(object declination)     ', math.cos(math.pi/2 - an_object.theta.radians)
+
+        print # linefeed
+        print 'cos(90 - observer latitude) ', math.cos(an_observer.theta.radians)
+        print 'sin(observer latitude)      ', math.sin(math.pi/2 - an_observer.theta.radians)
+
+        print # linefeed
+        print 'sin(90 - observer latitude) ', math.sin(an_observer.theta.radians)
+        print 'cos(observer latitude)      ', math.cos(math.pi/2 - an_observer.theta.radians)
+
+        print # linefeed
+        print 'Altitude' # linefeed
 
         foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
-               math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * math.cos(local_hour_angle.radians)
+               math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+               math.cos(local_hour_angle.radians)
 
-        print 'foo', foo
+        print 'foo 1', foo
 
-        altitude = 90 - math.acos(foo)
+        altitude = math.pi/2 - math.acos(foo)
         print 'altitude', altitude
 
-        alt = coords.angle(90 - altitude)
+        alt = coords.angle()
+        alt.radians = altitude
         print 'alt', alt, alt.radians
 
-        bar = math.sin(local_hour_angle.radians)*math.sin(an_object.theta.radians)/math.sin(alt.radians)
 
-        print 'bar', bar
+        foo =  math.sin(math.pi/2 - an_object.theta.radians) * math.sin(math.pi/2 - an_observer.theta.radians) + \
+               math.cos(math.pi/2 - an_object.theta.radians) * math.cos(math.pi/2 - an_observer.theta.radians) * \
+               math.cos(local_hour_angle.radians)
 
-        azimuth = 360 - math.asin(bar)
+        print # linefeed
+        print 'foo 2', foo
 
-        print 'azimuth', azimuth
+        altitude = math.asin(foo)
+        print 'altitude', altitude
+
+        alt.radians = altitude
+        print 'alt', alt, alt.radians
+
+        print # linefeed
+        print 'Azimuth'# linefeed
+
+        # Azimuth by sine rule
+        bar = -math.sin(local_hour_angle.radians)*math.cos(math.pi/2 - an_object.theta.radians)/math.cos(alt.radians)
+
+        print 'bar 1', bar
+
+        A = coords.angle()
+
+        try:
+            azimuth = math.asin(bar)
+            print 'azimuth', azimuth
+            A.radians = azimuth
+            print 'A', A, A.radians
+        except ValueError, err:
+            print err
+
+        print # linefeed
+
+        # Azimuth by cosine rule
+
+        bar = (math.sin(math.pi/2 - an_object.theta.radians) - \
+               math.sin(math.pi/2 - an_observer.theta.radians)*math.sin(alt.radians))/ \
+              (math.cos(math.pi/2 - an_observer.theta.radians)*math.cos(alt.radians))
+
+        print 'bar 2', bar
+
+        try:
+            azimuth = math.acos(bar)
+            print 'azimuth', azimuth
+            A.radians = azimuth
+            print 'A', A, A.radians
+        except ValueError, err:
+            print err
+
+
+        print # linefeed
+
+        # Azimuth by tan rule http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+
+        bar = math.sin(local_hour_angle.radians)/ \
+              (math.cos(alt.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
+               math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
+
+        print 'bar 3', bar
+
+        try:
+            azimuth = math.asin(bar)
+            print 'azimuth', azimuth
+            A.radians = azimuth
+            print 'A', A, A.radians
+        except ValueError, err:
+            print err
+
+
+
+    @classmethod
+    def toEquitorial(cls, an_object, an_observer, a_local_datetime):
+        """Transforms a vector from equatorial to ecliptic coordinates.
+
+        from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+
+        Args:
+
+        an_object: the vector to transform in theta (90 - altitude),
+                   phi (azimuth). See self.radec2spherical.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        a_local_datetime: local date and time of the observation.
+
+        Returns a spherical coordinate vector in the transformed coordinates
+        """
+
+        if not isinstance(an_object, coords.spherical):
+            raise Error('vector must be in spherical coordinates') # TODO for now
+
+        if not isinstance(an_observer, coords.spherical):
+            raise Error('observer must be in spherical coordinates') # TODO for now
+
+        print # linefeed
+
+
+
+
 
 
     @classmethod
