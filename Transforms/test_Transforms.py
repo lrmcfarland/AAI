@@ -286,57 +286,32 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
 
-class TestHorizon(unittest.TestCase):
+class TestEquitorial2Horizon(unittest.TestCase):
     """Test horizon transforms"""
 
     def setUp(self):
         """Set up test parameters."""
 
         self.places = 5 # precision limited by LAMBDA-tools reporting
-        self.hz_xforms = Transforms.Horizon()
-        self.eceq_xforms = Transforms.EclipticEquatorial()
-
-    @unittest.skip('TODO')
-    def test_toHorizon_APC_1(self):
-        """Test to horizon transform 1"""
-        a_point = coords.spherical(1, coords.angle(45), coords.angle(0))
-        an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
-        a_gst_time = coords.datetime('2015-01-01T00:00:00')
-
-        hz_point = self.hz_xforms.toHorizon_APC(a_point, an_observer, a_gst_time)
-
-        self.assertAlmostEqual(90, hz_point.theta.value)
-        self.assertAlmostEqual(0, hz_point.phi.value)
+        self.eq2hz_xforms = Transforms.Equitorial2Horizon()
 
 
-    @unittest.skip('TODO')
-    def test_toHorizon_APC_2(self):
-        """Test to horizon transform 2"""
-        a_point = coords.spherical(1, coords.angle(45), coords.angle(90))
-        an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
-        a_gst_time = coords.datetime('2015-01-01T00:00:00')
+    def test_toHorizon_overhead(self):
+        """Test to horizon transform overhead"""
+        an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(18, 41, 50.5),
+                                                      a_declination=coords.angle(0))
 
-        hz_point = self.hz_xforms.toHorizon_APC(a_point, an_observer, a_gst_time)
+        an_observer = coords.spherical(1, coords.latitude(23), coords.angle(0))
+        a_datetime = coords.datetime('2000-01-01T12:00:00')
 
-        # TODO validate
-        self.assertAlmostEqual(60, hz_point.theta.value)
-        self.assertAlmostEqual(54.735610317245346, hz_point.phi.value)
+        hz_point = self.eq2hz_xforms.toHorizon(an_object, an_observer, a_datetime)
 
 
-    @unittest.skip('TODO')
-    def test_fromHorizon_APC_1(self):
-        """Test from horizon transform 1"""
-        a_point = coords.spherical(1, coords.angle(90), coords.angle(0))
-        an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
-        a_gst_time = coords.datetime('2015-01-01T00:00:00')
-
-        hz_point = self.hz_xforms.fromHorizon_APC(a_point, an_observer, a_gst_time)
-
-        self.assertAlmostEqual(45, hz_point.theta.value)
-        self.assertAlmostEqual(0, hz_point.phi.value)
+        # TODO validate something
 
 
-    def test_radec2spherical_APC_sirius(self):
+
+    def test_sirius(self):
         """Test RA/dec of Sirius
 
         From theodolite app:
@@ -348,24 +323,59 @@ class TestHorizon(unittest.TestCase):
 
         """
 
-        a_gst_time = coords.datetime('2014-12-31T20:41:00')
+
+        sirius = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                                   a_declination=coords.angle(-16, 42, 58.017))
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
-        sirius = self.hz_xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
-                                                a_declination=coords.angle(-16, 42, 58.017))
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
 
-        sirius_eq = self.eceq_xforms.toEquatorial(sirius, a_gst_time)
+        sirius_hz = self.eq2hz_xforms.toHorizon(sirius, an_observer, a_datetime)
 
-        sirius_hz = self.hz_xforms.toHorizon_APC(sirius, an_observer, a_gst_time)
+        # TODO validate something
 
 
-        print 'sirius', sirius
-        print 'sirius eq', sirius_eq
-        print 'sirius hz', sirius_hz
-        print 'sirius dec', 90 - sirius_hz.theta.value
+
+    @unittest.skip('TODO')
+    def test_toHorizon_APC_1(self):
+        """Test APC to horizon transform 1"""
+        an_object = coords.spherical(1, coords.angle(45), coords.angle(0))
+        an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
+        a_gst_time = coords.datetime('2015-01-01T00:00:00')
+
+        hz_point = self.eq2hz_xforms.toHorizon_APC(an_object, an_observer, a_gst_time)
+
+        self.assertAlmostEqual(90, hz_point.theta.value)
+        self.assertAlmostEqual(0, hz_point.phi.value)
+
+
+    @unittest.skip('TODO')
+    def test_toHorizon_APC_2(self):
+        """Test APC to horizon transform 2"""
+        an_object = coords.spherical(1, coords.angle(45), coords.angle(90))
+        an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
+        a_gst_time = coords.datetime('2015-01-01T00:00:00')
+
+        hz_point = self.eq2hz_xforms.toHorizon_APC(an_object, an_observer, a_gst_time)
 
         # TODO validate
+        self.assertAlmostEqual(60, hz_point.theta.value)
+        self.assertAlmostEqual(54.735610317245346, hz_point.phi.value)
+
+
+    @unittest.skip('TODO')
+    def test_fromHorizon_APC_1(self):
+        """Test APC from horizon transform 1"""
+        an_object = coords.spherical(1, coords.angle(90), coords.angle(0))
+        an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
+        a_gst_time = coords.datetime('2015-01-01T00:00:00')
+
+        hz_point = self.eq2hz_xforms.fromHorizon_APC(an_object, an_observer, a_gst_time)
+
+        self.assertAlmostEqual(45, hz_point.theta.value)
+        self.assertAlmostEqual(0, hz_point.phi.value)
+
 
 
 
@@ -381,133 +391,133 @@ class TestEcEqXforms(unittest.TestCase):
         self.places = 5 # precision limited by LAMBDA-tools reporting
         self.eceq_xform = Transforms.EclipticEquatorial()
 
-    def getLatitude(self, a_point):
+    def getLatitude(self, an_object):
         """Return latitude of point"""
-        return Transforms.Transforms.spherical2latitude(a_point)
+        return Transforms.Transforms.spherical2latitude(an_object)
 
-    def getLongitude(self, a_point):
+    def getLongitude(self, an_object):
         """Return longitude of point"""
-        return Transforms.Transforms.spherical2longitude(a_point)
+        return Transforms.Transforms.spherical2longitude(an_object)
 
 
     def test_first_point_of_Aries(self):
         """Test J2000 first point of Aries"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_point = coords.spherical(coords.Ux)
+        an_object = coords.spherical(coords.Ux)
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2000)
-        self.assertAlmostEqual(0, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(0, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        self.assertAlmostEqual(0, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(0, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2000)
-        self.assertAlmostEqual(0, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(360, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        self.assertAlmostEqual(0, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(360, self.getLongitude(an_object_eq), self.places)
 
 
     def test_North_Pole(self):
         """Test J2000 North Pole"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(90), coords.angle(0))
+        an_object = coords.spherical(1, coords.declination(90), coords.angle(0))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2000)
-        self.assertAlmostEqual(66.56071, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(90, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        self.assertAlmostEqual(66.56071, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(90, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2000)
-        self.assertAlmostEqual(66.56071, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(270.00000, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        self.assertAlmostEqual(66.56071, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(270.00000, self.getLongitude(an_object_eq), self.places)
 
 
     def test_lat_0_long_15(self):
         """Test J2000 Latitude 0, Longitude 15"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(0), coords.angle(15))
+        an_object = coords.spherical(1, coords.declination(0), coords.angle(15))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2000)
-        self.assertAlmostEqual(-5.90920, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(13.81162, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        self.assertAlmostEqual(-5.90920, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(13.81162, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2000)
-        self.assertAlmostEqual(5.90920, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(13.81162, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        self.assertAlmostEqual(5.90920, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(13.81162, self.getLongitude(an_object_eq), self.places)
 
 
     def test_lat_0_long_345(self):
         """Test J2000 Latitude 0, Longitude 345"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(0), coords.angle(345))
+        an_object = coords.spherical(1, coords.declination(0), coords.angle(345))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2000)
-        self.assertAlmostEqual(5.90920, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(346.18838, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        self.assertAlmostEqual(5.90920, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(346.18838, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2000)
-        self.assertAlmostEqual(-5.90920, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(346.18838, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        self.assertAlmostEqual(-5.90920, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(346.18838, self.getLongitude(an_object_eq), self.places)
 
 
     def test_lat_45_long_100(self):
         """Test J2000 Latitude 45, Longitude 100"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(45), coords.angle(100))
+        an_object = coords.spherical(1, coords.declination(45), coords.angle(100))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2000)
-        self.assertAlmostEqual(21.82420, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(97.60065, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        self.assertAlmostEqual(21.82420, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(97.60065, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2000)
-        self.assertAlmostEqual(67.78257, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(108.94923, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        self.assertAlmostEqual(67.78257, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(108.94923, self.getLongitude(an_object_eq), self.places)
 
 
     def test_lat_n30_long_n30(self):
         """Test J2000 Latitude -30, Longitude -30"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(-30), coords.angle(-30))
+        an_object = coords.spherical(1, coords.declination(-30), coords.angle(-30))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2000)
-        self.assertAlmostEqual(-16.64844, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(321.51905, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        self.assertAlmostEqual(-16.64844, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(321.51905, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2000)
-        self.assertAlmostEqual(-39.12273, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(345.18327, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        self.assertAlmostEqual(-39.12273, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(345.18327, self.getLongitude(an_object_eq), self.places)
 
 
     def test_lat_n60_long_200(self):
         """Test J2015 Latitude -60, Longitude 200"""
 
         j2015 = coords.datetime('2015-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(-60), coords.angle(200))
+        an_object = coords.spherical(1, coords.declination(-60), coords.angle(200))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2015)
-        self.assertAlmostEqual(-46.59844, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(226.85843, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2015)
+        self.assertAlmostEqual(-46.59844, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(226.85843, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2015)
-        self.assertAlmostEqual(-59.60899, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(158.23870, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2015)
+        self.assertAlmostEqual(-59.60899, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(158.23870, self.getLongitude(an_object_eq), self.places)
 
 
     def test_lat_20_long_n10(self):
         """Test J2015 Latitude 20, Longitude -10"""
 
         j2015 = coords.datetime('2015-01-01T00:00:00')
-        a_point = coords.spherical(1, coords.declination(20), coords.angle(-10))
+        an_object = coords.spherical(1, coords.declination(20), coords.angle(-10))
 
-        a_point_ec = self.eceq_xform.toEcliptic(a_point, j2015)
-        self.assertAlmostEqual(22.25346, self.getLatitude(a_point_ec), self.places)
-        self.assertAlmostEqual(359.15333, self.getLongitude(a_point_ec), self.places)
+        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2015)
+        self.assertAlmostEqual(22.25346, self.getLatitude(an_object_ec), self.places)
+        self.assertAlmostEqual(359.15333, self.getLongitude(an_object_ec), self.places)
 
-        a_point_eq = self.eceq_xform.toEquatorial(a_point, j2015)
-        self.assertAlmostEqual(14.41240, self.getLatitude(a_point_eq), self.places)
-        self.assertAlmostEqual(342.84035, self.getLongitude(a_point_eq), self.places)
+        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2015)
+        self.assertAlmostEqual(14.41240, self.getLatitude(an_object_eq), self.places)
+        self.assertAlmostEqual(342.84035, self.getLongitude(an_object_eq), self.places)
 
 
 

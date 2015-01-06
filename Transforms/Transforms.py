@@ -2,7 +2,6 @@
 
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
-
 Sidereal Time
 
     http://aa.usno.navy.mil/faq/docs/GAST.php
@@ -211,7 +210,7 @@ class Transforms(object):
 
 
 
-class Horizon(Transforms):
+class Equitorial2Horizon(Transforms):
 
     """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
@@ -225,19 +224,19 @@ class Horizon(Transforms):
     horizon_axis = coords.rotator(coords.Uy)
 
     def __init__(self, *args, **kwargs):
-        super(Horizon, self).__init__(*args, **kwargs)
+        super(Equitorial2Horizon, self).__init__(*args, **kwargs)
 
 
     @classmethod
-    def _xform_APC(cls, a_vector, an_observer, a_local_datetime, a_direction):
+    def toHorizon(cls, an_object, an_observer, a_local_datetime):
         """Transforms a vector to/from equatorial/ecliptic coordinates.
 
-        TODO my implementation of this APC algorithm isn't working
+        from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
 
         Args:
 
-        a_vector: the vector to transform in theta (90 - declination),
-                  phi (RA * 15). See self.radec2spherical.
+        an_object: the vector to transform in theta (90 - declination),
+                   phi (RA * 15). See self.radec2spherical.
 
         an_observer: the latitude and longitude (positive west of the
                      prime meridian) of an observer as a spherical
@@ -251,16 +250,90 @@ class Horizon(Transforms):
 
         """
 
-        if not isinstance(a_vector, coords.spherical):
+        if not isinstance(an_object, coords.spherical):
             raise Error('vector must be in spherical coordinates') # TODO for now
+
+        if not isinstance(an_observer, coords.spherical):
+            raise Error('observer must be in spherical coordinates') # TODO for now
+
+        print # linefeed
+
+        print "an observers's theta (90 - latitude) =", an_observer.theta.value
+        print "an observers's phi (longitude -W/+E) =", an_observer.phi.value
+
+        print "an object's theta (90 - declination) =", an_object.theta.value
+        print "an object's phi (RA * 15) =", an_object.phi.value
+
+        gmst = Transforms.GMST_USNO(a_local_datetime) # hours
+
+        print 'gmst', gmst # TODO rm
+
+        local_hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
+
+        print 'local_hour_angle', local_hour_angle # TODO rm
+
+        print 'cos(90 - object declination)', math.cos(an_object.theta.radians)
+        print 'sin(90 - object declination)', math.sin(an_object.theta.radians)
+
+        print 'cos(90 - observer latitude)', math.cos(an_observer.theta.radians)
+        print 'sin(90 - observer latitude)', math.sin(an_observer.theta.radians)
+
+        foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
+               math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * math.cos(local_hour_angle.radians)
+
+        print 'foo', foo
+
+        altitude = 90 - math.acos(foo)
+        print 'altitude', altitude
+
+        alt = coords.angle(90 - altitude)
+        print 'alt', alt, alt.radians
+
+        bar = math.sin(local_hour_angle.radians)*math.sin(an_object.theta.radians)/math.sin(alt.radians)
+
+        print 'bar', bar
+
+        azimuth = 360 - math.asin(bar)
+
+        print 'azimuth', azimuth
+
+
+    @classmethod
+    def _xform_APC(cls, an_object, an_observer, a_local_datetime, a_direction):
+        """Transforms a vector to/from equatorial/ecliptic coordinates.
+
+        TODO my implementation of this APC algorithm isn't working
+
+        Args:
+
+        an_object: the vector to transform in theta (90 - declination),
+                   phi (RA * 15). See self.radec2spherical.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        a_local_datetime: local date and time of the observation.
+
+        a_direction: +1 to horizon, -1 from horizon
+
+        Returns a vector in the transformed coordinates
+
+        """
+
+        if not isinstance(an_object, coords.spherical):
+            raise Error('vector must be in spherical coordinates') # TODO for now
+
+        if not isinstance(an_observer, coords.spherical):
+            raise Error('observer must be in spherical coordinates') # TODO for now
 
 
         gmst = Transforms.GMST_USNO_simplified(a_local_datetime)
 
-        hour_angle = coords.angle(gmst.value + an_observer.phi.value - a_vector.phi.value)
+        hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
         hour_angle.normalize(0, 360)
 
-        the_local_vector = coords.spherical(a_vector.r, a_vector.theta, hour_angle)
+        the_local_vector = coords.spherical(an_object.r, an_object.theta, hour_angle)
 
         the_rotatee = coords.Cartesian(the_local_vector)
 
@@ -272,44 +345,16 @@ class Horizon(Transforms):
 
 
     @classmethod
-    def toHorizon_APC(cls, a_vector, an_observer, a_local_datetime):
+    def toHorizon_APC(cls, an_object, an_observer, a_local_datetime):
         """Transforms an equatorial vector into one in the horizon coordinate system"""
-        return cls._xform_APC(a_vector, an_observer, a_local_datetime, 1.0)
+        return cls._xform_APC(an_object, an_observer, a_local_datetime, 1.0)
 
 
     @classmethod
-    def fromHorizon_APC(cls, a_vector, an_observer, a_local_datetime):
+    def fromHorizon_APC(cls, an_object, an_observer, a_local_datetime):
         """Transforms a horizon vector into one in the equatorial coordinate system"""
-        return cls._xform_APC(a_vector, an_observer, a_local_datetime, -1.0)
+        return cls._xform_APC(an_object, an_observer, a_local_datetime, -1.0)
 
-
-    @classmethod
-    def toHorizon(cls, a_vector, an_observer, a_local_datetime):
-        """Transforms a vector to/from equatorial/ecliptic coordinates.
-
-        from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
-
-        Args:
-
-        a_vector: the vector to transform in theta (90 - declination),
-                  phi (RA * 15). See self.radec2spherical.
-
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
-
-        a_local_datetime: local date and time of the observation.
-
-        a_direction: +1 to horizon, -1 from horizon
-
-        Returns a vector in the transformed coordinates
-
-        """
-
-        if not isinstance(a_vector, coords.spherical):
-            raise Error('vector must be in spherical coordinates') # TODO for now
-
-        # TODO positional astronomy
 
 
 
@@ -353,47 +398,47 @@ class EclipticEquatorial(Transforms):
 
 
     @classmethod
-    def _xform(cls, a_vector, a_datetime, a_direction):
+    def _xform(cls, an_object, a_datetime, a_direction):
         """Transforms a vector to/from equatorial/ecliptic coordinates.
 
         Args:
-        a_vector: the vector to transform. May be Cartesian or spherical.
+        an_object: the vector to transform. May be Cartesian or spherical.
         a_datetime: the time of the transformation
         a_direction: +1 to equatorial, -1 to ecliptic
 
         Returns a vector in the transformed coordinates
         """
 
-        if isinstance(a_vector, coords.spherical):
-            the_rotatee = coords.Cartesian(a_vector)
+        if isinstance(an_object, coords.spherical):
+            the_rotatee = coords.Cartesian(an_object)
         else:
-            the_rotatee = a_vector
+            the_rotatee = an_object
 
         the_rotated = cls.equinox_axis.rotate(the_rotatee,
                                               coords.angle(a_direction * cls.eps(a_datetime)))
 
-        if isinstance(a_vector, coords.spherical):
+        if isinstance(an_object, coords.spherical):
             return coords.spherical(the_rotated)
         else:
             return the_rotated
 
 
     @classmethod
-    def toEcliptic(cls, a_vector, a_datetime):
-        """Transforms a_vector from equatorial to ecliptic coordinates
+    def toEcliptic(cls, an_object, a_datetime):
+        """Transforms an_object from equatorial to ecliptic coordinates
 
         Returns a Cartesian vector in eliptic coordinates
         """
-        return cls._xform(a_vector, a_datetime, -1.0)
+        return cls._xform(an_object, a_datetime, -1.0)
 
 
     @classmethod
-    def toEquatorial(cls, a_vector, a_datetime):
-        """Transforms a_vector from ecliptic to equatorial coordinates
+    def toEquatorial(cls, an_object, a_datetime):
+        """Transforms an_object from ecliptic to equatorial coordinates
 
         Returns a Cartesian vector in equatorial coordinates
         """
-        return cls._xform(a_vector, a_datetime, 1.0)
+        return cls._xform(an_object, a_datetime, 1.0)
 
 
 
