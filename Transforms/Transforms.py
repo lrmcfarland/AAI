@@ -118,7 +118,7 @@ class Transforms(object):
         gmst = 6.697374558 + 0.06570982441908*Do + 1.00273790935*H + 0.000026*T*T
 
         gmst_hours = coords.angle(gmst)
-        gmst_hours.normalize(0, 24)
+        gmst_hours.normalize(-12, 12)
 
         return gmst_hours
 
@@ -140,7 +140,7 @@ class Transforms(object):
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
         gmst = 18.697374558 + 24.06570982441908 * D # in hours
         gmst_hours = coords.angle(gmst)
-        gmst_hours.normalize(0, 24)
+        gmst_hours.normalize(-12, 12)
 
         return gmst_hours
 
@@ -164,7 +164,7 @@ class Transforms(object):
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
         gmst = 280.46061837 + 360.98564736629 * D # in degrees
         gmst_angle = coords.angle(gmst)
-        gmst_angle.normalize(0, 360)
+        gmst_angle.normalize(-180, 180)
         gmst_hours = coords.angle(gmst_angle.value/15.0)
 
         return gmst_hours
@@ -201,12 +201,15 @@ class Transforms(object):
         gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0)
 
         # seconds
+        print # linefeed
+        print 'APC gmst', gmst # TODO rm
 
-        gmst_angle = coords.angle(0, 0, gmst)
-        gmst_angle.normalize(0, 360)
-        gmst_hours = coords.angle(gmst_angle.value/15.0)
+        gmst_hours = gmst/3600.0
 
-        return gmst_hours
+        gmst_angle = coords.angle(gmst_hours)
+        gmst_angle.normalize(-24, 24)
+
+        return gmst_angle
 
 
 

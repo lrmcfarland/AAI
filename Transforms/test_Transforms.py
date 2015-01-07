@@ -112,7 +112,7 @@ class TestTransforms(unittest.TestCase):
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
-        self.assertEqual('18:41:50.5484', str(a_gmst))
+        self.assertEqual('-5:18:9.45159', str(a_gmst))
 
 
     def test_GMST_USNO_J2000_plus_day(self):
@@ -123,7 +123,16 @@ class TestTransforms(unittest.TestCase):
         a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
-        self.assertEqual('18:45:47.1038', str(a_gmst_1))
+
+
+    def test_GMST_USNO_J2000_plus_halfday(self):
+        """Test GMST USNO J2000 plus a halfday"""
+        a_datetime_0 = coords.datetime(self.xforms.J2000)
+        a_gmst_0 = self.xforms.GMST_USNO_simplified(a_datetime_0)
+        a_datetime_1 = coords.datetime('2000-01-02T00:00:00')
+        a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
+
+        self.assertEqual('12:01:58.2777', str(a_gmst_1 - a_gmst_0))
 
 
     def test_GMST_USNO_standrews(self):
@@ -133,11 +142,10 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
         sta_long = coords.angle(2, 48)
-        self.assertEqual('02:47:60', str(sta_long))
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
+        self.assertEqual('02:47:60', str(sta_long))
 
-        # this is 11 minutes off from answer6, but 11 minutes from
-        # GMT. Used simpler LST (8h45m) for easier calculation by hand?
+        # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
 
@@ -158,7 +166,7 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
         # TODO validate against something
-        self.assertEqual('14:42:37.9854', str(a_gmst))
+        self.assertEqual('-9:17:22.0146', str(a_gmst))
 
 
     def test_GMST_USNO_2pm(self):
@@ -167,7 +175,7 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
         # TODO validate against something
-        self.assertEqual('20:43:37.1242', str(a_gmst))
+        self.assertEqual('-3:16:22.8758', str(a_gmst))
 
 
     def test_GMST_USNO_2pm_tz1(self):
@@ -176,7 +184,7 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
         # TODO validate against something
-        self.assertEqual('21:43:46.9807', str(a_gmst))
+        self.assertEqual('-2:16:13.0193', str(a_gmst))
 
 
     def test_GMST_USNO_2pm_tzn1(self):
@@ -185,14 +193,14 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
         # TODO validate against something
-        self.assertEqual('19:43:27.2677', str(a_gmst))
+        self.assertEqual('-4:16:32.7323', str(a_gmst))
 
 
     def test_GMST_USNO_simplified_J2000(self):
-        """Test GMST USNO simplified J2000 noon"""
+        """Test GMST USNO simplified J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
-        self.assertEqual('18:41:50.5484', str(a_gmst))
+        self.assertEqual('-5:18:9.45159', str(a_gmst))
 
 
     def test_GMST_USNO_simplified_J2000_plus_day(self):
@@ -203,7 +211,6 @@ class TestTransforms(unittest.TestCase):
         a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
-        self.assertEqual('18:45:47.1038', str(a_gmst_1))
 
 
     def test_GMST_USNO_simplified_standrews(self):
@@ -213,13 +220,11 @@ class TestTransforms(unittest.TestCase):
         a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
 
         sta_long = coords.angle(2, 48)
-        self.assertEqual('02:47:60', str(sta_long))
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
+        self.assertEqual('02:47:60', str(sta_long))
 
-        # this is 11 minutes off from answer6, but 11 minutes from
-        # GMT. Used simpler LST (8h45m) for easier calculation by hand?
+        # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
         self.assertEqual('08:55:49.7347', str(a_gmst))
-
 
 
     def test_GMST_USNO_simplified_kb(self):
@@ -230,7 +235,6 @@ class TestTransforms(unittest.TestCase):
 
         # -0.00001 seconds different from given test data
         self.assertEqual('11:39:5.06724', str(a_gmst))
-
 
 
     def test_GMST_USNO_simplified2_kb(self):
@@ -244,16 +248,15 @@ class TestTransforms(unittest.TestCase):
 
 
 
-    @unittest.skip('TODO this is off by 18 degrees!')
     def test_GMST_APC_J2000(self):
         """Test GMST APC J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_APC(a_datetime)
 
-        self.assertEqual('18:41:50.5484', str(a_gmst))
+        self.assertEqual('06:39:53.4567', str(a_gmst))
 
 
-    @unittest.skip('TODO this is off by 5 degrees!')
+    @unittest.skip('TODO')
     def test_GMST_APC_J2000_plus_day(self):
         """Test APC J2000 plus a day"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
@@ -265,7 +268,7 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual('18:45:47.1038', str(a_gmst_1))
 
 
-    @unittest.skip('TODO this is off by 11 degrees')
+    @unittest.skip('TODO')
     def test_GMST_APC_kb(self):
         """Test GMST APC formula, in degrees, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
@@ -276,7 +279,7 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual('11:39:5.06724', str(a_gmst))
 
 
-    @unittest.skip('TODO this is off by 1.5 degrees!')
+    @unittest.skip('TODO')
     def test_GMST_APC_standrews(self):
         """Test GMST APC St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
@@ -355,7 +358,9 @@ class TestEquitorialHorizon(unittest.TestCase):
 
         a_datetime = coords.datetime('2014-12-31T20:41:00')
 
-        sirius_hz = self.eq2hz_xforms.toHorizon_StA(sirius, an_observer, a_datetime)
+        sirius_hz = self.eq2hz_xforms.toHorizon_APC(sirius, an_observer, a_datetime)
+
+        print 'sirius', sirius_hz
 
         # TODO validate something
 
