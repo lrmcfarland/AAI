@@ -13,7 +13,7 @@ class TestTransforms(unittest.TestCase):
     def setUp(self):
         """Set up test parameters."""
 
-        self.places = 5 # precision limited by LAMBDA-tools reporting
+        self.places = 5
         self.xforms = Transforms.Transforms()
 
 
@@ -295,7 +295,7 @@ class TestEquitorialHorizon(unittest.TestCase):
     def setUp(self):
         """Set up test parameters."""
 
-        self.places = 5 # precision limited by LAMBDA-tools reporting
+        self.places = 5
         self.eq2hz_xforms = Transforms.EquitorialHorizon()
 
 
@@ -561,9 +561,9 @@ class TestStjarnHimlen(unittest.TestCase):
     def setUp(self):
         """Set up test parameters."""
 
-        self.places = 5 # precision limited by LAMBDA-tools reporting
-
+        self.places = 5
         self.sthm_xform = Transforms.StjarnHimlen()
+
 
     def test_SolarLongitude_J2000(self):
         """Tests solar longitude calculation 1"""

@@ -625,11 +625,11 @@ class StjarnHimlen(object):
         xs = r * math.cos(lonsun)
         ys = r * math.sin(lonsun)
 
-        ecl = 23.4393 - 3.563E-7 * d # TODO use JPL obliquit of the ecliptic?
+        ecl = coords.angle(23.4393 - 3.563E-7 * d) # TODO use JPL obliquit of the ecliptic?
 
         xe = xs
-        ye = ys * math.cos(ecl)
-        ze = ys * math.sin(ecl)
+        ye = ys * math.cos(ecl.radians)
+        ze = ys * math.sin(ecl.radians)
 
         RA = coords.angle(math.atan2(ye, xe))
         Dec = coords.angle(math.atan2(ze, math.sqrt(xe*xe+ye*ye)))
