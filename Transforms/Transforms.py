@@ -22,6 +22,7 @@ See also:
     http://en.wikipedia.org/wiki/Ecliptic
     http://en.wikipedia.org/wiki/Axial_tilt
     http://lambda.gsfc.nasa.gov/toolbox/tb_converters_ov.cfm
+
 """
 
 import math
@@ -558,6 +559,84 @@ class EclipticEquatorial(Transforms):
         """
         return cls._xform(an_object, a_datetime, 1.0)
 
+
+
+class StjarnHimlen(object):
+    """Starry Sky
+
+    from http://stjarnhimlen.se/comp/ppcomp.html
+
+    How to convert Equitorial to Horizontal coordinates.
+    Another method to help me sort out what is wrong with the others.
+
+    Tack Paul!
+
+    """
+
+    def SolarLongitude(self, a_datetime):
+        """Compute the position of the sun from the date"""
+
+        print # linefeed
+        print a_datetime # TODO rm
+
+        d = a_datetime.toJulianDate() - a_datetime.J2000
+        print 'd', d # TODO rm
+
+        N = coords.angle(0.0) # longitude of the ascending node
+        i = coords.angle(0.0) # inclination to the eclipitic
+        w = coords.angle(282.9404 + 4.70935E-5 * d) # argument of perihelion
+        w.normalize(0, 360)
+
+        a = 1.000000 #  semi-major axis, or mean disntance from the Sun (AU)
+        e = 0.016709 - 1.151E-9 * d # eccentricity
+
+        print 'e', e
+
+        M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
+        M.normalize(0, 360)
+
+
+        E = coords.angle(M.value + e *(180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+
+        print 'E', E # TODO rm
+        # E.normalize(0, 360) # TODO? Not necessary, sin/cos this
+        print 'E.normalized', E # TODO rm
+
+        xv = math.cos(E.radians) - e
+        yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
+
+        v = math.atan2(yv, xv)
+
+        lonsun = v + w.value
+
+        gmst0 = coords.angle(lonsun + 180)
+        print 'gmst0', gmst0
+        gmst0.normalize(0, 360)
+        print 'gmst0 normalized', gmst0
+
+        # TODO unnecessary from here to the return. Separate method?
+
+        r = math.sqrt( xv*xv + yv*yv)
+
+        print 'v', v # TODO rm
+        print 'r', r # TODO rm
+        print 'lonsun', lonsun # TODO rm
+
+        xs = r * math.cos(lonsun)
+        ys = r * math.sin(lonsun)
+
+        ecl = 23.4393 - 3.563E-7 * d # TODO use JPL obliquit of the ecliptic?
+
+        xe = xs
+        ye = ys * math.cos(ecl)
+        ze = ys * math.sin(ecl)
+
+        RA = coords.angle(math.atan2(ye, xe))
+        Dec = coords.angle(math.atan2(ze, math.sqrt(xe*xe+ye*ye)))
+
+        print 'RA', RA, 'Dec', Dec # TODO rm
+
+        return lonsun
 
 
 if __name__ == '__main__':

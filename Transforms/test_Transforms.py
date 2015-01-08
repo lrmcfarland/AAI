@@ -549,6 +549,47 @@ class TestEcEqXforms(unittest.TestCase):
         self.assertAlmostEqual(342.84035, self.getLongitude(an_object_eq), self.places)
 
 
+class TestStjarnHimlen(unittest.TestCase):
+
+    """Tests Starry Sky methods
+
+
+    validate with http://www.satellite-calculations.com/Satellite/suncalc.htm
+
+    """
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 5 # precision limited by LAMBDA-tools reporting
+
+        self.sthm_xform = Transforms.StjarnHimlen()
+
+    def test_SolarLongitude_J2000(self):
+        """Tests solar longitude calculation 1"""
+        j2000 = coords.datetime('2001-01-01T12:00:00') # starts at noon
+        self.sthm_xform.SolarLongitude(j2000)
+
+
+    def test_SolarLongitude_by_months_for_years(self):
+        """Tests solar longitude calculation by months for years"""
+
+        for i in xrange(1, 5):
+            for j in xrange(1, 13):
+                a_datetime = coords.datetime('200%d-01-%02dT00:00:00' % (i, j)) # starts at noon
+                self.sthm_xform.SolarLongitude(a_datetime)
+
+
+    def test_SolarLongitude_1(self):
+        """Tests solar longitude calculation 1"""
+
+        for i in xrange(1, 5):
+            for j in xrange(0, 23):
+                a_datetime = coords.datetime('2000-01-%02dT%02d:00:00' % (i, j)) # starts at noon
+                self.sthm_xform.SolarLongitude(a_datetime)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
