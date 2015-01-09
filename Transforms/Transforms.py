@@ -46,10 +46,7 @@ class Error(Exception):
     pass
 
 class Transforms(object):
-    """Base class for transforms
-
-    Holds various static and class methods
-    """
+    """Base class for transforms"""
 
     J2000 = coords.datetime('2000-01-01T12:00:00') # starts at noon
     sidereal_day = coords.angle(23, 56, 4.0916)
@@ -61,7 +58,12 @@ class Transforms(object):
 
     @staticmethod
     def spherical2latitude(a_point):
-        """Converts spherical coordinate theta (angle to +z axis) to latitude/declination"""
+        """Spherical to latitude
+
+        Converts spherical coordinate theta (angle to +z axis) to
+        latitude/declination.
+
+        """
 
         if not isinstance(a_point, coords.spherical):
             raise Error('a coordinate must be an instance of coords.spherical')
@@ -71,7 +73,12 @@ class Transforms(object):
 
     @staticmethod
     def spherical2longitude(a_point):
-        """Converts spherical coordinate phi (angle to +x axis of projection in xy plane) to longitude"""
+        """Spherical to longitude
+
+        Converts spherical coordinate phi (angle to +x axis of
+        projection in xy plane) to longitude.
+
+        """
 
         if not isinstance(a_point, coords.spherical):
             raise Error('a coordinate must be an instance of coords.spherical')
@@ -84,7 +91,12 @@ class Transforms(object):
 
     @classmethod
     def spherical2ra(cls, a_point):
-        """Converts spherical coordinate phi (angle to +x axis of projection in xy plane) to right ascension"""
+        """Spherical to right ascension
+
+        Converts spherical coordinate phi (angle to +x axis of
+        projection in xy plane) to right ascension.
+
+        """
 
         return cls.spherical2longitude(a_point)/15.0
 
@@ -101,12 +113,16 @@ class Transforms(object):
         return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
 
 
-    @classmethod
-    def GMST_USNO(cls, a_datetime):
-        """Greenwich mean sidereal time
+class USNO(Transforms):
+    """Transforms from the U.S. Naval Observatory
 
-        from:
-            http://aa.usno.navy.mil/faq/docs/GAST.php
+    http://aa.usno.navy.mil/faq/docs/GAST.php
+
+    """
+
+    @classmethod
+    def GMST(cls, a_datetime):
+        """Greenwich mean sidereal time
 
         returns GMST in hours
         """
@@ -134,11 +150,8 @@ class Transforms(object):
 
 
     @classmethod
-    def GMST_USNO_simplified(cls, a_datetime):
+    def GMST_simplified(cls, a_datetime):
         """Greenwich mean sidereal time, simplified form
-
-        from:
-            http://aa.usno.navy.mil/faq/docs/GAST.php
 
         Returns GMST in hours
         """
@@ -152,7 +165,7 @@ class Transforms(object):
 
 
     @classmethod
-    def GMST_USNO_simplified2(cls, a_datetime):
+    def GMST_simplified2(cls, a_datetime):
         """Greenwich mean sidereal time, simplified
 
         This is the same as GMST_USNO but in degrees instead of hours,
@@ -176,11 +189,135 @@ class Transforms(object):
         return gmst_hours
 
 
-    @classmethod
-    def GMST_APC(cls, a_datetime):
-        """Greenwich mean sidereal time
+class StjarnHimlen(Transforms):
+    """Starry Sky: How to convert Equatorial to Horizontal coordinates.
 
-        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
+    from http://stjarnhimlen.se/comp/ppcomp.html
+
+    Another method to help me sort out what is wrong with the others.
+
+    Tack Paul!
+    """
+
+    @classmethod
+    def SolarLongitude(cls, a_datetime):
+        """Calculate the longitude of the sun for the given date
+
+        returns the sun's longitude
+        """
+
+        d = a_datetime.toJulianDate() - a_datetime.J2000
+
+        w = 282.9404 + 4.70935E-5 * d # argument of perihelion
+        e = 0.016709 - 1.151E-9 * d # eccentricity
+        M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
+        E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+
+        xv = math.cos(E.radians) - e
+        yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
+
+        v = math.atan2(yv, xv)*180/math.pi
+
+        lonsun = coords.angle(v + w)
+        lonsun.normalize(0, 360) # flips to 0 on March 21 2000, not quite equinox
+
+        return lonsun
+
+
+    def SolarRADec(cls, a_datetime):
+        """Calculate the right ascension and declination of the sun for the given date
+
+        returns the sun's RA and declination
+        """
+
+        d = a_datetime.toJulianDate() - a_datetime.J2000
+
+        w = 282.9404 + 4.70935E-5 * d # argument of perihelion
+        e = 0.016709 - 1.151E-9 * d # eccentricity
+        M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
+        E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+
+        xv = math.cos(E.radians) - e
+        yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
+
+        v = math.atan2(yv, xv)*180/math.pi
+
+        lonsun = coords.angle(v + w)
+
+        r = math.sqrt( xv*xv + yv*yv)
+
+        xs = r * math.cos(lonsun.radians)
+        ys = r * math.sin(lonsun.radians)
+
+        ecl = coords.angle(23.4393 - 3.563E-7 * d) # TODO use JPL obliquity of the ecliptic?
+
+        xe = xs
+        ye = ys * math.cos(ecl.radians)
+        ze = ys * math.sin(ecl.radians)
+
+        RA = coords.angle(math.atan2(ye, xe)*180/math.pi)
+        RA.normalize(0, 360)
+
+        Dec = coords.angle(math.atan2(ze, math.sqrt(xe*xe+ye*ye))*180/math.pi)
+
+        return RA, Dec # TODO as coords.spherical(1, Longitue(Dec), RA)?
+
+
+    @classmethod
+    def GMST0(cls, a_datetime):
+        """Calculate the Greenwich mean siderial time at Greenwich"""
+
+        lonsun = cls.SolarLongitude(a_datetime)
+        gmst0 = coords.angle(lonsun.value + 180) # TODO noon or midnight vs. GMST USNO
+        gmst0.normalize(0, 360) # TODO as hours?
+
+        return gmst0
+
+    @classmethod
+    def GMST(cls, a_datetime):
+        """Calculate the Greenwich mean siderial time at location"""
+
+        gmst0 = cls.GMST0(a_datetime)
+
+        d = a_datetime.toJulianDate() - a_datetime.J2000
+
+        gmst = coords.angle(gmst0.value/15 + d*24)
+        gmst.normalize(-12, 12)
+
+        return gmst
+
+
+    @classmethod
+    def toHorizon(cls, an_object, an_observer, a_local_datetime):
+        """Transforms a vector from equatorial to ecliptic coordinates.
+
+        from http://stjarnhimlen.se/comp/ppcomp.html
+
+
+        Args:
+
+        an_object: the vector to transform in theta (90 - declination),
+                   phi (RA * 15). See self.radec2spherical.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        a_local_datetime: local date and time of the observation.
+
+        Returns a spherical coordinate vector in the transformed coordinates
+        """
+
+
+class APC(Transforms):
+    """Transforms from Astronomy on the Personal Computer
+
+    by Montenbruck and Pfleger
+    """
+
+    @classmethod
+    def GMST(cls, a_datetime):
+        """Greenwich mean sidereal time
 
         TODO my implementation doesn't match USNO results
         one day difference is much less than the expected 4 minutes
@@ -214,15 +351,74 @@ class Transforms(object):
         return gmst_angle
 
 
+    @classmethod
+    def _xform(cls, an_object, an_observer, a_local_datetime, a_direction):
+        """Transforms a vector to/from equatorial/ecliptic coordinates.
 
-class EquitorialHorizon(Transforms):
+        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
+
+        TODO my implementation of this APC algorithm isn't working
+
+        Args:
+
+        an_object: the vector to transform in theta (90 - declination),
+                   phi (RA * 15). See self.radec2spherical.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        a_local_datetime: local date and time of the observation.
+
+        a_direction: +1 to horizon, -1 from horizon
+
+        Returns a vector in the transformed coordinates
+
+        """
+
+        if not isinstance(an_object, coords.spherical):
+            raise Error('vector must be in spherical coordinates') # TODO for now
+
+        if not isinstance(an_observer, coords.spherical):
+            raise Error('observer must be in spherical coordinates') # TODO for now
+
+
+        gmst = Transforms.GMST_USNO_simplified(a_local_datetime)
+
+        hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
+        hour_angle.normalize(0, 360)
+
+        the_local_vector = coords.spherical(an_object.r, an_object.theta, hour_angle)
+
+        the_rotatee = coords.Cartesian(the_local_vector)
+
+
+        the_rotated = cls.horizon_axis.rotate(the_rotatee,
+                                              coords.angle(a_direction * an_observer.theta.value))
+
+        return coords.spherical(the_rotated)
+
+
+    @classmethod
+    def toHorizon(cls, an_object, an_observer, a_local_datetime):
+        """Transforms an equatorial vector into one in the horizon coordinate system"""
+        return cls._xform(an_object, an_observer, a_local_datetime, 1.0)
+
+
+    @classmethod
+    def fromHorizon(cls, an_object, an_observer, a_local_datetime):
+        """Transforms a horizon vector into one in the equatorial coordinate system"""
+        return cls._xform(an_object, an_observer, a_local_datetime, -1.0)
+
+
+class EquatorialHorizon(Transforms):
 
     """Transforms 3D space vectors to/from ecliptic/equatorial coordinates"""
 
     horizon_axis = coords.rotator(coords.Uy)
 
     def __init__(self, *args, **kwargs):
-        super(EquitorialHorizon, self).__init__(*args, **kwargs)
+        super(EquatorialHorizon, self).__init__(*args, **kwargs)
 
 
     @classmethod
@@ -373,7 +569,7 @@ class EquitorialHorizon(Transforms):
 
 
     @classmethod
-    def toEquitorial(cls, an_object, an_observer, a_local_datetime):
+    def toEquatorial(cls, an_object, an_observer, a_local_datetime):
         """Transforms a vector from equatorial to ecliptic coordinates.
 
         from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
@@ -401,69 +597,6 @@ class EquitorialHorizon(Transforms):
         print # linefeed
 
         # TODO implement this
-
-
-
-
-    @classmethod
-    def _xform_APC(cls, an_object, an_observer, a_local_datetime, a_direction):
-        """Transforms a vector to/from equatorial/ecliptic coordinates.
-
-        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
-
-        TODO my implementation of this APC algorithm isn't working
-
-        Args:
-
-        an_object: the vector to transform in theta (90 - declination),
-                   phi (RA * 15). See self.radec2spherical.
-
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
-
-        a_local_datetime: local date and time of the observation.
-
-        a_direction: +1 to horizon, -1 from horizon
-
-        Returns a vector in the transformed coordinates
-
-        """
-
-        if not isinstance(an_object, coords.spherical):
-            raise Error('vector must be in spherical coordinates') # TODO for now
-
-        if not isinstance(an_observer, coords.spherical):
-            raise Error('observer must be in spherical coordinates') # TODO for now
-
-
-        gmst = Transforms.GMST_USNO_simplified(a_local_datetime)
-
-        hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
-        hour_angle.normalize(0, 360)
-
-        the_local_vector = coords.spherical(an_object.r, an_object.theta, hour_angle)
-
-        the_rotatee = coords.Cartesian(the_local_vector)
-
-
-        the_rotated = cls.horizon_axis.rotate(the_rotatee,
-                                              coords.angle(a_direction * an_observer.theta.value))
-
-        return coords.spherical(the_rotated)
-
-
-    @classmethod
-    def toHorizon_APC(cls, an_object, an_observer, a_local_datetime):
-        """Transforms an equatorial vector into one in the horizon coordinate system"""
-        return cls._xform_APC(an_object, an_observer, a_local_datetime, 1.0)
-
-
-    @classmethod
-    def fromHorizon_APC(cls, an_object, an_observer, a_local_datetime):
-        """Transforms a horizon vector into one in the equatorial coordinate system"""
-        return cls._xform_APC(an_object, an_observer, a_local_datetime, -1.0)
-
 
 
 
@@ -550,115 +683,6 @@ class EclipticEquatorial(Transforms):
         Returns a Cartesian vector in equatorial coordinates
         """
         return cls._xform(an_object, a_datetime, 1.0)
-
-
-
-class StjarnHimlen(object):
-    """Starry Sky
-
-    from http://stjarnhimlen.se/comp/ppcomp.html
-
-    How to convert Equitorial to Horizontal coordinates.
-    Another method to help me sort out what is wrong with the others.
-
-    Tack Paul!
-
-    see also:
-        http://kortis.to/radix/python/code/Sun-old.py
-
-    """
-
-    def SolarLongitude(self, a_datetime):
-        """Calculate the longitude of the sun for the given date
-
-        returns the sun's longitude
-        """
-
-        d = a_datetime.toJulianDate() - a_datetime.J2000
-
-        w = 282.9404 + 4.70935E-5 * d # argument of perihelion
-        e = 0.016709 - 1.151E-9 * d # eccentricity
-        M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
-        E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
-
-        xv = math.cos(E.radians) - e
-        yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
-
-        v = math.atan2(yv, xv)*180/math.pi
-
-        lonsun = coords.angle(v + w)
-        lonsun.normalize(0, 360) # flips to 0 on March 21 2000, not quite equinox
-
-        return lonsun
-
-
-    def SolarRADec(self, a_datetime):
-        """Calculate the right ascension and declination of the sun for the given date
-
-        returns the sun's RA and declination
-        """
-
-        d = a_datetime.toJulianDate() - a_datetime.J2000
-
-        w = 282.9404 + 4.70935E-5 * d # argument of perihelion
-        e = 0.016709 - 1.151E-9 * d # eccentricity
-        M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
-        E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
-
-        xv = math.cos(E.radians) - e
-        yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
-
-        v = math.atan2(yv, xv)*180/math.pi
-
-        lonsun = coords.angle(v + w)
-
-        r = math.sqrt( xv*xv + yv*yv)
-
-        xs = r * math.cos(lonsun.radians)
-        ys = r * math.sin(lonsun.radians)
-
-        ecl = coords.angle(23.4393 - 3.563E-7 * d) # TODO use JPL obliquity of the ecliptic?
-
-        xe = xs
-        ye = ys * math.cos(ecl.radians)
-        ze = ys * math.sin(ecl.radians)
-
-        RA = coords.angle(math.atan2(ye, xe)*180/math.pi)
-        RA.normalize(0, 360)
-
-        Dec = coords.angle(math.atan2(ze, math.sqrt(xe*xe+ye*ye))*180/math.pi)
-
-        return RA, Dec # TODO as coords.spherical(1, Longitue(Dec), RA)?
-
-
-
-    def GMST0(self, a_datetime):
-        """Calculate the Greenwich mean siderial time at Greenwich"""
-
-        lonsun = self.SolarLongitude(a_datetime)
-        gmst0 = coords.angle(lonsun.value + 180) # TODO noon or midnight vs. GMST USNO
-        gmst0.normalize(0, 360) # TODO as hours?
-
-        return gmst0
-
-
-    def GMST(self, a_datetime):
-        """Calculate the Greenwich mean siderial time at location"""
-
-        gmst0 = self.GMST0(a_datetime)
-
-        d = a_datetime.toJulianDate() - a_datetime.J2000
-
-        gmst = coords.angle(gmst0.value/15 + d*24)
-        gmst.normalize(-12, 12)
-
-        return gmst
-
-
-
-
-
-
 
 
 

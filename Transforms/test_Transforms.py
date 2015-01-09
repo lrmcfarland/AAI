@@ -8,7 +8,7 @@ import coords
 import Transforms
 
 class TestTransforms(unittest.TestCase):
-    """Test RA/declination transforms."""
+    """Test basic transforms."""
 
     def setUp(self):
         """Set up test parameters."""
@@ -103,52 +103,59 @@ class TestTransforms(unittest.TestCase):
         a_Julian_century = self.xforms.JulianCentury(a_datetime)
         self.assertEqual(1, a_Julian_century)
 
-    # ----------------------------------------
-    # ----- Greenwich Mean Sidereal Time -----
-    # ----------------------------------------
 
-    def test_GMST_USNO(self):
-        """Test GMST USNO"""
+class Test_USNO_Transforms(unittest.TestCase):
+    """Test USNO transforms."""
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 5
+        self.xforms = Transforms.USNO()
+
+
+    def test_GMST(self):
+        """Test GMST"""
         a_datetime = coords.datetime('2000-01-01T12:00:00')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
-        print 'GMST USNO', a_gmst # TODO rm
+        print 'GMST', a_gmst # TODO rm
 
 
-    def test_GMST_USNO_J2000(self):
-        """Test GMST USNO J2000"""
+    def test_GMST_J2000(self):
+        """Test GMST J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         self.assertEqual('-5:18:9.45159', str(a_gmst))
 
 
-    def test_GMST_USNO_J2000_plus_day(self):
-        """Test GMST USNO J2000 plus a day"""
+    def test_GMST_J2000_plus_day(self):
+        """Test GMST J2000 plus a day"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
-        a_gmst_0 = self.xforms.GMST_USNO_simplified(a_datetime_0)
+        a_gmst_0 = self.xforms.GMST_simplified(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
-        a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
+        a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
 
 
-    def test_GMST_USNO_J2000_plus_halfday(self):
-        """Test GMST USNO J2000 plus a halfday"""
+    def test_GMST_J2000_plus_halfday(self):
+        """Test GMST J2000 plus a halfday"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
-        a_gmst_0 = self.xforms.GMST_USNO_simplified(a_datetime_0)
+        a_gmst_0 = self.xforms.GMST_simplified(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T00:00:00')
-        a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
+        a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
         self.assertEqual('12:01:58.2777', str(a_gmst_1 - a_gmst_0))
 
 
-    def test_GMST_USNO_standrews(self):
-        """Test GMST USNO at St. Andrews"""
+    def test_GMST_standrews(self):
+        """Test GMST at St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
         a_datetime = coords.datetime('1998-02-04T00:00:00')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         sta_long = coords.angle(2, 48)
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
@@ -158,75 +165,75 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
 
-    def test_GMST_USNO_kb(self):
-        """Test GMST USNO formula, in hours, with kburnett data"""
+    def test_GMST_kb(self):
+        """Test GMST formula, in hours, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
         a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         # -0.00029 seconds different from given test data.
         # This is higher precision.
         self.assertEqual('11:39:5.06752', str(a_gmst))
 
 
-    def test_GMST_USNO_8am(self):
-        """Test GMST USNO 8 am"""
+    def test_GMST_8am(self):
+        """Test GMST 8 am"""
         a_datetime = coords.datetime('2015-01-01T08:00:00')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         # TODO validate against something
         self.assertEqual('-9:17:22.0146', str(a_gmst))
 
 
-    def test_GMST_USNO_2pm(self):
-        """Test GMST USNO 2 pm"""
+    def test_GMST_2pm(self):
+        """Test GMST 2 pm"""
         a_datetime = coords.datetime('2015-01-01T14:00:00')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         # TODO validate against something
         self.assertEqual('-3:16:22.8758', str(a_gmst))
 
 
-    def test_GMST_USNO_2pm_tz1(self):
-        """Test GMST USNO 2 pm timezone +1"""
+    def test_GMST_2pm_tz1(self):
+        """Test GMST 2 pm timezone +1"""
         a_datetime = coords.datetime('2015-01-01T14:00:00+0100')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         # TODO validate against something
         self.assertEqual('-2:16:13.0193', str(a_gmst))
 
 
-    def test_GMST_USNO_2pm_tzn1(self):
-        """Test GMST USNO 2 pm timezone -1"""
+    def test_GMST_2pm_tzn1(self):
+        """Test GMST 2 pm timezone -1"""
         a_datetime = coords.datetime('2015-01-01T14:00:00-01:00')
-        a_gmst = self.xforms.GMST_USNO(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         # TODO validate against something
         self.assertEqual('-4:16:32.7323', str(a_gmst))
 
 
-    def test_GMST_USNO_simplified_J2000(self):
-        """Test GMST USNO simplified J2000"""
+    def test_GMST_simplified_J2000(self):
+        """Test GMST simplified J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
-        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
+        a_gmst = self.xforms.GMST_simplified(a_datetime)
         self.assertEqual('-5:18:9.45159', str(a_gmst))
 
 
-    def test_GMST_USNO_simplified_J2000_plus_day(self):
-        """Test GMST USNO J2000 plus a day"""
+    def test_GMST_simplified_J2000_plus_day(self):
+        """Test GMST J2000 plus a day"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
-        a_gmst_0 = self.xforms.GMST_USNO_simplified(a_datetime_0)
+        a_gmst_0 = self.xforms.GMST_simplified(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
-        a_gmst_1 = self.xforms.GMST_USNO_simplified(a_datetime_1)
+        a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
 
 
-    def test_GMST_USNO_simplified_standrews(self):
-        """Test GMST USNO simplified at St. Andrews"""
+    def test_GMST_simplified_standrews(self):
+        """Test GMST simplified at St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
         a_datetime = coords.datetime('1998-02-04T00:00:00')
-        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
+        a_gmst = self.xforms.GMST_simplified(a_datetime)
 
         sta_long = coords.angle(2, 48)
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
@@ -236,87 +243,236 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
 
-    def test_GMST_USNO_simplified_kb(self):
-        """Test GMST USNO simplified formula, in hours, with kburnett data"""
+    def test_GMST_simplified_kb(self):
+        """Test GMST simplified formula, in hours, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
         a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST_USNO_simplified(a_datetime)
+        a_gmst = self.xforms.GMST_simplified(a_datetime)
 
         # -0.00001 seconds different from given test data
         self.assertEqual('11:39:5.06724', str(a_gmst))
 
 
-    def test_GMST_USNO_simplified2_kb(self):
-        """Test GMST USNO simplified formula 2, in degrees, with kburnett data"""
+    def test_GMST_simplified2_kb(self):
+        """Test GMST simplified formula 2, in degrees, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
         a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST_USNO_simplified2(a_datetime)
+        a_gmst = self.xforms.GMST_simplified2(a_datetime)
 
         # matches test data given when rouded to 0.0001 places
         self.assertEqual('11:39:5.06723', str(a_gmst))
 
 
 
-    def test_GMST_APC(self):
+class TestStjarnHimlen(unittest.TestCase):
+
+    """Tests Starry Sky methods
+
+    validate with http://www.satellite-calculations.com/Satellite/suncalc.htm
+
+    Assertions are to the calculated results not exactly the
+    suncalc.htm results.  Differences are not much more than a degree
+    in most cases, but I do not know what algorithm it is using.
+    """
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 5
+        self.sthm_xform = Transforms.StjarnHimlen()
+
+
+    def test_SolarLongitude_J2000(self):
+        """Tests solar longitude calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        a_solar_longitude = self.sthm_xform.SolarLongitude(j2000)
+
+        self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
+
+
+    def test_SolarRADec_J2000(self):
+        """Tests solar RA and Dec calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        RA, Dec = self.sthm_xform.SolarRADec(j2000)
+
+        self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
+        self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
+
+
+    def test_GMST0_J2000(self):
+        """Tests GMST0 calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        gmst0 = self.sthm_xform.GMST0(j2000)
+
+        self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
+
+
+    def test_GMST_J2000(self):
+        """Tests GMST calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        gmst = self.sthm_xform.GMST(j2000)
+
+        self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
+
+
+
+
+    def test_GMST(self):
+        """Tests GMST
+
+        gmst hours agrees with USNO when half a day off (approximately):
+
+        StH a day ahead agrees better?
+
+        USNO('2000-01-01T00:00:00') == 6:35/9:24 == StH('2000-01-01T12:00:00')
+
+        USNO('2000-01-01T06:00:00') == -11:19:8 == StH('2000-01-02T18:00:00')
+
+
+        USNO('2000-01-01T12:00:00') == -5:18:9 == StH('2000-01-02T00:00:00')
+        USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
+
+        """
+        a_datetime = coords.datetime('2000-01-02T00:00:00')
+        a_gmst = self.sthm_xform.GMST(a_datetime)
+
+        print '\nDatetime:', a_datetime # TODO rm
+        print 'gmst', a_gmst # TODO rm
+
+
+
+    @unittest.skip('tests if exceeds 360 in some cases')
+    def test_SolarLongitude_for_years(self):
+        """Tests solar longitude calculation by months for years
+
+        TODO:
+        flips to 0 on March 21 2000, not quite equinox, not quite midnight.
+        different in different years.
+        """
+
+        for i in xrange(0, 5):
+            for j in xrange(1, 13):
+                for k in xrange(1, 28):
+                    a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
+                    a_solar_longitude = self.sthm_xform.SolarLongitude(a_datetime)
+                    print a_datetime, a_solar_longitude
+
+
+
+    def test_sirius(self):
+        """Test RA/dec of Sirius
+
+        From theodolite app:
+        Date & Time: Wed Dec 31 20:41:41 PST 2014
+        Position: +037.40015* / -122.08219*
+        Altitude: 56ft
+        Azimuth/Bearing: 127* S53E 2258mils (True)
+        Elevation Angle: +18.1*
+
+        from http://www.convertalot.com/celestial_horizon_co-ordinates_calculator.html
+
+        azimuth: 127.59
+        altitude: 16.81
+
+        from http://www.stargazing.net/mas/al_az.htm
+
+        azimuth: 127* 24' 16"
+        altitude: 16* 41' 31"
+
+        """
+
+
+        sirius = Transforms.Transforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                                       a_declination=coords.angle(-16, 42, 58.017))
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
+
+        sirius_hz = self.sthm_xform.toHorizon(sirius, an_observer, a_datetime)
+
+        print 'sirius', sirius_hz
+
+        # TODO validate something
+
+
+
+
+
+
+        
+
+class TestAPC_Transforms(unittest.TestCase):
+    """Test APC transforms."""
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 5
+        self.xforms = Transforms.APC()
+
+
+    def test_GMST(self):
         """Test GMST APC"""
         a_datetime = coords.datetime('2001-01-01T11:00:00')
-        a_gmst = self.xforms.GMST_APC(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
         print 'GMST APC', a_gmst # TODO rm
 
 
 
-    def test_GMST_APC_J2000(self):
+    def test_GMST_J2000(self):
         """Test GMST APC J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
-        a_gmst = self.xforms.GMST_APC(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         self.assertEqual('06:39:53.4567', str(a_gmst))
 
 
 
     @unittest.skip('TODO')
-    def test_GMST_APC_J2000_plus_day(self):
+    def test_GMST_J2000_plus_day(self):
         """Test APC J2000 plus a day"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
-        a_gmst_0 = self.xforms.GMST_APC(a_datetime_0)
+        a_gmst_0 = self.xforms.GMST(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
-        a_gmst_1 = self.xforms.GMST_APC(a_datetime_1)
+        a_gmst_1 = self.xforms.GMST(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
         self.assertEqual('18:45:47.1038', str(a_gmst_1))
 
 
     @unittest.skip('TODO')
-    def test_GMST_APC_kb(self):
+    def test_GMST_kb(self):
         """Test GMST APC formula, in degrees, with kburnett data"""
         # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
         a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST_APC(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         # matches test data given
         self.assertEqual('11:39:5.06724', str(a_gmst))
 
 
     @unittest.skip('TODO')
-    def test_GMST_APC_standrews(self):
+    def test_GMST_standrews(self):
         """Test GMST APC St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
         a_datetime = coords.datetime('1998-02-04T00:00:00')
-        a_gmst = self.xforms.GMST_APC(a_datetime)
+        a_gmst = self.xforms.GMST(a_datetime)
 
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
 
-class TestEquitorialHorizon(unittest.TestCase):
-    """Test horizon transforms"""
+class TestEquatorialHorizon(unittest.TestCase):
+    """Test equatorial horizon transforms"""
 
     def setUp(self):
         """Set up test parameters."""
 
         self.places = 5
-        self.eq2hz_xforms = Transforms.EquitorialHorizon()
+        self.eq2hz_xforms = Transforms.EquatorialHorizon()
+
 
     @unittest.skip('TODO')
     def test_toHorizon_StA_overhead_0(self):
@@ -569,104 +725,6 @@ class TestEcEqXforms(unittest.TestCase):
         an_object_eq = self.eceq_xform.toEquatorial(an_object, j2015)
         self.assertAlmostEqual(14.41240, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(342.84035, self.getLongitude(an_object_eq), self.places)
-
-
-class TestStjarnHimlen(unittest.TestCase):
-
-    """Tests Starry Sky methods
-
-    validate with http://www.satellite-calculations.com/Satellite/suncalc.htm
-
-    Assertions are to the calculated results not exactly the
-    suncalc.htm results.  Differences are not much more than a degree
-    in most cases, but I do not know what algorithm it is using.
-    """
-
-    def setUp(self):
-        """Set up test parameters."""
-
-        self.places = 5
-        self.sthm_xform = Transforms.StjarnHimlen()
-
-
-    def test_SolarLongitude_J2000(self):
-        """Tests solar longitude calculation for J2000"""
-        j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_solar_longitude = self.sthm_xform.SolarLongitude(j2000)
-
-        self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
-
-
-    def test_SolarRADec_J2000(self):
-        """Tests solar RA and Dec calculation for J2000"""
-        j2000 = coords.datetime('2000-01-01T00:00:00')
-        RA, Dec = self.sthm_xform.SolarRADec(j2000)
-
-        self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
-        self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
-
-
-    def test_GMST0_J2000(self):
-        """Tests GMST0 calculation for J2000"""
-        j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst0 = self.sthm_xform.GMST0(j2000)
-
-        self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
-
-
-    def test_GMST_J2000(self):
-        """Tests GMST calculation for J2000"""
-        j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst = self.sthm_xform.GMST(j2000)
-
-        self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
-
-
-
-
-    def test_GMST(self):
-        """Tests GMST
-
-        gmst hours agrees with USNO when half a day off (approximately):
-
-        StH a day ahead agrees better?
-
-        USNO('2000-01-01T00:00:00') == 6:35/9:24 == StH('2000-01-01T12:00:00')
-
-        USNO('2000-01-01T06:00:00') == -11:19:8 == StH('2000-01-02T18:00:00')
-
-
-        USNO('2000-01-01T12:00:00') == -5:18:9 == StH('2000-01-02T00:00:00')
-        USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
-
-        """
-        a_datetime = coords.datetime('2000-01-02T00:00:00')
-        a_gmst = self.sthm_xform.GMST(a_datetime)
-
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'gmst', a_gmst # TODO rm
-
-
-
-    @unittest.skip('tests if exceeds 360 in some cases')
-    def test_SolarLongitude_for_years(self):
-        """Tests solar longitude calculation by months for years
-
-        TODO:
-        flips to 0 on March 21 2000, not quite equinox, not quite midnight.
-        different in different years.
-        """
-
-        for i in xrange(0, 5):
-            for j in xrange(1, 13):
-                for k in xrange(1, 28):
-                    a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
-                    a_solar_longitude = self.sthm_xform.SolarLongitude(a_datetime)
-                    print a_datetime, a_solar_longitude
-
-
-
-
 
 
 if __name__ == '__main__':
