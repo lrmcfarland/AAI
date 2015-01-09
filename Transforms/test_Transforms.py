@@ -121,8 +121,6 @@ class TestTransforms(unittest.TestCase):
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_USNO(a_datetime)
 
-        print '\nGMST USNO', a_gmst # TODO rm
-
         self.assertEqual('-5:18:9.45159', str(a_gmst))
 
 
@@ -320,7 +318,7 @@ class TestEquitorialHorizon(unittest.TestCase):
         self.places = 5
         self.eq2hz_xforms = Transforms.EquitorialHorizon()
 
-
+    @unittest.skip('TODO')
     def test_toHorizon_StA_overhead_0(self):
         """Test to horizon transform overhead 0"""
         an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(1),
@@ -335,6 +333,7 @@ class TestEquitorialHorizon(unittest.TestCase):
         # TODO validate something
 
 
+    @unittest.skip('TODO')
     def test_toHorizon_StA_overhead(self):
         """Test to horizon transform overhead"""
         an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(3),
@@ -350,6 +349,7 @@ class TestEquitorialHorizon(unittest.TestCase):
 
 
 
+    @unittest.skip('TODO')
     def test_sirius(self):
         """Test RA/dec of Sirius
 
@@ -575,9 +575,11 @@ class TestStjarnHimlen(unittest.TestCase):
 
     """Tests Starry Sky methods
 
-
     validate with http://www.satellite-calculations.com/Satellite/suncalc.htm
 
+    Assertions are to the calculated results not exactly the
+    suncalc.htm results.  Differences are not much more than a degree
+    in most cases, but I do not know what algorithm it is using.
     """
 
     def setUp(self):
@@ -587,8 +589,43 @@ class TestStjarnHimlen(unittest.TestCase):
         self.sthm_xform = Transforms.StjarnHimlen()
 
 
-    def test_GMST_StH(self):
-        """Tests GMST calculation 1
+    def test_SolarLongitude_J2000(self):
+        """Tests solar longitude calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        a_solar_longitude = self.sthm_xform.SolarLongitude(j2000)
+
+        self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
+
+
+    def test_SolarRADec_J2000(self):
+        """Tests solar RA and Dec calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        RA, Dec = self.sthm_xform.SolarRADec(j2000)
+
+        self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
+        self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
+
+
+    def test_GMST0_J2000(self):
+        """Tests GMST0 calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        gmst0 = self.sthm_xform.GMST0(j2000)
+
+        self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
+
+
+    def test_GMST_J2000(self):
+        """Tests GMST calculation for J2000"""
+        j2000 = coords.datetime('2000-01-01T00:00:00')
+        gmst = self.sthm_xform.GMST(j2000)
+
+        self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
+
+
+
+
+    def test_GMST(self):
+        """Tests GMST
 
         gmst hours agrees with USNO when half a day off (approximately):
 
@@ -603,36 +640,31 @@ class TestStjarnHimlen(unittest.TestCase):
         USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
 
         """
-        a_datetime = coords.datetime('2000-06-01T12:00:00') # starts at noon
-        a_lonsun = self.sthm_xform.SolarLongitude(a_datetime)
+        a_datetime = coords.datetime('2000-01-02T00:00:00')
+        a_gmst = self.sthm_xform.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
-        print 'lonsun', a_lonsun # TODO rm
+        print 'gmst', a_gmst # TODO rm
 
 
 
-    def test_SolarLongitude_J2000(self):
-        """Tests solar longitude calculation 1"""
-        j2000 = coords.datetime('2000-01-01T00:00:00') # starts at noon
-        self.sthm_xform.SolarLongitude(j2000)
+    @unittest.skip('tests if exceeds 360 in some cases')
+    def test_SolarLongitude_for_years(self):
+        """Tests solar longitude calculation by months for years
 
+        TODO:
+        flips to 0 on March 21 2000, not quite equinox, not quite midnight.
+        different in different years.
+        """
 
-    def test_SolarLongitude_by_months_for_years(self):
-        """Tests solar longitude calculation by months for years"""
-
-        for i in xrange(1, 5):
+        for i in xrange(0, 5):
             for j in xrange(1, 13):
-                a_datetime = coords.datetime('200%d-%02d-01T00:00:00' % (i, j)) # starts at noon
-                self.sthm_xform.SolarLongitude(a_datetime)
+                for k in xrange(1, 28):
+                    a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
+                    a_solar_longitude = self.sthm_xform.SolarLongitude(a_datetime)
+                    print a_datetime, a_solar_longitude
 
 
-    def test_SolarLongitude_1(self):
-        """Tests solar longitude calculation 1"""
-
-        for i in xrange(1, 5):
-            for j in xrange(0, 23):
-                a_datetime = coords.datetime('2000-01-%02dT%02d:00:00' % (i, j)) # starts at noon
-                self.sthm_xform.SolarLongitude(a_datetime)
 
 
 

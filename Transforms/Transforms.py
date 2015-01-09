@@ -2,27 +2,38 @@
 
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
-Sidereal Time
+to run: ./pylaunch.sh ecliptic.py
 
+References:
+
+Sidereal Time
     http://en.wikipedia.org/wiki/Sidereal_time
     http://aa.usno.navy.mil/faq/docs/GAST.php
     http://aa.usno.navy.mil/data/docs/JulianDate.php
+    http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
 
-Equatorial Coordinate System http://en.wikipedia.org/wiki/Equatorial_coordinate_system
-    right ascension http://en.wikipedia.org/wiki/Right_ascension
-    declination http://en.wikipedia.org/wiki/Declination
+Celestial Coordinate System
+    http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
+    http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
 
-Ecliptic Coordinate System http://en.wikipedia.org/wiki/Ecliptic_coordinate_system
-    ecliptic longitude
-    ecliptic latitude
 
-to run: ./pylaunch.sh ecliptic.py
+Equatorial Coordinate System
+    http://en.wikipedia.org/wiki/Equatorial_coordinate_system
+
+Ecliptic Coordinate System
+    http://en.wikipedia.org/wiki/Ecliptic
+    http://en.wikipedia.org/wiki/Ecliptic_coordinate_system
+    http://en.wikipedia.org/wiki/Axial_tilt
+
+Validation:
+    http://lambda.gsfc.nasa.gov/toolbox/tb_converters_ov.cfm
+    http://www.stargazing.net/mas/al_az.htm
+    http://www.satellite-calculations.com/Satellite/suncalc.htm
 
 See also:
-    http://en.wikipedia.org/wiki/Ecliptic
-    http://en.wikipedia.org/wiki/Axial_tilt
-    http://lambda.gsfc.nasa.gov/toolbox/tb_converters_ov.cfm
-
+    http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+    http://stjarnhimlen.se/english.html
+    http://www2.arnes.si/~gljsentvid10/sidereal.htm
     https://stuff.mit.edu/afs/athena/project/xephem/src/xephem-3.1/libastro/utc_gst.c
     http://kortis.to/radix/python/code/Sun-old.py
 
@@ -45,7 +56,6 @@ class Transforms(object):
 
 
     def __init__(self, *args, **kwargs):
-        # no instance data members so far.
         super(Transforms, self).__init__(*args, **kwargs)
 
 
@@ -97,10 +107,6 @@ class Transforms(object):
 
         from:
             http://aa.usno.navy.mil/faq/docs/GAST.php
-            http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
-
-        see also:
-            http://aa.usno.navy.mil/data/docs/JulianDate.php
 
         returns GMST in hours
         """
@@ -133,10 +139,6 @@ class Transforms(object):
 
         from:
             http://aa.usno.navy.mil/faq/docs/GAST.php
-            http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
-
-
-        see also http://en.wikipedia.org/wiki/Sidereal_time
 
         Returns GMST in hours
         """
@@ -202,11 +204,7 @@ class Transforms(object):
 
         UT = (T - To) * 86400.0 # TODO cls.siderial_day.value?
 
-        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0)
-
-        # seconds
-        print # linefeed
-        print 'APC gmst', gmst # TODO rm
+        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0) # in seconds
 
         gmst_hours = gmst/3600.0
 
@@ -219,20 +217,7 @@ class Transforms(object):
 
 class EquitorialHorizon(Transforms):
 
-    """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
-
-    See also:
-        http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
-        http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
-
-        http://en.wikipedia.org/wiki/Equatorial_coordinate_system
-        http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
-
-        http://www.stargazing.net/mas/al_az.htm
-        http://stjarnhimlen.se/english.html
-
-
-    """
+    """Transforms 3D space vectors to/from ecliptic/equatorial coordinates"""
 
     horizon_axis = coords.rotator(coords.Uy)
 
@@ -424,6 +409,8 @@ class EquitorialHorizon(Transforms):
     def _xform_APC(cls, an_object, an_observer, a_local_datetime, a_direction):
         """Transforms a vector to/from equatorial/ecliptic coordinates.
 
+        from Montenbruck and Pfleger, Astronomy on the Personal Computer, p. 40
+
         TODO my implementation of this APC algorithm isn't working
 
         Args:
@@ -487,10 +474,12 @@ class EclipticEquatorial(Transforms):
     ASSUMES: The x-axis points to vernal equinox. Positive rotations are right hand rule,
     Y x Z = X, i.e. counter clockwise looking down X.
 
-    See also:
-        http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
-        http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
+    from:
         http://en.wikipedia.org/wiki/Axial_tilt
+
+    See also:
+        http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
+        http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
 
     """
 
@@ -574,59 +563,56 @@ class StjarnHimlen(object):
 
     Tack Paul!
 
+    see also:
+        http://kortis.to/radix/python/code/Sun-old.py
+
     """
 
     def SolarLongitude(self, a_datetime):
-        """Compute the position of the sun from the date
+        """Calculate the longitude of the sun for the given date
 
-        see also:
-            http://kortis.to/radix/python/code/Sun-old.py
-
+        returns the sun's longitude
         """
-
-        print # linefeed
-        print a_datetime # TODO rm
 
         d = a_datetime.toJulianDate() - a_datetime.J2000
 
-        print 'd', d # TODO rm
-
-        N = coords.angle(0.0) # longitude of the ascending node
-        i = coords.angle(0.0) # inclination to the eclipitic
         w = 282.9404 + 4.70935E-5 * d # argument of perihelion
-
-        a = 1.000000 #  semi-major axis, or mean disntance from the Sun (AU)
         e = 0.016709 - 1.151E-9 * d # eccentricity
-
         M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
-
-        E = coords.angle(M.value + e *(180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+        E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
 
         xv = math.cos(E.radians) - e
         yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
 
         v = math.atan2(yv, xv)*180/math.pi
-        print 'v', v # TODO rm
 
         lonsun = coords.angle(v + w)
-        print 'lonsun', lonsun # TODO rm
+        lonsun.normalize(0, 360) # flips to 0 on March 21 2000, not quite equinox
 
-        gmst0 = coords.angle(lonsun.value + 180)
-        print 'gmst0', gmst0
-        gmst0.normalize(0, 360)
-        print 'gmst0 normalized', gmst0
-
-        gmst = coords.angle(gmst0.value/15 + d*24)
-        print 'gmst hours', gmst # TODO rm
-        gmst.normalize(-12, 12)
-        print 'gmst hours normalized', gmst # TODO rm
+        return lonsun
 
 
-        # TODO unnecessary from here to the return. Separate method?
+    def SolarRADec(self, a_datetime):
+        """Calculate the right ascension and declination of the sun for the given date
+
+        returns the sun's RA and declination
+        """
+
+        d = a_datetime.toJulianDate() - a_datetime.J2000
+
+        w = 282.9404 + 4.70935E-5 * d # argument of perihelion
+        e = 0.016709 - 1.151E-9 * d # eccentricity
+        M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
+        E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+
+        xv = math.cos(E.radians) - e
+        yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
+
+        v = math.atan2(yv, xv)*180/math.pi
+
+        lonsun = coords.angle(v + w)
 
         r = math.sqrt( xv*xv + yv*yv)
-
-        print 'r', r # TODO rm
 
         xs = r * math.cos(lonsun.radians)
         ys = r * math.sin(lonsun.radians)
@@ -639,11 +625,42 @@ class StjarnHimlen(object):
 
         RA = coords.angle(math.atan2(ye, xe)*180/math.pi)
         RA.normalize(0, 360)
+
         Dec = coords.angle(math.atan2(ze, math.sqrt(xe*xe+ye*ye))*180/math.pi)
 
-        print 'RA', RA, 'Dec', Dec # TODO rm
+        return RA, Dec # TODO as coords.spherical(1, Longitue(Dec), RA)?
 
-        return lonsun
+
+
+    def GMST0(self, a_datetime):
+        """Calculate the Greenwich mean siderial time at Greenwich"""
+
+        lonsun = self.SolarLongitude(a_datetime)
+        gmst0 = coords.angle(lonsun.value + 180) # TODO noon or midnight vs. GMST USNO
+        gmst0.normalize(0, 360) # TODO as hours?
+
+        return gmst0
+
+
+    def GMST(self, a_datetime):
+        """Calculate the Greenwich mean siderial time at location"""
+
+        gmst0 = self.GMST0(a_datetime)
+
+        d = a_datetime.toJulianDate() - a_datetime.J2000
+
+        gmst = coords.angle(gmst0.value/15 + d*24)
+        gmst.normalize(-12, 12)
+
+        return gmst
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
