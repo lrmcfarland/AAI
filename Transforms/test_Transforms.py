@@ -107,10 +107,21 @@ class TestTransforms(unittest.TestCase):
     # ----- Greenwich Mean Sidereal Time -----
     # ----------------------------------------
 
+    def test_GMST_USNO(self):
+        """Test GMST USNO"""
+        a_datetime = coords.datetime('2000-01-01T12:00:00')
+        a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        print '\nDatetime:', a_datetime # TODO rm
+        print 'GMST USNO', a_gmst # TODO rm
+
+
     def test_GMST_USNO_J2000(self):
         """Test GMST USNO J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_USNO(a_datetime)
+
+        print '\nGMST USNO', a_gmst # TODO rm
 
         self.assertEqual('-5:18:9.45159', str(a_gmst))
 
@@ -248,12 +259,23 @@ class TestTransforms(unittest.TestCase):
 
 
 
+    def test_GMST_APC(self):
+        """Test GMST APC"""
+        a_datetime = coords.datetime('2001-01-01T11:00:00')
+        a_gmst = self.xforms.GMST_APC(a_datetime)
+
+        print '\nDatetime:', a_datetime # TODO rm
+        print 'GMST APC', a_gmst # TODO rm
+
+
+
     def test_GMST_APC_J2000(self):
         """Test GMST APC J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_APC(a_datetime)
 
         self.assertEqual('06:39:53.4567', str(a_gmst))
+
 
 
     @unittest.skip('TODO')
@@ -565,9 +587,33 @@ class TestStjarnHimlen(unittest.TestCase):
         self.sthm_xform = Transforms.StjarnHimlen()
 
 
+    def test_GMST_StH(self):
+        """Tests GMST calculation 1
+
+        gmst hours agrees with USNO when half a day off (approximately):
+
+        StH a day ahead agrees better?
+
+        USNO('2000-01-01T00:00:00') == 6:35/9:24 == StH('2000-01-01T12:00:00')
+
+        USNO('2000-01-01T06:00:00') == -11:19:8 == StH('2000-01-02T18:00:00')
+
+
+        USNO('2000-01-01T12:00:00') == -5:18:9 == StH('2000-01-02T00:00:00')
+        USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
+
+        """
+        a_datetime = coords.datetime('2000-06-01T12:00:00') # starts at noon
+        a_lonsun = self.sthm_xform.SolarLongitude(a_datetime)
+
+        print '\nDatetime:', a_datetime # TODO rm
+        print 'lonsun', a_lonsun # TODO rm
+
+
+
     def test_SolarLongitude_J2000(self):
         """Tests solar longitude calculation 1"""
-        j2000 = coords.datetime('2001-01-01T12:00:00') # starts at noon
+        j2000 = coords.datetime('2000-01-01T00:00:00') # starts at noon
         self.sthm_xform.SolarLongitude(j2000)
 
 
@@ -576,7 +622,7 @@ class TestStjarnHimlen(unittest.TestCase):
 
         for i in xrange(1, 5):
             for j in xrange(1, 13):
-                a_datetime = coords.datetime('200%d-01-%02dT00:00:00' % (i, j)) # starts at noon
+                a_datetime = coords.datetime('200%d-%02d-01T00:00:00' % (i, j)) # starts at noon
                 self.sthm_xform.SolarLongitude(a_datetime)
 
 
