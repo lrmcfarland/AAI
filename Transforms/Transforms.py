@@ -282,7 +282,7 @@ class StjarnHimlen(Transforms):
         d = a_datetime.toJulianDate() - a_datetime.J2000
 
         gmst = coords.angle(gmst0.value/15 + d*24)
-        gmst.normalize(-12, 12)
+        gmst.normalize(-12, 12) # TODO as degrees?
 
         return gmst
 
@@ -307,6 +307,54 @@ class StjarnHimlen(Transforms):
 
         Returns a spherical coordinate vector in the transformed coordinates
         """
+
+        print # linefeed
+        print 'object', an_object # TODO rm
+        print 'observer', an_observer # TODO rm
+        print 'a time', a_local_datetime # TODO rm
+
+
+        gmst = cls.GMST(a_local_datetime)
+
+        print 'gmst', gmst # TODO rm
+
+        lst = gmst.value + an_observer.phi.value/15
+
+        print 'lst', lst # TODO rm
+
+        ha = coords.angle(360*(lst - an_object.phi.value/15)/24) # degrees?
+        ha.normalize(-180, 180)
+
+        # ha = coords.angle(-53) # TODO this hack makes it close to correct for test_sirius 2014-12-31
+        # ha = coords.angle(-105) # TODO this hack makes az close, but dec way off for test_sirius 2015-01-06
+
+        print 'ha', ha, ha.radians
+
+        dec = coords.angle(90 - an_object.theta.value)
+
+        print 'dec', dec
+
+        x = math.cos(ha.radians) * math.cos(dec.radians)
+        y = math.sin(ha.radians) * math.cos(dec.radians)
+        z = math.sin(dec.radians)
+
+        xhor = x * math.sin(math.pi/2 - an_observer.theta.radians) - z * math.cos(math.pi/2 - an_observer.theta.radians)
+        yhor = y
+        zhor = x * math.cos(math.pi/2 - an_observer.theta.radians) + z * math.sin(math.pi/2 - an_observer.theta.radians)
+
+        az = coords.angle((math.atan2(yhor, xhor) + math.pi)*180/math.pi)
+
+        print 'az', az
+
+        alt = coords.angle(math.asin(zhor)*180/math.pi) # or
+
+        print 'alt', alt
+
+        alt = coords.angle(math.atan2(zhor, math.sqrt(xhor*xhor + yhor*yhor))*180/math.pi)
+
+        print 'alt', alt
+
+
 
 
 class APC(Transforms):
@@ -422,7 +470,7 @@ class EquatorialHorizon(Transforms):
 
 
     @classmethod
-    def toHorizon_StA(cls, an_object, an_observer, a_local_datetime):
+    def toHorizon(cls, an_object, an_observer, a_local_datetime):
         """Transforms a vector from equatorial to ecliptic coordinates.
 
         from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm

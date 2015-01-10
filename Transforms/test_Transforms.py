@@ -116,7 +116,7 @@ class Test_USNO_Transforms(unittest.TestCase):
 
     def test_GMST(self):
         """Test GMST"""
-        a_datetime = coords.datetime('2000-01-01T12:00:00')
+        a_datetime = coords.datetime('2000-01-01T01:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
@@ -362,6 +362,11 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_sirius(self):
         """Test RA/dec of Sirius
 
+        http://en.wikipedia.org/wiki/Sirius
+
+        RA: 6h 45m 8.9173s
+        Dec: -16* 42' 58.017"
+
         From theodolite app:
         Date & Time: Wed Dec 31 20:41:41 PST 2014
         Position: +037.40015* / -122.08219*
@@ -379,6 +384,10 @@ class TestStjarnHimlen(unittest.TestCase):
         azimuth: 127* 24' 16"
         altitude: 16* 41' 31"
 
+        TODO
+        hour angle works out to be +5 degrees and asimuth follows at 186,
+        but if it is -53 hr, then az = 127 and dec = 16, correctly
+
         """
 
 
@@ -387,7 +396,8 @@ class TestStjarnHimlen(unittest.TestCase):
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
-        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        a_datetime = coords.datetime('2014-12-31T20:41:00') # obs 1
+        # a_datetime = coords.datetime('2015-01-06T21:39:00') # obs 2
 
         sirius_hz = self.sthm_xform.toHorizon(sirius, an_observer, a_datetime)
 
@@ -400,7 +410,7 @@ class TestStjarnHimlen(unittest.TestCase):
 
 
 
-        
+
 
 class TestAPC_Transforms(unittest.TestCase):
     """Test APC transforms."""
