@@ -127,13 +127,28 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
 
 
     def test_GMST(self):
-        """Test GMST"""
-        a_datetime = coords.datetime('2015-01-01T08:00:00')
+        """Hacking Test of GMST"""
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
         a_gmst = self.xforms.GMST(a_datetime)
+        a_gast = self.xforms.GAST(a_datetime)
 
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'GMST', a_gmst # TODO rm
+        print '\nDatetime:', a_datetime
+        print 'GMST', a_gmst
+        print 'GAST', a_gast # TODO rm
 
+
+    def test_LST(self):
+        """Hacking Test of LST"""
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_gmst = self.xforms.GMST(a_datetime)
+        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+
+        print '\nDatetime:', a_datetime
+        print 'observer:', an_observer
+        print 'GMST', a_gmst
+        print 'LSTA', a_lsta, a_lsta.value
 
 
     def test_JDo_1(self):
@@ -225,6 +240,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
 
         sta_long = coords.angle(2, 48)
+
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
         self.assertEqual('02:47:60', str(sta_long))
 
@@ -243,35 +259,68 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         self.assertEqual('11:39:5.06752', str(a_gmst))
 
 
+    def test_GMST_2014_12_31_8pm(self):
+        """Test GMST """
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2014&month=12&day=31&hr=20&min=41&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        a_gmst = self.xforms.GMST(a_datetime)
+        a_gast = self.xforms.GAST(a_datetime)
+        an_eqeq = a_gast - a_gmst
+
+        an_observer = coords.spherical(1, coords.latitude(37, 23, 24), coords.angle(-122, 4, 48))
+        a_lstm = self.xforms.LSTM(a_datetime, an_observer)
+        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+
+        self.assertEqual('03:21:46.443', str(a_gmst)) # Actual: 3 21 46.4412
+        self.assertEqual('03:21:46.7422', str(a_gast)) # Actual: 3 21 46.7386
+        self.assertEqual('00:00:0.299296', str(an_eqeq)) # Actual: +0.2975 seconds
+        self.assertEqual('19:13:27.243', str(a_lstm)) # Actual: 19 13 27.2412
+        self.assertEqual('19:13:27.5422', str(a_lsta)) # Actual: 19 13 27.5386
+
+
     def test_GMST_2015_01_01_8am(self):
-        """Test GMST 8 am"""
+        """Test GMST 2015 01 01 8 am"""
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=08&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
+
         a_datetime = coords.datetime('2015-01-01T08:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
         an_eqeq = a_gast - a_gmst
 
+        an_observer = coords.spherical(1, coords.latitude(37, 23, 24), coords.angle(-122, 4, 48))
+        a_lstm = self.xforms.LSTM(a_datetime, an_observer)
+        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+
         self.assertEqual('14:42:37.9854', str(a_gmst)) # Actual: 14 42 37.9836
         self.assertEqual('14:42:38.2855', str(a_gast)) # Actual: 14 42 38.2828
         self.assertEqual('00:00:0.300053', str(an_eqeq)) # Actual: +0.2992 seconds
-        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=08&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
+        self.assertEqual('06:34:18.7854', str(a_lstm)) # Actual: 6 34 18.7836
+        self.assertEqual('06:34:19.0855', str(a_lsta)) # Actual: 6 34 19.0828
 
 
     def test_GMST_2015_01_01_2pm(self):
-        """Test GMST 8 am"""
+        """Test GMST 2015 01 01 2 pm"""
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
+
         a_datetime = coords.datetime('2015-01-01T14:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
         an_eqeq = a_gast - a_gmst
 
+        an_observer = coords.spherical(1, coords.latitude(37, 23, 24), coords.angle(-122, 4, 48))
+        a_lstm = self.xforms.LSTM(a_datetime, an_observer)
+        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+
         self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
         self.assertEqual('20:43:37.4247', str(a_gast)) # Actual: 20 43 37.4227
         self.assertEqual('00:00:0.300452', str(an_eqeq)) # Actual: +0.3003 seconds
-        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
+        self.assertEqual('12:35:17.9242', str(a_lstm)) # Actual: 12 35 17.9224
+        self.assertEqual('12:35:18.2247', str(a_lsta)) # Actual: 12 35 18.2227
 
 
 
     def test_GMST_2015_01_01_2pm_tz1(self):
-        """Test GMST 2 pm timezone +1"""
+        """Test GMST 2015 01 01 2 pm timezone +1"""
         a_datetime = coords.datetime('2015-01-01T14:00:00+0100')
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
@@ -284,7 +333,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
 
 
     def test_GMST_2pm_tzn1(self):
-        """Test GMST 2 pm timezone -1"""
+        """Test GMST 2015 01 01 2 pm timezone -1"""
         a_datetime = coords.datetime('2015-01-01T14:00:00-01:00')
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
@@ -348,24 +397,16 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         self.assertEqual('11:39:5.06723', str(a_gmst))
 
 
-    def test_GAST(self):
-        """Test GAST"""
-        a_datetime = coords.datetime('2000-01-01T01:00:00')
-        a_gast = self.xforms.GAST(a_datetime)
-
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'GAST', a_gast # TODO rm
-
-
-
-
 
 class TestStjarnHimlen(unittest.TestCase):
 
     """Tests Starry Sky methods
 
-    Test values taken from http://www.satellite-calculations.com/Satellite/suncalc.htm
-    but TestStjarnHimlen.test_GMST_J2000_plus_day is 8 seconds too long.
+    validate:
+        http://www.satellite-calculations.com/Satellite/suncalc.htm
+        http://www.stargazing.net/mas/al_az.htm
+
+    TODO TestStjarnHimlen.test_GMST_J2000_plus_day is 8 seconds too long.
 
     """
 
@@ -377,7 +418,7 @@ class TestStjarnHimlen(unittest.TestCase):
 
 
     def test_GMST(self):
-        """Tests GMST
+        """Hacking Test of GMST
 
         gmst hours agrees with USNO when half a day off (approximately):
 
@@ -389,7 +430,7 @@ class TestStjarnHimlen(unittest.TestCase):
         USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
 
         """
-        a_datetime = coords.datetime('2000-01-01T12:00:00')
+        a_datetime = coords.datetime('2015-01-01T08:00:00')
         a_gmst = self.sthm_xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
@@ -496,8 +537,6 @@ class TestStjarnHimlen(unittest.TestCase):
         altitude: 16* 41' 31"
 
         TODO
-        hour angle works out to be +5 degrees and asimuth follows at 186,
-        but if it is -53 hr, then az = 127 and dec = 16, correctly
 
         """
 
@@ -519,10 +558,6 @@ class TestStjarnHimlen(unittest.TestCase):
 
 
 
-
-
-
-
 class TestAPC_Transforms(unittest.TestCase):
     """Test APC transforms."""
 
@@ -534,13 +569,12 @@ class TestAPC_Transforms(unittest.TestCase):
 
 
     def test_GMST(self):
-        """Test GMST APC"""
+        """Hacking Test of GMST"""
         a_datetime = coords.datetime('2001-01-01T11:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
         print 'GMST APC', a_gmst # TODO rm
-
 
 
     def test_GMST_J2000(self):

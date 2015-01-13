@@ -2,7 +2,7 @@
 
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
-to run: ./pylaunch.sh ecliptic.py
+to run: ./pylaunch.sh Transforms.py
 
 References:
 
@@ -17,7 +17,6 @@ Celestial Coordinate System
     http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
     http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
 
-
 Equatorial Coordinate System
     http://en.wikipedia.org/wiki/Equatorial_coordinate_system
 
@@ -28,15 +27,13 @@ Ecliptic Coordinate System
 
 Validation:
     http://lambda.gsfc.nasa.gov/toolbox/tb_converters_ov.cfm
-    http://www.stargazing.net/mas/al_az.htm
-    http://www.satellite-calculations.com/Satellite/suncalc.htm
+    http://aa.usno.navy.mil/cgi-bin/aa_jdconv.pl
+    http://aa.usno.navy.mil/data/docs/siderealtime.php
 
 See also:
     http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
     http://stjarnhimlen.se/english.html
     http://www2.arnes.si/~gljsentvid10/sidereal.htm
-    https://stuff.mit.edu/afs/athena/project/xephem/src/xephem-3.1/libastro/utc_gst.c
-    http://kortis.to/radix/python/code/Sun-old.py
 
 """
 
@@ -217,15 +214,10 @@ class USNO_C163(Transforms):
         gmst = cls.GMST(a_datetime)
 
         JD, JDo = cls.JulianDate0(a_datetime)
-
         D = JD - a_datetime.J2000
-
         eps = coords.angle(23.4393 - 0.0000004*D) # TODO JPL eps?
-
         L = coords.angle(280.47 + 0.98565*D)
-
         omega = coords.angle(125.04 - 0.052954*D)
-
         eqeq = coords.angle((-0.000319*math.sin(omega.radians) - 0.000024*math.sin(2*L.radians))*math.cos(eps.radians))
 
         gast = gmst + eqeq
@@ -234,22 +226,43 @@ class USNO_C163(Transforms):
 
 
     @classmethod
-    def LST(cls, a_datetime, an_observer):
-        """Local sidereal time
+    def LSTM(cls, a_datetime, an_observer):
+        """Local sidereal time, mean
 
         Args:
 
         a_datetime: local date and time of the observation.
 
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
+        an_observer: the latitude (90 - theta) and longitude (phi,
+                     positive west of the prime meridian) of an
+                     observer as a spherical coordinate (unit radius)
 
         """
 
-        print 'TODO'
+        gmst = cls.GMST(a_datetime)
+        lst = gmst + coords.angle(an_observer.phi.value/15)
+        lst.normalize(0, 24)
+        return lst
 
 
+    @classmethod
+    def LSTA(cls, a_datetime, an_observer):
+        """Local sidereal time, apparent
+
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        an_observer: the latitude (90 - theta) and longitude (phi,
+                     positive west of the prime meridian) of an
+                     observer as a spherical coordinate (unit radius)
+
+        """
+
+        gast = cls.GAST(a_datetime)
+        lst = gast + coords.angle(an_observer.phi.value/15)
+        lst.normalize(0, 24)
+        return lst
 
 
 class StjarnHimlen(Transforms):
@@ -392,7 +405,7 @@ class StjarnHimlen(Transforms):
 
         lst = gmst.value + an_observer.phi.value/15
 
-        # lst = 11 # TODO close to correct result for 2014-12-31T20:41:00
+        # lst = 19.2242 # TODO USNO LSTA for 2014-12-31T20:41:00
 
         print 'lst', lst # TODO rm
 
