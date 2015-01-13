@@ -11,6 +11,7 @@ Sidereal Time
     http://aa.usno.navy.mil/faq/docs/GAST.php
     http://aa.usno.navy.mil/data/docs/JulianDate.php
     http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+    http://www.usno.navy.mil/USNO/astronomical-applications/publications/Circular_179.pdf
 
 Celestial Coordinate System
     http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
@@ -113,12 +114,36 @@ class Transforms(object):
         return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
 
 
-class USNO(Transforms):
+class USNO_C163(Transforms):
     """Transforms from the U.S. Naval Observatory
 
-    http://aa.usno.navy.mil/faq/docs/GAST.php
+    from:
+        http://aa.usno.navy.mil/faq/docs/GAST.php
+        http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+
+    TODO USNO_C179
+    http://www.usno.navy.mil/USNO/astronomical-applications/publications/Circular_179.pdf
 
     """
+
+    @classmethod
+    def JulianDate0(cls, a_datetime):
+        """Julian date of the previous midnight
+
+        Returns the Julian Date and its previous midnight
+        """
+
+        JD = a_datetime.toJulianDate()
+        JDfloor = math.floor(JD)
+
+        # Must end in 0.5
+        if JD - JDfloor > 0.5:
+            JDo = JDfloor + 0.5
+        else:
+            JDo = JDfloor - 0.5
+
+        return JD, JDo
+
 
     @classmethod
     def GMST(cls, a_datetime):
@@ -127,14 +152,7 @@ class USNO(Transforms):
         returns GMST in hours
         """
 
-        JD = a_datetime.toJulianDate()
-
-        # JDo is the Julian date of the previous midnight. Must end in 0.5
-        JDfloor = math.floor(JD)
-        if JD - JDfloor > 0.5:
-            JDo = JDfloor + 0.5
-        else:
-            JDo = JDfloor - 0.5
+        JD, JDo = cls.JulianDate0(a_datetime)
 
         D = JD - a_datetime.J2000
         Do = JDo - a_datetime.J2000
@@ -189,14 +207,47 @@ class USNO(Transforms):
         return gmst_hours
 
 
+    @classmethod
+    def GAST(cls, a_datetime):
+        """Greenwich apparent sidereal time
+
+        """
+
+        gmst = cls.GMST(a_datetime)
+
+        JD, JDo = cls.JulianDate0(a_datetime)
+
+        D = JD - a_datetime.J2000
+
+        eps = coords.angle(23.4393 - 0.0000004*D) # TODO JPL eps?
+
+        L = coords.angle(280.47 + 0.98565*D)
+
+        omega = coords.angle(125.04 - 0.052954*D)
+
+        delta = coords.angle((-0.000319*math.sin(omega.radians) - 0.000024*math.sin(2*L.radians))*math.cos(eps.radians))
+
+        gast = gmst + delta
+
+        # TODO normalize?
+
+        return gast
+
+
+
 class StjarnHimlen(Transforms):
     """Starry Sky: How to convert Equatorial to Horizontal coordinates.
 
     from http://stjarnhimlen.se/comp/ppcomp.html
 
     Another method to help me sort out what is wrong with the others.
-
     Tack Paul!
+
+    TODO: The solar calculations agree with
+    http://www.satellite-calculations.com/Satellite/suncalc.htm,
+    but the GMST delta is about 8 seconds too long see
+    TestStjarnHimlen.test_GMST_J2000_plus_day
+
     """
 
     @classmethod
@@ -281,7 +332,7 @@ class StjarnHimlen(Transforms):
 
         d = a_datetime.toJulianDate() - a_datetime.J2000
 
-        gmst = coords.angle(gmst0.value/15 + d*24)
+        gmst = coords.angle(gmst0.value/15 + d*24) # cls.sidereal_day.value) # TODO siderial day?
         gmst.normalize(-12, 12) # TODO as degrees?
 
         return gmst
@@ -313,8 +364,12 @@ class StjarnHimlen(Transforms):
         print 'observer', an_observer # TODO rm
         print 'a time', a_local_datetime # TODO rm
 
+        # Big difference which GMST is being used! Stjarn Himeln's day
+        # is 8 seconds longer that actual.
 
         gmst = cls.GMST(a_local_datetime)
+
+        # gmst = USNO.GMST(a_local_datetime)
 
         print 'gmst', gmst # TODO rm
 
