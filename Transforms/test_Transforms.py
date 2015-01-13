@@ -110,6 +110,13 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
     from:
         http://aa.usno.navy.mil/faq/docs/GAST.php
         http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
+
+    validate:
+        http://aa.usno.navy.mil/cgi-bin/aa_jdconv.pl
+        http://aa.usno.navy.mil/data/docs/siderealtime.php
+
+    This service is only valid for dates between January 1, 2014 and December 31, 2016.
+
     """
 
     def setUp(self):
@@ -117,6 +124,16 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
 
         self.places = 5
         self.xforms = Transforms.USNO_C163()
+
+
+    def test_GMST(self):
+        """Test GMST"""
+        a_datetime = coords.datetime('2015-01-01T08:00:00')
+        a_gmst = self.xforms.GMST(a_datetime)
+
+        print '\nDatetime:', a_datetime # TODO rm
+        print 'GMST', a_gmst # TODO rm
+
 
 
     def test_JDo_1(self):
@@ -172,21 +189,13 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         self.assertEqual('2015-03-15T00:00:00', str(a_JDo_datetime))
 
 
-    def test_GMST(self):
-        """Test GMST"""
-        a_datetime = coords.datetime('2000-01-01T01:00:00')
-        a_gmst = self.xforms.GMST(a_datetime)
-
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'GMST', a_gmst # TODO rm
-
-
     def test_GMST_J2000(self):
         """Test GMST J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST(a_datetime)
 
-        self.assertEqual('-5:18:9.45159', str(a_gmst))
+        self.assertEqual('18:41:50.5484', str(a_gmst))
+        # TODO out of range of http://aa.usno.navy.mil/data/docs/siderealtime.php
 
 
     def test_GMST_J2000_plus_day(self):
@@ -197,7 +206,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
-
+        # matches http://en.wikipedia.org/wiki/Sidereal_time
 
     def test_GMST_J2000_plus_halfday(self):
         """Test GMST J2000 plus a halfday"""
@@ -234,40 +243,58 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         self.assertEqual('11:39:5.06752', str(a_gmst))
 
 
-    def test_GMST_8am(self):
+    def test_GMST_2015_01_01_8am(self):
         """Test GMST 8 am"""
         a_datetime = coords.datetime('2015-01-01T08:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
+        a_gast = self.xforms.GAST(a_datetime)
+        an_eqeq = a_gast - a_gmst
 
-        # TODO validate against something
-        self.assertEqual('-9:17:22.0146', str(a_gmst))
+        self.assertEqual('14:42:37.9854', str(a_gmst)) # Actual: 14 42 37.9836
+        self.assertEqual('14:42:38.2855', str(a_gast)) # Actual: 14 42 38.2828
+        self.assertEqual('00:00:0.300053', str(an_eqeq)) # Actual: +0.2992 seconds
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=08&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
 
 
-    def test_GMST_2pm(self):
-        """Test GMST 2 pm"""
+    def test_GMST_2015_01_01_2pm(self):
+        """Test GMST 8 am"""
         a_datetime = coords.datetime('2015-01-01T14:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
+        a_gast = self.xforms.GAST(a_datetime)
+        an_eqeq = a_gast - a_gmst
 
-        # TODO validate against something
-        self.assertEqual('-3:16:22.8758', str(a_gmst))
+        self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
+        self.assertEqual('20:43:37.4247', str(a_gast)) # Actual: 20 43 37.4227
+        self.assertEqual('00:00:0.300452', str(an_eqeq)) # Actual: +0.3003 seconds
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
 
 
-    def test_GMST_2pm_tz1(self):
+
+    def test_GMST_2015_01_01_2pm_tz1(self):
         """Test GMST 2 pm timezone +1"""
         a_datetime = coords.datetime('2015-01-01T14:00:00+0100')
         a_gmst = self.xforms.GMST(a_datetime)
+        a_gast = self.xforms.GAST(a_datetime)
+        an_eqeq = a_gast - a_gmst
 
-        # TODO validate against something
-        self.assertEqual('-2:16:13.0193', str(a_gmst))
+        self.assertEqual('20:43:46.9807', str(a_gmst)) # Actual: 20 43 37.1224
+        self.assertEqual('20:43:47.2812', str(a_gast)) # Actual: 20 43 37.4227
+        self.assertEqual('00:00:0.300518', str(an_eqeq)) # Actual: +0.3003 seconds
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=2&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&place=%28no+name+given%29&lon_sign=1&lon_deg=15&lon_min=&lon_sec=&lat_sign=1&lat_deg=0&lat_min=&lat_sec=
 
 
     def test_GMST_2pm_tzn1(self):
         """Test GMST 2 pm timezone -1"""
         a_datetime = coords.datetime('2015-01-01T14:00:00-01:00')
         a_gmst = self.xforms.GMST(a_datetime)
+        a_gast = self.xforms.GAST(a_datetime)
+        an_eqeq = a_gast - a_gmst
 
-        # TODO validate against something
-        self.assertEqual('-4:16:32.7323', str(a_gmst))
+        self.assertEqual('20:43:27.2677', str(a_gmst)) # Actual: 20 43 37.1224
+        self.assertEqual('20:43:27.5681', str(a_gast)) # Actual: 20 43 37.4227
+        self.assertEqual('00:00:0.300386', str(an_eqeq)) # Actual: +0.3003 seconds
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=2&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&place=%28no+name+given%29&lon_sign=-1&lon_deg=15&lon_min=&lon_sec=&lat_sign=1&lat_deg=0&lat_min=&lat_sec=
+
 
 
     def test_GMST_simplified_J2000(self):
@@ -349,6 +376,27 @@ class TestStjarnHimlen(unittest.TestCase):
         self.sthm_xforms = Transforms.StjarnHimlen()
 
 
+    def test_GMST(self):
+        """Tests GMST
+
+        gmst hours agrees with USNO when half a day off (approximately):
+
+        StH a day ahead agrees better?
+
+        USNO('2000-01-01T00:00:00') == 6:35/9:24 == StH('2000-01-01T12:00:00')
+        USNO('2000-01-01T06:00:00') == -11:19:8 == StH('2000-01-02T18:00:00')
+        USNO('2000-01-01T12:00:00') == -5:18:9 == StH('2000-01-02T00:00:00')
+        USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
+
+        """
+        a_datetime = coords.datetime('2000-01-01T12:00:00')
+        a_gmst = self.sthm_xforms.GMST(a_datetime)
+
+        print '\nDatetime:', a_datetime # TODO rm
+        print 'gmst', a_gmst # TODO rm
+
+
+
     def test_SolarLongitude_J2000(self):
         """Tests solar longitude calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
@@ -401,30 +449,6 @@ class TestStjarnHimlen(unittest.TestCase):
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
-
-
-
-    def test_GMST(self):
-        """Tests GMST
-
-        gmst hours agrees with USNO when half a day off (approximately):
-
-        StH a day ahead agrees better?
-
-        USNO('2000-01-01T00:00:00') == 6:35/9:24 == StH('2000-01-01T12:00:00')
-
-        USNO('2000-01-01T06:00:00') == -11:19:8 == StH('2000-01-02T18:00:00')
-
-
-        USNO('2000-01-01T12:00:00') == -5:18:9 == StH('2000-01-02T00:00:00')
-        USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
-
-        """
-        a_datetime = coords.datetime('2000-01-02T00:00:00')
-        a_gmst = self.sthm_xforms.GMST(a_datetime)
-
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'gmst', a_gmst # TODO rm
 
 
 

@@ -121,6 +121,9 @@ class USNO_C163(Transforms):
         http://aa.usno.navy.mil/faq/docs/GAST.php
         http://aa.usno.navy.mil/publications/docs/Circular_163.pdf
 
+    validate with:
+        http://aa.usno.navy.mil/data/docs/siderealtime.php
+
     TODO USNO_C179
     http://www.usno.navy.mil/USNO/astronomical-applications/publications/Circular_179.pdf
 
@@ -161,8 +164,8 @@ class USNO_C163(Transforms):
 
         gmst = 6.697374558 + 0.06570982441908*Do + 1.00273790935*H + 0.000026*T*T
 
-        gmst_hours = coords.angle(gmst)
-        gmst_hours.normalize(-12, 12)
+        gmst_hours = coords.angle(gmst - a_datetime.timezone())
+        gmst_hours.normalize(0, 24)
 
         return gmst_hours
 
@@ -209,9 +212,7 @@ class USNO_C163(Transforms):
 
     @classmethod
     def GAST(cls, a_datetime):
-        """Greenwich apparent sidereal time
-
-        """
+        """Greenwich apparent sidereal time"""
 
         gmst = cls.GMST(a_datetime)
 
@@ -225,13 +226,29 @@ class USNO_C163(Transforms):
 
         omega = coords.angle(125.04 - 0.052954*D)
 
-        delta = coords.angle((-0.000319*math.sin(omega.radians) - 0.000024*math.sin(2*L.radians))*math.cos(eps.radians))
+        eqeq = coords.angle((-0.000319*math.sin(omega.radians) - 0.000024*math.sin(2*L.radians))*math.cos(eps.radians))
 
-        gast = gmst + delta
-
-        # TODO normalize?
+        gast = gmst + eqeq
 
         return gast
+
+
+    @classmethod
+    def LST(cls, a_datetime, an_observer):
+        """Local sidereal time
+
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        an_observer: the latitude and longitude (positive west of the
+                     prime meridian) of an observer as a spherical
+                     coordinate (unit radius)
+
+        """
+
+        print 'TODO'
+
 
 
 
@@ -375,13 +392,12 @@ class StjarnHimlen(Transforms):
 
         lst = gmst.value + an_observer.phi.value/15
 
+        # lst = 11 # TODO close to correct result for 2014-12-31T20:41:00
+
         print 'lst', lst # TODO rm
 
         ha = coords.angle(360*(lst - an_object.phi.value/15)/24) # degrees?
         ha.normalize(-180, 180)
-
-        # ha = coords.angle(-53) # TODO this hack makes it close to correct for test_sirius 2014-12-31
-        # ha = coords.angle(-105) # TODO this hack makes az close, but dec way off for test_sirius 2015-01-06
 
         print 'ha', ha, ha.radians
 
@@ -449,7 +465,7 @@ class APC(Transforms):
         gmst_hours = gmst/3600.0
 
         gmst_angle = coords.angle(gmst_hours)
-        gmst_angle.normalize(-24, 24)
+        gmst_angle.normalize(-12, 12)
 
         return gmst_angle
 
