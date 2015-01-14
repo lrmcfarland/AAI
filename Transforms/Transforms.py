@@ -193,9 +193,16 @@ class USNO_C163(Transforms):
         Keith Burnett (kburnett@btinternet.com) - 29 Jan 2002
         implementing Meeus formula 11.4
 
-        This works for test data given above.
+        This works for test data given in the example, but the date is
+        out of range for validation from
+        http://aa.usno.navy.mil/data/docs/siderealtime.php
+
+        The APC algorithm also gives different results for the test
+        date (see test_Transforms.py, USNO_test_GMST_kb.test_GMST_kb
+        vs. APC.test_GMST_kb
 
         Returns GMST in hours
+
         """
 
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
@@ -447,22 +454,13 @@ class APC(Transforms):
     by Montenbruck and Pfleger
     """
 
+    horizon_axis = coords.rotator(coords.Uy)
+
     @classmethod
     def GMST(cls, a_datetime):
         """Greenwich mean sidereal time
 
-        TODO my implementation doesn't match USNO results
-        one day difference is much less than the expected 4 minutes
-
-        First term matches USNO with coefficients converteted to hours
-        (24110.54841/3600), others need further conversion?
-
-
-        2451545 == 2000-01-01T12:00:00
-        86400 = 60*60*24
-
         Returns GMST in hours
-
         """
 
         MJD = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
@@ -478,7 +476,7 @@ class APC(Transforms):
         gmst_hours = gmst/3600.0
 
         gmst_angle = coords.angle(gmst_hours)
-        gmst_angle.normalize(-12, 12)
+        gmst_angle.normalize(0, 24)
 
         return gmst_angle
 
@@ -509,13 +507,13 @@ class APC(Transforms):
         """
 
         if not isinstance(an_object, coords.spherical):
-            raise Error('vector must be in spherical coordinates') # TODO for now
+            raise Error('vector must be in spherical coordinates')
 
         if not isinstance(an_observer, coords.spherical):
-            raise Error('observer must be in spherical coordinates') # TODO for now
+            raise Error('observer must be in spherical coordinates')
 
 
-        gmst = Transforms.GMST_USNO_simplified(a_local_datetime)
+        gmst = cls.GMST(a_local_datetime)
 
         hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
         hour_angle.normalize(0, 360)
@@ -548,10 +546,6 @@ class EquatorialHorizon(Transforms):
     """Transforms 3D space vectors to/from ecliptic/equatorial coordinates"""
 
     horizon_axis = coords.rotator(coords.Uy)
-
-    def __init__(self, *args, **kwargs):
-        super(EquatorialHorizon, self).__init__(*args, **kwargs)
-
 
     @classmethod
     def toHorizon(cls, an_object, an_observer, a_local_datetime):
@@ -589,11 +583,14 @@ class EquatorialHorizon(Transforms):
         print "an observers's theta (90 - latitude) =", an_observer.theta.value
         print "an observers's phi (longitude -W/+E) =", an_observer.phi.value
 
-        gmst = Transforms.GMST_USNO(a_local_datetime) # hours
 
+        gmst = USNO_C163.GMST(a_local_datetime) # hours
         print 'gmst', gmst, gmst.value # TODO rm
 
-        local_hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
+        lst = USNO_C163.LSTA(a_local_datetime, an_observer) # hours
+        print 'lst', lst, lst.value, lst.value*15 # TODO rm
+
+        local_hour_angle = coords.angle(lst.value*15 - an_object.phi.value) # TODO
 
         print 'local_hour_angle', local_hour_angle # TODO rm
 

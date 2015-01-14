@@ -7,7 +7,7 @@ import unittest
 import coords
 import Transforms
 
-class TestTransforms(unittest.TestCase):
+class TransformTests(unittest.TestCase):
     """Test basic transforms."""
 
     def setUp(self):
@@ -104,7 +104,7 @@ class TestTransforms(unittest.TestCase):
         self.assertEqual(1, a_Julian_century)
 
 
-class Test_USNO_C163_Transforms(unittest.TestCase):
+class USNO_C163(unittest.TestCase):
     """Test USNO transforms.
 
     from:
@@ -126,9 +126,10 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         self.xforms = Transforms.USNO_C163()
 
 
+    @unittest.skip('hacking')
     def test_GMST(self):
         """Hacking Test of GMST"""
-        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        a_datetime = coords.datetime('2015-06-01T00:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
 
@@ -137,6 +138,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         print 'GAST', a_gast # TODO rm
 
 
+    @unittest.skip('hacking')
     def test_LST(self):
         """Hacking Test of LST"""
         a_datetime = coords.datetime('2014-12-31T20:41:00')
@@ -210,7 +212,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
 
         self.assertEqual('18:41:50.5484', str(a_gmst))
-        # TODO out of range of http://aa.usno.navy.mil/data/docs/siderealtime.php
+        # Note: out of range of http://aa.usno.navy.mil/data/docs/siderealtime.php
 
 
     def test_GMST_J2000_plus_day(self):
@@ -223,6 +225,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
         # matches http://en.wikipedia.org/wiki/Sidereal_time
 
+
     def test_GMST_J2000_plus_halfday(self):
         """Test GMST J2000 plus a halfday"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
@@ -231,6 +234,22 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
         self.assertEqual('12:01:58.2777', str(a_gmst_1 - a_gmst_0))
+
+
+    def test_GMST_kb(self):
+        """Test GMST formula, in hours, with kburnett data"""
+        # This example is from
+        # http://www2.arnes.si/~gljsentvid10/sidereal.htm and uses
+        # the same formula as
+        # http://aa.usno.navy.mil/faq/docs/GAST.php
+        # but
+        # http://aa.usno.navy.mil/data/docs/siderealtime.php says this
+        # date is out of range.
+
+        a_datetime = coords.datetime('1994-06-16T18:00:00')
+        a_gmst = self.xforms.GMST(a_datetime)
+
+        self.assertEqual('11:39:5.06752', str(a_gmst))
 
 
     def test_GMST_standrews(self):
@@ -247,16 +266,6 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
         # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
-
-    def test_GMST_kb(self):
-        """Test GMST formula, in hours, with kburnett data"""
-        # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
-        a_datetime = coords.datetime('1994-06-16T18:00:00')
-        a_gmst = self.xforms.GMST(a_datetime)
-
-        # -0.00029 seconds different from given test data.
-        # This is higher precision.
-        self.assertEqual('11:39:5.06752', str(a_gmst))
 
 
     def test_GMST_2014_12_31_8pm(self):
@@ -398,7 +407,7 @@ class Test_USNO_C163_Transforms(unittest.TestCase):
 
 
 
-class TestStjarnHimlen(unittest.TestCase):
+class StjarnHimlen(unittest.TestCase):
 
     """Tests Starry Sky methods
 
@@ -414,9 +423,10 @@ class TestStjarnHimlen(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5
-        self.sthm_xforms = Transforms.StjarnHimlen()
+        self.xforms = Transforms.StjarnHimlen()
 
 
+    @unittest.skip('hacking')
     def test_GMST(self):
         """Hacking Test of GMST
 
@@ -430,8 +440,8 @@ class TestStjarnHimlen(unittest.TestCase):
         USNO('2000-01-02T00:00:00') == 6:35/9:24 == StH('2000-01-02T12:00:00')
 
         """
-        a_datetime = coords.datetime('2015-01-01T08:00:00')
-        a_gmst = self.sthm_xforms.GMST(a_datetime)
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+        a_gmst = self.xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
         print 'gmst', a_gmst # TODO rm
@@ -441,7 +451,7 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_SolarLongitude_J2000(self):
         """Tests solar longitude calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_solar_longitude = self.sthm_xforms.SolarLongitude(j2000)
+        a_solar_longitude = self.xforms.SolarLongitude(j2000)
 
         self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
 
@@ -449,7 +459,7 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_SolarRADec_J2000(self):
         """Tests solar RA and Dec calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        RA, Dec = self.sthm_xforms.SolarRADec(j2000)
+        RA, Dec = self.xforms.SolarRADec(j2000)
 
         self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
         self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
@@ -458,7 +468,7 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_GMST0_J2000(self):
         """Tests GMST0 calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst0 = self.sthm_xforms.GMST0(j2000)
+        gmst0 = self.xforms.GMST0(j2000)
 
         self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
 
@@ -466,7 +476,7 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_GMST_J2000(self):
         """Tests GMST calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst = self.sthm_xforms.GMST(j2000)
+        gmst = self.xforms.GMST(j2000)
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
@@ -475,9 +485,9 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_GMST_J2000_plus_day(self):
         """Test GMST J2000 plus a day"""
         a_datetime_0 = coords.datetime('2000-01-01T12:00:00')
-        a_gmst_0 = self.sthm_xforms.GMST(a_datetime_0)
+        a_gmst_0 = self.xforms.GMST(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
-        a_gmst_1 = self.sthm_xforms.GMST(a_datetime_1)
+        a_gmst_1 = self.xforms.GMST(a_datetime_1)
 
         # returns '00:04:4.61177'
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
@@ -486,14 +496,14 @@ class TestStjarnHimlen(unittest.TestCase):
     def test_GMST_StA(self):
         """Tests GMST calculation for St. Andrews example"""
         a_datetime = coords.datetime('2000-01-01T00:00:00')
-        gmst = self.sthm_xforms.GMST(a_datetime)
+        gmst = self.xforms.GMST(a_datetime)
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
 
 
 
-    @unittest.skip('tests if exceeds 360 in some cases')
+    @unittest.skip('hacking')
     def test_SolarLongitude_for_years(self):
         """Tests solar longitude calculation by months for years
 
@@ -506,11 +516,12 @@ class TestStjarnHimlen(unittest.TestCase):
             for j in xrange(1, 13):
                 for k in xrange(1, 28):
                     a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
-                    a_solar_longitude = self.sthm_xforms.SolarLongitude(a_datetime)
+                    a_solar_longitude = self.xforms.SolarLongitude(a_datetime)
                     print a_datetime, a_solar_longitude
 
 
 
+    @unittest.skip('hacking')
     def test_sirius(self):
         """Test RA/dec of Sirius
 
@@ -541,15 +552,15 @@ class TestStjarnHimlen(unittest.TestCase):
         """
 
 
-        sirius = Transforms.Transforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
-                                                       a_declination=coords.angle(-16, 42, 58.017))
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
         a_datetime = coords.datetime('2014-12-31T20:41:00') # obs 1
         # a_datetime = coords.datetime('2015-01-06T21:39:00') # obs 2
 
-        sirius_hz = self.sthm_xforms.toHorizon(sirius, an_observer, a_datetime)
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
 
         print 'sirius', sirius_hz
 
@@ -558,7 +569,7 @@ class TestStjarnHimlen(unittest.TestCase):
 
 
 
-class TestAPC_Transforms(unittest.TestCase):
+class APC(unittest.TestCase):
     """Test APC transforms."""
 
     def setUp(self):
@@ -568,13 +579,14 @@ class TestAPC_Transforms(unittest.TestCase):
         self.xforms = Transforms.APC()
 
 
+    @unittest.skip('hacking')
     def test_GMST(self):
         """Hacking Test of GMST"""
-        a_datetime = coords.datetime('2001-01-01T11:00:00')
+        a_datetime = coords.datetime('2015-06-01T00:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
-        print 'GMST APC', a_gmst # TODO rm
+        print 'GMST', a_gmst # TODO rm
 
 
     def test_GMST_J2000(self):
@@ -582,11 +594,10 @@ class TestAPC_Transforms(unittest.TestCase):
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST(a_datetime)
 
+        # TODO: very different from USNO_C163
         self.assertEqual('06:39:53.4567', str(a_gmst))
 
 
-
-    @unittest.skip('TODO')
     def test_GMST_J2000_plus_day(self):
         """Test APC J2000 plus a day"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
@@ -595,21 +606,28 @@ class TestAPC_Transforms(unittest.TestCase):
         a_gmst_1 = self.xforms.GMST(a_datetime_1)
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
-        self.assertEqual('18:45:47.1038', str(a_gmst_1))
+        # matches http://en.wikipedia.org/wiki/Sidereal_time
 
 
-    @unittest.skip('TODO')
+    @unittest.skip('Does not match test data given, but is out of valid date range')
     def test_GMST_kb(self):
         """Test GMST APC formula, in degrees, with kburnett data"""
-        # from http://www2.arnes.si/~gljsentvid10/sidereal.htm
+        # This example is from
+        # http://www2.arnes.si/~gljsentvid10/sidereal.htm and uses
+        # the same formula as
+        # http://aa.usno.navy.mil/faq/docs/GAST.php
+        # but
+        # http://aa.usno.navy.mil/data/docs/siderealtime.php says this
+        # date is out of range.
+
         a_datetime = coords.datetime('1994-06-16T18:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
 
-        # matches test data given
+        # test data given
         self.assertEqual('11:39:5.06724', str(a_gmst))
+        # actual result is 17:36:9.42998
 
 
-    @unittest.skip('TODO')
     def test_GMST_standrews(self):
         """Test GMST APC St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
@@ -617,50 +635,35 @@ class TestAPC_Transforms(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
 
         self.assertEqual('08:55:49.7347', str(a_gmst))
+        # does match USNO result
 
 
-class TestEquatorialHorizon(unittest.TestCase):
-    """Test equatorial horizon transforms"""
-
-    def setUp(self):
-        """Set up test parameters."""
-
-        self.places = 5
-        self.eq2hz_xforms = Transforms.EquatorialHorizon()
+    @unittest.skip('TODO does not match USNO result')
+    def test_GMST_2014_12_31_8pm(self):
+        """Test GMST """
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2014&month=12&day=31&hr=20&min=41&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        a_gmst = self.xforms.GMST(a_datetime)
 
 
-    @unittest.skip('TODO')
-    def test_toHorizon_StA_overhead_0(self):
-        """Test to horizon transform overhead 0"""
-        an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(1),
-                                                      a_declination=coords.angle(10))
-
-        an_observer = coords.spherical(1, coords.latitude(10), coords.angle(15))
-        a_datetime = coords.datetime('2000-01-01T17:17:17.33')
-
-        hz_point = self.eq2hz_xforms.toHorizon_StA(an_object, an_observer, a_datetime)
+        self.assertEqual('03:21:46.443', str(a_gmst)) # Actual: 3 21 46.4412
+        # TODO does not match validation result: 06:37:24.6224
 
 
-        # TODO validate something
+    @unittest.skip('TODO does not match USNO result')
+    def test_GMST_2015_01_01_2pm(self):
+        """Test GMST 2015 01 01 2 pm"""
+        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=1&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&state=CA&place=mountain+view
 
+        a_datetime = coords.datetime('2015-01-01T14:00:00')
+        a_gmst = self.xforms.GMST(a_datetime)
 
-    @unittest.skip('TODO')
-    def test_toHorizon_StA_overhead(self):
-        """Test to horizon transform overhead"""
-        an_object = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(3),
-                                                      a_declination=coords.angle(40))
-
-        an_observer = coords.spherical(1, coords.latitude(30), coords.angle(40))
-        a_datetime = coords.datetime('2000-01-01T17:17:17.33')
-
-        hz_point = self.eq2hz_xforms.toHorizon_StA(an_object, an_observer, a_datetime)
-
-
-        # TODO validate something
+        self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
+        # TODO does not match validation result: '06:41:20.5172'
 
 
 
-    @unittest.skip('TODO')
+    @unittest.skip('hacking')
     def test_sirius(self):
         """Test RA/dec of Sirius
 
@@ -684,42 +687,42 @@ class TestEquatorialHorizon(unittest.TestCase):
         """
 
 
-        sirius = self.eq2hz_xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
-                                                   a_declination=coords.angle(-16, 42, 58.017))
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
-        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        # a_datetime = coords.datetime('2014-12-31T20:41:00')
+        a_datetime = coords.datetime('2015-01-06T21:39:00') # obs 2
 
-        sirius_hz = self.eq2hz_xforms.toHorizon_APC(sirius, an_observer, a_datetime)
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
 
         print 'sirius', sirius_hz
 
         # TODO validate something
 
 
-
     @unittest.skip('TODO')
-    def test_toHorizon_APC_1(self):
+    def test_toHorizon_1(self):
         """Test APC to horizon transform 1"""
         an_object = coords.spherical(1, coords.angle(45), coords.angle(0))
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
 
-        hz_point = self.eq2hz_xforms.toHorizon_APC(an_object, an_observer, a_gst_time)
+        hz_point = self.xforms.toHorizon_APC(an_object, an_observer, a_gst_time)
 
         self.assertAlmostEqual(90, hz_point.theta.value)
         self.assertAlmostEqual(0, hz_point.phi.value)
 
 
     @unittest.skip('TODO')
-    def test_toHorizon_APC_2(self):
+    def test_toHorizon_2(self):
         """Test APC to horizon transform 2"""
         an_object = coords.spherical(1, coords.angle(45), coords.angle(90))
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
 
-        hz_point = self.eq2hz_xforms.toHorizon_APC(an_object, an_observer, a_gst_time)
+        hz_point = self.xforms.toHorizon_APC(an_object, an_observer, a_gst_time)
 
         # TODO validate
         self.assertAlmostEqual(60, hz_point.theta.value)
@@ -727,21 +730,102 @@ class TestEquatorialHorizon(unittest.TestCase):
 
 
     @unittest.skip('TODO')
-    def test_fromHorizon_APC_1(self):
+    def test_fromHorizon_1(self):
         """Test APC from horizon transform 1"""
         an_object = coords.spherical(1, coords.angle(90), coords.angle(0))
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
 
-        hz_point = self.eq2hz_xforms.fromHorizon_APC(an_object, an_observer, a_gst_time)
+        hz_point = self.xforms.fromHorizon_APC(an_object, an_observer, a_gst_time)
 
         self.assertAlmostEqual(45, hz_point.theta.value)
         self.assertAlmostEqual(0, hz_point.phi.value)
 
 
 
+class EquatorialHorizon(unittest.TestCase):
+    """Test equatorial horizon transforms"""
 
-class TestEcEqXforms(unittest.TestCase):
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 5
+        self.xforms = Transforms.EquatorialHorizon()
+
+
+    @unittest.skip('TODO')
+    def test_toHorizon_StA_overhead_0(self):
+        """Test to horizon transform overhead 0"""
+        an_object = self.xforms.radec2spherical(a_right_ascension=coords.angle(1),
+                                                a_declination=coords.angle(10))
+
+        an_observer = coords.spherical(1, coords.latitude(10), coords.angle(15))
+        a_datetime = coords.datetime('2000-01-01T17:17:17.33')
+
+        hz_point = self.xforms.toHorizon_StA(an_object, an_observer, a_datetime)
+
+
+        # TODO validate something
+
+
+    @unittest.skip('TODO')
+    def test_toHorizon_StA_overhead(self):
+        """Test to horizon transform overhead"""
+        an_object = self.xforms.radec2spherical(a_right_ascension=coords.angle(3),
+                                                a_declination=coords.angle(40))
+
+        an_observer = coords.spherical(1, coords.latitude(30), coords.angle(40))
+        a_datetime = coords.datetime('2000-01-01T17:17:17.33')
+
+        hz_point = self.xforms.toHorizon_StA(an_object, an_observer, a_datetime)
+
+
+        # TODO validate something
+
+
+
+    @unittest.skip('hacking')
+    def test_sirius(self):
+        """Test RA/dec of Sirius
+
+        From theodolite app:
+        Date & Time: Wed Dec 31 20:41:41 PST 2014
+        Position: +037.40015* / -122.08219*
+        Altitude: 56ft
+        Azimuth/Bearing: 127* S53E 2258mils (True)
+        Elevation Angle: +18.1*
+
+        from http://www.convertalot.com/celestial_horizon_co-ordinates_calculator.html
+
+        azimuth: 127.59
+        altitude: 16.81
+
+        from http://www.stargazing.net/mas/al_az.htm
+
+        azimuth: 127* 24' 16"
+        altitude: 16* 41' 31"
+
+        """
+
+
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2014-12-31T20:41:00')
+
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+
+        print 'sirius', sirius_hz
+
+        # TODO validate something
+
+
+
+
+
+class EclipticEquitorial(unittest.TestCase):
     """Test ecliptic equatorial coordinate transformations
 
     Validated against http://lambda.gsfc.nasa.gov/toolbox/tb_coordconv.cfm
@@ -751,7 +835,7 @@ class TestEcEqXforms(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5 # precision limited by LAMBDA-tools reporting
-        self.eceq_xform = Transforms.EclipticEquatorial()
+        self.xforms = Transforms.EclipticEquatorial()
 
     def getLatitude(self, an_object):
         """Return latitude of point"""
@@ -768,11 +852,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         an_object = coords.spherical(coords.Ux)
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(0, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(0, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(0, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(360, self.getLongitude(an_object_eq), self.places)
 
@@ -783,11 +867,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(90), coords.angle(0))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(66.56071, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(90, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(66.56071, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(270.00000, self.getLongitude(an_object_eq), self.places)
 
@@ -798,11 +882,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(0), coords.angle(15))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(-5.90920, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(13.81162, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(5.90920, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(13.81162, self.getLongitude(an_object_eq), self.places)
 
@@ -813,11 +897,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(0), coords.angle(345))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(5.90920, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(346.18838, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(-5.90920, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(346.18838, self.getLongitude(an_object_eq), self.places)
 
@@ -828,11 +912,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(45), coords.angle(100))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(21.82420, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(97.60065, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(67.78257, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(108.94923, self.getLongitude(an_object_eq), self.places)
 
@@ -843,11 +927,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(-30), coords.angle(-30))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2000)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(-16.64844, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(321.51905, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2000)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(-39.12273, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(345.18327, self.getLongitude(an_object_eq), self.places)
 
@@ -858,11 +942,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2015 = coords.datetime('2015-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(-60), coords.angle(200))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2015)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2015)
         self.assertAlmostEqual(-46.59844, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(226.85843, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2015)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2015)
         self.assertAlmostEqual(-59.60899, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(158.23870, self.getLongitude(an_object_eq), self.places)
 
@@ -873,11 +957,11 @@ class TestEcEqXforms(unittest.TestCase):
         j2015 = coords.datetime('2015-01-01T00:00:00')
         an_object = coords.spherical(1, coords.declination(20), coords.angle(-10))
 
-        an_object_ec = self.eceq_xform.toEcliptic(an_object, j2015)
+        an_object_ec = self.xforms.toEcliptic(an_object, j2015)
         self.assertAlmostEqual(22.25346, self.getLatitude(an_object_ec), self.places)
         self.assertAlmostEqual(359.15333, self.getLongitude(an_object_ec), self.places)
 
-        an_object_eq = self.eceq_xform.toEquatorial(an_object, j2015)
+        an_object_eq = self.xforms.toEquatorial(an_object, j2015)
         self.assertAlmostEqual(14.41240, self.getLatitude(an_object_eq), self.places)
         self.assertAlmostEqual(342.84035, self.getLongitude(an_object_eq), self.places)
 
