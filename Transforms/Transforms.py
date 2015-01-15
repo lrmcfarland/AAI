@@ -241,7 +241,7 @@ class USNO_C163(Transforms):
         a_datetime: local date and time of the observation.
 
         an_observer: the latitude (90 - theta) and longitude (phi,
-                     positive west of the prime meridian) of an
+                     positive east of the prime meridian) of an
                      observer as a spherical coordinate (unit radius)
 
         """
@@ -261,7 +261,7 @@ class USNO_C163(Transforms):
         a_datetime: local date and time of the observation.
 
         an_observer: the latitude (90 - theta) and longitude (phi,
-                     positive west of the prime meridian) of an
+                     positive east of the prime meridian) of an
                      observer as a spherical coordinate (unit radius)
 
         """
@@ -387,13 +387,14 @@ class StjarnHimlen(Transforms):
         an_object: the vector to transform in theta (90 - declination),
                    phi (RA * 15). See self.radec2spherical.
 
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
+        an_observer: the latitude (90 - theta) and longitude (positive
+                     east of the prime meridian) of an observer as a
+                     spherical coordinate (unit radius)
 
         a_local_datetime: local date and time of the observation.
 
         Returns a spherical coordinate vector in the transformed coordinates
+
         """
 
         print # linefeed
@@ -577,13 +578,14 @@ class EquatorialHorizon(Transforms):
         an_object: the vector to transform in theta (90 - declination),
                    phi (RA * 15). See self.radec2spherical.
 
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
+        an_observer: the latitude (90 - theta) and longitude (positive
+                     east of the prime meridian) of an observer as a
+                     spherical coordinate (unit radius)
 
         a_local_datetime: local date and time of the observation.
 
         Returns a spherical coordinate vector in the transformed coordinates
+
         """
 
         if not isinstance(an_object, coords.spherical):
