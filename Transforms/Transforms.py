@@ -460,6 +460,9 @@ class APC(Transforms):
     def GMST(cls, a_datetime):
         """Greenwich mean sidereal time
 
+        Does not match USNO GMST.
+        Does have the correct delta for one day.
+
         Returns GMST in hours
         """
 
@@ -473,10 +476,24 @@ class APC(Transforms):
 
         gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0) # in seconds
 
-        gmst_hours = gmst/3600.0
+        gmst_angle = coords.angle()
 
-        gmst_angle = coords.angle(gmst_hours)
-        gmst_angle.normalize(0, 24)
+        if False:
+            # TODO almost original formula. Returns hours not
+            # degrees. Does not match one day delta of 3:56 minutes
+            def Frac(x):
+                return x - math.floor(x)
+
+            def Modulo(x, y):
+                return y * Frac(x/y)
+
+            gmst_angle.radians = (2*math.pi/86400.0)*Modulo(gmst, 86400.0)
+            gmst_angle.normalize(0, 24)
+
+        else:
+            gmst_angle.value = gmst/3600.0
+            gmst_angle.normalize(0, 24)
+
 
         return gmst_angle
 
@@ -494,9 +511,9 @@ class APC(Transforms):
         an_object: the vector to transform in theta (90 - declination),
                    phi (RA * 15). See self.radec2spherical.
 
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
+        an_observer: the latitude (90 - theta) and longitude (positive
+                     east of the prime meridian) of an observer as a
+                     spherical coordinate (unit radius)
 
         a_local_datetime: local date and time of the observation.
 

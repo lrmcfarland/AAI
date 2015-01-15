@@ -590,7 +590,7 @@ class APC(unittest.TestCase):
 
 
     def test_GMST_J2000(self):
-        """Test GMST APC J2000"""
+        """Test GMST J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST(a_datetime)
 
@@ -598,8 +598,8 @@ class APC(unittest.TestCase):
         self.assertEqual('06:39:53.4567', str(a_gmst))
 
 
-    def test_GMST_J2000_plus_day(self):
-        """Test APC J2000 plus a day"""
+    def test_GMST_J2000_plus_day_1(self):
+        """Test J2000 plus a day"""
         a_datetime_0 = coords.datetime(self.xforms.J2000)
         a_gmst_0 = self.xforms.GMST(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
@@ -609,9 +609,20 @@ class APC(unittest.TestCase):
         # matches http://en.wikipedia.org/wiki/Sidereal_time
 
 
+    def test_GMST_plus_another_day_2(self):
+        """Test plus another day"""
+        a_datetime_0 = coords.datetime('2015-01-10T12:30:00')
+        a_gmst_0 = self.xforms.GMST(a_datetime_0)
+        a_datetime_1 = coords.datetime('2015-01-11T12:30:00')
+        a_gmst_1 = self.xforms.GMST(a_datetime_1)
+
+        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        # matches http://en.wikipedia.org/wiki/Sidereal_time
+
+
     @unittest.skip('Does not match test data given, but is out of valid date range')
     def test_GMST_kb(self):
-        """Test GMST APC formula, in degrees, with kburnett data"""
+        """Test GMST formula, in degrees, with kburnett data"""
         # This example is from
         # http://www2.arnes.si/~gljsentvid10/sidereal.htm and uses
         # the same formula as
@@ -629,7 +640,7 @@ class APC(unittest.TestCase):
 
 
     def test_GMST_standrews(self):
-        """Test GMST APC St. Andrews"""
+        """Test GMST St. Andrews"""
         # from http://star-www.st-and.ac.uk/~fv/webnotes/answer6.htm
         a_datetime = coords.datetime('1998-02-04T00:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
@@ -704,7 +715,7 @@ class APC(unittest.TestCase):
 
     @unittest.skip('TODO')
     def test_toHorizon_1(self):
-        """Test APC to horizon transform 1"""
+        """Test to horizon transform 1"""
         an_object = coords.spherical(1, coords.angle(45), coords.angle(0))
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
@@ -717,7 +728,7 @@ class APC(unittest.TestCase):
 
     @unittest.skip('TODO')
     def test_toHorizon_2(self):
-        """Test APC to horizon transform 2"""
+        """Test to horizon transform 2"""
         an_object = coords.spherical(1, coords.angle(45), coords.angle(90))
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
@@ -731,7 +742,7 @@ class APC(unittest.TestCase):
 
     @unittest.skip('TODO')
     def test_fromHorizon_1(self):
-        """Test APC from horizon transform 1"""
+        """Test from horizon transform 1"""
         an_object = coords.spherical(1, coords.angle(90), coords.angle(0))
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
