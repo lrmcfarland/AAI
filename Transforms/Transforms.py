@@ -61,6 +61,7 @@ class Transforms(object):
         Converts spherical coordinate theta (angle to +z axis) to
         latitude/declination.
 
+        Returns a double value equal to the latitude.
         """
 
         if not isinstance(a_point, coords.spherical):
@@ -76,6 +77,7 @@ class Transforms(object):
         Converts spherical coordinate phi (angle to +x axis of
         projection in xy plane) to longitude.
 
+        Returns a double value equal to the longitude.
         """
 
         if not isinstance(a_point, coords.spherical):
@@ -94,6 +96,7 @@ class Transforms(object):
         Converts spherical coordinate phi (angle to +x axis of
         projection in xy plane) to right ascension.
 
+        Returns a double value equal to the right ascension.
         """
 
         return cls.spherical2longitude(a_point)/15.0
@@ -101,13 +104,30 @@ class Transforms(object):
 
     @staticmethod
     def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
-        """returns a spherical coordinate with the given right ascension and declination"""
+        """Converts a given right ascension and declination into spherical coordinates
 
+        Declination measured from the ecliptic is converted to theta
+        measured from the north pole.
+
+        Right ascension measured in hours is converted into degrees and assigned
+        to phi.
+
+        Returns the spherical coordinate.
+
+        """
         return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
                                 coords.angle(a_right_ascension.value * 15))
 
     @classmethod
     def JulianCentury(cls, a_datetime):
+        """Calculates the Julian century relative to J2000 of the given date
+
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        Returns a double equal to the Julian century.
+        """
         return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
 
 
@@ -128,9 +148,13 @@ class USNO_C163(Transforms):
 
     @classmethod
     def JulianDate0(cls, a_datetime):
-        """Julian date of the previous midnight
+        """Julian date and the previous midnight
 
-        Returns the Julian Date and its previous midnight
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        Returns a tuple of the Julian Date and its previous midnight
         """
 
         JD = a_datetime.toJulianDate()
@@ -147,9 +171,13 @@ class USNO_C163(Transforms):
 
     @classmethod
     def GMST(cls, a_datetime):
-        """Greenwich mean sidereal time
+        """Greenwich mean sidereal time (GMST)
 
-        returns GMST in hours
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        Returns GMST as an angle in hours
         """
 
         JD, JDo = cls.JulianDate0(a_datetime)
@@ -171,7 +199,11 @@ class USNO_C163(Transforms):
     def GMST_simplified(cls, a_datetime):
         """Greenwich mean sidereal time, simplified form
 
-        Returns GMST in hours
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        Returns GMST as an angle in hours
         """
 
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
@@ -201,8 +233,11 @@ class USNO_C163(Transforms):
         date (see test_Transforms.py, USNO_test_GMST_kb.test_GMST_kb
         vs. APC.test_GMST_kb
 
-        Returns GMST in hours
+        Args:
 
+        a_datetime: local date and time of the observation.
+
+        Returns GMST as an angle in hours
         """
 
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
@@ -216,7 +251,14 @@ class USNO_C163(Transforms):
 
     @classmethod
     def GAST(cls, a_datetime):
-        """Greenwich apparent sidereal time"""
+        """Greenwich apparent sidereal time
+
+        Args:
+
+        a_datetime: local date and time of the observation.
+
+        Returns GMST as an angle in hours
+        """
 
         gmst = cls.GMST(a_datetime)
 
@@ -244,6 +286,7 @@ class USNO_C163(Transforms):
                      positive east of the prime meridian) of an
                      observer as a spherical coordinate (unit radius)
 
+        Returns LSTM as an angle in hours
         """
 
         gmst = cls.GMST(a_datetime)
@@ -264,6 +307,7 @@ class USNO_C163(Transforms):
                      positive east of the prime meridian) of an
                      observer as a spherical coordinate (unit radius)
 
+        Returns LSTA as an angle in hours
         """
 
         gast = cls.GAST(a_datetime)
@@ -381,6 +425,7 @@ class StjarnHimlen(Transforms):
 
         from http://stjarnhimlen.se/comp/ppcomp.html
 
+        TODO: not working yet.
 
         Args:
 
@@ -451,6 +496,8 @@ class StjarnHimlen(Transforms):
 
 class APC(Transforms):
     """Transforms from Astronomy on the Personal Computer
+
+    TODO: not working yet.
 
     by Montenbruck and Pfleger
     """
