@@ -860,11 +860,13 @@ class EquatorialHorizon(unittest.TestCase):
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
         # a_datetime = coords.datetime('2014-12-31T22:00:00')
-        a_datetime = coords.datetime('2015-01-01T00:00:00')
+        # a_datetime = coords.datetime('2015-01-01T16:00:00') # all 3 azimuth calculations agree
+        # a_datetime = coords.datetime('2015-01-01T07:50:00') # azimuth tan rules part company at 90 degrees
+        a_datetime = coords.datetime('2015-01-01T18:00:00')
 
         sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
 
-        print 'sirius', sirius_hz
+        print '\nsirius', sirius_hz
 
         # TODO validate something
 

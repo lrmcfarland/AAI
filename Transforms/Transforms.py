@@ -616,11 +616,15 @@ class EquatorialHorizon(Transforms):
     def toHorizon(cls, an_object, an_observer, a_local_datetime):
         """Transforms a vector from equatorial to ecliptic coordinates.
 
-        from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+        from:
+        http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
 
-        But I think it is incorrect in calculating the Local Hour Angle.
-        I observed Sirius on New Years Eve 2015 at 8pm and measured its
-        altitude and azimuth using a theodolite app on my iPhone. I got
+        With input from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
+
+        But I think "chapter7" is incorrect in calculating the Local
+        Hour Angle.  I observed Sirius on New Years Eve 2015 at 8pm
+        and measured its altitude and azimuth using a theodolite app
+        on my iPhone. I got
 
         Date & Time: Wed Dec 31 20:41:41 PST 2014
         Position: +037.40015* / -122.08219*
@@ -689,10 +693,14 @@ class EquatorialHorizon(Transforms):
         print 'Cosine rule' # TODO rm
 
         altitude = coords.angle()
+        theta = coords.angle()
 
         foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
                math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
                math.cos(local_hour_angle.radians)
+
+        theta.radians = math.acos(foo)
+        print 'theta', theta # TODO rm
 
         altitude.radians = math.pi/2 - math.acos(foo)
         print 'altitude', altitude # TODO rm
@@ -710,6 +718,7 @@ class EquatorialHorizon(Transforms):
         print # linefeed # TODO rm
         print 'Azimuth'# linefeed # TODO rm
         azimuth = coords.angle()
+        phi = coords.angle()
 
         # Azimuth by sine rule, 0 is south
         print 'Sine rule' # TODO rm
@@ -731,17 +740,34 @@ class EquatorialHorizon(Transforms):
         azimuth.radians = math.acos(bar)
         print 'azimuth', azimuth # TODO rm
 
+
+        # http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+
         print # linefeed # TODO rm
-        print 'Tan rule' # TODO rm
-        # Azimuth by tan rule http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+        print 'atan rule' # TODO rm
 
         bar = math.sin(local_hour_angle.radians)/ \
-              (math.cos(altitude.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
+              (math.cos(local_hour_angle.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
                math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
 
-        azimuth.radians = math.tan(bar)
+        azimuth.radians = math.atan(bar)
         print 'azimuth', azimuth # TODO rm
 
+        print # linefeed # TODO rm
+        print 'atan2 rule' # TODO rm
+
+        # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+
+        bar1 = math.sin(local_hour_angle.radians)
+        bar2 = (math.cos(local_hour_angle.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
+                math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
+
+        azimuth.radians = math.atan2(bar1, bar2)
+        print 'azimuth', azimuth # TODO rm
+
+        phi.radians = math.pi + math.atan2(bar1, bar2)
+
+        return coords.spherical(1, theta, phi)
 
 
     @classmethod
