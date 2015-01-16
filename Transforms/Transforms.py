@@ -571,7 +571,34 @@ class EquatorialHorizon(Transforms):
 
         from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm
 
-        TODO: implementation not working
+        But I think it is incorrect in calculating the Local Hour Angle.
+        I observed Sirius on New Years Eve 2015 at 8pm and measured its
+        altitude and azimuth using a theodolite app on my iPhone. I got
+
+        Date & Time: Wed Dec 31 20:41:41 PST 2014
+        Position: +037.40015* / -122.08219*
+        Altitude: 56ft
+        Azimuth/Bearing: 127* S53E 2258mils (True)
+        Elevation Angle: +18.1*
+
+        By happy coincidence, Sirius was on/near my local
+        meridian. due south, at midnight new years eve when I measured
+        it with my theodolite app at 8:41 pm above.
+
+        According to http://star-www.st-and.ac.uk/~fv/webnotes/chapter6.htm
+        an alternative definition of LST is "Local Sidereal Time =
+        Right Ascension of whichever stars are on the meridian."
+        Therefore, local sidereal time == right ascension of Sirius ==
+        6* 45' 9"
+
+        But according to http://aa.usno.navy.mil/data/docs/siderealtime.php
+        this is my Greenwich Mean Sidereal Time; my local sidereal
+        time is 22h 32m 59.9s.
+
+
+        If I let my Local Hour Angle = GMST - RA(star) this matches my
+        observed results.
+
 
         Args:
 
@@ -594,125 +621,79 @@ class EquatorialHorizon(Transforms):
         if not isinstance(an_observer, coords.spherical):
             raise Error('observer must be in spherical coordinates') # TODO for now
 
-        print # linefeed
+        print # linefeed # TODO rm
 
-        print "an object's theta (90 - declination) =", an_object.theta.value
-        print "an object's phi (RA * 15) =", an_object.phi.value
+        print "object's theta (90 - declination) =", an_object.theta.value # TODO rm
+        print "object's phi (RA * 15) =", an_object.phi.value # TODO rm
 
-        print "an observers's theta (90 - latitude) =", an_observer.theta.value
-        print "an observers's phi (longitude -W/+E) =", an_observer.phi.value
+        print "observer's theta (90 - latitude) =", an_observer.theta.value # TODO rm
+        print "observer's phi (longitude -W/+E) =", an_observer.phi.value # TODO rm
 
+        print "observer's local time", a_local_datetime # TODO rm
+
+        print # linefeed TODO rm
 
         gmst = USNO_C163.GMST(a_local_datetime) # hours
-        print 'gmst', gmst, gmst.value # TODO rm
+        local_hour_angle = coords.angle(gmst.value*15 - an_object.phi.value) # TODO
 
-        lst = USNO_C163.LSTA(a_local_datetime, an_observer) # hours
-        print 'lst', lst, lst.value, lst.value*15 # TODO rm
+        print 'local hour angle', local_hour_angle # TODO rm
 
-        local_hour_angle = coords.angle(lst.value*15 - an_object.phi.value) # TODO
+        print '\nAltitude' # TODO rm
+        print 'Cosine rule' # TODO rm
 
-        print 'local_hour_angle', local_hour_angle # TODO rm
-
-        print # linefeed
-        print 'cos(90 - object declination)', math.cos(an_object.theta.radians)
-        print 'sin(object declination)     ', math.sin(math.pi/2 - an_object.theta.radians)
-
-        print # linefeed
-        print 'sin(90 - object declination)', math.sin(an_object.theta.radians)
-        print 'cos(object declination)     ', math.cos(math.pi/2 - an_object.theta.radians)
-
-        print # linefeed
-        print 'cos(90 - observer latitude) ', math.cos(an_observer.theta.radians)
-        print 'sin(observer latitude)      ', math.sin(math.pi/2 - an_observer.theta.radians)
-
-        print # linefeed
-        print 'sin(90 - observer latitude) ', math.sin(an_observer.theta.radians)
-        print 'cos(observer latitude)      ', math.cos(math.pi/2 - an_observer.theta.radians)
-
-        print # linefeed
-        print 'Altitude' # linefeed
+        altitude = coords.angle()
 
         foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
                math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
                math.cos(local_hour_angle.radians)
 
-        print 'foo 1', foo
+        altitude.radians = math.pi/2 - math.acos(foo)
+        print 'altitude', altitude # TODO rm
 
-        altitude = math.pi/2 - math.acos(foo)
-        print 'altitude', altitude
-
-        alt = coords.angle()
-        alt.radians = altitude
-        print 'alt', alt, alt.radians
-
+        print # linefeed # TODO rm
+        print 'Simplified Cosine rule' # TODO rm
 
         foo =  math.sin(math.pi/2 - an_object.theta.radians) * math.sin(math.pi/2 - an_observer.theta.radians) + \
                math.cos(math.pi/2 - an_object.theta.radians) * math.cos(math.pi/2 - an_observer.theta.radians) * \
                math.cos(local_hour_angle.radians)
 
-        print # linefeed
-        print 'foo 2', foo
-
-        altitude = math.asin(foo)
+        altitude.radians = math.asin(foo)
         print 'altitude', altitude
 
-        alt.radians = altitude
-        print 'alt', alt, alt.radians
+        print # linefeed # TODO rm
+        print 'Azimuth'# linefeed # TODO rm
+        azimuth = coords.angle()
 
-        print # linefeed
-        print 'Azimuth'# linefeed
+        # Azimuth by sine rule, 0 is south
+        print 'Sine rule' # TODO rm
+        bar = -math.sin(local_hour_angle.radians)*math.cos(math.pi/2 - an_object.theta.radians)/math.cos(altitude.radians)
 
-        # Azimuth by sine rule
-        bar = -math.sin(local_hour_angle.radians)*math.cos(math.pi/2 - an_object.theta.radians)/math.cos(alt.radians)
+        azimuth.radians = math.asin(bar)
+        azimuth.normalize(0, 360)
+        print 'azimuth', azimuth # TODO rm
 
-        print 'bar 1', bar
+        print # linefeed # TODO rm
 
-        A = coords.angle()
-
-        try:
-            azimuth = math.asin(bar)
-            print 'azimuth', azimuth
-            A.radians = azimuth
-            print 'A', A, A.radians
-        except ValueError, err:
-            print err
-
-        print # linefeed
-
-        # Azimuth by cosine rule
+        # Azimuth by cosine rule, 0 is north, angle is counter clock wise (right hand rule)
+        print 'Cosine rule' # TODO rm
 
         bar = (math.sin(math.pi/2 - an_object.theta.radians) - \
-               math.sin(math.pi/2 - an_observer.theta.radians)*math.sin(alt.radians))/ \
-              (math.cos(math.pi/2 - an_observer.theta.radians)*math.cos(alt.radians))
+               math.sin(math.pi/2 - an_observer.theta.radians)*math.sin(altitude.radians))/ \
+              (math.cos(math.pi/2 - an_observer.theta.radians)*math.cos(altitude.radians))
 
-        print 'bar 2', bar
+        azimuth.radians = math.acos(bar)
+        print 'azimuth', azimuth # TODO rm
 
-        try:
-            azimuth = math.acos(bar)
-            print 'azimuth', azimuth
-            A.radians = azimuth
-            print 'A', A, A.radians
-        except ValueError, err:
-            print err
-
-
-        print # linefeed
-
+        print # linefeed # TODO rm
+        print 'Tan rule' # TODO rm
         # Azimuth by tan rule http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
 
         bar = math.sin(local_hour_angle.radians)/ \
-              (math.cos(alt.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
+              (math.cos(altitude.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
                math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
 
-        print 'bar 3', bar
-
-        try:
-            azimuth = math.asin(bar)
-            print 'azimuth', azimuth
-            A.radians = azimuth
-            print 'A', A, A.radians
-        except ValueError, err:
-            print err
+        azimuth.radians = math.tan(bar)
+        print 'azimuth', azimuth # TODO rm
 
 
 

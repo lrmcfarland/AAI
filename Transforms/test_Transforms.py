@@ -795,8 +795,8 @@ class EquatorialHorizon(unittest.TestCase):
 
 
 
-    @unittest.skip('hacking')
-    def test_sirius(self):
+    # @unittest.skip('hacking')
+    def test_sirius_2014_12_31T20_41_00(self):
         """Test RA/dec of Sirius
 
         From theodolite app:
@@ -825,6 +825,42 @@ class EquatorialHorizon(unittest.TestCase):
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
         a_datetime = coords.datetime('2014-12-31T20:41:00')
+
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+
+        print 'sirius', sirius_hz
+
+        # TODO validate something
+
+
+    # @unittest.skip('hacking')
+    def test_sirius_2015_01_01T00_00_00(self):
+        """Test RA/dec of Sirius
+
+        By happy coincidence, Sirius was on/near my local
+        meridian. due south, at midnight new years eve when I measured
+        it with my theodolite app at 8:41 pm above.
+
+        According to http://star-www.st-and.ac.uk/~fv/webnotes/chapter6.htm
+        "Local Sidereal Time = Right Ascension of whichever stars are on the meridian."
+        Therefore, local sidereal time == right ascension of Sirius ==
+        6* 45' 9"
+
+        But according to USNO this is my Greenwich Mean Sidereal Time. My
+        local sidereal time is 22h 32m 59.9s.
+
+        see http://aa.usno.navy.mil/data/docs/siderealtime.php
+
+        """
+
+
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        # a_datetime = coords.datetime('2014-12-31T22:00:00')
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
 
         sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
 
