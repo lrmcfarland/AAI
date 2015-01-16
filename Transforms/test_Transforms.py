@@ -620,7 +620,7 @@ class APC(unittest.TestCase):
         # matches http://en.wikipedia.org/wiki/Sidereal_time
 
 
-    @unittest.skip('Does not match test data given, but is out of valid date range')
+    @unittest.skip('Does not match the test data given, but is out of valid date range')
     def test_GMST_kb(self):
         """Test GMST formula, in degrees, with kburnett data"""
         # This example is from
@@ -795,11 +795,10 @@ class EquatorialHorizon(unittest.TestCase):
 
 
 
-    # @unittest.skip('hacking')
     def test_sirius_2014_12_31T20_41_00(self):
-        """Test RA/dec of Sirius
+        """Test RA/dec of Sirius 2014-12-31T20:41:41
 
-        From theodolite app:
+        From my iPhone theodolite app (not very precise):
         Date & Time: Wed Dec 31 20:41:41 PST 2014
         Position: +037.40015* / -122.08219*
         Altitude: 56ft
@@ -824,32 +823,88 @@ class EquatorialHorizon(unittest.TestCase):
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
-        a_datetime = coords.datetime('2014-12-31T20:41:00')
+        a_datetime = coords.datetime('2014-12-31T20:41:41')
 
         sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
 
-        print 'sirius', sirius_hz
+        self.assertEqual('17:54:28.6306', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('128:52:13.836', str(sirius_hz.phi))
 
-        # TODO validate something
 
-
-    # @unittest.skip('hacking')
     def test_sirius_2015_01_01T00_00_00(self):
-        """Test RA/dec of Sirius
+        """Test RA/dec of Sirius 2015-01-01T00:00:00
 
         By happy coincidence, Sirius was on/near my local
-        meridian. due south, at midnight new years eve when I measured
+        meridian, due south, at midnight new years eve when I measured
         it with my theodolite app at 8:41 pm above.
+        """
 
-        According to http://star-www.st-and.ac.uk/~fv/webnotes/chapter6.htm
-        "Local Sidereal Time = Right Ascension of whichever stars are on the meridian."
-        Therefore, local sidereal time == right ascension of Sirius ==
-        6* 45' 9"
 
-        But according to USNO this is my Greenwich Mean Sidereal Time. My
-        local sidereal time is 22h 32m 59.9s.
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
 
-        see http://aa.usno.navy.mil/data/docs/siderealtime.php
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+
+        self.assertEqual('35:52:34.9412', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('178:52:5.91641', str(sirius_hz.phi))
+
+
+    def test_sirius_2015_01_01T06_00_00(self):
+        """Test RA/dec of Sirius 2015-01-01T06:00:00"""
+
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T06:00:00')
+
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+
+        self.assertEqual('-9:30:43.9809', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('256:10:20.4311', str(sirius_hz.phi))
+
+
+    def test_sirius_2015_01_01T12_00_00(self):
+        """Test RA/dec of Sirius 2015-01-01T12:00:00"""
+
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T12:00:00')
+
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+
+        self.assertEqual('-69:18:43.4107', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('358:44:25.2683', str(sirius_hz.phi))
+
+
+    def test_sirius_2015_01_01T21_00_00(self):
+        """Test RA/dec of Sirius 2015-01-01T21:00:00"""
+
+        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                             a_declination=coords.angle(-16, 42, 58.017))
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T21:00:00')
+
+        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+
+        self.assertEqual('21:14:52.8586', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('133:17:44.3899', str(sirius_hz.phi))
+
+
+    @unittest.skip('hacking')
+    def test_sirius_hacking(self):
+        """Test RA/dec of Sirius
+
 
         """
 
@@ -859,10 +914,7 @@ class EquatorialHorizon(unittest.TestCase):
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
-        # a_datetime = coords.datetime('2014-12-31T22:00:00')
-        # a_datetime = coords.datetime('2015-01-01T16:00:00') # all 3 azimuth calculations agree
-        # a_datetime = coords.datetime('2015-01-01T07:50:00') # azimuth tan rules part company at 90 degrees
-        a_datetime = coords.datetime('2015-01-01T18:00:00')
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
 
         sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
 
