@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-"""Transforms from Astronomy on the Personal Computer
+""" Transforms from Astronomy on the Personal Computer (APC)
     by Montenbruck and Pfleger
 
-    TODO: not working yet.
-
+    TODO: not all of my implementations of this are working. Check unittests.
 """
 
 import math
@@ -15,43 +14,37 @@ class APCTransforms(object):
     horizon_axis = coords.rotator(coords.Uy)
 
     @classmethod
+    def Frac(cls, x):
+        return x - math.floor(x)
+
+
+    @classmethod
+    def Modulo(cls, x, y):
+        return y * cls.Frac(x/y)
+
+
+    @classmethod
     def GMST(cls, a_datetime):
         """Greenwich mean sidereal time
 
-        Does not match USNO GMST.
-        Does have the correct delta for one day.
+        APC p. 40
 
         Returns GMST in hours
         """
 
-        MJD = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
+        MJD  = a_datetime.toJulianDate() - a_datetime.ModifiedJulianDate
         MJDo = math.floor(MJD)
 
-        T = (MJD - 51544.5)/36525.0
-        To = (MJDo - 51544.5)/36525.0
+        UT   = (MJD - MJDo) * 86400.0
 
-        UT = (T - To) * 86400.0 # TODO cls.siderial_day.value?
+        To   = (MJDo - 51544.5)/36525.0
+        T    = (MJD  - 51544.5)/36525.0
 
-        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + 0.093104*math.pow(T, 2.0) + 6.2e-6*math.pow(T, 3.0) # in seconds
+        gmst = 24110.54841 + 8640184.812866*To + 1.0027379093*UT + (0.093104 - 6.2e-6*T)*T*T # in seconds
 
-        gmst_angle = coords.angle()
+        gmst_angle = coords.angle(gmst/3600.0)
 
-        if False:
-            # TODO almost original formula. Returns hours not
-            # degrees. Does not match one day delta of 3:56 minutes
-            def Frac(x):
-                return x - math.floor(x)
-
-            def Modulo(x, y):
-                return y * Frac(x/y)
-
-            gmst_angle.radians = (2*math.pi/86400.0)*Modulo(gmst, 86400.0)
-            gmst_angle.normalize(0, 24)
-
-        else:
-            gmst_angle.value = gmst/3600.0
-            gmst_angle.normalize(0, 24)
-
+        gmst_angle.normalize(0, 24)
 
         return gmst_angle
 
@@ -88,8 +81,7 @@ class APCTransforms(object):
 
         gmst = cls.GMST(a_local_datetime)
 
-        hour_angle = coords.angle(gmst.value*15 + an_observer.phi.value - an_object.phi.value)
-        hour_angle.normalize(0, 360)
+        hour_angle = coords.angle(gmst.value*15 - an_object.phi.value)
 
         the_local_vector = coords.spherical(an_object.r, an_object.theta, hour_angle)
 
@@ -99,18 +91,35 @@ class APCTransforms(object):
         the_rotated = cls.horizon_axis.rotate(the_rotatee,
                                               coords.angle(a_direction * an_observer.theta.value))
 
-        return coords.spherical(the_rotated)
+        the_result = coords.spherical(the_rotated)
+
+        # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+        # adjust azimuth to phi from the north
+        the_result.phi += coords.angle(180)
+
+        return the_result
 
 
     @classmethod
     def toHorizon(cls, an_object, an_observer, a_local_datetime):
         """Transforms an equatorial vector into one in the horizon coordinate system"""
-        return cls._xform(an_object, an_observer, a_local_datetime, 1.0)
-
-
-    @classmethod
-    def fromHorizon(cls, an_object, an_observer, a_local_datetime):
-        """Transforms a horizon vector into one in the equatorial coordinate system"""
         return cls._xform(an_object, an_observer, a_local_datetime, -1.0)
 
 
+    @classmethod
+    def toEquatorial(cls, an_object, an_observer, a_local_datetime):
+        """Transforms a horizon vector into one in the equatorial coordinate system"""
+        return cls._xform(an_object, an_observer, a_local_datetime, 1.0)
+
+
+
+
+    @classmethod
+    def MiniSun(cls, a_datetime):
+        """Calculates the Sun's RA and declination
+
+
+        from
+
+
+        """
