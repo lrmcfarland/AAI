@@ -22,7 +22,6 @@ import unittest
 
 import coords
 import APCTransforms
-import Transforms
 
 
 class APCTransformTests(unittest.TestCase):

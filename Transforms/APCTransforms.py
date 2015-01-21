@@ -9,8 +9,6 @@
 import math
 import coords
 
-import Transforms
-
 class APCTransforms(object):
 
     horizon_axis = coords.rotator(coords.Uy)
