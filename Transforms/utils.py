@@ -14,7 +14,7 @@ class Error(Exception):
     pass
 
 
-angle_re = re.compile(r'\d+:{0,1}\d+:{0,1}\d+.{0,1}\d+') # TODO limits 0-360, 0-60, etc
+angle_re = re.compile(r'(\d+)(:\d+){0,1}(:\d+\.?\d+){0,1}') # TODO limits 0-360, 0-60, etc
 
 def parse_angle_arg(an_arg):
     """Parse angle arg as dd:mm:ss.sss"""
