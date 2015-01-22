@@ -5,10 +5,44 @@
 """
 
 import math
+import re
+
 import coords
+
 
 class Error(Exception):
     pass
+
+
+angle_re = re.compile(r'\d+:{0,1}\d+:{0,1}\d+.{0,1}\d+') # TODO limits 0-360, 0-60, etc
+
+def parse_angle_arg(an_arg):
+    """Parse angle arg as dd:mm:ss.sss"""
+
+    degrees = 0
+    minutes = 0
+    seconds = 0
+
+    if not angle_re.match(an_arg):
+        raise Error('Unsupported angle format: %s' % (an_arg,))
+
+    words = an_arg.split(':')
+
+    if len(words) == 3:
+        degrees = float(words[0])
+        minutes = float(words[1])
+        seconds = float(words[2])
+    elif len(words) == 2:
+        degrees = float(words[0])
+        minutes = float(words[1])
+    elif len(words) == 1:
+        degrees = float(words[0])
+    else:
+        raise Error('Unsupported format')
+
+    result = coords.angle(degrees, minutes, seconds)
+
+    return result
 
 
 def get_latitude(a_point):
