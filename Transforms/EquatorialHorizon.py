@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 
-"""Transforms coordinates, Ecliptic, Equatorial and Horizontal
+"""Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
-to run: ./pylaunch.sh Transforms.py
+This uses spherical trigonometry from:
+
+    http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+
+
+to run: /pylaunch.sh EquatorialHorizon.py -- 6:45:09 -16:42:58 37:24 -122:04:57 2014-12-31T20:41:41
+
+where -- ends options and allows -16 to be a negative number and not option -1.
 
 References:
 
@@ -52,146 +59,187 @@ import coords
 import GMST
 import utils
 
+
 class Error(Exception):
     pass
 
 
-class EquatorialHorizon(object):
+def toHorizon(an_object, an_observer, a_local_datetime):
+    """Transforms a vector from equatorial to ecliptic coordinates.
 
-    """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
+    Args:
 
-    This uses spherical trigonometry.
+    an_object: the vector to transform in theta (90 - declination),
+               phi (RA * 15). See self.radec2spherical.
 
-    from:
-        http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+    an_observer: the latitude (90 - theta) and longitude (positive
+                 east of the prime meridian) of an observer as a
+                 spherical coordinate (unit radius)
+
+    a_local_datetime: local date and time of the observation.
+
+    Returns a spherical coordinate vector in the transformed coordinates
 
     """
+    debug = False
 
-    horizon_axis = coords.rotator(coords.Uy)
+    if not isinstance(an_object, coords.spherical):
+        raise Error('vector must be in spherical coordinates')
 
+    if not isinstance(an_observer, coords.spherical):
+        raise Error('observer must be in spherical coordinates')
 
-    def __init__(self, *args, **kwargs):
-        super(EquatorialHorizon, self).__init__(*args, **kwargs)
+    gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
+    local_hour_angle = coords.angle(gmst.value*15 - an_object.phi.value)
 
+    # Altitude = 90 - theta
+    theta = coords.angle()
 
-    @classmethod
-    def toHorizon(cls, an_object, an_observer, a_local_datetime):
-        """Transforms a vector from equatorial to ecliptic coordinates.
+    foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
+           math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+           math.cos(local_hour_angle.radians)
 
-        Args:
+    theta.radians = math.acos(foo)
 
-        an_object: the vector to transform in theta (90 - declination),
-                   phi (RA * 15). See self.radec2spherical.
+    if debug:
+        altitude = coords.angle()
+        altitude.radians = math.pi/2 - math.acos(foo)
+        print 'altitude', altitude
 
-        an_observer: the latitude (90 - theta) and longitude (positive
-                     east of the prime meridian) of an observer as a
-                     spherical coordinate (unit radius)
+    # Azimuth = phi - 180
+    # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+    phi = coords.angle()
 
-        a_local_datetime: local date and time of the observation.
+    nom = math.sin(local_hour_angle.radians)
+    den = (math.cos(local_hour_angle.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
+           math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
 
-        Returns a spherical coordinate vector in the transformed coordinates
+    phi.radians = math.pi + math.atan2(nom, den)
 
-        """
-        debug = False
+    if debug:
+        azimuth = coords.angle()
+        azimuth.radians = math.atan2(nom, den)
+        print 'azimuth', azimuth
 
-        if not isinstance(an_object, coords.spherical):
-            raise Error('vector must be in spherical coordinates')
-
-        if not isinstance(an_observer, coords.spherical):
-            raise Error('observer must be in spherical coordinates')
-
-        gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
-        local_hour_angle = coords.angle(gmst.value*15 - an_object.phi.value)
-
-        # Altitude = 90 - theta
-        theta = coords.angle()
-
-        foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
-               math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
-               math.cos(local_hour_angle.radians)
-
-        theta.radians = math.acos(foo)
-
-        if debug:
-            altitude = coords.angle()
-            altitude.radians = math.pi/2 - math.acos(foo)
-            print 'altitude', altitude
-
-        # Azimuth = phi - 180
-        # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
-        phi = coords.angle()
-
-        nom = math.sin(local_hour_angle.radians)
-        den = (math.cos(local_hour_angle.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
-               math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
-
-        phi.radians = math.pi + math.atan2(nom, den)
-
-        if debug:
-            azimuth = coords.angle()
-            azimuth.radians = math.atan2(nom, den)
-            print 'azimuth', azimuth
-
-        return coords.spherical(1, theta, phi)
+    return coords.spherical(1, theta, phi)
 
 
-    @classmethod
-    def toEquatorial(cls, an_object, an_observer, a_local_datetime):
-        """Transforms a vector from equatorial to ecliptic coordinates.
 
-        Args:
+def toEquatorial(an_object, an_observer, a_local_datetime):
+    """Transforms a vector from equatorial to ecliptic coordinates.
 
-        an_object: the vector to transform in theta (90 - altitude),
-                   phi (azimuth). See self.radec2spherical.
+    Args:
 
-        an_observer: the latitude and longitude (positive west of the
-                     prime meridian) of an observer as a spherical
-                     coordinate (unit radius)
+    an_object: the vector to transform in theta (90 - altitude),
+               phi (azimuth). See self.radec2spherical.
 
-        a_local_datetime: local date and time of the observation.
+    an_observer: the latitude and longitude (positive west of the
+                 prime meridian) of an observer as a spherical
+                 coordinate (unit radius)
 
-        Returns a spherical coordinate vector in the transformed coordinates
-        """
+    a_local_datetime: local date and time of the observation.
 
-        debug = False
+    Returns a spherical coordinate vector in the transformed coordinates
+    """
 
-        if not isinstance(an_object, coords.spherical):
-            raise Error('vector must be in spherical coordinates')
+    debug = False
 
-        if not isinstance(an_observer, coords.spherical):
-            raise Error('observer must be in spherical coordinates')
+    if not isinstance(an_object, coords.spherical):
+        raise Error('vector must be in spherical coordinates')
 
-        gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
+    if not isinstance(an_observer, coords.spherical):
+        raise Error('observer must be in spherical coordinates')
 
-        # declination = 90 - theta
-        theta = coords.angle()
+    gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
 
-        foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) - \
-               math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
-               math.cos(an_object.phi.radians - math.pi)
+    # declination = 90 - theta
+    theta = coords.angle()
 
-        theta.radians = math.acos(foo)
+    foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) - \
+           math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+           math.cos(an_object.phi.radians - math.pi)
 
-        if debug:
-            declination = coords.angle()
-            declination.radians = math.pi/2 - math.acos(foo)
-            print 'declination', declination
+    theta.radians = math.acos(foo)
 
-        # Azimuth = phi - 180
-        # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
-        phi = coords.angle()
+    if debug:
+        declination = coords.angle()
+        declination.radians = math.pi/2 - math.acos(foo)
+        print 'declination', declination
 
-        nom = math.sin(an_object.phi.radians - math.pi)
-        den = (math.cos(an_object.phi.radians - math.pi)*math.sin(math.pi/2 - an_observer.theta.radians) + \
-               math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
+    # Azimuth = phi - 180
+    # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+    phi = coords.angle()
 
-        phi.radians = gmst.radians*15 - math.atan2(nom, den)
+    nom = math.sin(an_object.phi.radians - math.pi)
+    den = (math.cos(an_object.phi.radians - math.pi)*math.sin(math.pi/2 - an_observer.theta.radians) + \
+           math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
 
-        if debug:
-            ra = coords.angle()
-            ra.radians = gmst.radians*15 - math.atan2(nom, den)
-            ra /= coords.angle(15)
-            print 'R.A.', ra
+    phi.radians = gmst.radians*15 - math.atan2(nom, den)
 
-        return coords.spherical(1, theta, phi)
+    if debug:
+        ra = coords.angle()
+        ra.radians = gmst.radians*15 - math.atan2(nom, den)
+        ra /= coords.angle(15)
+        print 'R.A.', ra
 
+    return coords.spherical(1, theta, phi)
+
+
+# ================
+# ===== main =====
+# ================
+
+
+if __name__ == '__main__':
+
+    # -------------------------
+    # ----- parse options -----
+    # -------------------------
+
+    import optparse
+
+    defaults = {'toEquatorial' : False}
+
+    usage = '%prog [options] <RA as deg:min:sec> <dec as deg:min:sec> <observer latitude as deg:min:sec> <observer longitude as deg:min:sec> <a datetime>'
+
+    parser = optparse.OptionParser(usage=usage)
+
+    parser.add_option('--toEquatorial',
+                      action='store_true', dest='toEquatorial',
+                      default=defaults['toEquatorial'],
+                      help='to ecliptic [%default]')
+
+    options, args = parser.parse_args()
+
+    # ----- validate -----
+
+    if len(args) < 5:
+        parser.error('missing object RA, DEC or observer latitude, longitude or datetime.')
+
+    RA = utils.parse_angle_arg(args[0])
+    dec = utils.parse_angle_arg(args[1])
+
+    lat = utils.parse_angle_arg(args[2])
+    lon = utils.parse_angle_arg(args[3])
+
+    an_object = utils.radec2spherical(a_right_ascension=RA, a_declination=dec)
+    an_observer = coords.spherical(1, coords.angle(90) - lat, lon)
+
+    a_datetime = coords.datetime(args[4])
+
+    # TODO validate toEquatorial/toHorizon option logic
+
+    # ---------------------
+    # ----- transform -----
+    # ---------------------
+
+    if options.toEquatorial == True:
+        result = toEquatorial(an_object, an_observer, a_datetime)
+
+    else:
+        result = toHorizon(an_object, an_observer, a_datetime)
+
+
+    print result
+
+    # TODO add print options for output in RA and Dec

@@ -40,7 +40,6 @@ class EquatorialHorizonTests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 13 # limit 15
-        self.xforms = EquatorialHorizon.EquatorialHorizon()
 
         self.sirius = utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
                                             a_declination=coords.angle(-16, 42, 58.017))
@@ -79,12 +78,12 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2014-12-31T20:41:41')
 
-        sirius_hz = self.xforms.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
         self.assertEqual('17:54:28.6306', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('128:52:13.836', str(sirius_hz.phi))
 
-        sirius_eq = self.xforms.toEquatorial(sirius_hz, an_observer, a_datetime)
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
@@ -101,12 +100,12 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = self.xforms.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
         self.assertEqual('35:52:34.9412', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('178:52:5.91641', str(sirius_hz.phi))
 
-        sirius_eq = self.xforms.toEquatorial(sirius_hz, an_observer, a_datetime)
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
@@ -118,12 +117,12 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T06:00:00')
 
-        sirius_hz = self.xforms.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
         self.assertEqual('-9:30:43.9809', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('256:10:20.4311', str(sirius_hz.phi))
 
-        sirius_eq = self.xforms.toEquatorial(sirius_hz, an_observer, a_datetime)
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
@@ -137,12 +136,12 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T12:00:00')
 
-        sirius_hz = self.xforms.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
         self.assertEqual('-69:18:43.4107', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('358:44:25.2683', str(sirius_hz.phi))
 
-        sirius_eq = self.xforms.toEquatorial(sirius_hz, an_observer, a_datetime)
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
@@ -154,12 +153,12 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T21:00:00')
 
-        sirius_hz = self.xforms.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
         self.assertEqual('21:14:52.8586', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('133:17:44.3899', str(sirius_hz.phi))
 
-        sirius_eq = self.xforms.toEquatorial(sirius_hz, an_observer, a_datetime)
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
@@ -173,7 +172,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = self.xforms.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
         print '\nsirius', sirius_hz
 
@@ -190,7 +189,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_eq = self.xforms.toEquatorial(an_object, an_observer, a_datetime)
+        sirius_eq = EquatorialHorizon.toEquatorial(an_object, an_observer, a_datetime)
 
         print '\nsirius', sirius_eq
 
