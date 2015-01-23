@@ -42,7 +42,6 @@ class StjarnHimlenTests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5
-        self.xforms = StjarnHimlen.StjarnHimlen()
 
 
     @unittest.skip('hacking')
@@ -60,7 +59,7 @@ class StjarnHimlenTests(unittest.TestCase):
 
         """
         a_datetime = coords.datetime('2015-01-01T00:00:00')
-        a_gmst = self.xforms.GMST(a_datetime)
+        a_gmst = StjarnHimlen.GMST(a_datetime)
 
         print '\nDatetime:', a_datetime # TODO rm
         print 'gmst', a_gmst # TODO rm
@@ -70,7 +69,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_SolarLongitude_J2000(self):
         """Tests solar longitude calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_solar_longitude = self.xforms.SolarLongitude(j2000)
+        a_solar_longitude = StjarnHimlen.SolarLongitude(j2000)
 
         self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
 
@@ -78,7 +77,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_SolarRADec_J2000(self):
         """Tests solar RA and Dec calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        RA, Dec = self.xforms.SolarRADec(j2000)
+        RA, Dec = StjarnHimlen.SolarRADec(j2000)
 
         self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
         self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
@@ -87,7 +86,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST0_J2000(self):
         """Tests GMST0 calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst0 = self.xforms.GMST0(j2000)
+        gmst0 = StjarnHimlen.GMST0(j2000)
 
         self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
 
@@ -95,7 +94,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST_J2000(self):
         """Tests GMST calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst = self.xforms.GMST(j2000)
+        gmst = StjarnHimlen.GMST(j2000)
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
@@ -104,9 +103,9 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST_J2000_plus_day(self):
         """Test GMST J2000 plus a day"""
         a_datetime_0 = coords.datetime('2000-01-01T12:00:00')
-        a_gmst_0 = self.xforms.GMST(a_datetime_0)
+        a_gmst_0 = StjarnHimlen.GMST(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
-        a_gmst_1 = self.xforms.GMST(a_datetime_1)
+        a_gmst_1 = StjarnHimlen.GMST(a_datetime_1)
 
         # returns '00:04:4.61177'
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
@@ -115,7 +114,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST_StA(self):
         """Tests GMST calculation for St. Andrews example"""
         a_datetime = coords.datetime('2000-01-01T00:00:00')
-        gmst = self.xforms.GMST(a_datetime)
+        gmst = StjarnHimlen.GMST(a_datetime)
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
@@ -135,7 +134,7 @@ class StjarnHimlenTests(unittest.TestCase):
             for j in xrange(1, 13):
                 for k in xrange(1, 28):
                     a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
-                    a_solar_longitude = self.xforms.SolarLongitude(a_datetime)
+                    a_solar_longitude = StjarnHimlen.SolarLongitude(a_datetime)
                     print a_datetime, a_solar_longitude
 
 
@@ -171,7 +170,7 @@ class StjarnHimlenTests(unittest.TestCase):
         """
 
 
-        sirius = self.xforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+        sirius = StjarnHimlen.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
                                              a_declination=coords.angle(-16, 42, 58.017))
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
@@ -179,7 +178,7 @@ class StjarnHimlenTests(unittest.TestCase):
         a_datetime = coords.datetime('2014-12-31T20:41:00') # obs 1
         # a_datetime = coords.datetime('2015-01-06T21:39:00') # obs 2
 
-        sirius_hz = self.xforms.toHorizon(sirius, an_observer, a_datetime)
+        sirius_hz = StjarnHimlen.toHorizon(sirius, an_observer, a_datetime)
 
         print 'sirius', sirius_hz
 

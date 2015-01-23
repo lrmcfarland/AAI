@@ -34,7 +34,6 @@ class APCBodyTests(unittest.TestCase):
         self.places = 5
 
 
-    @unittest.skip('TODO')
     def test_analemma(self):
         """Test mini sun
 
@@ -55,7 +54,7 @@ class APCBodyTests(unittest.TestCase):
 
                 print a_datetime,  # TODO rm
 
-                sun_eq = APCBodies.APCBodies.MiniSun(a_datetime)
+                sun_eq = APCBodies.MiniSun(a_datetime)
 
                 sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
