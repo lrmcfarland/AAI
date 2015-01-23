@@ -39,6 +39,10 @@ else
     exit 1
 fi
 
+TRANSFORMS_PYTHON_ROOT=${COORDS_ROOT}/Transforms
+export PYTHONPATH=${PYTHONPATH}:${TRANSFORMS_PYTHON_ROOT}
+
+
 # -----------------------
 # ----- echo result -----
 # -----------------------
