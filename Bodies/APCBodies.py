@@ -9,7 +9,8 @@
 import math
 import coords
 
-import Transforms
+from Transforms import utils
+from Transforms import EclipticEquatorial
 
 
 def Frac(x):
@@ -37,8 +38,8 @@ def MiniSun(a_datetime):
 
     """
 
-    T = Transforms.Transforms.JulianCentury(a_datetime)
-    eps = coords.angle(Transforms.EclipticEquatorial.eps(a_datetime))
+    T = utils.JulianCentury(a_datetime)
+    eps = coords.angle(EclipticEquatorial.eps(a_datetime))
 
     M = 2*math.pi * Frac(0.993133 + 99.997361*T) # Mean anomaly
     L = 2*math.pi * Frac(0.7859453 * M/(2*math.pi) + (6893.0*math.sin(M) + 72.0*math.sin(2.0*M) + 6191.2*T)/1296.0e3)
@@ -48,6 +49,6 @@ def MiniSun(a_datetime):
 
     sun = coords.spherical(1, coords.angle(90), sun_azimuth)
 
-    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun, a_datetime)
+    sun_eq = EclipticEquatorial.toEquatorial(sun, a_datetime)
 
     return sun_eq

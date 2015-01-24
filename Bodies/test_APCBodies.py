@@ -22,7 +22,7 @@ import unittest
 
 import coords
 import APCBodies
-import Transforms
+from Transforms import EquatorialHorizon
 
 
 class APCBodyTests(unittest.TestCase):
@@ -56,7 +56,7 @@ class APCBodyTests(unittest.TestCase):
 
                 sun_eq = APCBodies.MiniSun(a_datetime)
 
-                sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+                sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
                 print 'colatitude', sun_hz.theta, 'azimuth', sun_hz.phi # TODO rm
 
