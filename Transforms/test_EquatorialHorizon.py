@@ -44,6 +44,9 @@ class EquatorialHorizonTests(unittest.TestCase):
         self.sirius = utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
                                             a_declination=coords.angle(-16, 42, 58.017))
 
+        self.rigel = utils.radec2spherical(a_right_ascension=coords.angle(5, 14, 32.27210),
+                                           a_declination=coords.angle(-8, 12, 5.8981))
+
 
     def assertSpacesAreEqual(self, lhs_space, rhs_space):
         """Space assert helper method with limited places."""
@@ -162,6 +165,72 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
+
+    def test_sirius_2015_01_25T18_41_43(self):
+        """Test RA/dec of Sirius 2015-01-25T18:41:43"""
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-25T18:41:43')
+
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+
+        self.assertEqual('14:27:14.4951', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('124:49:5.30833', str(sirius_hz.phi))
+
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(self.sirius, sirius_eq)
+
+
+    def test_rigel_2015_01_25T10_32_29(self):
+        """Test RA/dec of Rigel 2015-01-25T18:32:29
+
+        TODO: elivation relative to sirius, 15, is twice expected
+        difference in declination of 8. RA also a couple of degrees
+        different. Expect 15 get 12.
+
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-25T18:32:29')
+
+        rigel_hz = EquatorialHorizon.toHorizon(self.rigel, an_observer, a_datetime)
+
+        self.assertEqual('33:27:34.8299', str(coords.angle(90) - rigel_hz.theta))
+        self.assertEqual('136:05:51.8178', str(rigel_hz.phi))
+
+        rigel_eq = EquatorialHorizon.toEquatorial(rigel_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(self.rigel, rigel_eq)
+
+
+    @unittest.skip('failing')
+    def test_venus_2015_01_25T18_33_36(self):
+        """Test RA/dec of Venus 2015-01-25T18:46:40
+
+        My observation from telescope
+
+        TODO this is way out. declination is -49 degrees below the horizon
+        Bearing more reasonable at 249
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-25T18:46:40')
+
+        venus = utils.radec2spherical(a_right_ascension=coords.angle(18, 33, 36.1),
+                                      a_declination=coords.angle(-40, 12, 46))
+
+        venus_hz = EquatorialHorizon.toHorizon(venus, an_observer, a_datetime)
+
+        self.assertEqual('14:27:14.4951', str(coords.angle(90) - venus_hz.theta))
+        self.assertEqual('124:49:5.30833', str(venus_hz.phi))
+
+        venus_eq = EquatorialHorizon.toEquatorial(venus_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(self.venus, venus_eq)
 
 
     @unittest.skip('hacking')
