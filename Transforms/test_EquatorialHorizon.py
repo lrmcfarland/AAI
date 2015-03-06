@@ -39,8 +39,6 @@ class EquatorialHorizonTests(unittest.TestCase):
     def setUp(self):
         """Set up test parameters."""
 
-        self.places = 13 # limit 15
-
         self.sirius = utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
                                             a_declination=coords.angle(-16, 42, 58.017))
 
@@ -48,11 +46,14 @@ class EquatorialHorizonTests(unittest.TestCase):
                                            a_declination=coords.angle(-8, 12, 5.8981))
 
 
-    def assertSpacesAreEqual(self, lhs_space, rhs_space):
-        """Space assert helper method with limited places."""
-        self.assertAlmostEqual(lhs_space.r, rhs_space.r, places=self.places)
-        self.assertAlmostEqual(lhs_space.theta.value, rhs_space.theta.value, places=self.places)
-        self.assertAlmostEqual(lhs_space.phi.value, rhs_space.phi.value, places=self.places)
+    def assertSpacesAreEqual(self, lhs_space, rhs_space, places=13):
+        """Space assert helper method with limited places.
+
+        default 13 works for most.
+        """
+        self.assertAlmostEqual(lhs_space.r, rhs_space.r, places)
+        self.assertAlmostEqual(lhs_space.theta.value, rhs_space.theta.value, places)
+        self.assertAlmostEqual(lhs_space.phi.value, rhs_space.phi.value, places)
 
 
     def test_sirius_2014_12_31T20_41_41(self):
@@ -233,11 +234,10 @@ class EquatorialHorizonTests(unittest.TestCase):
         self.assertSpacesAreEqual(self.venus, venus_eq)
 
 
-    @unittest.skip('failing')
     def test_venus_2015_01_25T18_30_starwalk(self):
         """Test RA/dec of Venus 2015-01-25T18:30
 
-        Observation from star walk
+        Azimuth, altitude from star walk
 
         """
 
@@ -250,21 +250,109 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         venus_hz = EquatorialHorizon.toHorizon(venus, an_observer, a_datetime)
 
-        # should be 7:14:07
+        # starwalk has 7:14:07
         self.assertEqual('05:55:56.1873', str(coords.angle(90) - venus_hz.theta))
 
-        # should be 246:42:18
+        # starwalk has 246:42:18
         self.assertEqual('247:50:54.7261', str(venus_hz.phi))
 
         venus_eq = EquatorialHorizon.toEquatorial(venus_hz, an_observer, a_datetime)
 
-        print # linefeed TODO
-        print 'venus', venus # TODO
-        print 'venus eq', venus_eq # TODO
-
-        # phi incorrect: 330.8375 in, -29.1625 out
-
         self.assertSpacesAreEqual(venus, venus_eq)
+
+
+    def test_castor_2015_03_06T20_00_starwalk(self):
+        """Test RA/dec of Castor 2015-03-06T20:00
+
+        http://en.wikipedia.org/wiki/Castor_(star)
+
+        something above the ecliptic
+
+        RA, DEC, Azimuth, altitude from star walk
+
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-03-06T20:00:00')
+
+        castor = utils.radec2spherical(a_right_ascension=coords.angle(07, 34, 36),
+                                       a_declination=coords.angle(31, 53, 17))
+
+        castor_hz = EquatorialHorizon.toHorizon(castor, an_observer, a_datetime)
+
+        # starwalk has 79:19:17
+        self.assertEqual('80:29:59.4777', str(coords.angle(90) - castor_hz.theta))
+
+        # starwalk has 118:06:19
+        self.assertEqual('122:40:24.8745', str(castor_hz.phi))
+
+        castor_eq = EquatorialHorizon.toEquatorial(castor_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(castor, castor_eq)
+
+
+
+    def test_polaris_2015_03_06T20_00_starwalk(self):
+        """Test RA/dec of Polaris 2015-03-06T20:00
+
+        http://en.wikipedia.org/wiki/Polaris
+
+        something above the ecliptic
+
+        RA, DEC, Azimuth, altitude from star walk
+
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-03-06T20:00:00')
+
+        polaris = utils.radec2spherical(a_right_ascension=coords.angle(02, 31, 48),
+                                        a_declination=coords.angle(89, 15, 51))
+
+        polaris_hz = EquatorialHorizon.toHorizon(polaris, an_observer, a_datetime)
+
+        # starwalk has 37:45:56
+        self.assertEqual('37:41:34.5305', str(coords.angle(90) - polaris_hz.theta))
+
+        # starwalk has 359:09:47
+        self.assertEqual('359:08:55.0551', str(polaris_hz.phi))
+
+        polaris_eq = EquatorialHorizon.toEquatorial(polaris_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(polaris, polaris_eq, 12)
+
+
+    def test_alpha_crucis_2015_03_06T20_00_starwalk(self):
+        """Test RA/dec of Alpha_Crucis 2015-03-06T20:00
+
+        http://en.wikipedia.org/wiki/Alpha_Crucis
+
+        something very below the ecliptic
+
+        RA, DEC, Azimuth, altitude from star walk
+
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-03-06T20:00:00')
+
+        alpha_crucis = utils.radec2spherical(a_right_ascension=coords.angle(12, 26, 35),
+                                             a_declination=coords.angle(-63, 05, 55))
+
+        alpha_crucis_hz = EquatorialHorizon.toHorizon(alpha_crucis, an_observer, a_datetime)
+
+        # starwalk has -30, 21, 21
+        self.assertEqual('-29:36:59.9091', str(coords.angle(90) - alpha_crucis_hz.theta))
+
+        # starwalk has 148:33:49
+        self.assertEqual('148:56:33.2962', str(alpha_crucis_hz.phi))
+
+        alpha_crucis_eq = EquatorialHorizon.toEquatorial(alpha_crucis_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(alpha_crucis, alpha_crucis_eq)
 
 
 

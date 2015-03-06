@@ -100,15 +100,15 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
     # Altitude = 90 - theta
     theta = coords.angle()
 
-    foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
-           math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
-           math.cos(local_hour_angle.radians)
+    altitude =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
+                math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+                math.cos(local_hour_angle.radians)
 
-    theta.radians = math.acos(foo)
+    theta.radians = math.acos(altitude)
 
     if verbose:
         altitude = coords.angle()
-        altitude.radians = math.pi/2 - math.acos(foo)
+        altitude.radians = math.pi/2 - math.acos(altitude)
         print 'altitude', altitude
 
     # Azimuth = phi - 180
@@ -163,15 +163,15 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
     # declination = 90 - theta
     theta = coords.angle()
 
-    foo =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) - \
-           math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
-           math.cos(an_object.phi.radians - math.pi)
+    altitude =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) - \
+                math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+                math.cos(an_object.phi.radians - math.pi)
 
-    theta.radians = math.acos(foo)
+    theta.radians = math.acos(altitude)
 
     if verbose:
         declination = coords.angle()
-        declination.radians = math.pi/2 - math.acos(foo)
+        declination.radians = math.pi/2 - math.acos(altitude)
         print 'declination', declination
 
     # Azimuth = phi - 180
@@ -182,7 +182,11 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
     den = (math.cos(an_object.phi.radians - math.pi)*math.sin(math.pi/2 - an_observer.theta.radians) + \
            math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
 
-    phi.radians = gmst.radians*15 - math.atan2(nom, den)
+
+    azimuth = math.atan2(nom, den)
+
+    phi.radians = gmst.radians*15 - azimuth
+    phi.normalize(0, 360)
 
     if verbose:
         ra = coords.angle()
