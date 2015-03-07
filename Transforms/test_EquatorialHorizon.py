@@ -207,33 +207,6 @@ class EquatorialHorizonTests(unittest.TestCase):
         self.assertSpacesAreEqual(self.rigel, rigel_eq)
 
 
-    @unittest.skip('failing')
-    def test_venus_2015_01_25T18_33_36(self):
-        """Test RA/dec of Venus 2015-01-25T18:46:40
-
-        My observation from telescope. -40 dec must be an error.
-
-        TODO this is way out. declination is -49 degrees below the horizon
-        Bearing more reasonable at 249
-        """
-
-        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
-
-        a_datetime = coords.datetime('2015-01-25T18:46:40')
-
-        venus = utils.radec2spherical(a_right_ascension=coords.angle(18, 33, 36.1),
-                                      a_declination=coords.angle(-40, 12, 46))
-
-        venus_hz = EquatorialHorizon.toHorizon(venus, an_observer, a_datetime)
-
-        self.assertEqual('14:27:14.4951', str(coords.angle(90) - venus_hz.theta))
-        self.assertEqual('124:49:5.30833', str(venus_hz.phi))
-
-        venus_eq = EquatorialHorizon.toEquatorial(venus_hz, an_observer, a_datetime)
-
-        self.assertSpacesAreEqual(self.venus, venus_eq)
-
-
     def test_venus_2015_01_25T18_30_starwalk(self):
         """Test RA/dec of Venus 2015-01-25T18:30
 
