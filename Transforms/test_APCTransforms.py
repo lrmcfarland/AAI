@@ -22,6 +22,7 @@ import unittest
 
 import coords
 import APCTransforms
+import utils
 
 
 class APCTransformTests(unittest.TestCase):
@@ -129,9 +130,8 @@ class APCTransformTests(unittest.TestCase):
         self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
 
 
-
     @unittest.skip('TODO')
-    def test_sirius(self):
+    def test_sirius_2014_12_31T20_41_41(self):
         """Test RA/dec of Sirius
 
         From theodolite app:
@@ -154,8 +154,10 @@ class APCTransformTests(unittest.TestCase):
         """
 
 
-        sirius = Transforms.Transforms.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
-                                                       a_declination=coords.angle(-16, 42, 58.017))
+        sirius = utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                       a_declination=coords.angle(-16, 42, 58.017))
+
+        print '\nsirius', sirius
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
@@ -172,7 +174,8 @@ class APCTransformTests(unittest.TestCase):
 
         sirius_eq = APCTransforms.toEquatorial(sirius_hz, an_observer, a_datetime)
 
-        print 'sirius eq', sirius_eq # TODO not inverting correctly
+        print 'sirius eq', sirius_eq # TODO not inverting correctly,
+                                     # ~10 degrees difference in theta and phi
 
         # TODO validate something
 
@@ -184,7 +187,7 @@ class APCTransformTests(unittest.TestCase):
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
 
-        hz_point = APCTransforms.toHorizon_APC(an_object, an_observer, a_gst_time)
+        hz_point = APCTransforms.toHorizon(an_object, an_observer, a_gst_time)
 
         self.assertAlmostEqual(90, hz_point.theta.value)
         self.assertAlmostEqual(0, hz_point.phi.value)
@@ -197,7 +200,7 @@ class APCTransformTests(unittest.TestCase):
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
 
-        hz_point = APCTransforms.toHorizon_APC(an_object, an_observer, a_gst_time)
+        hz_point = APCTransforms.toHorizon(an_object, an_observer, a_gst_time)
 
         # TODO validate
         self.assertAlmostEqual(60, hz_point.theta.value)
@@ -211,7 +214,7 @@ class APCTransformTests(unittest.TestCase):
         an_observer = coords.spherical(1, coords.latitude(45), coords.angle(0))
         a_gst_time = coords.datetime('2015-01-01T00:00:00')
 
-        hz_point = APCTransforms.fromHorizon_APC(an_object, an_observer, a_gst_time)
+        hz_point = APCTransforms.toEquatorial(an_object, an_observer, a_gst_time)
 
         self.assertAlmostEqual(45, hz_point.theta.value)
         self.assertAlmostEqual(0, hz_point.phi.value)

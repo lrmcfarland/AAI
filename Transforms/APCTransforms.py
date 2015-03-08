@@ -92,7 +92,6 @@ def toHorizon(an_object, an_observer, a_local_datetime):
     return _xform(an_object, an_observer, a_local_datetime, -1.0)
 
 
-@classmethod
 def toEquatorial(an_object, an_observer, a_local_datetime):
     """Transforms a horizon vector into one in the equatorial coordinate system"""
     return _xform(an_object, an_observer, a_local_datetime, 1.0)
