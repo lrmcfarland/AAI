@@ -22,7 +22,7 @@ import unittest
 
 import coords
 import APCBodies
-from Transforms import EquatorialHorizon
+import EquatorialHorizon
 
 
 class APCBodyTests(unittest.TestCase):
