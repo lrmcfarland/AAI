@@ -3,7 +3,7 @@
 """ Transforms from Astronomy on the Personal Computer (APC)
     by Montenbruck and Pfleger
 
-to run: ./pylaunch.sh test_APCBodies.py
+to test: ./pylaunch.sh test_APCBodies.py
 
 TODO: not all of my implementations of this are working. Check unittests.
 """
@@ -11,8 +11,8 @@ TODO: not all of my implementations of this are working. Check unittests.
 import math
 import coords
 
-import utils
-import EclipticEquatorial
+from Transforms import EclipticEquatorial
+from Transforms import utils
 
 
 def Frac(x):

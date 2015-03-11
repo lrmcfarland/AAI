@@ -13,9 +13,10 @@ Note: use -- to end options and allow for negative coordinates.
 import math
 
 import coords
-import EclipticEquatorial
-import EquatorialHorizon
-import utils
+
+from Transforms import EclipticEquatorial
+from Transforms import EquatorialHorizon
+from Transforms import utils
 
 
 def SolarLongitude(a_datetime):
