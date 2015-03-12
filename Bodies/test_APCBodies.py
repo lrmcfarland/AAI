@@ -47,18 +47,19 @@ class APCBodyTests(unittest.TestCase):
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
-        for m in xrange(1, 13):
-            for d in xrange(1, 28): # skips some days
+        a_datetime = coords.datetime('2015-01-01T12:00:00')
 
-                a_datetime = coords.datetime('2015-%02d-%02dT12:00:00' % (m, d))
+        for d in xrange(1, 365):
 
-                print a_datetime,  # TODO rm
+            a_datetime += 1
 
-                sun_eq = APCBodies.MiniSun(a_datetime)
+            print a_datetime,  # TODO rm
 
-                sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+            sun_eq = APCBodies.MiniSun(a_datetime)
 
-                print 'colatitude', sun_hz.theta, 'azimuth', sun_hz.phi # TODO rm
+            sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+
+            print 'colatitude', sun_hz.theta, 'azimuth', sun_hz.phi # TODO rm
 
 
 if __name__ == '__main__':

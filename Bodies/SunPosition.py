@@ -16,11 +16,14 @@ import coords
 
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
+from Transforms import GMST
 from Transforms import utils
 
 
 def SolarLongitude(a_datetime):
     """Calculate the longitude of the sun for the given date
+
+    http://en.wikipedia.org/wiki/Position_of_the_Sun
 
     returns the sun's longitude and distance in AU
     """
@@ -42,6 +45,34 @@ def SolarLongitude(a_datetime):
     R = 1.00014 - 0.01671*math.cos(g.radians) - 0.00014*math.cos(2.0*g.radians)
 
     return ecliptic_longitude, R
+
+
+def EquationOfTime(a_datetime):
+    """Calcuate the equation of time
+
+    http://en.wikipedia.org/wiki/Equation_of_time
+
+    Returns: equation of time in degrees.
+    """
+
+    gast = GMST.USNO_C163.GAST(a_datetime)
+
+    ecliptic_longitude, R = SolarLongitude(a_datetime)
+
+    sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+
+    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+
+    sun_ra = utils.get_ra(sun_eq)
+
+    eot = gast.value - sun_ra # TODO - UT + offset
+
+    # TODO correction for not noon? LAST?
+    # TODO hack for discontinuity at vernal equinox?
+
+    return eot
+
+
 
 
 # ================
@@ -81,24 +112,28 @@ if __name__ == '__main__':
     # ----------------------------------
 
 
+
     ecliptic_longitude, R = SolarLongitude(a_datetime)
-
-    print 'ecliptic longitude', ecliptic_longitude # TODO rm
-    print 'distance in AU', R # TODO rm
-
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
 
-    print 'sun ec', sun_ec # TODO rm
-
     sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
 
-    print 'sun eq', sun_eq # TODO rm
-
     an_observer = coords.spherical(1, a_latitude, a_longitude)
-    
+
     sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
-    print 'sun hz', sun_hz # TODO rm
-
     print 'sun alt', coords.angle(90) - sun_hz.theta # TODO rm
+
+    eot = EquationOfTime(a_datetime)
+
+    print 'eot', eot # TODO rm
+
+
+    for d in xrange(1, 365): # skips some days
+
+        a_datetime += 1
+
+        eot = EquationOfTime(a_datetime)
+
+        print eot # TODO rm
