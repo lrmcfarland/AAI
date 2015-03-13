@@ -4,6 +4,17 @@
 
 http://en.wikipedia.org/wiki/Position_of_the_Sun
 
+azimuth ok-ish, elevation 10 degrees off
+
+
+to calculate:
+    http://www.nrel.gov/docs/fy08osti/34302.pdf
+
+to validate:
+
+    http://www.esrl.noaa.gov/gmd/grad/solcalc/
+
+
 to run: ./pylaunch.sh SunPosition.py -- 37:24 -122:4:57 2015-12-22T00:00:00
 
 Note: use -- to end options and allow for negative coordinates.
@@ -52,26 +63,23 @@ def EquationOfTime(a_datetime):
 
     http://en.wikipedia.org/wiki/Equation_of_time
 
+    "A mathematical discontinuity exists at noon."
+
+    Rounds to nearst half day.
+
     Returns: equation of time in degrees.
     """
 
-    gast = GMST.USNO_C163.GAST(a_datetime)
+    noon = coords.datetime()
+    noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
 
-    ecliptic_longitude, R = SolarLongitude(a_datetime)
+    gast = GMST.USNO_C163.GAST(noon)
+    ecliptic_longitude, R = SolarLongitude(noon)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, noon)
 
-    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-
-    sun_ra = utils.get_ra(sun_eq)
-
-    eot = gast.value - sun_ra # TODO - UT + offset
-
-    # TODO correction for not noon? LAST?
-    # TODO hack for discontinuity at vernal equinox?
-
-    return eot
-
+    return gast.value - utils.get_ra(sun_eq)
 
 
 
@@ -106,34 +114,55 @@ if __name__ == '__main__':
 
     a_datetime = coords.datetime(args[2])
 
+    an_observer = coords.spherical(1, a_latitude, a_longitude)
 
     # ----------------------------------
     # ----- calculate sun position -----
     # ----------------------------------
 
+    # azimuth, altitude
+    if False:
+        ecliptic_longitude, R = SolarLongitude(a_datetime)
+
+        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+
+        print 'az', sun_hz.phi, 'alt', coords.angle(90) - sun_hz.theta
 
 
-    ecliptic_longitude, R = SolarLongitude(a_datetime)
-
-    sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-
-    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-
-    an_observer = coords.spherical(1, a_latitude, a_longitude)
-
-    sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-
-    print 'sun alt', coords.angle(90) - sun_hz.theta # TODO rm
-
-    eot = EquationOfTime(a_datetime)
-
-    print 'eot', eot # TODO rm
 
 
-    for d in xrange(1, 365): # skips some days
+    # years worth of equation of time
+    if False:
 
-        a_datetime += 1
+        current_date = a_datetime
 
-        eot = EquationOfTime(a_datetime)
+        for d in xrange(1, 365):
 
-        print eot # TODO rm
+            current_date += 1
+
+            eot = EquationOfTime(current_date)
+
+            print eot # TODO rm
+
+
+
+    # analemma
+    if True:
+
+        current_date = a_datetime
+
+        for d in xrange(1, 365):
+
+            current_date += 1
+
+            ecliptic_longitude, R = SolarLongitude(current_date)
+
+            sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+            sun_eq = EclipticEquatorial.toEquatorial(sun_ec, current_date)
+            sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_date)
+
+            eot = EquationOfTime(current_date)
+
+            print coords.angle(90) - sun_hz.theta, eot
