@@ -67,7 +67,7 @@ def EquationOfTime(a_datetime):
 
     Rounds to nearst half day.
 
-    Returns: equation of time in degrees.
+    Returns: equation of time as a coords angle.
     """
 
     noon = coords.datetime()
@@ -79,7 +79,10 @@ def EquationOfTime(a_datetime):
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
     sun_eq = EclipticEquatorial.toEquatorial(sun_ec, noon)
 
-    return gast.value - utils.get_ra(sun_eq)
+    eot = coords.angle()
+    eot.radians = gast.value - utils.get_ra(sun_eq)
+
+    return eot
 
 
 
@@ -164,5 +167,6 @@ if __name__ == '__main__':
             sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_date)
 
             eot = EquationOfTime(current_date)
+            alt = coords.angle(90) - sun_hz.theta
 
-            print coords.angle(90) - sun_hz.theta, eot
+            print alt.value, eot.value
