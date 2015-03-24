@@ -47,7 +47,7 @@ def SolarLongitude(a_datetime):
 
     # ecliptic longitude
     g = coords.angle(357.528 + 0.9856003*n)
-    g.normalize(0, 365)
+    g.normalize(0, 360)
 
     # ecliptic longitude
     ecliptic_longitude = coords.angle(L.value + 1.915*math.sin(g.radians) + 0.020*math.sin(2.0*g.radians))
@@ -80,7 +80,8 @@ def EquationOfTime(a_datetime):
     sun_eq = EclipticEquatorial.toEquatorial(sun_ec, noon)
 
     eot = coords.angle()
-    eot.radians = gast.value - utils.get_ra(sun_eq)
+
+    eot.value = gast.value - utils.get_ra(sun_eq)
 
     return eot
 
@@ -126,18 +127,27 @@ if __name__ == '__main__':
     # azimuth, altitude
     if False:
         ecliptic_longitude, R = SolarLongitude(a_datetime)
+        print 'ecliptic longitude', ecliptic_longitude
 
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+        print 'sun ec', sun_ec # TODO rm
+
         sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        print 'sun eq', sun_eq # TODO rm
+
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+        print 'sun hz', sun_hz # TODO rm
 
         print 'az', sun_hz.phi, 'alt', coords.angle(90) - sun_hz.theta
 
+        eot = EquationOfTime(a_datetime)
+
+        print 'Equation of time', a_datetime, eot # TODO rm
 
 
 
     # years worth of equation of time
-    if False:
+    if True:
 
         current_date = a_datetime
 
@@ -147,12 +157,14 @@ if __name__ == '__main__':
 
             eot = EquationOfTime(current_date)
 
-            print eot # TODO rm
+            # TODO equation of time blows up near the vernal equinox
+            if d != 80 and d != 81:
+                print d, current_date, eot.value*60 # TODO rm
 
 
 
     # analemma
-    if True:
+    if False:
 
         current_date = a_datetime
 
@@ -166,7 +178,13 @@ if __name__ == '__main__':
             sun_eq = EclipticEquatorial.toEquatorial(sun_ec, current_date)
             sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_date)
 
-            eot = EquationOfTime(current_date)
-            alt = coords.angle(90) - sun_hz.theta
+            # switch to astronomer coordinates
+            eot = EquationOfTime(current_date) + coords.angle(180)
 
-            print alt.value, eot.value
+            az = 360*eot.value/(24.0*15.0) # convert RA into degrees
+
+            alt = coords.angle(180) - sun_hz.theta
+
+            # TODO equation of time blows up near the vernal equinox
+            if d != 80 and d != 81:
+                print alt.value, az
