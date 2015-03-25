@@ -19,6 +19,18 @@ to run: ./pylaunch.sh SunPosition.py -- 37:24 -122:4:57 2015-12-22T00:00:00
 
 Note: use -- to end options and allow for negative coordinates.
 
+
+to plot:
+
+> analemma <- read.table("analemma.txt")
+> plot(analemma$V2, analemma$V1, type="l", xlab="azimuth", ylab="altitude", col="red")
+> title("Analemma, 37N")
+
+> eot <- read.table("eot.txt")
+> plot(eot$V1, eot$V3, type="l", xlab="day of year", ylab="minutes", col="blue")
+> title("Equation of Time, 2015")
+
+
 """
 
 import math
@@ -125,7 +137,7 @@ if __name__ == '__main__':
     # ----------------------------------
 
     # azimuth, altitude
-    if False:
+    if True:
         ecliptic_longitude, R = SolarLongitude(a_datetime)
         print 'ecliptic longitude', ecliptic_longitude
 
@@ -147,7 +159,7 @@ if __name__ == '__main__':
 
 
     # years worth of equation of time
-    if True:
+    if False:
 
         current_date = a_datetime
 
@@ -158,8 +170,8 @@ if __name__ == '__main__':
             eot = EquationOfTime(current_date)
 
             # TODO equation of time blows up near the vernal equinox
-            if d != 80 and d != 81:
-                print d, current_date, eot.value*60 # TODO rm
+            if d < 79 or d > 81:
+                print d, current_date, eot.value*60
 
 
 
@@ -179,12 +191,10 @@ if __name__ == '__main__':
             sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_date)
 
             # switch to astronomer coordinates
-            eot = EquationOfTime(current_date) + coords.angle(180)
+            eot = EquationOfTime(current_date)
 
-            az = 360*eot.value/(24.0*15.0) # convert RA into degrees
-
-            alt = coords.angle(180) - sun_hz.theta
+            alt = coords.angle(90) - sun_hz.theta
 
             # TODO equation of time blows up near the vernal equinox
-            if d != 80 and d != 81:
-                print alt.value, az
+            if d < 79 or d > 81:
+                print alt.value, eot.value*60 + 180
