@@ -92,7 +92,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
 
-    def test_sirius_2015_01_01T00_00_00(self):
+    def test_sirius_2015_01_01T00_00_00_404mlc(self):
         """Test RA/dec of Sirius 2015-01-01T00:00:00
 
         By happy coincidence, Sirius was on/near my local
@@ -106,12 +106,96 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
 
+        # convertalot has 35.8414
+        # http://www.stargazing.net has 33:29:59
         self.assertEqual('35:52:34.9412', str(coords.angle(90) - sirius_hz.theta))
+
+        # convertalot has 176.8388
+        # http://www.stargazing.net has 159:29:35
         self.assertEqual('178:52:5.91641', str(sirius_hz.phi))
 
         sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
+
+
+
+    def test_sirius_2015_01_01T00_00_00_47N(self):
+        """Test RA/dec of Sirius 2015-01-01T00:00:00
+
+        Same as above but 47 degrees north latitude.
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(47, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+
+        # convertalot has 25.8550
+        # http://www.stargazing.net has 24:04:27
+        self.assertEqual('25:52:41.2332', str(coords.angle(90) - sirius_hz.theta))
+
+        # convertalot has 177.1526
+        # http://www.stargazing.net has 161:20:22
+        self.assertEqual('178:58:50.964', str(sirius_hz.phi))
+
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(self.sirius, sirius_eq)
+
+
+
+    def test_sirius_2015_01_01T00_00_00_17N(self):
+        """Test RA/dec of Sirius 2015-01-01T00:00:00
+
+        Same as above but 17 degrees north latitude.
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(17, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+
+        # convertalot has 55.7983
+        # http://www.stargazing.net has 51:47:34
+        self.assertEqual('55:52:15.0665', str(coords.angle(90) - sirius_hz.theta))
+
+        # convertalot has 175.4386
+        # http://www.stargazing.net has 151:48:55
+        self.assertEqual('178:21:55.7911', str(sirius_hz.phi))
+
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(self.sirius, sirius_eq)
+
+
+    @unittest.skip('azimuth more than 10 degrees out')
+    def test_sirius_2015_01_01T00_00_00_17S(self):
+        """Test RA/dec of Sirius 2015-01-01T00:00:00
+
+        Same as above but 17 degrees south latitude.
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(-17, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+
+        # convertalot has 87.3485
+        # http://www.stargazing.net has 73:00:46
+        self.assertEqual('88:51:26.7255', str(coords.angle(90) - sirius_hz.theta))
+
+        # convertalot has 75.0877 TODO way out!
+        # http://www.stargazing.net has 90:49:36
+        self.assertEqual('53:22:32.3603', str(sirius_hz.phi))
+
+        sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
+
+        self.assertSpacesAreEqual(self.sirius, sirius_eq, 12)
+
 
 
     def test_sirius_2015_01_01T06_00_00(self):
