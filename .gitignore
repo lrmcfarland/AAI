@@ -17,3 +17,6 @@
 # python cruft
 *.pyc
 
+# r stuff
+Bodies/.RData
+Bodies/.Rhistory
