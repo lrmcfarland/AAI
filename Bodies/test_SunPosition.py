@@ -27,8 +27,8 @@ from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
 
 
-class APCBodyTests(unittest.TestCase):
-    """Test APC body calculations"""
+class SunPositionsTests(unittest.TestCase):
+    """Test Sun Position calculations"""
 
     def setUp(self):
         """Set up test parameters."""
