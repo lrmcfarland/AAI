@@ -65,7 +65,7 @@ class Error(Exception):
 
 
 def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
-    """Transforms a vector from equatorial to ecliptic coordinates.
+    """Transforms a vector from equatorial to horizon coordinates.
 
     Args:
 
@@ -131,7 +131,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
 
 
 def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
-    """Transforms a vector from equatorial to ecliptic coordinates.
+    """Transforms a vector from horizon to equatorial coordinates.
 
     Args:
 
