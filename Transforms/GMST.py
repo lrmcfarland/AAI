@@ -21,6 +21,8 @@ Validation:
 import math
 import coords
 
+from Transforms import utils
+
 class Error(Exception):
     pass
 
@@ -212,3 +214,55 @@ class USNO_C163(object):
         return lst
 
 
+
+
+# ================
+# ===== main =====
+# ================
+
+
+if __name__ == '__main__':
+
+    # -------------------------
+    # ----- parse options -----
+    # -------------------------
+
+    import optparse
+
+    defaults = {}
+
+    usage = '%prog [options] <datetime> [<latitude> [<longitude>]]'
+
+    parser = optparse.OptionParser(usage=usage)
+
+    options, args = parser.parse_args()
+
+    # ----- validate -----
+
+    if len(args) < 1:
+        parser.error('missing datetime.')
+
+    a_datetime = coords.datetime(args[0])
+
+    if len(args) > 1:
+        a_latitude = utils.parse_angle_arg(args[1])
+    else:
+        a_latitude = utils.parse_angle_arg('0')
+
+    if len(args) > 2:
+        a_longitude = utils.parse_angle_arg(args[2])
+    else:
+        a_longitude = utils.parse_angle_arg('0')
+
+    an_observer = coords.spherical(1, a_latitude, a_longitude)
+
+    # ----- results -----
+
+    print a_datetime
+    print an_observer
+
+    print 'Julian Date', a_datetime.toJulianDate()
+    print 'GMST', USNO_C163.GMST(a_datetime)
+    print 'GAST', USNO_C163.GAST(a_datetime)
+    print 'LSTM', USNO_C163.LSTM(a_datetime, an_observer)
+    print 'LSTA', USNO_C163.LSTA(a_datetime, an_observer)
