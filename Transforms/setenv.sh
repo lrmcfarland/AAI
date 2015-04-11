@@ -39,6 +39,9 @@ else
     exit 1
 fi
 
+ASTRONOMY_PYTHON_ROOT=${COORDS_ROOT}
+export PYTHONPATH=${PYTHONPATH}:${ASTRONOMY_PYTHON_ROOT}
+
 # -----------------------
 # ----- echo result -----
 # -----------------------
