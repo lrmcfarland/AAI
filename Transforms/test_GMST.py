@@ -332,6 +332,41 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('11:39:5.06723', str(a_gmst))
 
 
+    def test_GMST_meeus_12a(self):
+        """Test GMST with Meeus example 12a"""
+        # from Astronomical Algorithms, Jean Meeus, pp. 88
+
+        a_datetime = coords.datetime('1987-04-10T00:00:00')
+        self.assertEqual(2446895.5, a_datetime.toJulianDate())
+        # Meeus: 2446895.5
+
+        a_gmst = self.xforms.GMST(a_datetime)
+        self.assertEqual('13:10:46.3668', str(a_gmst))
+        # Meeus: 13:10:46.3668
+
+        a_gast = self.xforms.GAST(a_datetime)
+        self.assertEqual('13:10:46.1154', str(a_gast))
+        # Meeus: 13:10:46.1351. I am using a different algorithm for
+        # obliquity of ecliptic (USNOs)
+
+
+    def test_GMST_meeus_12b(self):
+        """Test GMST with Meeus example 12b"""
+        # from Astronomical Algorithms, Jean Meeus, pp. 89
+
+        a_datetime = coords.datetime('1987-04-10T19:21:00')
+        self.assertEqual(2446896.30625, a_datetime.toJulianDate())
+        # Meeus: 2446896.30625
+
+        a_gmst = self.xforms.GMST(a_datetime)
+        self.assertEqual('13:10:46.3668', str(a_gmst))
+        # Meeus: 13:10:46.3668
+
+        a_gast = self.xforms.GAST(a_datetime)
+        self.assertEqual('13:10:46.1154', str(a_gast))
+        # Meeus: 13:10:46.1351. I am using a different algorithm for
+        # obliquity of ecliptic (USNOs)
+
 
 if __name__ == '__main__':
     unittest.main()

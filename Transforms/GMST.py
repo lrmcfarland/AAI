@@ -71,6 +71,8 @@ class USNO_C163(object):
     def GMST(cls, a_datetime):
         """Greenwich mean sidereal time (GMST)
 
+        http://aa.usno.navy.mil/faq/docs/GAST.php
+
         Args:
 
         a_datetime: local date and time of the observation.
@@ -96,6 +98,8 @@ class USNO_C163(object):
     @classmethod
     def GMST_simplified(cls, a_datetime):
         """Greenwich mean sidereal time, simplified form
+
+        http://aa.usno.navy.mil/faq/docs/GAST.php
 
         Args:
 
@@ -150,6 +154,8 @@ class USNO_C163(object):
     @classmethod
     def GAST(cls, a_datetime):
         """Greenwich apparent sidereal time
+
+        http://aa.usno.navy.mil/faq/docs/GAST.php
 
         Args:
 
