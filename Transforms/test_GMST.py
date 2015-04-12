@@ -359,13 +359,8 @@ class USNO_C163_Tests(unittest.TestCase):
         # Meeus: 2446896.30625
 
         a_gmst = self.xforms.GMST(a_datetime)
-        self.assertEqual('13:10:46.3668', str(a_gmst))
-        # Meeus: 13:10:46.3668
-
-        a_gast = self.xforms.GAST(a_datetime)
-        self.assertEqual('13:10:46.1154', str(a_gast))
-        # Meeus: 13:10:46.1351. I am using a different algorithm for
-        # obliquity of ecliptic (USNOs)
+        self.assertEqual('08:34:57.0896', str(a_gmst))
+        # Meeus: 08:34:57.0896
 
 
 if __name__ == '__main__':
