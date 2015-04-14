@@ -91,11 +91,11 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
-    local_hour_angle = coords.angle(gmst.value*15 - an_object.phi.value)
+    gast = GMST.USNO_C163.GAST(a_local_datetime) # hours
+    local_hour_angle = coords.angle(gast.value*15 - an_object.phi.value)
 
     if is_verbose:
-        print 'GMST', gmst
+        print 'GAST', gast
         print 'Local Hour Angle', local_hour_angle
 
     theta = coords.angle()
@@ -158,10 +158,10 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
+    gast = GMST.USNO_C163.GAST(a_local_datetime) # hours
 
     if is_verbose:
-        print 'GMST', gmst
+        print 'GAST', gast
 
     # declination = 90 - theta
     theta = coords.angle()
@@ -188,12 +188,12 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     azimuth = math.atan2(nom, den)
 
-    phi.radians = gmst.radians*15 - azimuth
+    phi.radians = gast.radians*15 - azimuth
     phi.normalize(0, 360)
 
     if is_verbose:
         ra = coords.angle()
-        ra.radians = gmst.radians*15 - math.atan2(nom, den)
+        ra.radians = gast.radians*15 - math.atan2(nom, den)
         ra /= coords.angle(15)
         print 'R.A.', ra
 
