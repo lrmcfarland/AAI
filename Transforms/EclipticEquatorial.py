@@ -60,7 +60,7 @@ def eps(a_datetime):
     return the_eps
 
 
-def _xform(an_object, a_datetime, a_direction):
+def _xform(an_object, a_datetime, a_direction, is_verbose=False):
     """Transforms a vector to/from equatorial/ecliptic coordinates.
 
     Args:
@@ -70,6 +70,8 @@ def _xform(an_object, a_datetime, a_direction):
     a_datetime (ISO8601 string): date and time of the observation.
 
     a_direction: +1 to equatorial, -1 to ecliptic
+
+    is_verbose(bool): verbose mode. TODO use?
 
     Returns: coords.spherical in the transformed coordinates.
     """
@@ -87,7 +89,7 @@ def _xform(an_object, a_datetime, a_direction):
         return the_rotated
 
 
-def toEcliptic(an_object, a_datetime):
+def toEcliptic(an_object, a_datetime, is_verbose=False):
     """Transforms an_object from equatorial to ecliptic coordinates
 
     Args:
@@ -96,12 +98,14 @@ def toEcliptic(an_object, a_datetime):
 
     a_datetime (ISO8601 string): date and time of the observation.
 
+    is_verbose(bool): verbose mode.
+
     Returns: coords.spherical in the transformed coordinates.
     """
-    return _xform(an_object, a_datetime, -1.0)
+    return _xform(an_object, a_datetime, -1.0, is_verbose)
 
 
-def toEquatorial(an_object, a_datetime):
+def toEquatorial(an_object, a_datetime, is_verbose=False):
     """Transforms an_object from ecliptic to equatorial coordinates
 
     Args:
@@ -110,9 +114,11 @@ def toEquatorial(an_object, a_datetime):
 
     a_datetime (ISO8601 string): date and time of the observation.
 
+    is_verbose(bool): verbose mode.
+
     Returns: coords.spherical in the transformed coordinates.
     """
-    return _xform(an_object, a_datetime, 1.0)
+    return _xform(an_object, a_datetime, 1.0, is_verbose)
 
 
 # ================
@@ -128,7 +134,8 @@ if __name__ == '__main__':
 
     import optparse
 
-    defaults = {'toEcliptic' : False}
+    defaults = {'toEcliptic' : False,
+                'isVerbose': False}
 
     usage = '%prog [options] <RA as deg:min:sec> <dec as deg:min:sec> <a datetime>'
 
@@ -138,6 +145,11 @@ if __name__ == '__main__':
                       action='store_true', dest='toEcliptic',
                       default=defaults['toEcliptic'],
                       help='to ecliptic [%default]')
+
+    parser.add_option('-v', '--verbose',
+                      action='store_true', dest='verbose',
+                      default=defaults['isVerbose'],
+                      help='verbose [%default]')
 
     options, args = parser.parse_args()
 
@@ -160,12 +172,10 @@ if __name__ == '__main__':
     # ---------------------
 
     if options.toEcliptic == True:
-        result = toEcliptic(an_object, a_datetime)
+        result = toEcliptic(an_object, a_datetime, is_verbose=options.verbose)
+        print 'Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', result.phi
 
     else:
-        result = toEquatorial(an_object, a_datetime)
+        result = toEquatorial(an_object, a_datetime, is_verbose=options.verbose)
+        print 'RA:', utils.get_RA(result), ', Dec:', result.phi
 
-
-    print result
-
-    # TODO add print options for output in RA and Dec

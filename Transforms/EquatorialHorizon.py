@@ -64,7 +64,7 @@ class Error(Exception):
     pass
 
 
-def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
+def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     """Transforms a vector from equatorial to horizon coordinates.
 
     Args:
@@ -78,7 +78,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
 
-    verbose (bool): verbose mode
+    is_verbose (bool): verbose mode
 
     Returns: coords.spherical in the transformed coordinates.
     """
@@ -92,7 +92,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
     gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
     local_hour_angle = coords.angle(gmst.value*15 - an_object.phi.value)
 
-    if verbose:
+    if is_verbose:
         print 'GMST', gmst
         print 'Local Hour Angle', local_hour_angle
 
@@ -105,9 +105,9 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
 
     theta.radians = math.acos(altitude)
 
-    if verbose:
+    if is_verbose:
         altitude = coords.angle()
-        altitude.radians = math.pi/2 - math.acos(altitude)
+        # TODO altitude.radians = math.pi/2 - math.acos(altitude)
         print 'altitude', altitude
 
     # Azimuth = phi - 180
@@ -120,7 +120,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
 
     phi.radians = math.pi + math.atan2(nom, den)
 
-    if verbose:
+    if is_verbose:
         azimuth = coords.angle()
         azimuth.radians = math.atan2(nom, den)
         print 'azimuth', azimuth
@@ -129,7 +129,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
 
 
 
-def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
+def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     """Transforms a vector from horizon to equatorial coordinates.
 
     Args:
@@ -143,7 +143,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
 
-    verbose (bool): verbose mode
+    is_verbose (bool): verbose mode
 
     Returns: coords.spherical in the transformed coordinates.
     """
@@ -156,7 +156,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
 
     gmst = GMST.USNO_C163.GMST(a_local_datetime) # hours
 
-    if verbose:
+    if is_verbose:
         print 'GMST', gmst
 
     # declination = 90 - theta
@@ -168,7 +168,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
 
     theta.radians = math.acos(altitude)
 
-    if verbose:
+    if is_verbose:
         declination = coords.angle()
         declination.radians = math.pi/2 - math.acos(altitude)
         print 'declination', declination
@@ -187,7 +187,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
     phi.radians = gmst.radians*15 - azimuth
     phi.normalize(0, 360)
 
-    if verbose:
+    if is_verbose:
         ra = coords.angle()
         ra.radians = gmst.radians*15 - math.atan2(nom, den)
         ra /= coords.angle(15)
@@ -210,21 +210,21 @@ if __name__ == '__main__':
     import optparse
 
     defaults = {'toEquatorial' : False,
-                'verbose': False}
+                'isVerbose': False}
 
     usage = '%prog [options] <RA as deg:min:sec> <dec as deg:min:sec> <observer latitude as deg:min:sec> <observer longitude as deg:min:sec> <a datetime>'
 
     parser = optparse.OptionParser(usage=usage)
 
-    parser.add_option('-v', '--verbose',
-                      action='store_true', dest='verbose',
-                      default=defaults['verbose'],
-                      help='verbose [%default]')
-
     parser.add_option('--toEquatorial',
                       action='store_true', dest='toEquatorial',
                       default=defaults['toEquatorial'],
                       help='to equatorial [%default]')
+
+    parser.add_option('-v', '--verbose',
+                      action='store_true', dest='verbose',
+                      default=defaults['isVerbose'],
+                      help='verbose [%default]')
 
     options, args = parser.parse_args()
 
@@ -236,11 +236,11 @@ if __name__ == '__main__':
     RA = utils.parse_angle_arg(args[0])
     dec = utils.parse_angle_arg(args[1])
 
-    lat = utils.parse_angle_arg(args[2])
+    lat = coords.angle(90) - utils.parse_angle_arg(args[2])
     lon = utils.parse_angle_arg(args[3])
 
     an_object = utils.radec2spherical(a_right_ascension=RA, a_declination=dec)
-    an_observer = coords.spherical(1, coords.angle(90) - lat, lon)
+    an_observer = coords.spherical(1, lat, lon)
 
     a_datetime = coords.datetime(args[4])
 
@@ -251,12 +251,11 @@ if __name__ == '__main__':
     # ---------------------
 
     if options.toEquatorial == True:
-        result = toEquatorial(an_object, an_observer, a_datetime, options.verbose)
+        result = toEquatorial(an_object, an_observer, a_datetime, is_verbose=options.verbose)
+        print 'Equatorial Latitude:', utils.get_latitude(result), ', Longitude:', result.phi
 
     else:
-        result = toHorizon(an_object, an_observer, a_datetime, options.verbose)
+        result = toHorizon(an_object, an_observer, a_datetime, is_verbose=options.verbose)
+        print 'Altitude:', result.theta.complement(), ', Azimuth:', result.phi
 
 
-    print result
-
-    # TODO add print options for output in RA and Dec
