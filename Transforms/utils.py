@@ -93,17 +93,30 @@ def get_RA(a_point):
 def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
     """Converts a given right ascension and declination into spherical coordinates
 
-    Declination measured from the ecliptic is converted to theta
+    Declination measured from the ecliptic and is converted to theta
     measured from the north pole.
 
     Right ascension measured in hours is converted into degrees and assigned
     to phi.
 
-    Returns the spherical coordinate.
-
+    Returns coords.spherical.
     """
     return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
                             coords.angle(a_right_ascension.value * 15))
+
+
+def altaz2spherical(an_altitude, an_azimuth, a_radius = 1):
+    """Converts a given altitude and azimuth into spherical coordinates
+
+    Altitude is measured from the horizon is converted to theta
+    measured from the north pole.
+
+    Azimuth is measured from the meridian and is converted into
+    degrees and assigned to phi.
+
+    Returns coords.spherical.
+    """
+    return coords.spherical(a_radius, coords.angle(90.0) - an_altitude, an_azimuth)
 
 
 def JulianCentury(a_datetime):
