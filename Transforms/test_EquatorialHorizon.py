@@ -134,8 +134,6 @@ class EquatorialHorizonTests(unittest.TestCase):
         # http://www.stargazing.net has 33:29:59
         self.assertEqual(35.876392134760174, utils.get_latitude(sirius_hz).value)
 
-        print utils.get_latitude(sirius_hz) # TODO rm
-
         # convertalot has 176.8388
         # http://www.stargazing.net has 159:29:35
         self.assertEqual(178.86978502523434, utils.get_longitude(sirius_hz).value)
