@@ -100,7 +100,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
         print 'GAST', gast
         print 'observer latitude', an_observer.phi.value
         print 'object latitude', an_object.phi.value
-        print 'local hour angle', local_hour_angle
+        print 'local hour angle', local_hour_angle.value
 
     theta = coords.angle()
 
@@ -125,7 +125,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
         phi.radians = math.atan2(nom, den)
 
     else:
-        phi.radians = math.pi + math.atan2(nom, den)
+        phi.radians = math.atan2(nom, den) + math.pi
 
 
     if is_verbose:
@@ -165,8 +165,10 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     altitude = an_object.theta.complement()
 
-    azimuth = an_object.phi # TODO is azimuth south
-
+    if is_azimuth_south:
+        azimuth = an_object.phi
+    else:
+        azimuth = coords.angle(an_object.phi.value - 180)
 
     dec = coords.angle()
 
