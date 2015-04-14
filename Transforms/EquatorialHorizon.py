@@ -69,19 +69,18 @@ def toHorizon(an_object, an_observer, a_local_datetime, verbose=False):
 
     Args:
 
-    an_object: the vector to transform in theta (90 - declination),
-               phi (RA * 15). See self.radec2spherical.
+    an_object (coords.spherical): in right ascension and declination.
 
-    an_observer: the latitude (90 - theta) and longitude (positive
-                 east of the prime meridian) of an observer as a
-                 spherical coordinate (unit radius)
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime azimuth) of an observer as a spherical
+    coordinate (unit radius).
 
-    a_local_datetime: local date and time of the observation.
+    a_local_datetime (ISO8601 string): local date and time of the
+    observation.
 
-    verbose: verbose mode
+    verbose (bool): verbose mode
 
-    Returns a spherical coordinate vector in the transformed coordinates
-
+    Returns: coords.spherical in the transformed coordinates.
     """
 
     if not isinstance(an_object, coords.spherical):
@@ -135,18 +134,18 @@ def toEquatorial(an_object, an_observer, a_local_datetime, verbose=False):
 
     Args:
 
-    an_object: the vector to transform in theta (90 - altitude),
-               phi (azimuth). See self.radec2spherical.
+    an_object (coords.spherical): in altitude and azimuth.
 
-    an_observer: the latitude and longitude (positive west of the
-                 prime meridian) of an observer as a spherical
-                 coordinate (unit radius)
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime azimuth) of an observer as a spherical
+    coordinate (unit radius).
 
-    a_local_datetime: local date and time of the observation.
+    a_local_datetime (ISO8601 string): local date and time of the
+    observation.
 
-    verbose: verbose mode
+    verbose (bool): verbose mode
 
-    Returns a spherical coordinate vector in the transformed coordinates
+    Returns: coords.spherical in the transformed coordinates.
     """
 
     if not isinstance(an_object, coords.spherical):

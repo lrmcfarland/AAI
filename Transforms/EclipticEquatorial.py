@@ -64,11 +64,14 @@ def _xform(an_object, a_datetime, a_direction):
     """Transforms a vector to/from equatorial/ecliptic coordinates.
 
     Args:
-    an_object: the vector to transform. May be Cartesian or spherical.
-    a_datetime: the time of the transformation
+
+    an_object (coords.spherical): in RA, dec. to azimuth and altitude.
+
+    a_datetime (ISO8601 string): date and time of the observation.
+
     a_direction: +1 to equatorial, -1 to ecliptic
 
-    Returns a vector in the transformed coordinates
+    Returns: coords.spherical in the transformed coordinates.
     """
 
     if not isinstance(an_object, coords.spherical):
@@ -87,7 +90,13 @@ def _xform(an_object, a_datetime, a_direction):
 def toEcliptic(an_object, a_datetime):
     """Transforms an_object from equatorial to ecliptic coordinates
 
-    Returns a Cartesian vector in eliptic coordinates
+    Args:
+
+    an_object (coords.spherical): in RA, dec. to azimuth and altitude.
+
+    a_datetime (ISO8601 string): date and time of the observation.
+
+    Returns: coords.spherical in the transformed coordinates.
     """
     return _xform(an_object, a_datetime, -1.0)
 
@@ -95,7 +104,13 @@ def toEcliptic(an_object, a_datetime):
 def toEquatorial(an_object, a_datetime):
     """Transforms an_object from ecliptic to equatorial coordinates
 
-    Returns a Cartesian vector in equatorial coordinates
+    Args:
+
+    an_object (coords.spherical): in RA, dec. to azimuth and altitude.
+
+    a_datetime (ISO8601 string): date and time of the observation.
+
+    Returns: coords.spherical in the transformed coordinates.
     """
     return _xform(an_object, a_datetime, 1.0)
 
