@@ -162,5 +162,25 @@ class EclipticEquatorialTests(unittest.TestCase):
         self.assertAlmostEqual(342.84035, utils.get_longitude(an_object_eq).value, self.places)
 
 
+
+
+    def test_meeus_13a(self):
+
+        """Test Meeus example 13a"""
+
+        pollux = utils.radec2spherical(coords.latitude(7, 45, 18.946), coords.angle(28, 01, 34.26))
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        pollux_ec = EclipticEquatorial.toEcliptic(pollux, a_datetime)
+
+        # Meeus: 6.684170
+        self.assertAlmostEqual(6.685962149434033, utils.get_latitude(pollux_ec).value, self.places)
+
+        # Meeus: 113.215630
+        self.assertAlmostEqual(113.21571932194666, utils.get_longitude(pollux_ec).value, self.places)
+
+
+
 if __name__ == '__main__':
     unittest.main()
