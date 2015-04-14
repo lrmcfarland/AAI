@@ -82,7 +82,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2014-12-31T20:41:41')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         self.assertEqual('17:54:28.6306', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('128:52:13.836', str(sirius_hz.phi))
@@ -104,7 +104,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         # convertalot has 35.8414
         # http://www.stargazing.net has 33:29:59
@@ -130,7 +130,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         # convertalot has 25.8550
         # http://www.stargazing.net has 24:04:27
@@ -156,7 +156,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         # convertalot has 55.7983
         # http://www.stargazing.net has 51:47:34
@@ -182,7 +182,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         # convertalot has 87.3485
         # http://www.stargazing.net has 73:00:46
@@ -205,7 +205,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T06:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         self.assertEqual('-9:30:43.9809', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('256:10:20.4311', str(sirius_hz.phi))
@@ -224,7 +224,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T12:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         self.assertEqual('-69:18:43.4107', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('358:44:25.2683', str(sirius_hz.phi))
@@ -241,7 +241,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T21:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         self.assertEqual('21:14:52.8586', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('133:17:44.3899', str(sirius_hz.phi))
@@ -258,7 +258,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-25T18:41:43')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         self.assertEqual('14:27:14.4951', str(coords.angle(90) - sirius_hz.theta))
         self.assertEqual('124:49:5.30833', str(sirius_hz.phi))
@@ -281,7 +281,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-25T18:32:29')
 
-        rigel_hz = EquatorialHorizon.toHorizon(self.rigel, an_observer, a_datetime)
+        rigel_hz = EquatorialHorizon.toHorizon(self.rigel, an_observer, a_datetime, is_azimuth_south=False)
 
         self.assertEqual('33:27:34.8299', str(coords.angle(90) - rigel_hz.theta))
         self.assertEqual('136:05:51.8178', str(rigel_hz.phi))
@@ -305,7 +305,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         venus = utils.radec2spherical(a_right_ascension=coords.angle(22, 03, 21),
                                       a_declination=coords.angle(-13, 36, 04))
 
-        venus_hz = EquatorialHorizon.toHorizon(venus, an_observer, a_datetime)
+        venus_hz = EquatorialHorizon.toHorizon(venus, an_observer, a_datetime, is_azimuth_south=False)
 
         # starwalk has 7:14:07
         self.assertEqual('05:55:56.1873', str(coords.angle(90) - venus_hz.theta))
@@ -336,7 +336,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         castor = utils.radec2spherical(a_right_ascension=coords.angle(07, 34, 36),
                                        a_declination=coords.angle(31, 53, 17))
 
-        castor_hz = EquatorialHorizon.toHorizon(castor, an_observer, a_datetime)
+        castor_hz = EquatorialHorizon.toHorizon(castor, an_observer, a_datetime, is_azimuth_south=False)
 
         # starwalk has 79:19:17
         self.assertEqual('80:29:59.4777', str(coords.angle(90) - castor_hz.theta))
@@ -368,7 +368,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         polaris = utils.radec2spherical(a_right_ascension=coords.angle(02, 31, 48),
                                         a_declination=coords.angle(89, 15, 51))
 
-        polaris_hz = EquatorialHorizon.toHorizon(polaris, an_observer, a_datetime)
+        polaris_hz = EquatorialHorizon.toHorizon(polaris, an_observer, a_datetime, is_azimuth_south=False)
 
         # starwalk has 37:45:56
         self.assertEqual('37:41:34.5305', str(coords.angle(90) - polaris_hz.theta))
@@ -399,7 +399,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         alpha_crucis = utils.radec2spherical(a_right_ascension=coords.angle(12, 26, 35),
                                              a_declination=coords.angle(-63, 05, 55))
 
-        alpha_crucis_hz = EquatorialHorizon.toHorizon(alpha_crucis, an_observer, a_datetime)
+        alpha_crucis_hz = EquatorialHorizon.toHorizon(alpha_crucis, an_observer, a_datetime, is_azimuth_south=False)
 
         # starwalk has -30, 21, 21
         self.assertEqual('-29:36:59.9091', str(coords.angle(90) - alpha_crucis_hz.theta))
@@ -421,7 +421,7 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
 
-        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime)
+        sirius_hz = EquatorialHorizon.toHorizon(self.sirius, an_observer, a_datetime, is_azimuth_south=False)
 
         print '\nsirius', sirius_hz
 

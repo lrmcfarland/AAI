@@ -64,7 +64,7 @@ class Error(Exception):
     pass
 
 
-def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
+def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, is_verbose=False):
     """Transforms a vector from equatorial to horizon coordinates.
 
     Args:
@@ -78,7 +78,9 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
 
-    is_verbose (bool): verbose mode
+    is_azimuth_south (bool): azimuth is relative to south.
+
+    is_verbose (bool): verbose mode.
 
     Returns: coords.spherical in the transformed coordinates.
     """
@@ -96,40 +98,40 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
         print 'GMST', gmst
         print 'Local Hour Angle', local_hour_angle
 
-    # Altitude = 90 - theta
     theta = coords.angle()
 
-    altitude =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
-                math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
-                math.cos(local_hour_angle.radians)
+    cosaltitude =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
+                   math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+                   math.cos(local_hour_angle.radians)
 
-    theta.radians = math.acos(altitude)
+    theta.radians = math.acos(cosaltitude)
 
     if is_verbose:
-        altitude = coords.angle()
-        # TODO altitude.radians = math.pi/2 - math.acos(altitude)
-        print 'altitude', altitude
+        print 'altitude:', theta.complement(), '(', theta.complement().value, ')' # Altitude = 90 - theta
 
-    # Azimuth = phi - 180
-    # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
     phi = coords.angle()
 
     nom = math.sin(local_hour_angle.radians)
     den = (math.cos(local_hour_angle.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
            math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians))
 
-    phi.radians = math.pi + math.atan2(nom, den)
+
+    if is_azimuth_south:
+        # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+        phi.radians = math.atan2(nom, den)
+
+    else:
+        phi.radians = math.pi + math.atan2(nom, den)
+
 
     if is_verbose:
-        azimuth = coords.angle()
-        azimuth.radians = math.atan2(nom, den)
-        print 'azimuth', azimuth
+        print 'azimuth:', phi, '(', phi.value, ')'
 
     return coords.spherical(1, theta, phi)
 
 
 
-def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
+def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True, is_verbose=False):
     """Transforms a vector from horizon to equatorial coordinates.
 
     Args:
@@ -143,7 +145,9 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
 
-    is_verbose (bool): verbose mode
+    is_azimuth_south (bool): azimuth is relative to south.
+
+    is_verbose (bool): verbose mode.
 
     Returns: coords.spherical in the transformed coordinates.
     """
@@ -210,6 +214,7 @@ if __name__ == '__main__':
     import optparse
 
     defaults = {'toEquatorial' : False,
+                'isAzimuthSouth': False,
                 'isVerbose': False}
 
     usage = '%prog [options] <RA as deg:min:sec> <dec as deg:min:sec> <observer latitude as deg:min:sec> <observer longitude as deg:min:sec> <a datetime>'
@@ -220,6 +225,11 @@ if __name__ == '__main__':
                       action='store_true', dest='toEquatorial',
                       default=defaults['toEquatorial'],
                       help='to equatorial [%default]')
+
+    parser.add_option('--isAzimuthSouth',
+                      action='store_true', dest='isAzimuthSouth',
+                      default=defaults['isAzimuthSouth'],
+                      help='is azimuth south [%default]')
 
     parser.add_option('-v', '--verbose',
                       action='store_true', dest='verbose',
@@ -251,11 +261,11 @@ if __name__ == '__main__':
     # ---------------------
 
     if options.toEquatorial == True:
-        result = toEquatorial(an_object, an_observer, a_datetime, is_verbose=options.verbose)
+        result = toEquatorial(an_object, an_observer, a_datetime,
+                              is_azimuth_south=options.isAzimuthSouth, is_verbose=options.verbose)
         print 'Equatorial Latitude:', utils.get_latitude(result), ', Longitude:', result.phi
 
     else:
-        result = toHorizon(an_object, an_observer, a_datetime, is_verbose=options.verbose)
+        result = toHorizon(an_object, an_observer, a_datetime,
+                           is_azimuth_south=options.isAzimuthSouth, is_verbose=options.verbose)
         print 'Altitude:', result.theta.complement(), ', Azimuth:', result.phi
-
-
