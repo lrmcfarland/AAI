@@ -42,63 +42,63 @@ class UtilsTests(unittest.TestCase):
         """Test get_latitude north pole"""
         a_point = coords.spherical(1)
         a_latitude = utils.get_latitude(a_point)
-        self.assertEqual(90, a_latitude)
+        self.assertEqual(90, a_latitude.value)
 
 
     def test_get_latitude_equator(self):
         """Test get_latitude equator"""
         a_point = coords.spherical(1, coords.angle(90))
         a_latitude = utils.get_latitude(a_point)
-        self.assertEqual(0, a_latitude)
+        self.assertEqual(0, a_latitude.value)
 
 
     def test_get_latitude_spole(self):
         """Test get_latitude south pole"""
         a_point = coords.spherical(1, coords.angle(180))
         a_latitude = utils.get_latitude(a_point)
-        self.assertEqual(-90, a_latitude)
+        self.assertEqual(-90, a_latitude.value)
 
 
     def test_get_longitude_prime_meridian(self):
         """Test get_latitude prime meridian"""
         a_point = coords.spherical(1)
         a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(0, a_longitude)
+        self.assertEqual(0, a_longitude.value)
 
 
     def test_get_longitude_dateline(self):
         """Test get_latitude date line"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(180))
         a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(180, a_longitude)
+        self.assertEqual(180, a_longitude.value)
 
 
     def test_get_longitude_45_east(self):
         """Test get_latitude 45 east"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
         a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(45, a_longitude)
+        self.assertEqual(45, a_longitude.value)
 
 
     def test_get_longitude_45_west(self):
         """Test get_latitude 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
         a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(315, a_longitude)
+        self.assertEqual(315, a_longitude.value)
 
 
-    def test_get_ra_45_east(self):
-        """Test get_ra 45 east"""
+    def test_get_RA_45_east(self):
+        """Test get_RA 45 east"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
-        a_right_ascension = utils.get_ra(a_point)
-        self.assertEqual(3, a_right_ascension)
+        a_right_ascension = utils.get_RA(a_point)
+        self.assertEqual(3, a_right_ascension.value)
 
 
-    def test_get_ra_45_west(self):
-        """Test get_ra 45 west"""
+    def test_get_RA_45_west(self):
+        """Test get_RA 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
-        a_right_ascension = utils.get_ra(a_point)
-        self.assertEqual(21, a_right_ascension)
+        a_right_ascension = utils.get_RA(a_point)
+        self.assertEqual(21, a_right_ascension.value)
 
 
     def test_radec2spherical_1(self):
@@ -108,7 +108,7 @@ class UtilsTests(unittest.TestCase):
 
         self.assertAlmostEqual(90, a_point.theta.value)
         self.assertAlmostEqual(15, a_point.phi.value)
-        self.assertAlmostEqual(1, utils.get_ra(a_point))
+        self.assertAlmostEqual(1, utils.get_RA(a_point).value)
 
 
     def test_JulianCentury_2000(self):

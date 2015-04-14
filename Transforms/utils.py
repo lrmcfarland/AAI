@@ -51,13 +51,13 @@ def get_latitude(a_point):
     Converts spherical coordinate theta (angle to +z axis) to
     latitude/declination.
 
-    Returns a double value equal to the latitude.
+    Returns an angle with a value equal to the latitude.
     """
 
     if not isinstance(a_point, coords.spherical):
         raise Error('a coordinate must be an instance of coords.spherical')
 
-    return 90 - a_point.theta.value
+    return a_point.theta.complement()
 
 
 def get_longitude(a_point):
@@ -66,28 +66,28 @@ def get_longitude(a_point):
     Converts spherical coordinate phi (angle to +x axis of
     projection in xy plane) to longitude.
 
-    Returns a double value equal to the longitude.
+    Returns an angle with a value equal to the longitude.
     """
 
     if not isinstance(a_point, coords.spherical):
         raise Error('a coordinate must be an instance of coords.spherical')
 
     if a_point.phi.value < 0:
-        return 360 + a_point.phi.value
+        return coords.angle(coords.angle(360) + a_point.phi)
     else:
-        return a_point.phi.value
+        return a_point.phi
 
 
-def get_ra(a_point):
+def get_RA(a_point):
     """Spherical to right ascension
 
     Converts spherical coordinate phi (angle to +x axis of
     projection in xy plane) to right ascension.
 
-    Returns a double value equal to the right ascension.
+    Returns an angle value equal to the right ascension.
     """
 
-    return get_longitude(a_point)/15.0
+    return coords.angle(get_longitude(a_point).value/15.0)
 
 
 def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
