@@ -81,7 +81,6 @@ class EquatorialHorizonTests(unittest.TestCase):
         # TODO self.assertAlmostEqual(23, utils.get_longitude(venus_eq).value)
 
 
-    @unittest.skip('pending')
     def test_sirius_2014_12_31T20_41_41(self):
         """Test RA/dec of Sirius 2014-12-31T20:41:41
 
@@ -108,18 +107,14 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = EquatorialHorizon.toHorizon(self.sirius, self.mlc404, a_datetime, is_azimuth_south=False)
 
-        print sirius_hz # TODO rm
-
-        self.assertEqual('17:54:31.4074', utils.get_latitude(sirius_hz).value)
-        self.assertEqual('128:52:17.2861', str(sirius_hz.phi))
+        self.assertEqual(17.908724266152447, utils.get_latitude(sirius_hz).value)
+        self.assertEqual(128.87146834940916, utils.get_longitude(sirius_hz).value)
 
         sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
         self.assertSpacesAreEqual(self.sirius, sirius_eq)
 
 
-
-    @unittest.skip('pending')
     def test_sirius_2015_01_01T00_00_00_404mlc(self):
         """Test RA/dec of Sirius 2015-01-01T00:00:00
 
@@ -135,11 +130,11 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         # convertalot has 35.8414
         # http://www.stargazing.net has 33:29:59
-        self.assertEqual('35:52:35.0117', utils.get_latitude(sirius_hz).value)
+        self.assertEqual(35.876392134760174, utils.get_latitude(sirius_hz).value)
 
         # convertalot has 176.8388
         # http://www.stargazing.net has 159:29:35
-        self.assertEqual('178:52:11.2261', str(sirius_hz.phi))
+        self.assertEqual(178.86978502523434, utils.get_longitude(sirius_hz).value)
 
         sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
@@ -185,11 +180,11 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         # convertalot has 55.7983
         # http://www.stargazing.net has 51:47:34
-        self.assertEqual('55:52:15.1887', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual(55.87088576168508, utils.get_latitude(sirius_hz).value)
 
         # convertalot has 175.4386
         # http://www.stargazing.net has 151:48:55
-        self.assertEqual('178:22:3.45725', str(sirius_hz.phi))
+        self.assertEqual(178.36762701282893, utils.get_longitude(sirius_hz).value)
 
         sirius_eq = EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
