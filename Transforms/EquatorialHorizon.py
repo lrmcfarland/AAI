@@ -104,20 +104,24 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
 
     theta = coords.angle()
 
-    cosaltitude =  math.cos(an_object.theta.radians) * math.cos(an_observer.theta.radians) + \
-                   math.sin(an_object.theta.radians) * math.sin(an_observer.theta.radians) * \
+    # Meeus 13.6
+    sinaltitude =  math.sin(utils.get_latitude(an_observer).radians) * \
+                   math.sin(utils.get_declination(an_object).radians) + \
+                   math.cos(utils.get_latitude(an_observer).radians) * \
+                   math.cos(utils.get_declination(an_object).radians) * \
                    math.cos(local_hour_angle.radians)
 
-    theta.radians = math.acos(cosaltitude)
+    theta.radians = math.pi/2 - math.asin(sinaltitude)
 
     if is_verbose:
         print 'altitude:', theta.complement(), '(', theta.complement().value, ')' # Altitude = 90 - theta
 
     phi = coords.angle()
 
+    # Meeus 13.5
     nom = math.sin(local_hour_angle.radians)
-    den = math.cos(local_hour_angle.radians)*math.sin(math.pi/2 - an_observer.theta.radians) - \
-          math.tan(math.pi/2 - an_object.theta.radians) *  math.cos(math.pi/2 - an_observer.theta.radians)
+    den = math.cos(local_hour_angle.radians)*math.sin(utils.get_latitude(an_observer).radians) - \
+          math.tan(utils.get_declination(an_object).radians) *  math.cos(utils.get_latitude(an_observer).radians)
 
 
     if is_azimuth_south:
@@ -172,7 +176,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     dec = coords.angle()
 
-
+    # Meeus, p. 94
     sindec =  math.sin(utils.get_latitude(an_observer).radians) * math.sin(altitude.radians) - \
               math.cos(utils.get_latitude(an_observer).radians) * math.cos(altitude.radians) * \
               math.cos(azimuth.radians)
@@ -187,6 +191,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
     # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
     phi = coords.angle()
 
+    # Meeus, p. 94
     nom = math.sin(azimuth.radians)
     den = math.cos(azimuth.radians)  *  math.sin(utils.get_latitude(an_observer).radians) + \
           math.tan(altitude.radians) *  math.cos(utils.get_latitude(an_observer).radians)

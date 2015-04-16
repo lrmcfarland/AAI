@@ -90,6 +90,21 @@ def get_RA(a_point):
     return coords.angle(get_longitude(a_point).value/15.0)
 
 
+def get_declination(a_point):
+    """Spherical to declination
+
+    Converts spherical coordinate theta (angle to +z axis) to
+    declination.
+
+    Returns an angle with a value equal to the latitude.
+    """
+
+    if not isinstance(a_point, coords.spherical):
+        raise Error('a coordinate must be an instance of coords.spherical')
+
+    return a_point.theta.complement()
+
+
 def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
     """Converts a given right ascension and declination into spherical coordinates
 
