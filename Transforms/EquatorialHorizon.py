@@ -204,7 +204,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
     observer_ra = coords.angle(an_observer.phi.value/15)
 
     ra = coords.angle()
-    ra = gast.value + observer_ra.value - local_hour_angle.value
+    ra.value = gast.value + observer_ra.value - local_hour_angle.value
 
 
     if is_verbose:
@@ -214,6 +214,8 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
         print 'object latitude', an_object.phi.value
         print 'local hour angle', local_hour_angle.value
 
+        print 'R.A.', ra
+        ra.normalize(0, 24)
         print 'R.A.', ra
 
 
