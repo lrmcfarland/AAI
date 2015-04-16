@@ -98,7 +98,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
 
     if is_verbose:
         print 'GAST', gast
-        print 'observer latitude', an_observer.phi.value
+        print 'observer longitude', an_observer.phi.value
         print 'object latitude', an_object.phi.value
         print 'local hour angle', local_hour_angle.value
 
@@ -209,7 +209,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     if is_verbose:
         print 'GAST', gast
-        print 'observer latitude', an_observer.phi.value, coords.angle(an_observer.phi.value/15)
+        print 'observer longitude', an_observer.phi.value, coords.angle(an_observer.phi.value/15)
         print 'observer ra', observer_ra
         print 'object latitude', an_object.phi.value
         print 'local hour angle', local_hour_angle.value
