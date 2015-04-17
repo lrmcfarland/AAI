@@ -112,7 +112,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
 
     Args:
 
-    an_object (coords.spherical): in right ascension in hours and declination in degrees.
+    an_object (coords.spherical): in degrees from RA/dec.
 
     TODO: validate RA in hours?
 
@@ -252,7 +252,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     ra = coords.angle()
     ra.value = gast.value + observer_ra.value - local_hour_angle.value
-
+    ra.normalize(0, 24)
 
     if is_verbose:
         print 'GAST', gast
@@ -262,11 +262,9 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
         print 'local hour angle', local_hour_angle.value
 
         print 'R.A.', ra
-        ra.normalize(0, 24)
-        print 'R.A.', ra
 
-
-    return coords.spherical(1, dec.complement(), ra) # TODO utils.radec2spherical(a_right_ascension=ra, a_declination=dec)
+    # return coords.spherical(1, dec.complement(), ra)
+    return utils.radec2spherical(a_right_ascension=ra, a_declination=dec)
 
 
 

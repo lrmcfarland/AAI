@@ -72,10 +72,7 @@ def get_longitude(a_point):
     if not isinstance(a_point, coords.spherical):
         raise Error('a coordinate must be an instance of coords.spherical')
 
-    if a_point.phi.value < 0:
-        return coords.angle(coords.angle(360) + a_point.phi)
-    else:
-        return a_point.phi
+    return a_point.phi
 
 
 def get_RA(a_point):
@@ -105,17 +102,18 @@ def get_declination(a_point):
     return a_point.theta.complement()
 
 
-def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
+def radec2spherical(a_right_ascension, a_declination, a_radius = 1, is_azimuth_south=False):
     """Converts a given right ascension and declination into spherical coordinates
 
-    Declination measured from the ecliptic and is converted to theta
-    measured from the north pole.
+    Declination (coords.angle): is measured in degrees from the ecliptic
+    and is converted to theta measured from the axis of the north pole.
 
-    Right ascension measured in hours is converted into degrees and assigned
-    to phi.
+    Right ascension (coords.angle): is measured in hours from the vernal
+    equinox and converted into degrees.
 
     Returns coords.spherical.
     """
+
     return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
                             coords.angle(a_right_ascension.value * 15))
 
@@ -123,14 +121,15 @@ def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
 def altaz2spherical(an_altitude, an_azimuth, a_radius = 1):
     """Converts a given altitude and azimuth into spherical coordinates
 
-    Altitude is measured from the horizon is converted to theta
-    measured from the north pole.
+    Altitude (coords.angle): is measured from the horizon is converted
+    to theta measured from the north pole.
 
-    Azimuth is measured from the meridian and is converted into
+    Azimuth (coords.angle): is measured from the meridian and is converted into
     degrees and assigned to phi.
 
     Returns coords.spherical.
     """
+
     return coords.spherical(a_radius, coords.angle(90.0) - an_altitude, an_azimuth)
 
 

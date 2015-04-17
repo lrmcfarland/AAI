@@ -66,11 +66,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         venus = utils.radec2spherical(coords.latitude(23, 9, 16.641), coords.angle(-6, 43, 11.61))
         a_datetime = coords.datetime('1987-04-10T19:21:00')
 
-
         venus_hz = EquatorialHorizon.toHorizon(venus, usno, a_datetime, is_azimuth_south=True)
-
-        print venus_hz # TODO rm
-
 
         # Meeus: 15.1249
         self.assertAlmostEqual(15.12502164977829, utils.get_latitude(venus_hz).value)
@@ -78,17 +74,10 @@ class EquatorialHorizonTests(unittest.TestCase):
         # Meeus: 68.0337
         self.assertAlmostEqual(68.0335491018803, utils.get_longitude(venus_hz).value)
 
-
-        # TODO venus_hz not right for this transformation. RA in hours not degrees?
-
-
         venus_eq = EquatorialHorizon.toEquatorial(venus_hz, usno, a_datetime, is_azimuth_south=True)
 
-        print venus_eq # TODO rm
-
         self.assertAlmostEqual(-6.719891666666669, utils.get_latitude(venus_eq).value)
-
-        self.assertAlmostEqual(23, utils.get_longitude(venus_eq).value)
+        self.assertAlmostEqual(22.971575990261428, utils.get_longitude(venus_eq).value/15)
 
 
     def test_sirius_2014_12_31T20_41_41(self):
