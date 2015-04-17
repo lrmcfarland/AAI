@@ -2,9 +2,52 @@
 
 """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
+
+TODO in transition to Meeus formulas. Needs to resolve coords.spherical all in degrees or include RA?
+TODO create degree/RA child classes of angle to type check this?
+
+
+This forward/reverse works at this checkpoint:
+
+[lrm@lrmz-iMac Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v --isAzimuthSouth -- 23:09:16.641 -6:43:11.61 38:55:17 -77:03:56 1987-04-10T19:21:00
+# COORDS_ROOT not set. Using ..
+# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7/coords.so
+# DYLD_LIBRARY_PATH :../Coordinates/libCoords
+# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7:..
+
+GAST 08:34:56.8371
+observer longitude -77.0655555556
+object latitude 347.3193375
+local hour angle 64.3519283778
+altitude: 15:07:30.0779 ( 15.1250216498 )
+azimuth: 68:02:0.776767 ( 68.0335491019 )
+Altitude: 15:07:30.0779 , Azimuth: 68:02:0.776767
+
+
+[lrm@lrmz-iMac Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v --toEquatorial --isAzimuthSouth -- 15:07:30.0779 68:02:0.776767 38:55:17 -77:03:56 1987-04-10T19:21:00
+# COORDS_ROOT not set. Using ..
+# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7/coords.so
+# DYLD_LIBRARY_PATH :../Coordinates/libCoords
+# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7:..
+
+declination -6:43:11.61
+GAST 08:34:56.8371
+observer longitude -77.0655555556 -5:08:15.7333
+observer ra -5:08:15.7333
+object latitude 68.0335491019
+local hour angle -91.5268249415
+R.A. 94:58:17.6736
+R.A. 22:58:17.6736
+Equatorial Latitude: -6:43:11.61 , Longitude: 22:58:17.6736
+
+
+
+
+
 This uses spherical trigonometry from:
 
     http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
+
 
 
 to run: /pylaunch.sh EquatorialHorizon.py -- 6:45:09 -16:42:58 37:24 -122:04:57 2014-12-31T20:41:41
@@ -69,11 +112,17 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
 
     Args:
 
-    an_object (coords.spherical): in right ascension and declination.
+    an_object (coords.spherical): in right ascension in hours and declination in degrees.
+
+    TODO: validate RA in hours?
 
     an_observer (coords.spherical): the latitude and longitude
     (positive east of the prime azimuth) of an observer as a spherical
-    coordinate (unit radius).
+    coordinate (unit radius), e.g. CA is 34 latitude, -122 longitude
+
+
+    TODO: positive east IAU vs. Meeus positive west issue, p. 93
+
 
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
@@ -144,7 +193,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     Args:
 
-    an_object (coords.spherical): in altitude and azimuth.
+    an_object (coords.spherical): in altitude and azimuth or RA (TODO hours?) and dec. in degrees
 
     an_observer (coords.spherical): the latitude and longitude
     (positive east of the prime azimuth) of an observer as a spherical
@@ -169,10 +218,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     altitude = an_object.theta.complement()
 
-    if is_azimuth_south:
-        azimuth = an_object.phi
-    else:
-        azimuth = coords.angle(an_object.phi.value - 180)
+    azimuth = coords.angle(an_object.phi.value) # TODO hack
 
     dec = coords.angle()
 
@@ -187,9 +233,10 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
         print 'declination', dec
 
 
+    azimuth = coords.angle(an_object.phi.value - 180) # TODO hack
+
 
     # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
-    phi = coords.angle()
 
     # Meeus, p. 94
     nom = math.sin(azimuth.radians)
@@ -219,8 +266,8 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
         print 'R.A.', ra
 
 
+    return coords.spherical(1, dec.complement(), ra) # TODO utils.radec2spherical(a_right_ascension=ra, a_declination=dec)
 
-    return coords.spherical(1, dec.complement(), phi)
 
 
 # ================
