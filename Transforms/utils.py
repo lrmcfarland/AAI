@@ -118,14 +118,15 @@ def radec2spherical(a_right_ascension, a_declination, a_radius = 1, is_azimuth_s
                             coords.angle(a_right_ascension.value * 15))
 
 
-def altaz2spherical(an_altitude, an_azimuth, a_radius = 1):
+def azalt2spherical(an_azimuth, an_altitude, a_radius = 1):
     """Converts a given altitude and azimuth into spherical coordinates
+
+    Azimuth (coords.angle): is measured from the anti-meridian (north,
+    positive east following IAU standard) and is converted into
+    degrees and assigned to phi.
 
     Altitude (coords.angle): is measured from the horizon is converted
     to theta measured from the north pole.
-
-    Azimuth (coords.angle): is measured from the meridian and is converted into
-    degrees and assigned to phi.
 
     Returns coords.spherical.
     """

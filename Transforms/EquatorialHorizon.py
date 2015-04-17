@@ -9,44 +9,54 @@ TODO create degree/RA child classes of angle to type check this?
 
 This forward/reverse works at this checkpoint:
 
-[lrm@lrmz-iMac Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v --isAzimuthSouth -- 23:09:16.641 -6:43:11.61 38:55:17 -77:03:56 1987-04-10T19:21:00
+
+[Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v -- 23:09:16.641 -6:43:11.61 38:55:17 -77:03:56 1987-04-10T19:21:00
 # COORDS_ROOT not set. Using ..
-# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7/coords.so
+# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7/coords.so
 # DYLD_LIBRARY_PATH :../Coordinates/libCoords
-# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7:..
+# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7:..
 
 GAST 08:34:56.8371
 observer longitude -77.0655555556
-object latitude 347.3193375
+object latitude -6.71989166667
 local hour angle 64.3519283778
 altitude: 15:07:30.0779 ( 15.1250216498 )
-azimuth: 68:02:0.776767 ( 68.0335491019 )
-Altitude: 15:07:30.0779 , Azimuth: 68:02:0.776767
+azimuth: 248:02:0.776767 ( 248.033549102 )
+Azimuth: 248:02:0.776767 ( 68:02:0.776767  south) , Altitude: 15:07:30.0779
 
 
-[lrm@lrmz-iMac Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v --toEquatorial --isAzimuthSouth -- 15:07:30.0779 68:02:0.776767 38:55:17 -77:03:56 1987-04-10T19:21:00
+
+[Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v --toEquatorial -- 248:02:0.776767 15:07:30.0779 38:55:17 -77:03:56 1987-04-10T19:21:00
 # COORDS_ROOT not set. Using ..
-# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7/coords.so
+# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7/coords.so
 # DYLD_LIBRARY_PATH :../Coordinates/libCoords
-# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.10-intel-2.7:..
+# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7:..
 
 declination -6:43:11.61
 GAST 08:34:56.8371
-observer longitude -77.0655555556 -5:08:15.7333
 observer ra -5:08:15.7333
-object latitude 68.0335491019
-local hour angle -91.5268249415
-R.A. 94:58:17.6736
-R.A. 22:58:17.6736
-Equatorial Latitude: -6:43:11.61 , Longitude: 22:58:17.6736
+local hour angle 64.3519283858
+Object R.A. 23:05:34.1616 ( 23.0928226727 )
+Equatorial Latitude: -6:43:11.61 , Longitude: 346:23:32.4243
 
 
+Works for Sirius when time zone is accounted for:
+
+[mcfarl@usxxmcfarlm1 Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v -- 6:45:08.9173 -16:42:58.017 37:24 -122:04:57 2015-01-01T08:00:00
+# COORDS_ROOT not set. Using ..
+# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7/coords.so
+# DYLD_LIBRARY_PATH :../Coordinates/libCoords
+# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7:..
+
+GAST 14:42:38.2855
+observer longitude -122.0825
+object latitude -16.7161158333
+local hour angle 357.289867328
+altitude: 35:49:25.4196 ( 35.8237276719 )
+azimuth: 176:47:53.9568 ( 176.798321326 )
+Azimuth: 176:47:53.9568 ( -3:12:6.04323  south) , Altitude: 35:49:25.4196
 
 
-
-This uses spherical trigonometry from:
-
-    http://en.wikipedia.org/wiki/Celestial_coordinate_system#Equatorial_.E2.86.90.E2.86.92_horizontal
 
 
 
@@ -107,7 +117,7 @@ class Error(Exception):
     pass
 
 
-def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, is_verbose=False):
+def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     """Transforms a coordinate vector from equatorial to horizon coordinates.
 
     Args:
@@ -127,8 +137,6 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
 
-    is_azimuth_south (bool): azimuth is relative to south.
-
     is_verbose (bool): verbose mode.
 
     Returns: coords.spherical in the transformed coordinates.
@@ -146,12 +154,11 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
     local_hour_angle.normalize(0, 360)
 
     if is_verbose:
+        print 'datetime', a_local_datetime.toJulianDate()
         print 'GAST', gast
-        print 'observer longitude', an_observer.phi.value
-        print 'object latitude', an_object.phi.value
+        print 'observer longitude', utils.get_longitude(an_observer).value
+        print 'object latitude', utils.get_latitude(an_object).value
         print 'local hour angle', local_hour_angle.value
-
-    theta = coords.angle()
 
     # Meeus 13.6
     sinaltitude =  math.sin(utils.get_latitude(an_observer).radians) * \
@@ -160,12 +167,10 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
                    math.cos(utils.get_declination(an_object).radians) * \
                    math.cos(local_hour_angle.radians)
 
-    theta.radians = math.pi/2 - math.asin(sinaltitude)
+    theta = coords.angle(coords.angle().rad2deg(math.pi/2 - math.asin(sinaltitude)))
 
     if is_verbose:
         print 'altitude:', theta.complement(), '(', theta.complement().value, ')' # Altitude = 90 - theta
-
-    phi = coords.angle()
 
     # Meeus 13.5
     nom = math.sin(local_hour_angle.radians)
@@ -173,13 +178,8 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
           math.tan(utils.get_declination(an_object).radians) *  math.cos(utils.get_latitude(an_observer).radians)
 
 
-    if is_azimuth_south:
-        # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
-        phi.radians = math.atan2(nom, den)
-
-    else:
-        phi.radians = math.atan2(nom, den) + math.pi
-
+    # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+    phi = coords.angle(coords.angle().rad2deg(math.atan2(nom, den) + math.pi))
 
     if is_verbose:
         print 'azimuth:', phi, '(', phi.value, ')'
@@ -188,7 +188,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_azimuth_south=True, i
 
 
 
-def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True, is_verbose=False):
+def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     """Transforms a coordinate vector from horizon to equatorial coordinates.
 
     Args:
@@ -201,8 +201,6 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     a_local_datetime (ISO8601 string): local date and time of the
     observation.
-
-    is_azimuth_south (bool): azimuth is relative to south.
 
     is_verbose (bool): verbose mode.
 
@@ -218,25 +216,20 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     altitude = an_object.theta.complement()
 
-    azimuth = coords.angle(an_object.phi.value) # TODO hack
-
-    dec = coords.angle()
+    # The calculation assumes "that Azimuth (A) is measured from the
+    # South point, turning positive to the West". coords.spherical
+    # assumes azimuth is measured from the north.
+    azimuth = coords.angle(an_object.phi.value - 180)
 
     # Meeus, p. 94
     sindec =  math.sin(utils.get_latitude(an_observer).radians) * math.sin(altitude.radians) - \
               math.cos(utils.get_latitude(an_observer).radians) * math.cos(altitude.radians) * \
               math.cos(azimuth.radians)
 
-    dec.radians = math.asin(sindec)
+    object_dec = coords.angle(coords.angle().rad2deg(math.asin(sindec)))
 
     if is_verbose:
-        print 'declination', dec
-
-
-    azimuth = coords.angle(an_object.phi.value - 180) # TODO hack
-
-
-    # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
+        print 'declination', object_dec
 
     # Meeus, p. 94
     nom = math.sin(azimuth.radians)
@@ -250,21 +243,18 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_azimuth_south=True
 
     observer_ra = coords.angle(an_observer.phi.value/15)
 
-    ra = coords.angle()
-    ra.value = gast.value + observer_ra.value - local_hour_angle.value
-    ra.normalize(0, 24)
+    object_ra = coords.angle(gast.value + observer_ra.value - local_hour_angle.value - 12)
+    object_ra.normalize(0, 24)
 
     if is_verbose:
+        print 'datetime', a_local_datetime.toJulianDate()
         print 'GAST', gast
-        print 'observer longitude', an_observer.phi.value, coords.angle(an_observer.phi.value/15)
         print 'observer ra', observer_ra
-        print 'object latitude', an_object.phi.value
         print 'local hour angle', local_hour_angle.value
-
-        print 'R.A.', ra
+        print 'Object R.A.', object_ra, '(', object_ra.value, ')'
 
     # return coords.spherical(1, dec.complement(), ra)
-    return utils.radec2spherical(a_right_ascension=ra, a_declination=dec)
+    return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec)
 
 
 
@@ -285,7 +275,7 @@ if __name__ == '__main__':
                 'isAzimuthSouth': False,
                 'isVerbose': False}
 
-    usage = '%prog [options] <RA/alt as deg:min:sec> <dec/az as deg:min:sec> <observer latitude as deg:min:sec> <observer longitude as deg:min:sec +west> <a datetime>'
+    usage = '%prog [options] <RA/azimuth as deg:min:sec> <dec/altitude as deg:min:sec> <observer latitude as deg:min:sec> <observer longitude as deg:min:sec +west> <a datetime>'
 
     parser = optparse.OptionParser(usage=usage)
 
@@ -293,11 +283,6 @@ if __name__ == '__main__':
                       action='store_true', dest='toEquatorial',
                       default=defaults['toEquatorial'],
                       help='to equatorial [%default]')
-
-    parser.add_option('--isAzimuthSouth',
-                      action='store_true', dest='isAzimuthSouth',
-                      default=defaults['isAzimuthSouth'],
-                      help='is azimuth south [%default]')
 
     parser.add_option('-v', '--verbose',
                       action='store_true', dest='verbose',
@@ -326,20 +311,21 @@ if __name__ == '__main__':
 
     if options.toEquatorial == True:
 
-        an_object = utils.altaz2spherical(an_altitude=utils.parse_angle_arg(args[0]),
-                                          an_azimuth=utils.parse_angle_arg(args[1]))
+        an_object = utils.azalt2spherical(an_azimuth=utils.parse_angle_arg(args[0]),
+                                          an_altitude=utils.parse_angle_arg(args[1]))
 
-        result = toEquatorial(an_object, an_observer, a_datetime,
-                              is_azimuth_south=options.isAzimuthSouth, is_verbose=options.verbose)
+        result = toEquatorial(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
-        print 'Equatorial Latitude:', utils.get_latitude(result), ', Longitude:', result.phi
+        print 'Equatorial Latitude:', utils.get_latitude(result),
+        print ', Longitude:', result.phi,
 
     else:
 
         an_object = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg(args[0]),
                                           a_declination=utils.parse_angle_arg(args[1]))
 
-        result = toHorizon(an_object, an_observer, a_datetime,
-                           is_azimuth_south=options.isAzimuthSouth, is_verbose=options.verbose)
+        result = toHorizon(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
-        print 'Altitude:', result.theta.complement(), ', Azimuth:', result.phi
+        print 'Azimuth:', result.phi,
+        print '(', coords.angle(result.phi.value - 180), ' south)',
+        print ', Altitude:', result.theta.complement(),
