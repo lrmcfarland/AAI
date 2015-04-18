@@ -171,7 +171,7 @@ if __name__ == '__main__':
     # ----- transform -----
     # ---------------------
 
-    if options.toEcliptic == True:
+    if options.toEcliptic is True:
         result = toEcliptic(an_object, a_datetime, is_verbose=options.verbose)
         print 'Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', result.phi
 

@@ -262,7 +262,7 @@ if __name__ == '__main__':
     # ----- transform -----
     # ---------------------
 
-    if options.toEquatorial == True:
+    if options.toEquatorial is True:
 
         an_object = utils.azalt2spherical(an_azimuth=utils.parse_angle_arg(args[0]),
                                           an_altitude=utils.parse_angle_arg(args[1]))
