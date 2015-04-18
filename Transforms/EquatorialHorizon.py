@@ -117,7 +117,7 @@ class Error(Exception):
     pass
 
 
-def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
+def toHorizon(an_object, an_observer, a_utc_datetime, is_verbose=False):
     """Transforms a coordinate vector from equatorial to horizon coordinates.
 
     Args:
@@ -133,13 +133,13 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     TODO: positive east IAU vs. Meeus positive west issue, p. 93
 
-
-    a_local_datetime (ISO8601 string): local date and time of the
+    a_utc_datetime (ISO8601 string): UTC date and time of the
     observation.
 
     is_verbose (bool): verbose mode.
 
     Returns: coords.spherical in the transformed coordinates.
+
     """
 
     if not isinstance(an_object, coords.spherical):
@@ -148,13 +148,13 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gast = GMST.USNO_C163.GAST(a_local_datetime) # hours
+    gast = GMST.USNO_C163.GAST(a_utc_datetime) - coords.angle(a_utc_datetime.timezone()) # hours
 
     local_hour_angle = coords.angle(gast.value*15 + an_observer.phi.value - an_object.phi.value)
     local_hour_angle.normalize(0, 360)
 
     if is_verbose:
-        print 'datetime', a_local_datetime.toJulianDate()
+        print 'datetime', a_utc_datetime.toJulianDate()
         print 'GAST', gast
         print 'observer longitude', utils.get_longitude(an_observer).value
         print 'object latitude', utils.get_latitude(an_object).value
@@ -188,7 +188,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
 
 
 
-def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
+def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
     """Transforms a coordinate vector from horizon to equatorial coordinates.
 
     Args:
@@ -199,7 +199,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     (positive east of the prime azimuth) of an observer as a spherical
     coordinate (unit radius).
 
-    a_local_datetime (ISO8601 string): local date and time of the
+    a_utc_datetime (ISO8601 string): UTC date and time of the
     observation.
 
     is_verbose (bool): verbose mode.
@@ -238,16 +238,17 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     local_hour_angle = coords.angle()
     local_hour_angle.radians = math.atan2(nom, den)
+    local_hour_angle.normalize(0, 360)
 
-    gast = GMST.USNO_C163.GAST(a_local_datetime) # hours
+    gast = GMST.USNO_C163.GAST(a_utc_datetime) - coords.angle(a_utc_datetime.timezone()) # hours
 
     observer_ra = coords.angle(an_observer.phi.value/15)
 
-    object_ra = coords.angle(gast.value + observer_ra.value - local_hour_angle.value - 12)
+    object_ra = coords.angle(gast.value + observer_ra.value - local_hour_angle.value - 12) # 12 for azimuth north
     object_ra.normalize(0, 24)
 
     if is_verbose:
-        print 'datetime', a_local_datetime.toJulianDate()
+        print 'datetime', a_utc_datetime.toJulianDate()
         print 'GAST', gast
         print 'observer ra', observer_ra
         print 'local hour angle', local_hour_angle.value
