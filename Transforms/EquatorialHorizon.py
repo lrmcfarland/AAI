@@ -2,20 +2,24 @@
 
 """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
+Conventions:
+	timezone is added to UTC, e.g. UTC (00:00) = local time (16:00 PST day - 1) + time zone (-08)
+	Azimuth is from the North positive east in degrees when stored in a coords.spherical object (Navigators not Astronomers preference).
+	Longitude is positive east in degrees, e.g. MV is -122 Latitude
+	Theta is from the north pole in degrees
+	altitude is in degrees from the horizon
+	RA is in hours from the x-axis (vernal equinox) when stored in a coords.spherical
+	declination is in degrees from the ecliptic.
 
-TODO in transition to Meeus formulas. Needs to resolve coords.spherical all in degrees or include RA?
-TODO create degree/RA child classes of angle to type check this?
+
+to run: /pylaunch.sh EquatorialHorizon.py -- 6:45:09 -16:42:58 37:24 -122:04:57 2014-12-31T20:41:41
+
+where -- ends options and allows -16 to be a negative number and not option -1.
 
 
-This forward/reverse works at this checkpoint:
+$ ./pylaunch.sh EquatorialHorizon.py -v -- 23:09:16.641 -6:43:11.61 38:55:17 -77:03:56 1987-04-10T19:21:00
 
-
-[Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v -- 23:09:16.641 -6:43:11.61 38:55:17 -77:03:56 1987-04-10T19:21:00
-# COORDS_ROOT not set. Using ..
-# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7/coords.so
-# DYLD_LIBRARY_PATH :../Coordinates/libCoords
-# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7:..
-
+datetime 2446896.30625
 GAST 08:34:56.8371
 observer longitude -77.0655555556
 object latitude -6.71989166667
@@ -24,47 +28,20 @@ altitude: 15:07:30.0779 ( 15.1250216498 )
 azimuth: 248:02:0.776767 ( 248.033549102 )
 Azimuth: 248:02:0.776767 ( 68:02:0.776767  south) , Altitude: 15:07:30.0779
 
-
-
-[Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v --toEquatorial -- 248:02:0.776767 15:07:30.0779 38:55:17 -77:03:56 1987-04-10T19:21:00
-# COORDS_ROOT not set. Using ..
-# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7/coords.so
-# DYLD_LIBRARY_PATH :../Coordinates/libCoords
-# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7:..
+$ ./pylaunch.sh EquatorialHorizon.py -v --toEquatorial -- 248:02:0.776767 15:07:30.0779 38:55:17 -77:03:56 1987-04-10T19:21:00
 
 declination -6:43:11.61
+datetime 2446896.30625
 GAST 08:34:56.8371
-observer ra -5:08:15.7333
 local hour angle 64.3519283858
-Object R.A. 23:05:34.1616 ( 23.0928226727 )
-Equatorial Latitude: -6:43:11.61 , Longitude: 346:23:32.4243
+Object longitude 347:19:9.61497 ( 347.319337492 )
+Object R.A. 11:19:9.61497 ( 11.319337492 )
+Equatorial Latitude: -6:43:11.61 , Longitude: 347:19:9.61497
 
-
-Works for Sirius when time zone is accounted for:
-
-[mcfarl@usxxmcfarlm1 Transforms (eqhz2azalt)]$ ./pylaunch.sh EquatorialHorizon.py -v -- 6:45:08.9173 -16:42:58.017 37:24 -122:04:57 2015-01-01T08:00:00
-# COORDS_ROOT not set. Using ..
-# coords.so: ../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7/coords.so
-# DYLD_LIBRARY_PATH :../Coordinates/libCoords
-# PYTHONPATH :../Coordinates/Python/Manual/build/lib.macosx-10.9-intel-2.7:..
-
-GAST 14:42:38.2855
-observer longitude -122.0825
-object latitude -16.7161158333
-local hour angle 357.289867328
-altitude: 35:49:25.4196 ( 35.8237276719 )
-azimuth: 176:47:53.9568 ( 176.798321326 )
-Azimuth: 176:47:53.9568 ( -3:12:6.04323  south) , Altitude: 35:49:25.4196
-
-
-
-
-
-to run: /pylaunch.sh EquatorialHorizon.py -- 6:45:09 -16:42:58 37:24 -122:04:57 2014-12-31T20:41:41
-
-where -- ends options and allows -16 to be a negative number and not option -1.
 
 References:
+
+Astronomical Algorithms 2ed, Jean Meeus ISBN 0-943396-61-1
 
 Celestial Coordinate System
     http://en.wikipedia.org/wiki/Celestial_coordinate_system#Transformation_of_coordinates
@@ -72,37 +49,6 @@ Celestial Coordinate System
 
 Equatorial Coordinate System
     http://en.wikipedia.org/wiki/Equatorial_coordinate_system
-
-
-
-With input from http://star-www.st-and.ac.uk/~fv/webnotes/chapter7.htm,
-but I think "chapter7" is incorrect in calculating the Local Hour Angle.
-
-I observed Sirius on New Years Eve 2015 at 8pm and measured its
-altitude and azimuth using a theodolite app on my iPhone. I
-got:
-
-    Date & Time: Wed Dec 31 20:41:41 PST 2014
-    Position: +037.40015* / -122.08219*
-    Altitude: 56ft
-    Azimuth/Bearing: 127* S53E 2258mils (True)
-    Elevation Angle: +18.1*
-
-By happy coincidence, Sirius was on/near my local meridian, due
-south, at midnight new years eve, 3 hours after I measured it with
-my theodolite app at 8:41 pm above.
-
-According to http://star-www.st-and.ac.uk/~fv/webnotes/chapter6.htm
-an alternative definition of LST is "Local Sidereal Time = Right
-Ascension of whichever stars are on the meridian."  Therefore,
-local sidereal time == right ascension of Sirius == 6* 45' 9"
-
-But according to    http://aa.usno.navy.mil/data/docs/siderealtime.php
-this is my Greenwich Mean Sidereal Time; my local sidereal time is 22h 32m
-59.9s.
-
-If I let my Local Hour Angle = GMST - RA(star) this matches my
-observed results.
 
 """
 
@@ -161,11 +107,11 @@ def toHorizon(an_object, an_observer, a_utc_datetime, is_verbose=False):
         print 'local hour angle', local_hour_angle.value
 
     # Meeus 13.6
-    sinaltitude =  math.sin(utils.get_latitude(an_observer).radians) * \
-                   math.sin(utils.get_declination(an_object).radians) + \
-                   math.cos(utils.get_latitude(an_observer).radians) * \
-                   math.cos(utils.get_declination(an_object).radians) * \
-                   math.cos(local_hour_angle.radians)
+    sinaltitude =    math.sin(utils.get_latitude(an_observer).radians) \
+                   * math.sin(utils.get_declination(an_object).radians) \
+                   + math.cos(utils.get_latitude(an_observer).radians) \
+                   * math.cos(utils.get_declination(an_object).radians) \
+                   * math.cos(local_hour_angle.radians)
 
     theta = coords.angle(coords.angle().rad2deg(math.pi/2 - math.asin(sinaltitude)))
 
@@ -185,7 +131,6 @@ def toHorizon(an_object, an_observer, a_utc_datetime, is_verbose=False):
         print 'azimuth:', phi, '(', phi.value, ')'
 
     return coords.spherical(1, theta, phi)
-
 
 
 def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
@@ -238,24 +183,29 @@ def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
 
     local_hour_angle = coords.angle()
     local_hour_angle.radians = math.atan2(nom, den)
-    local_hour_angle.normalize(0, 360)
+    local_hour_angle.normalize(0, 360) # ERROR: degrees adding to hours
 
     gast = GMST.USNO_C163.GAST(a_utc_datetime) - coords.angle(a_utc_datetime.timezone()) # hours
 
-    observer_ra = coords.angle(an_observer.phi.value/15)
+    object_longitude = coords.angle(gast.value*15 + an_observer.phi.value - local_hour_angle.value )
+    object_longitude.normalize(0, 360)
 
-    object_ra = coords.angle(gast.value + observer_ra.value - local_hour_angle.value - 12) # 12 for azimuth north
-    object_ra.normalize(0, 24)
+    object_ra = coords.angle(object_longitude)
+    object_ra.normalize(0, 24) # TODO coords.angle().normalized() returns new angle object.
+
+    # TODO convert this properly via ratio
 
     if is_verbose:
         print 'datetime', a_utc_datetime.toJulianDate()
         print 'GAST', gast
-        print 'observer ra', observer_ra
         print 'local hour angle', local_hour_angle.value
+        print 'Object longitude', object_longitude, '(', object_longitude.value, ')'
         print 'Object R.A.', object_ra, '(', object_ra.value, ')'
 
-    # return coords.spherical(1, dec.complement(), ra)
-    return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec)
+
+    return coords.spherical(1, object_dec.complement(), object_longitude)
+
+    # TODO return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec) # rounding problem?
 
 
 
