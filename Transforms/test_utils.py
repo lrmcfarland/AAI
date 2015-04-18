@@ -84,7 +84,7 @@ class UtilsTests(unittest.TestCase):
         """Test get_latitude 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
         a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(315, a_longitude.value)
+        self.assertEqual(-45, a_longitude.value)
 
 
     def test_get_RA_45_east(self):
@@ -98,7 +98,7 @@ class UtilsTests(unittest.TestCase):
         """Test get_RA 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
         a_right_ascension = utils.get_RA(a_point)
-        self.assertEqual(21, a_right_ascension.value)
+        self.assertEqual(-3.0, a_right_ascension.value)
 
 
     def test_radec2spherical_1(self):

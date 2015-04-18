@@ -72,10 +72,7 @@ def get_longitude(a_point):
     if not isinstance(a_point, coords.spherical):
         raise Error('a coordinate must be an instance of coords.spherical')
 
-    if a_point.phi.value < 0:
-        return coords.angle(coords.angle(360) + a_point.phi)
-    else:
-        return a_point.phi
+    return a_point.phi
 
 
 def get_RA(a_point):
@@ -90,20 +87,51 @@ def get_RA(a_point):
     return coords.angle(get_longitude(a_point).value/15.0)
 
 
-def radec2spherical(a_right_ascension, a_declination, a_radius = 1):
+def get_declination(a_point):
+    """Spherical to declination
+
+    Converts spherical coordinate theta (angle to +z axis) to
+    declination.
+
+    Returns an angle with a value equal to the latitude.
+    """
+
+    if not isinstance(a_point, coords.spherical):
+        raise Error('a coordinate must be an instance of coords.spherical')
+
+    return a_point.theta.complement()
+
+
+def radec2spherical(a_right_ascension, a_declination, a_radius = 1, is_azimuth_south=False):
     """Converts a given right ascension and declination into spherical coordinates
 
-    Declination measured from the ecliptic is converted to theta
-    measured from the north pole.
+    Declination (coords.angle): is measured in degrees from the ecliptic
+    and is converted to theta measured from the axis of the north pole.
 
-    Right ascension measured in hours is converted into degrees and assigned
-    to phi.
+    Right ascension (coords.angle): is measured in hours from the vernal
+    equinox and converted into degrees.
 
-    Returns the spherical coordinate.
-
+    Returns coords.spherical.
     """
+
     return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
                             coords.angle(a_right_ascension.value * 15))
+
+
+def azalt2spherical(an_azimuth, an_altitude, a_radius = 1):
+    """Converts a given altitude and azimuth into spherical coordinates
+
+    Azimuth (coords.angle): is measured from the anti-meridian (north,
+    positive east following IAU standard) and is converted into
+    degrees and assigned to phi.
+
+    Altitude (coords.angle): is measured from the horizon is converted
+    to theta measured from the north pole.
+
+    Returns coords.spherical.
+    """
+
+    return coords.spherical(a_radius, coords.angle(90.0) - an_altitude, an_azimuth)
 
 
 def JulianCentury(a_datetime):
