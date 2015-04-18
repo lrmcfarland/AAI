@@ -2,7 +2,7 @@
 
 """Transforms 3D space vectors to/from ecliptic/equatorial coordinates
 
-Conventions:
+Conventions (different from Meeus):
 	timezone is added to UTC, e.g. UTC (00:00) = local time (16:00 PST day - 1) + time zone (-08)
 	Azimuth is from the North positive east in degrees when stored in a coords.spherical object (Navigators not Astronomers preference).
 	Longitude is positive east in degrees, e.g. MV is -122 Latitude
@@ -63,29 +63,28 @@ class Error(Exception):
     pass
 
 
-def toHorizon(an_object, an_observer, a_utc_datetime, is_verbose=False):
+def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     """Transforms a coordinate vector from equatorial to horizon coordinates.
+
+    Astronomical Algorithms 2ed, Jean Meeus ISBN 0-943396-61-1
+
+    TODO: validate RA in hours?
+    TODO: positive east IAU vs. Meeus positive west issue, p. 93
 
     Args:
 
     an_object (coords.spherical): in degrees from RA/dec.
 
-    TODO: validate RA in hours?
-
     an_observer (coords.spherical): the latitude and longitude
     (positive east of the prime azimuth) of an observer as a spherical
     coordinate (unit radius), e.g. CA is 34 latitude, -122 longitude
 
-
-    TODO: positive east IAU vs. Meeus positive west issue, p. 93
-
-    a_utc_datetime (ISO8601 string): UTC date and time of the
-    observation.
+    a_local_datetime (ISO8601 string): the local date, time and
+    timezone of the observation.
 
     is_verbose (bool): verbose mode.
 
     Returns: coords.spherical in the transformed coordinates.
-
     """
 
     if not isinstance(an_object, coords.spherical):
@@ -94,22 +93,22 @@ def toHorizon(an_object, an_observer, a_utc_datetime, is_verbose=False):
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gast = GMST.USNO_C163.GAST(a_utc_datetime) - coords.angle(a_utc_datetime.timezone()) # hours
+    gast = GMST.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone()) # hours
 
     local_hour_angle = coords.angle(gast.value*15 + an_observer.phi.value - an_object.phi.value)
     local_hour_angle.normalize(0, 360)
 
     if is_verbose:
-        print 'datetime', a_utc_datetime.toJulianDate()
+        print 'datetime', a_local_datetime.toJulianDate()
         print 'GAST', gast
         print 'observer longitude', utils.get_longitude(an_observer).value
         print 'object latitude', utils.get_latitude(an_object).value
         print 'local hour angle', local_hour_angle.value
 
     # Meeus 13.6
-    sinaltitude =    math.sin(utils.get_latitude(an_observer).radians) \
+    sinaltitude =    math.sin(utils.get_latitude(an_observer).radians)  \
                    * math.sin(utils.get_declination(an_object).radians) \
-                   + math.cos(utils.get_latitude(an_observer).radians) \
+                   + math.cos(utils.get_latitude(an_observer).radians)  \
                    * math.cos(utils.get_declination(an_object).radians) \
                    * math.cos(local_hour_angle.radians)
 
@@ -133,23 +132,27 @@ def toHorizon(an_object, an_observer, a_utc_datetime, is_verbose=False):
     return coords.spherical(1, theta, phi)
 
 
-def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
+def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     """Transforms a coordinate vector from horizon to equatorial coordinates.
+
+    Astronomical Algorithms 2ed, Jean Meeus ISBN 0-943396-61-1
 
     Args:
 
-    an_object (coords.spherical): in altitude and azimuth or RA (TODO hours?) and dec. in degrees
+    an_object (coords.spherical): in altitude and azimuth or RA (TODO
+    hours?) and dec. in degrees
 
     an_observer (coords.spherical): the latitude and longitude
     (positive east of the prime azimuth) of an observer as a spherical
     coordinate (unit radius).
 
-    a_utc_datetime (ISO8601 string): UTC date and time of the
-    observation.
+    a_local_datetime (ISO8601 string): the local date, time and
+    timezone of the observation.
 
     is_verbose (bool): verbose mode.
 
     Returns: coords.spherical in the transformed coordinates.
+
     """
 
     if not isinstance(an_object, coords.spherical):
@@ -157,7 +160,6 @@ def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
 
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
-
 
     altitude = an_object.theta.complement()
 
@@ -167,9 +169,9 @@ def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
     azimuth = coords.angle(an_object.phi.value - 180)
 
     # Meeus, p. 94
-    sindec =  math.sin(utils.get_latitude(an_observer).radians) * math.sin(altitude.radians) - \
-              math.cos(utils.get_latitude(an_observer).radians) * math.cos(altitude.radians) * \
-              math.cos(azimuth.radians)
+    sindec =    math.sin(utils.get_latitude(an_observer).radians) * math.sin(altitude.radians) \
+              - math.cos(utils.get_latitude(an_observer).radians) * math.cos(altitude.radians) \
+              * math.cos(azimuth.radians)
 
     object_dec = coords.angle(coords.angle().rad2deg(math.asin(sindec)))
 
@@ -178,34 +180,30 @@ def toEquatorial(an_object, an_observer, a_utc_datetime, is_verbose=False):
 
     # Meeus, p. 94
     nom = math.sin(azimuth.radians)
-    den = math.cos(azimuth.radians)  *  math.sin(utils.get_latitude(an_observer).radians) + \
-          math.tan(altitude.radians) *  math.cos(utils.get_latitude(an_observer).radians)
+    den =     math.cos(azimuth.radians) \
+            * math.sin(utils.get_latitude(an_observer).radians) \
+            + math.tan(altitude.radians) \
+            * math.cos(utils.get_latitude(an_observer).radians)
 
     local_hour_angle = coords.angle()
     local_hour_angle.radians = math.atan2(nom, den)
-    local_hour_angle.normalize(0, 360) # ERROR: degrees adding to hours
+    local_hour_angle.normalize(0, 360)
 
-    gast = GMST.USNO_C163.GAST(a_utc_datetime) - coords.angle(a_utc_datetime.timezone()) # hours
+    gast = GMST.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone()) # hours
 
     object_longitude = coords.angle(gast.value*15 + an_observer.phi.value - local_hour_angle.value )
     object_longitude.normalize(0, 360)
 
-    object_ra = coords.angle(object_longitude)
-    object_ra.normalize(0, 24) # TODO coords.angle().normalized() returns new angle object.
-
-    # TODO convert this properly via ratio
+    object_ra = coords.angle(object_longitude.value/360.0*24.0)
 
     if is_verbose:
-        print 'datetime', a_utc_datetime.toJulianDate()
+        print 'datetime', a_local_datetime.toJulianDate()
         print 'GAST', gast
         print 'local hour angle', local_hour_angle.value
         print 'Object longitude', object_longitude, '(', object_longitude.value, ')'
         print 'Object R.A.', object_ra, '(', object_ra.value, ')'
 
-
-    return coords.spherical(1, object_dec.complement(), object_longitude)
-
-    # TODO return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec) # rounding problem?
+    return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec) # rounding problem?
 
 
 
@@ -223,7 +221,6 @@ if __name__ == '__main__':
     import optparse
 
     defaults = {'toEquatorial' : False,
-                'isAzimuthSouth': False,
                 'isVerbose': False}
 
     usage = '%prog [options] <RA/azimuth as deg:min:sec> <dec/altitude as deg:min:sec> <observer latitude as deg:min:sec> <observer longitude as deg:min:sec +west> <a datetime>'
@@ -247,10 +244,10 @@ if __name__ == '__main__':
     if len(args) < 5:
         parser.error('missing object RA, DEC or observer latitude, longitude or datetime.')
 
-    lat = coords.angle(90) - utils.parse_angle_arg(args[2])
-    lon = utils.parse_angle_arg(args[3])
+    colatitude = coords.angle(90) - utils.parse_angle_arg(args[2])
+    longitude = utils.parse_angle_arg(args[3])
 
-    an_observer = coords.spherical(1, lat, lon)
+    an_observer = coords.spherical(1, colatitude, longitude)
 
     a_datetime = coords.datetime(args[4])
 
