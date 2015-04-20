@@ -4,8 +4,6 @@
 
 http://en.wikipedia.org/wiki/Position_of_the_Sun
 
-azimuth ok-ish, elevation 10 degrees off
-
 
 to calculate:
     http://www.nrel.gov/docs/fy08osti/34302.pdf
@@ -14,8 +12,10 @@ to validate:
 
     http://www.esrl.noaa.gov/gmd/grad/solcalc/
 
+to run:
 
-to run: ./pylaunch.sh SunPosition.py -- 37:24 -122:4:57 2015-12-22T00:00:00
+$ ./pylaunch.sh SunPosition.py -v -- 37:24 -122:04:57 2015-03-21T12:57:00-08
+
 
 Note: use -- to end options and allow for negative coordinates.
 
@@ -84,8 +84,8 @@ def EquationOfTime(a_datetime):
 
     noon = coords.datetime()
     noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
-
     gast = GMST.USNO_C163.GAST(noon)
+
     ecliptic_longitude, R = SolarLongitude(noon)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
@@ -112,11 +112,16 @@ if __name__ == '__main__':
 
     import optparse
 
-    defaults = {}
+    defaults = {'isVerbose': False}
 
     usage = '%prog [options] <latitude> <longitude> <datetime>'
 
     parser = optparse.OptionParser(usage=usage)
+
+    parser.add_option('-v', '--verbose',
+                      action='store_true', dest='verbose',
+                      default=defaults['isVerbose'],
+                      help='verbose [%default]')
 
     options, args = parser.parse_args()
 
@@ -125,12 +130,10 @@ if __name__ == '__main__':
     if len(args) < 3:
         parser.error('missing object and/or datetime.')
 
-    a_latitude = utils.parse_angle_arg(args[0])
-    a_longitude = utils.parse_angle_arg(args[1])
+    an_observer = utils.latlon2spherical(a_latitude=utils.parse_angle_arg(args[0]),
+                                         a_longitude=utils.parse_angle_arg(args[1]))
 
     a_datetime = coords.datetime(args[2])
-
-    an_observer = coords.spherical(1, a_latitude, a_longitude)
 
     # ----------------------------------
     # ----- calculate sun position -----
@@ -138,6 +141,7 @@ if __name__ == '__main__':
 
     # azimuth, altitude
     if True:
+
         ecliptic_longitude, R = SolarLongitude(a_datetime)
         print 'ecliptic longitude', ecliptic_longitude
 
@@ -148,9 +152,10 @@ if __name__ == '__main__':
         print 'sun eq', sun_eq # TODO rm
 
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+        print 'an_observer', an_observer # TODO rm
         print 'sun hz', sun_hz # TODO rm
 
-        print 'az', sun_hz.phi, 'alt', coords.angle(90) - sun_hz.theta
+        print 'az', utils.get_azimuth(sun_hz), 'alt', utils.get_altitude(sun_hz)
 
         eot = EquationOfTime(a_datetime)
 

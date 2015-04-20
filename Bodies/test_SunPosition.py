@@ -25,6 +25,7 @@ import SunPosition
 
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
+from Transforms import utils
 
 
 class SunPositionsTests(unittest.TestCase):
@@ -35,7 +36,8 @@ class SunPositionsTests(unittest.TestCase):
 
         self.places = 12
 
-        self.an_observer = coords.spherical(1, coords.angle(37, 24), coords.angle(-122, 4, 56))
+        self.mlc404 = utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                             a_longitude=coords.angle(-122, 4, 56))
 
 
     def test_EoT_2015_01_01T12_00(self):

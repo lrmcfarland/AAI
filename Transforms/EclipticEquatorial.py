@@ -158,10 +158,8 @@ if __name__ == '__main__':
     if len(args) < 3:
         parser.error('missing object and/or datetime.')
 
-    RA = utils.parse_angle_arg(args[0])
-    dec = utils.parse_angle_arg(args[1])
-
-    an_object = utils.radec2spherical(a_right_ascension=RA, a_declination=dec)
+    an_object = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg(args[0]),
+                                      a_declination=utils.parse_angle_arg(args[1]))
 
     a_datetime = coords.datetime(args[2])
 
@@ -173,9 +171,9 @@ if __name__ == '__main__':
 
     if options.toEcliptic is True:
         result = toEcliptic(an_object, a_datetime, is_verbose=options.verbose)
-        print 'Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', result.phi
+        print 'Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', utils.get_longitude(result)
 
     else:
         result = toEquatorial(an_object, a_datetime, is_verbose=options.verbose)
-        print 'RA:', utils.get_RA(result), ', Dec:', result.phi
+        print 'RA:', utils.get_RA(result), ', Dec:', utils.get_declination(result)
 

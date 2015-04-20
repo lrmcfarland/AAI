@@ -19,7 +19,6 @@ Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/utils.py:14
 (Pdb) c
 ..> /Users/lrm/src/Astronomy/Transforms/utils.py(23)get_latitude()
 -> if not isinstance(a_point, coords.spherical):
-
 """
 
 import math
@@ -36,6 +35,20 @@ class UtilsTests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5
+
+
+    def test_JulianCentury_2000(self):
+        """Test Julian Century 2000"""
+        a_datetime = coords.datetime('2000-01-01T12:00:00')
+        a_Julian_century = utils.JulianCentury(a_datetime)
+        self.assertEqual(0, a_Julian_century)
+
+
+    def test_JulianCentury_2100(self):
+        """Test Julian Century 2100"""
+        a_datetime = coords.datetime('2100-01-01T12:00:00')
+        a_Julian_century = utils.JulianCentury(a_datetime)
+        self.assertEqual(1, a_Julian_century)
 
 
     def test_get_latitude_npole(self):
@@ -101,28 +114,34 @@ class UtilsTests(unittest.TestCase):
         self.assertEqual(-3.0, a_right_ascension.value)
 
 
+
+    def test_azalt2spherical_1(self):
+        """Test azimuth, altitude 2 spherical 1"""
+        a_point = utils.azalt2spherical(an_azimuth=utils.parse_angle_arg('248:02:0.77676'),
+                                        an_altitude=utils.parse_angle_arg('15:07:30.0779'))
+
+        self.assertAlmostEqual(248.03354910000002, utils.get_azimuth(a_point).value)
+        self.assertAlmostEqual(15.125021649800004, utils.get_altitude(a_point).value)
+
+
+    def test_latlon2spherical_1(self):
+        """Test latitude, longitude to spherical 1"""
+        a_point = utils.latlon2spherical(a_latitude=utils.parse_angle_arg('37:24'),
+                                         a_longitude=utils.parse_angle_arg('-122:04:57'))
+
+        self.assertAlmostEqual(37.4, utils.get_latitude(a_point).value)
+        self.assertAlmostEqual(-122.0825, utils.get_longitude(a_point).value)
+
+
     def test_radec2spherical_1(self):
-        """Test RA 1, dec 0"""
-        a_point = utils.radec2spherical(a_right_ascension=coords.angle(1),
-                                                 a_declination=coords.angle(0))
+        """Test RA, declination 2 spherical 1"""
+        a_point = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg('23:09:16.641'),
+                                        a_declination=utils.parse_angle_arg('-6:43:11.61'))
 
-        self.assertAlmostEqual(90, a_point.theta.value)
-        self.assertAlmostEqual(15, a_point.phi.value)
-        self.assertAlmostEqual(1, utils.get_RA(a_point).value)
-
-
-    def test_JulianCentury_2000(self):
-        """Test Julian Century 2000"""
-        a_datetime = coords.datetime('2000-01-01T12:00:00')
-        a_Julian_century = utils.JulianCentury(a_datetime)
-        self.assertEqual(0, a_Julian_century)
+        self.assertAlmostEqual(23.154622500000002, utils.get_RA(a_point).value)
+        self.assertAlmostEqual(-6.719891666666669, utils.get_declination(a_point).value)
 
 
-    def test_JulianCentury_2100(self):
-        """Test Julian Century 2100"""
-        a_datetime = coords.datetime('2100-01-01T12:00:00')
-        a_Julian_century = utils.JulianCentury(a_datetime)
-        self.assertEqual(1, a_Julian_century)
 
 if __name__ == '__main__':
     unittest.main()

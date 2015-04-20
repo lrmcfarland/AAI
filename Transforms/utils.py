@@ -17,7 +17,7 @@ class Error(Exception):
 angle_re = re.compile(r'(-){0,1}(\d+)(:\d+){0,1}(:\d+\.?\d+){0,1}') # TODO limits 0-360, 0-60, etc
 
 def parse_angle_arg(an_arg):
-    """Parse angle arg as dd:mm:ss.sss"""
+    """Parse angle arg as a string of dd:mm:ss.sss"""
 
     degrees = 0
     minutes = 0
@@ -45,17 +45,53 @@ def parse_angle_arg(an_arg):
     return result
 
 
+def JulianCentury(a_datetime):
+    """Calculates the Julian century relative to J2000 of the given date
+
+    Args:
+
+    a_datetime: local date and time of the observation.
+
+    Returns a double equal to the Julian century.
+    """
+    return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
+
+
+def get_altitude(a_point):
+    """Spherical to altitude
+
+    Converts spherical coordinate theta (angle to +z axis) to
+    altitude (angle to the horizon).
+
+    Returns coords.angle, the angle to the longitude.
+    """
+
+    return a_point.theta.complement()
+
+
+def get_azimuth(a_point, is_relative2south=False):
+    """Spherical to azimuth
+
+    Converts spherical coordinate phi (angle to +x axis of
+    projection in xy plane) to longitude (angle to the prime meridian).
+
+    Returns coords.angle, the angle to the azimuth.
+    """
+
+    if is_relative2south:
+        return coords.angle(a_point.phi.value - 180)
+    else:
+        return a_point.phi
+
+
 def get_latitude(a_point):
     """Spherical to latitude
 
     Converts spherical coordinate theta (angle to +z axis) to
-    latitude/declination.
+    latitude (angle to the equator).
 
-    Returns an angle with a value equal to the latitude.
+    Returns coords.angle, the angle to the latitude.
     """
-
-    if not isinstance(a_point, coords.spherical):
-        raise Error('a coordinate must be an instance of coords.spherical')
 
     return a_point.theta.complement()
 
@@ -64,13 +100,10 @@ def get_longitude(a_point):
     """Spherical to longitude
 
     Converts spherical coordinate phi (angle to +x axis of
-    projection in xy plane) to longitude.
+    projection in xy plane) to longitude (angle to the prime meridian).
 
-    Returns an angle with a value equal to the longitude.
+    Returns coords.angle, the angle to the longitude.
     """
-
-    if not isinstance(a_point, coords.spherical):
-        raise Error('a coordinate must be an instance of coords.spherical')
 
     return a_point.phi
 
@@ -79,9 +112,9 @@ def get_RA(a_point):
     """Spherical to right ascension
 
     Converts spherical coordinate phi (angle to +x axis of
-    projection in xy plane) to right ascension.
+    projection in xy plane) to right ascension (/= 15).
 
-    Returns an angle value equal to the right ascension.
+    Returns an angle with a value equal to the Right Ascension.
     """
 
     return coords.angle(get_longitude(a_point).value/15.0)
@@ -91,34 +124,15 @@ def get_declination(a_point):
     """Spherical to declination
 
     Converts spherical coordinate theta (angle to +z axis) to
-    declination.
+    declination (angle to the ecliptic).
 
-    Returns an angle with a value equal to the latitude.
+    Returns an angle with a value equal to the declination.
     """
-
-    if not isinstance(a_point, coords.spherical):
-        raise Error('a coordinate must be an instance of coords.spherical')
 
     return a_point.theta.complement()
 
 
-def radec2spherical(a_right_ascension, a_declination, a_radius = 1, is_azimuth_south=False):
-    """Converts a given right ascension and declination into spherical coordinates
-
-    Declination (coords.angle): is measured in degrees from the ecliptic
-    and is converted to theta measured from the axis of the north pole.
-
-    Right ascension (coords.angle): is measured in hours from the vernal
-    equinox and converted into degrees.
-
-    Returns coords.spherical.
-    """
-
-    return coords.spherical(a_radius, coords.angle(90.0) - a_declination,
-                            coords.angle(a_right_ascension.value * 15))
-
-
-def azalt2spherical(an_azimuth, an_altitude, a_radius = 1):
+def azalt2spherical(an_azimuth, an_altitude, a_radius=1):
     """Converts a given altitude and azimuth into spherical coordinates
 
     Azimuth (coords.angle): is measured from the anti-meridian (north,
@@ -131,16 +145,40 @@ def azalt2spherical(an_azimuth, an_altitude, a_radius = 1):
     Returns coords.spherical.
     """
 
-    return coords.spherical(a_radius, coords.angle(90.0) - an_altitude, an_azimuth)
+    return coords.spherical(a_radius, an_altitude.complement(), an_azimuth)
 
 
-def JulianCentury(a_datetime):
-    """Calculates the Julian century relative to J2000 of the given date
+def latlon2spherical(a_latitude, a_longitude, a_radius=1):
+    """Converts a given latitude and longitude into spherical coordinates
 
-    Args:
+    latitude (coords.angle): is measured in degrees from the equator
+    and is converted to theta measured from the axis of the north pole.
 
-    a_datetime: local date and time of the observation.
+    longitude (coords.angle): is measured in degrees from the prime
+    merdian.
 
-    Returns a double equal to the Julian century.
+    Returns coords.spherical.
+
     """
-    return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
+
+    return coords.spherical(a_radius, a_latitude.complement(),
+                            coords.angle(a_longitude))
+
+
+def radec2spherical(a_right_ascension, a_declination, a_radius=1):
+    """Converts a given right ascension and declination into spherical coordinates
+
+    Right ascension (coords.angle): is measured in hours from the vernal
+    equinox and converted into degrees.
+
+    Declination (coords.angle): is measured in degrees from the ecliptic
+    and is converted to theta measured from the axis of the north pole.
+
+    Returns coords.spherical.
+    """
+
+    if a_right_ascension.value < 0 or a_right_ascension.value > 24:
+        raise Error('Right Ascension out of range: %s' % (a_right_ascension,))
+
+    return coords.spherical(a_radius, a_declination.complement(),
+                            coords.angle(a_right_ascension.value * 15))
