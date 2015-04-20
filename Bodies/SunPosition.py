@@ -93,10 +93,9 @@ def EquationOfTime(a_datetime):
 
     eot = coords.angle()
 
-    eot.value = gast.value - utils.get_ra(sun_eq)
+    eot.value = gast.value - utils.get_RA(sun_eq).value
 
     return eot
-
 
 
 # ================
