@@ -43,6 +43,8 @@ class SunPositionsTests(unittest.TestCase):
     def test_stick_shadow_2015_03_21(self):
         """Test matches sun angle measured from a stick's shadow
 
+        Stick not straight, shadow not level.
+
         Note time zone.
         """
 
@@ -59,10 +61,18 @@ class SunPositionsTests(unittest.TestCase):
 
 
     def test_sextant_2015_03_27(self):
-        """Test matches sun angle measured with a sextant using a swimming
-        pool as an artificial horizon.
+        """Test against sextant measurement
+
+        The sun angle is measured with a sextant using a swimming pool
+        as an artificial horizon.
+
+        A light wind blurred the reflected image, sextant calibration rough
+
+        Sextant reading 70:10 => 35:05 (35.0833333333) degrees altitude (/=2)
 
         Note time zone.
+
+        TODO improve precision, but problem largely in sextant user
         """
 
         a_datetime = coords.datetime('2015-03-27T16:24:00-07')
@@ -72,10 +82,38 @@ class SunPositionsTests(unittest.TestCase):
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
         sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
-
         self.assertAlmostEqual(243.07115892922118, utils.get_azimuth(sun_hz).value, self.places)
-        self.assertAlmostEqual(34.237892286606794, utils.get_altitude(sun_hz).value, self.places)
 
+        sextant_alt = coords.angle(utils.parse_angle_arg('70:10').value/2)
+        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun_hz).value, delta=1)
+
+
+    def test_sextant_2015_04_20(self):
+        """Test against sextant measurement
+
+        The sun angle is measured with a sextant using a swimming pool
+        as an artificial horizon.
+
+        A light wind blurred the reflected image, sextant calibration rough
+
+        Sextant reading 44:32 => 22:15:60 (22.2666666667) degrees altitude (/=2)
+
+        Note time zone.
+
+        TODO improve precision, but problem largely in sextant user
+        """
+
+        a_datetime = coords.datetime('2015-04-20T17:52:00-07')
+
+        ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+
+        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
+        self.assertAlmostEqual(267.90829781482097, utils.get_azimuth(sun_hz).value, self.places)
+
+        sextant_alt = coords.angle(utils.parse_angle_arg('44:32').value/2)
+        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun_hz).value, delta=1)
 
 
     @unittest.skip('todo')
