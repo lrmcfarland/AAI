@@ -24,13 +24,18 @@ to plot:
 
 $ ./pylaunch.sh SunPosition.py -- 37:24 0 2015-03-21T00:00:00 > altitude_2015.03.21.txt
 
-> altitude <- read.table("altitude_2015.12.21.txt")
-> altitude2 <- read.table("altitude_2015.06.21.txt")
-> altitude3 <- read.table("altitude_2015.03.21.txt")
-> plot(altitude$V1, altitude$V2, type="l", xlab="time", ylab="altitude", ylim=c(-100, 100), col="blue")
-> lines(altitude2$V1, altitude2$V2, type="l", col="red")
-> lines(altitude3$V1, altitude3$V2, type="l", col="green")
+> altitude12 <- read.table("altitude_2015.12.21.txt")
+> altitude06 <- read.table("altitude_2015.06.21.txt")
+> altitude03 <- read.table("altitude_2015.03.21.txt")
+> altitude09 <- read.table("altitude_2015.09.21.txt")
+
+> plot(altitude12$V1, altitude12$V2, type="l", xlab="time", ylab="altitude", ylim=c(-100, 100), col="cyan")
+> lines(altitude03$V1, altitude03$V2, type="l", col="green")
+> lines(altitude06$V1, altitude06$V2, type="l", col="red")
+> lines(altitude09$V1, altitude09$V2, type="l", col="orange")
 > title("Sun altitude at 37 Latitude")
+> legend("topright", title="date", c("winter", "spring", "summer", "fall"), lwd=c(1,1), col=c("cyan", "green", "red", "orange"))
+
 
 
 > analemma <- read.table("analemma.txt")
