@@ -22,6 +22,17 @@ Note: use -- to end options and allow for negative coordinates.
 
 to plot:
 
+$ ./pylaunch.sh SunPosition.py -- 37:24 0 2015-03-21T00:00:00 > altitude_2015.03.21.txt
+
+> altitude <- read.table("altitude_2015.12.21.txt")
+> altitude2 <- read.table("altitude_2015.06.21.txt")
+> altitude3 <- read.table("altitude_2015.03.21.txt")
+> plot(altitude$V1, altitude$V2, type="l", xlab="time", ylab="altitude", ylim=c(-100, 100), col="blue")
+> lines(altitude2$V1, altitude2$V2, type="l", col="red")
+> lines(altitude3$V1, altitude3$V2, type="l", col="green")
+> title("Sun altitude at 37 Latitude")
+
+
 > analemma <- read.table("analemma.txt")
 > plot(analemma$V2, analemma$V1, type="l", xlab="azimuth", ylab="altitude", col="red")
 > title("Analemma, 37N")
@@ -29,7 +40,6 @@ to plot:
 > eot <- read.table("eot.txt")
 > plot(eot$V1, eot$V3, type="l", xlab="day of year", ylab="minutes", col="blue")
 > title("Equation of Time, 2015")
-
 
 """
 
@@ -190,7 +200,7 @@ if __name__ == '__main__':
             sun_eq = EclipticEquatorial.toEquatorial(sun_ec, current_datetime)
             sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_datetime)
 
-            print current_datetime,
+            # print current_datetime,
             print 0.01*d,
             # print utils.get_azimuth(sun_hz),
             print utils.get_altitude(sun_hz).value
