@@ -70,7 +70,7 @@ def SolarLongitude(a_datetime):
     return ecliptic_longitude, R
 
 
-def EquationOfTime(a_datetime):
+def EquationOfTime(a_datetime, is_verbose=False):
     """Calcuate the equation of time
 
     http://en.wikipedia.org/wiki/Equation_of_time
@@ -93,7 +93,21 @@ def EquationOfTime(a_datetime):
 
     eot = coords.angle()
 
+    sun_ra = utils.get_RA(sun_eq)
+
     eot.value = gast.value - utils.get_RA(sun_eq).value
+
+    ut = a_datetime.UT()
+
+    if is_verbose:
+        print # linefeed TODO rm
+        print 'datetime', a_datetime
+        print 'UT', ut, type(ut)
+        print 'gast', gast
+        print 'sun ra', sun_ra, sun_ra.value
+        print 'eot', eot, eot.value*60
+        eot.normalize(0, 24)
+        print 'eot', eot, eot.value*60
 
     return eot
 
@@ -161,6 +175,27 @@ if __name__ == '__main__':
         print 'Equation of time', a_datetime, eot # TODO rm
 
 
+    # a days worth of azimuth and altitude
+    if False:
+
+        current_datetime = coords.datetime()
+
+        for d in xrange(0, 100):
+
+            current_datetime.fromJulianDate(a_datetime.toJulianDate() + 0.01*d)
+
+            ecliptic_longitude, R = SolarLongitude(current_datetime)
+
+            sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+            sun_eq = EclipticEquatorial.toEquatorial(sun_ec, current_datetime)
+            sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_datetime)
+
+            print current_datetime,
+            print 0.01*d,
+            # print utils.get_azimuth(sun_hz),
+            print utils.get_altitude(sun_hz).value
+
+
 
     # years worth of equation of time
     if False:
@@ -171,7 +206,7 @@ if __name__ == '__main__':
 
             current_date += 1
 
-            eot = EquationOfTime(current_date)
+            eot = EquationOfTime(current_date, is_verbose=options.verbose)
 
             # TODO equation of time blows up near the vernal equinox
             if d < 79 or d > 81:
