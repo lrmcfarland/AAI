@@ -22,33 +22,45 @@ Note: use -- to end options and allow for negative coordinates.
 
 to plot:
 
+Altitude:
+
 $ ./pylaunch.sh SunPosition.py -- 37:24 0 2015-03-21T00:00:00 > altitude_2015.03.20.txt
 
-$ r
-> spring <- read.table("altitude_2015.03.20.txt")
-> summer <- read.table("altitude_2015.06.21.txt")
-> autumnal <- read.table("altitude_2015.09.23.txt")
-> winter <- read.table("altitude_2015.12.22.txt")
+Note: Series starts at midnight and 0 longitude to center noon w/o time zone.
 
-> plot(spring$V1, spring$V2, ylim=c(-90, 90), xlab="time of day", ylab="altitude in degrees", type="l", col="green")
-> lines(summer$V1, summer$V2, type="l", col="red")
-> lines(autumnal$V1, autumnal$V2, type="l", col="orange")
-> lines(winter$V1, winter$V2, type="l", col="light blue")
-> legend("topright", c("spring", "summer", "autum", "winter"), lwd=c(1,1), col=c("green", "red", "orange", "light blue"))
-> title("Solar altitude above the horizon from 37N latitude")
+$ r
+
+> altitude03 <- read.table("altitude_2015.03.20.txt")
+> altitude06 <- read.table("altitude_2015.06.21.txt")
+> altitude09 <- read.table("altitude_2015.09.23.txt")
+> altitude12 <- read.table("altitude_2015.12.22.txt")
+> plot(altitude03$V1, altitude03$V3, type="l", xlab="time of day", ylab="altitude in degrees", ylim=c(-100, 100), col="light green")
+> lines(altitude06$V1, altitude06$V3, type="l", col="pink")
+> lines(altitude09$V1, altitude09$V3, type="l", col="orange")
+> lines(altitude12$V1, altitude12$V3, type="l", col="light blue")
+> legend("topright", c("vernal equinox", "summer solstice", "autumnal equinox", "winter solstice"), lwd=c(1,1), col=c("light green", "red", "orange", "light blue"))
+> title("Solar altitude at 37N latitude")
+> grid()
+
+
+Analemma:
+
+$ ./pylaunch.sh SunPosition.py -o analemma -- 45 0 2015-01-01T12:00:00 > analemma.txt
+
+Note: Series starts at noon and 0 longitude to center noon w/o time zone.
+
+> analemma <- read.table("analemma.txt")
+> plot(analemma$V1, analemma$V2, type="l", xlab="Azimuth in degrees", ylab="Altitude in degrees", col="red")
+> title("Analemma at 37N, 2015")
+> grid()
+
+
 
 EoT:
 
 > eot <- read.table("eot.txt")
 > plot(eot$V1, eot$V3, type="l", xlab="day of year", ylab="minutes", col="green")
 > title("Equation of time 2015")
-> grid()
-
-Analemma:
-
-> analemma <- read.table("analemma.txt")
-> plot(analemma$V1, analemma$V2, type="l", xlab="Azimuth in degrees", ylab="Altitude in degrees", col="red")
-> title("Analemma at 37N, 2015")
 > grid()
 
 
