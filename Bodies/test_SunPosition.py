@@ -116,21 +116,19 @@ class SunPositionsTests(unittest.TestCase):
         self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun_hz).value, delta=1)
 
 
-    @unittest.skip('todo')
     def test_EoT_2015_01_01T12_00(self):
         """Test Equation of time 2015-01-01T12:00:00
 
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime('2015-01-02T12:00:00-08')
+        a_datetime = coords.datetime('2015-01-02T12:00:00')
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -3.59 minutes
-        self.assertAlmostEqual(-3.4317446135022323, eot.value, self.places)
+        self.assertAlmostEqual(-3.901196866415546, eot.value*60, self.places)
 
 
-    @unittest.skip('todo')
     def test_EoT_2015_02_11T12_00(self):
         """Test Equation of time 2015-02-11T12:00:00
 
@@ -146,7 +144,6 @@ class SunPositionsTests(unittest.TestCase):
         self.assertAlmostEqual(-14.212711856485711, eot.value*60, self.places)
 
 
-    @unittest.skip('todo')
     def test_EoT_2015_03_20T12_00(self):
         """Test Equation of time 2015-03-20T12:00:00
 
@@ -160,7 +157,6 @@ class SunPositionsTests(unittest.TestCase):
         self.assertAlmostEqual(-7.563513810377245, eot.value*60, self.places)
 
 
-    @unittest.skip('todo')
     def test_EoT_2015_05_14T12_00(self):
         """Test Equation of time 2015-05-14T12:00:00
 
@@ -176,7 +172,6 @@ class SunPositionsTests(unittest.TestCase):
         self.assertAlmostEqual(3.6588472510257475, eot.value*60, self.places)
 
 
-    @unittest.skip('todo')
     def test_EoT_2015_07_26T12_00(self):
         """Test Equation of time 2015-07-26T12:00:00
 
@@ -192,8 +187,6 @@ class SunPositionsTests(unittest.TestCase):
         self.assertAlmostEqual(-6.5354183954768175, eot.value*60, self.places)
 
 
-
-    @unittest.skip('todo')
     def test_EoT_2015_11_03T12_00(self):
         """Test Equation of time 2015-11-03T12:00:00
 
@@ -207,8 +200,6 @@ class SunPositionsTests(unittest.TestCase):
 
         # NOAA says 16.48 minutes
         self.assertAlmostEqual(16.43786410739647, eot.value*60, self.places)
-
-
 
 
 

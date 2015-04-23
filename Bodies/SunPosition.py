@@ -24,6 +24,8 @@ to plot:
 
 $ ./pylaunch.sh SunPosition.py -- 37:24 0 2015-03-21T00:00:00 > altitude_2015.03.21.txt
 
+Altitude:
+
 > altitude12 <- read.table("altitude_2015.12.21.txt")
 > altitude06 <- read.table("altitude_2015.06.21.txt")
 > altitude03 <- read.table("altitude_2015.03.21.txt")
@@ -37,14 +39,20 @@ $ ./pylaunch.sh SunPosition.py -- 37:24 0 2015-03-21T00:00:00 > altitude_2015.03
 > legend("topright", title="date", c("winter", "spring", "summer", "fall"), lwd=c(1,1), col=c("cyan", "green", "red", "orange"))
 
 
-
-> analemma <- read.table("analemma.txt")
-> plot(analemma$V2, analemma$V1, type="l", xlab="azimuth", ylab="altitude", col="red")
-> title("Analemma, 37N")
+EoT:
 
 > eot <- read.table("eot.txt")
-> plot(eot$V1, eot$V3, type="l", xlab="day of year", ylab="minutes", col="blue")
-> title("Equation of Time, 2015")
+> plot(eot$V1, eot$V3, type="l", xlab="day of year", ylab="minutes", col="green")
+> title("Equation of time 2015")
+> grid()
+
+Analemma:
+
+> analemma <- read.table("analemma.txt")
+> plot(analemma$V1, analemma$V2, type="l", xlab="Azimuth in degrees", ylab="Altitude in degrees", col="red")
+> title("Analemma at 37N, 2015")
+> grid()
+
 
 """
 
@@ -56,6 +64,10 @@ from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
 from Transforms import GMST
 from Transforms import utils
+
+
+class Error(Exception):
+    pass
 
 
 def SolarLongitude(a_datetime):
@@ -85,16 +97,14 @@ def SolarLongitude(a_datetime):
     return ecliptic_longitude, R
 
 
-def EquationOfTime(a_datetime, is_verbose=False):
+def EquationOfTime(a_datetime):
     """Calcuate the equation of time
 
     http://en.wikipedia.org/wiki/Equation_of_time
 
-    "A mathematical discontinuity exists at noon."
+    TODO: Only valid at for noon. Rounds to nearest half day.
 
-    Rounds to nearst half day.
-
-    Returns: equation of time as a coords angle.
+    Returns: equation of time as a coords angle in degrees. *60 for minutes.
     """
 
     noon = coords.datetime()
@@ -110,19 +120,14 @@ def EquationOfTime(a_datetime, is_verbose=False):
 
     sun_ra = utils.get_RA(sun_eq)
 
-    eot.value = gast.value - utils.get_RA(sun_eq).value
+    if gast.value - sun_ra.value < 12:
+        eot.value = gast.value - sun_ra.value
 
-    ut = a_datetime.UT()
+    elif gast.value - sun_ra.value >= 12:
+        eot.value = gast.value - sun_ra.value - 24
 
-    if is_verbose:
-        print # linefeed TODO rm
-        print 'datetime', a_datetime
-        print 'UT', ut, type(ut)
-        print 'gast', gast
-        print 'sun ra', sun_ra, sun_ra.value
-        print 'eot', eot, eot.value*60
-        eot.normalize(0, 24)
-        print 'eot', eot, eot.value*60
+    else:
+        raise Error('unsupported EoT case')
 
     return eot
 
@@ -187,7 +192,7 @@ if __name__ == '__main__':
 
         eot = EquationOfTime(a_datetime)
 
-        print 'Equation of time', a_datetime, eot # TODO rm
+        print 'Equation of time', a_datetime, eot.value * 60 # TODO rm
 
 
     # a days worth of azimuth and altitude
@@ -220,13 +225,9 @@ if __name__ == '__main__':
         for d in xrange(1, 365):
 
             current_date += 1
+            eot = EquationOfTime(current_date)
 
-            eot = EquationOfTime(current_date, is_verbose=options.verbose)
-
-            # TODO equation of time blows up near the vernal equinox
-            if d < 79 or d > 81:
-                print d, current_date, eot.value*60
-
+            print d, current_date, eot.value * 60
 
 
     # analemma
@@ -247,8 +248,6 @@ if __name__ == '__main__':
             # switch to astronomer coordinates
             eot = EquationOfTime(current_date)
 
-            alt = coords.angle(90) - sun_hz.theta
+            alt = utils.get_altitude(sun_hz).value
 
-            # TODO equation of time blows up near the vernal equinox
-            if d < 79 or d > 81:
-                print alt.value, eot.value*60 + 180
+            print eot.value*60 + 180, alt
