@@ -50,14 +50,10 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-03-21T12:57:00-08')
 
-        ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
 
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
-
-        self.assertAlmostEqual(196.74093494548637, utils.get_azimuth(sun_hz).value, self.places)
-        self.assertAlmostEqual(51.50253975117711, utils.get_altitude(sun_hz).value, self.places)
+        self.assertAlmostEqual(196.74093494548637, utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(51.50253975117711, utils.get_altitude(sun).value, self.places)
 
 
     def test_sextant_2015_03_27(self):
@@ -77,15 +73,12 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-03-27T16:24:00-07')
 
-        ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
 
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
-        self.assertAlmostEqual(243.07115892922118, utils.get_azimuth(sun_hz).value, self.places)
+        self.assertAlmostEqual(243.07115892922118, utils.get_azimuth(sun).value, self.places)
 
         sextant_alt = coords.angle(utils.parse_angle_arg('70:10').value/2)
-        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun_hz).value, delta=1)
+        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun).value, delta=1)
 
 
     def test_sextant_2015_04_20(self):
@@ -105,15 +98,12 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-20T17:52:00-07')
 
-        ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
 
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
-        self.assertAlmostEqual(267.90829781482097, utils.get_azimuth(sun_hz).value, self.places)
+        self.assertAlmostEqual(267.90829781482097, utils.get_azimuth(sun).value, self.places)
 
         sextant_alt = coords.angle(utils.parse_angle_arg('44:32').value/2)
-        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun_hz).value, delta=1)
+        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun).value, delta=1)
 
 
     def test_EoT_2015_01_01T12_00(self):
