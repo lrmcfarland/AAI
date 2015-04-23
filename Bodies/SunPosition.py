@@ -71,9 +71,13 @@ class Error(Exception):
 def SolarLongitude(a_datetime):
     """Calculate the longitude of the sun for the given date
 
-    http://en.wikipedia.org/wiki/Position_of_the_Sun
+    from http://en.wikipedia.org/wiki/Position_of_the_Sun
 
-    returns the sun's longitude and distance in AU
+    Args:
+
+    a_datetime: The time of the observation (coords.datetime).
+
+    Returns: the sun's longitude and distance in AU
     """
 
     n = a_datetime.toJulianDate() - a_datetime.J2000
@@ -95,12 +99,37 @@ def SolarLongitude(a_datetime):
     return ecliptic_longitude, R
 
 
+def SunPosition(a_datetime, an_observer):
+    """Calculate the location of the sun relaive to an observer
+
+    Args:
+
+    a_datetime: The time of the observation (coords.datetime).
+
+    an_observer: The observers location (coords.spherical).
+
+    Returns: the position of the sun (coords.spherical).
+    """
+
+    ecliptic_longitude, R = SolarLongitude(a_datetime)
+
+    sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+
+    return sun_hz
+
+
 def EquationOfTime(a_datetime):
     """Calcuate the equation of time
 
-    http://en.wikipedia.org/wiki/Equation_of_time
+    from http://en.wikipedia.org/wiki/Equation_of_time
 
     TODO: Only valid at for noon. Rounds to nearest half day.
+
+    Args:
+
+    a_datetime: The time of the observation (coords.datetime).
 
     Returns: equation of time as a coords angle in degrees. *60 for minutes.
     """
@@ -143,7 +172,10 @@ if __name__ == '__main__':
 
     import optparse
 
-    defaults = {'isVerbose': False}
+    output_modes = ('altitude', 'analemma', 'eot', 'default')
+
+    defaults = {'isVerbose': False,
+                'output mode': 'default'}
 
     usage = '%prog [options] <latitude> <longitude> <datetime>'
 
@@ -153,6 +185,12 @@ if __name__ == '__main__':
                       action='store_true', dest='verbose',
                       default=defaults['isVerbose'],
                       help='verbose [%default]')
+
+    parser.add_option('-o', '--output-mode',
+                      action='store', dest='output_mode',
+                      type='choice', choices=output_modes,
+                      default=defaults['output mode'],
+                      help='output mode %s' % (output_modes,))
 
     options, args = parser.parse_args()
 
@@ -170,31 +208,9 @@ if __name__ == '__main__':
     # ----- calculate sun position -----
     # ----------------------------------
 
-    # azimuth, altitude
-    if True:
+    if options.output_mode.lower() == 'altitude':
 
-        ecliptic_longitude, R = SolarLongitude(a_datetime)
-        print 'ecliptic longitude', ecliptic_longitude
-
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        print 'sun ec', sun_ec # TODO rm
-
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        print 'sun eq', sun_eq # TODO rm
-
-        sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-        print 'an_observer', an_observer # TODO rm
-        print 'sun hz', sun_hz # TODO rm
-
-        print 'az', utils.get_azimuth(sun_hz), 'alt', utils.get_altitude(sun_hz)
-
-        eot = EquationOfTime(a_datetime)
-
-        print 'Equation of time', a_datetime, eot.value * 60 # TODO rm
-
-
-    # a days worth of azimuth and altitude
-    if False:
+        # a days worth of azimuth and altitude
 
         current_datetime = coords.datetime()
 
@@ -202,24 +218,36 @@ if __name__ == '__main__':
 
             current_datetime.fromJulianDate(a_datetime.toJulianDate() + 0.01*d)
 
-            ecliptic_longitude, R = SolarLongitude(current_datetime)
+            sun = SunPosition(current_datetime, an_observer)
 
-            sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-            sun_eq = EclipticEquatorial.toEquatorial(sun_ec, current_datetime)
-            sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_datetime)
-
-            # print current_datetime,
             print 0.01*d,
-            # print utils.get_azimuth(sun_hz),
-            print utils.get_altitude(sun_hz).value
+            print current_datetime,
+            # print utils.get_azimuth(sun),
+            print utils.get_altitude(sun).value
 
 
+    elif options.output_mode.lower() == 'analemma':
 
-    # years worth of equation of time
-    if False:
+        # a years worth of analemma data
+
+        current_datetime = a_datetime
+
+        # TODO duration option
+        for d in xrange(1, 365):
+            current_datetime += 1
+            sun = SunPosition(current_datetime, an_observer)
+            eot = EquationOfTime(current_datetime)
+
+            print eot.value*60 + 180, utils.get_altitude(sun).value
+
+
+    elif options.output_mode.lower() == 'eot':
+
+        # years worth of equation of time data
 
         current_date = a_datetime
 
+        # TODO duration option
         for d in xrange(1, 365):
 
             current_date += 1
@@ -228,24 +256,31 @@ if __name__ == '__main__':
             print d, current_date, eot.value * 60
 
 
-    # analemma
-    if False:
+    else:
 
-        current_date = a_datetime
+        # azimuth, altitude
 
-        for d in xrange(1, 365):
+        print 'A datetime: ', a_datetime
+        print 'An observer:', an_observer
 
-            current_date += 1
+        ecliptic_longitude, R = SolarLongitude(a_datetime)
+        print 'Ecliptic longitude:', ecliptic_longitude
+        print 'Distance in AU:', R
 
-            ecliptic_longitude, R = SolarLongitude(current_date)
+        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+        print 'Sun in ecliptic coordinates:\n\t', sun_ec
 
-            sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-            sun_eq = EclipticEquatorial.toEquatorial(sun_ec, current_date)
-            sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, current_date)
+        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        print 'Sun in equatorial coordinates:\n\t', sun_eq
 
-            # switch to astronomer coordinates
-            eot = EquationOfTime(current_date)
+        sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+        print 'Sun in horizon coordinates:\n\t', sun_hz
 
-            alt = utils.get_altitude(sun_hz).value
+        print 'Azimuth (degrees):', utils.get_azimuth(sun_hz),
+        print ''.join(('(', str(utils.get_azimuth(sun_hz).value), ')'))
+        print 'Altitude (degrees):', utils.get_altitude(sun_hz),
+        print ''.join(('(', str(utils.get_altitude(sun_hz).value), ')'))
 
-            print eot.value*60 + 180, alt
+        eot = EquationOfTime(a_datetime)
+
+        print 'Equation of time (minutes):', eot.value * 60
