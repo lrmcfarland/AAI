@@ -22,7 +22,10 @@ import unittest
 
 import coords
 import APCBodies
+
+from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
+from Transforms import utils
 
 
 class APCBodyTests(unittest.TestCase):
@@ -31,7 +34,38 @@ class APCBodyTests(unittest.TestCase):
     def setUp(self):
         """Set up test parameters."""
 
-        self.places = 5
+        self.places = 12
+
+        self.mlc404 = utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                             a_longitude=coords.angle(-122, 4, 56))
+
+
+    def test_minisun_2015_01_01T1200(self):
+        """Test mini sun
+
+        validate with SunPosition.SunPosition and
+        http://www.esrl.noaa.gov/gmd/grad/solcalc/
+
+        """
+
+        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+
+        a_datetime = coords.datetime('2015-01-01T12:00:00-08')
+
+        sun_ec = APCBodies.MiniSun(a_datetime)
+        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
+
+        # noaa: 176.85
+        # SunPosition: 176.93209352
+        self.assertAlmostEqual(176.26017129238437, utils.get_azimuth(sun_hz).value, self.places)
+
+        # noaa: 29.59
+        # SunPosition: 29.5085142925
+        self.assertAlmostEqual(29.52550042910097, utils.get_altitude(sun_hz).value, self.places)
+
+
+
 
     @unittest.skip('todo')
     def test_analemma(self):

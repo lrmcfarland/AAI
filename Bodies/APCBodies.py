@@ -3,9 +3,17 @@
 """ Transforms from Astronomy on the Personal Computer (APC)
     by Montenbruck and Pfleger
 
+to run:
+
+TODO $ ./pylaunch.sh APCBodies.py -v -- 37:24 -122:04:57 2015-03-21T12:57:00-08
+
+
+to validate:
+
+    http://www.esrl.noaa.gov/gmd/grad/solcalc/
+
 to test: ./pylaunch.sh test_APCBodies.py
 
-TODO: not all of my implementations of this are working. Check unittests.
 """
 
 import math
@@ -29,15 +37,6 @@ def MiniSun(a_datetime):
 
     from p. 39
 
-
-    TODO generating data for an analemma:
-
-    maximum altitude (minimum colatitude) is 2015-07-21 not 2015-06-21
-
-    colatitude snaps from 70 to 79 on 2015-01-04.
-    azimuth snaps from 178 to 97 on 2015-01-04.
-    L snaps from 4.9 to 0.01 at the same time. Frac?
-
     """
 
     T = utils.JulianCentury(a_datetime)
@@ -49,8 +48,6 @@ def MiniSun(a_datetime):
     sun_azimuth = coords.angle()
     sun_azimuth.radians = L
 
-    sun = coords.spherical(1, coords.angle(90), sun_azimuth)
+    sun_ec = coords.spherical(1, coords.angle(90), sun_azimuth)
 
-    sun_eq = EclipticEquatorial.toEquatorial(sun, a_datetime)
-
-    return sun_eq
+    return sun_ec
