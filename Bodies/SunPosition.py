@@ -246,7 +246,9 @@ if __name__ == '__main__':
 
         # TODO duration option
         for d in xrange(1, 365):
+
             current_datetime += 1
+
             sun = SunPosition(current_datetime, an_observer)
             eot = EquationOfTime(current_datetime)
 
@@ -288,11 +290,10 @@ if __name__ == '__main__':
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
         print 'Sun in horizon coordinates:\n\t', sun_hz
 
+        eot = EquationOfTime(a_datetime)
+        print 'Equation of time (minutes):', eot.value * 60
+
         print 'Azimuth (degrees):', utils.get_azimuth(sun_hz),
         print ''.join(('(', str(utils.get_azimuth(sun_hz).value), ')'))
         print 'Altitude (degrees):', utils.get_altitude(sun_hz),
         print ''.join(('(', str(utils.get_altitude(sun_hz).value), ')'))
-
-        eot = EquationOfTime(a_datetime)
-
-        print 'Equation of time (minutes):', eot.value * 60
