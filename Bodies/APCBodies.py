@@ -66,7 +66,6 @@ def MiniMoon(a_datetime):
     """
 
     T = utils.JulianCentury(a_datetime)
-    eps = coords.angle(EclipticEquatorial.eps(a_datetime))
 
     Lo = Frac(0.606433 + 1336.855225 * T) # mean longitude
 
@@ -82,11 +81,10 @@ def MiniMoon(a_datetime):
          + 192*math.sin(lm + 2*D) - 165*math.sin(ls - 2*D) - 125*math.sin(D) - 110*math.sin(lm + ls) \
          + 148*math.sin(lm - ls) - 55*math.sin(2*F - 2*D)
 
+    apc_phi = coords.angle()
+    apc_phi.radians = 2*math.pi * Frac(Lo + dL/1296.0e3) # radians, aka Az
 
-    apc_phi = 2*math.pi * Frac(Lo + dL/1296.0e3) # radians, aka Az
-
-
-    print 'apc phi', coords.angle().rad2deg(apc_phi)
+    print 'apc phi', apc_phi, apc_phi.value
 
 
     Arcs = 3600.0 * 180.0/math.pi
@@ -96,11 +94,14 @@ def MiniMoon(a_datetime):
     N = -526*math.sin(h) + 44*math.sin(lm + h) - 31*math.sin(-lm + h) - 23*math.sin(ls + h) \
         + 11*math.sin(-ls + h) - 25*math.sin(-2*lm + F) + 21*math.sin(-lm + F)
 
+    apc_theta = coords.angle()
+    apc_theta.radians = (18520.0*math.sin(S) + N) / Arcs # radians, aka Elev
 
-    apc_theta = (18520.0*math.sin(S) + N) / Arcs # aka Elev
+    print 'apc theta', apc_theta, apc_theta.value
 
-    print 'apc theta', coords.angle().rad2deg(apc_theta)
+    moon_ec = coords.spherical(1, apc_theta.complement(), apc_phi)
 
+    return moon_ec
 
 
 
@@ -178,6 +179,17 @@ if __name__ == '__main__':
 
         moon_ec = MiniMoon(a_datetime)
         print 'Moon in ecliptic coordinates:\n\t', moon_ec
+
+        moon_eq = EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
+        print 'Moon in equatorial coordinates:\n\t', moon_eq
+
+        moon_hz = EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
+        print 'Moon in horizon coordinates:\n\t', moon_hz
+
+        print 'Azimuth (degrees):', utils.get_azimuth(moon_hz),
+        print ''.join(('(', str(utils.get_azimuth(moon_hz).value), ')'))
+        print 'Altitude (degrees):', utils.get_altitude(moon_hz),
+        print ''.join(('(', str(utils.get_altitude(moon_hz).value), ')'))
 
 
     else:
