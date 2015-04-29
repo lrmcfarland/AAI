@@ -31,6 +31,7 @@ from Transforms import utils
 class APCBodyTests(unittest.TestCase):
     """Test APC body calculations"""
 
+
     def setUp(self):
         """Set up test parameters."""
 
@@ -41,14 +42,11 @@ class APCBodyTests(unittest.TestCase):
 
 
     def test_minisun_2015_01_01T1200(self):
-        """Test mini sun
+        """Test mini sun 2015-01-01T12:00:00-08
 
-        validate with SunPosition.SunPosition and
-        http://www.esrl.noaa.gov/gmd/grad/solcalc/
-
+        validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
+        and SunPosition.SunPosition
         """
-
-        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
         a_datetime = coords.datetime('2015-01-01T12:00:00-08')
 
@@ -65,35 +63,22 @@ class APCBodyTests(unittest.TestCase):
         self.assertAlmostEqual(29.52550042910097, utils.get_altitude(sun_hz).value, self.places)
 
 
+    def test_minimoon_2015_04_29T1700(self):
+        """Test mini moon
 
-
-    @unittest.skip('todo')
-    def test_analemma(self):
-        """Test mini sun
-
-        TODO generating data for an analemma:
-
-        maximum altitude (minimum colatitude) is July 21, not June 21
-
-        azimuth snaps from 178 to 97 on 2015-01-04.
-        L snaps from 4.9 to 0.01 at the same time
         """
 
-        an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
+        a_datetime = coords.datetime('2015-04-29T17:00:00-07')
 
-        a_datetime = coords.datetime('2015-01-01T12:00:00')
+        moon_ec = APCBodies.MiniMoon(a_datetime)
+        moon_eq = EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
+        moon_hz = EquatorialHorizon.toHorizon(moon_eq, self.mlc404, a_datetime)
 
-        for d in xrange(1, 365):
+        # Star Walk: 96:22:55
+        self.assertAlmostEqual(98.63462904038198, utils.get_azimuth(moon_hz).value, self.places)
 
-            a_datetime += 1
-
-            print a_datetime,  # TODO rm
-
-            sun_eq = APCBodies.MiniSun(a_datetime)
-
-            sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-
-            print 'colatitude', sun_hz.theta, 'azimuth', sun_hz.phi # TODO rm
+        # Star Walk: 10:29:00
+        self.assertAlmostEqual(16.786314348482563, utils.get_altitude(moon_hz).value, self.places)
 
 
 if __name__ == '__main__':

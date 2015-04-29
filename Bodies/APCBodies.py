@@ -82,22 +82,17 @@ def MiniMoon(a_datetime):
          + 148*math.sin(lm - ls) - 55*math.sin(2*F - 2*D)
 
     apc_phi = coords.angle()
-    apc_phi.radians = 2*math.pi * Frac(Lo + dL/1296.0e3) # radians, aka Az
-
-    print 'apc phi', apc_phi, apc_phi.value
-
+    apc_phi.radians = 2*math.pi * Frac(Lo + dL/1296.0e3) # a.k.a. Polar Az
 
     Arcs = 3600.0 * 180.0/math.pi
 
     S = F + (dL + 412*math.sin(2*F) + 541*math.sin(ls)) / Arcs
     h = F - 2*D
-    N = -526*math.sin(h) + 44*math.sin(lm + h) - 31*math.sin(-lm + h) - 23*math.sin(ls + h) \
+    N = - 526*math.sin(h) + 44*math.sin(lm + h) - 31*math.sin(-lm + h) - 23*math.sin(ls + h) \
         + 11*math.sin(-ls + h) - 25*math.sin(-2*lm + F) + 21*math.sin(-lm + F)
 
     apc_theta = coords.angle()
-    apc_theta.radians = (18520.0*math.sin(S) + N) / Arcs # radians, aka Elev
-
-    print 'apc theta', apc_theta, apc_theta.value
+    apc_theta.radians = (18520.0*math.sin(S) + N) / Arcs # a.k.a. Polar Elev
 
     moon_ec = coords.spherical(1, apc_theta.complement(), apc_phi)
 
