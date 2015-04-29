@@ -61,6 +61,28 @@ class APCBodyTests(unittest.TestCase):
         self.assertAlmostEqual(29.52550042910097, utils.get_altitude(sun_hz).value, self.places)
 
 
+    def test_minisun_2015_04_29T1200(self):
+        """Test mini sun 2015-04-29T12:00:00-07
+
+        validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
+        and SunPosition.SunPosition
+        """
+
+        a_datetime = coords.datetime('2015-04-29T12:00:00-07')
+
+        sun_hz = APCBodies.SunPosition(a_datetime, self.mlc404)
+
+        # noaa: 143.1
+        # SunPosition: 143.257198509
+        self.assertAlmostEqual(80.82240618150763, utils.get_azimuth(sun_hz).value, self.places)
+        # TODO: way out
+
+        # noaa: 62.89
+        # SunPosition: 62.7193776732
+        self.assertAlmostEqual(28.074501187751423, utils.get_altitude(sun_hz).value, self.places)
+        # TODO: way out
+
+
     def test_minimoon_2015_04_29T1700(self):
         """Test mini moon
 
