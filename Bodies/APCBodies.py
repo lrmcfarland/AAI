@@ -83,13 +83,13 @@ def MiniMoon(a_datetime):
          + 148*math.sin(lm - ls) - 55*math.sin(2*F - 2*D)
 
 
-    latitude = 2*math.pi * Frac(Lo + dL/1296.0e3) # radians
+    apc_phi = 2*math.pi * Frac(Lo + dL/1296.0e3) # radians, aka Az
 
 
-    print 'lunar latitude?', coords.angle().rad2deg(latitude)
+    print 'apc phi', coords.angle().rad2deg(apc_phi)
 
 
-    Arcs = 3600 # TODO find this
+    Arcs = 3600.0 * 180.0/math.pi
 
     S = F + (dL + 412*math.sin(2*F) + 541*math.sin(ls)) / Arcs
     h = F - 2*D
@@ -97,9 +97,12 @@ def MiniMoon(a_datetime):
         + 11*math.sin(-ls + h) - 25*math.sin(-2*lm + F) + 21*math.sin(-lm + F)
 
 
-    longitude = (18520.0*math.sin(S) + N) / Arcs
+    apc_theta = (18520.0*math.sin(S) + N) / Arcs # aka Elev
 
-    print 'lunar longitude?', coords.angle().rad2deg(longitude)
+    print 'apc theta', coords.angle().rad2deg(apc_theta)
+
+
+
 
 
 # ================
