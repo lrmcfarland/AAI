@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
     import optparse
 
-    bodies = ('sun', 'moon')
+    bodies = ('sun', 'moon', 'tbd')
 
     defaults = {'isVerbose': False,
                 'body': 'sun'}
@@ -175,8 +175,8 @@ if __name__ == '__main__':
     # ----- calculate position -----
     # ------------------------------
 
-    print 'A datetime: ', a_datetime
-    print 'An observer:', an_observer
+    print '# A datetime: ', a_datetime
+    print '# An observer:', an_observer
 
     if options.body.lower() == 'sun':
 
@@ -210,6 +210,22 @@ if __name__ == '__main__':
         print ''.join(('(', str(utils.get_azimuth(moon_hz).value), ')'))
         print 'Altitude (degrees):', utils.get_altitude(moon_hz),
         print ''.join(('(', str(utils.get_altitude(moon_hz).value), ')'))
+
+
+    elif options.body.lower() == 'tbd':
+
+        current_datetime = coords.datetime()
+
+        for d in xrange(0, 100):
+
+            current_datetime.fromJulianDate(a_datetime.toJulianDate() + 0.01*d)
+
+            moon = MoonPosition(current_datetime, an_observer)
+
+            print 0.01*d,
+            print current_datetime,
+            print utils.get_azimuth(moon).value,
+            print utils.get_altitude(moon).value
 
 
     else:
