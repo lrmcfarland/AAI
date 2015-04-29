@@ -57,6 +57,19 @@ def MiniSun(a_datetime):
     return sun_ec
 
 
+def SunPosition(a_datetime, an_observer):
+    """Calculates the Sun's relative to the observer
+
+    Returns the position (coords.spherical) in horizon coordinates.
+    """
+
+    sun_ec = MiniSun(a_datetime)
+    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+
+    return sun_hz
+
+
 def MiniMoon(a_datetime):
     """Calculates the moon's RA and declination for the given datetime.
 
@@ -94,10 +107,22 @@ def MiniMoon(a_datetime):
     apc_theta = coords.angle()
     apc_theta.radians = (18520.0*math.sin(S) + N) / Arcs # a.k.a. Polar Elev
 
-    moon_ec = coords.spherical(1, apc_theta.complement(), apc_phi)
+    moon_ec = coords.spherical(1, apc_theta.complement(), apc_phi) # APC theta is to xy plane, not z axis.
 
     return moon_ec
 
+
+def MoonPosition(a_datetime, an_observer):
+    """Calculates the Moon's position relative to the observer
+
+    Returns the position (coords.spherical) in horizon coordinates.
+    """
+
+    moon_ec = MiniMoon(a_datetime)
+    moon_eq = EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
+    moon_hz = EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
+
+    return moon_hz
 
 
 

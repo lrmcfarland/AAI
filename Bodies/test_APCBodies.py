@@ -50,9 +50,7 @@ class APCBodyTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T12:00:00-08')
 
-        sun_ec = APCBodies.MiniSun(a_datetime)
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        sun_hz = EquatorialHorizon.toHorizon(sun_eq, self.mlc404, a_datetime)
+        sun_hz = APCBodies.SunPosition(a_datetime, self.mlc404)
 
         # noaa: 176.85
         # SunPosition: 176.93209352
@@ -70,9 +68,7 @@ class APCBodyTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-29T17:00:00-07')
 
-        moon_ec = APCBodies.MiniMoon(a_datetime)
-        moon_eq = EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
-        moon_hz = EquatorialHorizon.toHorizon(moon_eq, self.mlc404, a_datetime)
+        moon_hz = APCBodies.MoonPosition(a_datetime, self.mlc404)
 
         # Star Walk: 96:22:55
         self.assertAlmostEqual(98.63462904038198, utils.get_azimuth(moon_hz).value, self.places)
