@@ -83,20 +83,28 @@ class APCBodyTests(unittest.TestCase):
         # TODO: way out
 
 
-    def test_minimoon_2015_04_29T1700(self):
+    def test_minimoon_2015_04_29T2200(self):
         """Test mini moon
 
+        verify with:
+            star walk
+            http://www.dailymoonposition.com/default.aspx
+            sextant reading
         """
 
-        a_datetime = coords.datetime('2015-04-29T17:00:00-07')
+        a_datetime = coords.datetime('2015-04-29T22:00:00-07')
 
         moon_hz = APCBodies.MoonPosition(a_datetime, self.mlc404)
 
-        # Star Walk: 96:22:55
-        self.assertAlmostEqual(98.63462904038198, utils.get_azimuth(moon_hz).value, self.places)
+        # Star Walk: 172:15:43
+        # dailymoonposition: 186
+        self.assertAlmostEqual(182.38480914363294, utils.get_azimuth(moon_hz).value, self.places)
 
-        # Star Walk: 10:29:00
-        self.assertAlmostEqual(16.786314348482563, utils.get_altitude(moon_hz).value, self.places)
+        # Star Walk: 52:53:10
+        # dailymoonposition: 52
+        sextant_reading = utils.parse_angle_arg('105:51.4') # 52.928333333333335
+
+        self.assertAlmostEqual(55.32447196217382, utils.get_altitude(moon_hz).value, self.places)
 
 
 if __name__ == '__main__':
