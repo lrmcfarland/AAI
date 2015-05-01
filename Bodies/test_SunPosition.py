@@ -12,8 +12,6 @@ next until import module:
 -> import SunPosition
 (Pdb) b SunPosition.SunPosition.EquationOfTime
 Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/SunPosition.py:17
-
-
 """
 
 import math
@@ -68,7 +66,7 @@ class SunPositionsTests(unittest.TestCase):
         SunPosition             = 34:14:17.1205 (34.2380890297) degrees altitude
         APC mini sun            = 71:24:47.9738 (71.41332606)   degrees altitude TODO way out!
 
-        Star Walk               = 34:18:36 degrees altitude, 243:18:47 degrees azimuth 
+        Star Walk               = 34:18:36 degrees altitude, 243:18:47 degrees azimuth
         TODO taken from 37:27N, -122:11 adjust, to 404 MLC
 
 
