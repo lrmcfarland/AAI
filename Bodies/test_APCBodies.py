@@ -28,8 +28,8 @@ from Transforms import EquatorialHorizon
 from Transforms import utils
 
 
-class APCBodyTests(unittest.TestCase):
-    """Test APC body calculations"""
+class MiniSun(unittest.TestCase):
+    """Test mini sun calculations"""
 
 
     def setUp(self):
@@ -41,7 +41,7 @@ class APCBodyTests(unittest.TestCase):
                                              a_longitude=coords.angle(-122, 4, 56))
 
 
-    def test_minisun_2015_01_01T1200(self):
+    def test_2015_01_01T1200(self):
         """Test mini sun 2015-01-01T12:00:00-08
 
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
@@ -61,7 +61,7 @@ class APCBodyTests(unittest.TestCase):
         self.assertAlmostEqual(29.52550042910097, utils.get_altitude(sun_hz).value, self.places)
 
 
-    def test_minisun_2015_04_29T1200(self):
+    def test_2015_04_29T1200(self):
         """Test mini sun 2015-04-29T12:00:00-07
 
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
@@ -83,28 +83,90 @@ class APCBodyTests(unittest.TestCase):
         # TODO: way out
 
 
-    def test_minimoon_2015_04_29T2200(self):
+    def test_sextant_2015_05_01(self):
+        """Test against sextant measurement
+
+        The sun angle is measured with a sextant using a swimming pool
+        as an artificial horizon.
+
+        Calm morning, no wind, clear image.
+
+        Sextant reading 66:46/2 = 33:23         (33.3833333333)  degrees altitude
+        SunPosition             = 32:36:24.6968 (32.6068602091)  degrees altitude
+        APC mini sun            = -3:55:13.4557 (-3.92040435387) degrees altitude TODO way out!
+
+        Star Walk               = 32:49:24 degrees altitude, 95:55:24 degrees azimuth
+        TODO taken from 37:27N, -122:11, adjust to 404 MLC
+        """
+
+        a_datetime = coords.datetime('2015-05-01T09:05:00-07')
+
+        sun = APCBodies.SunPosition(a_datetime, self.mlc404)
+
+        # TODO way out from Star Walk
+        self.assertAlmostEqual(56.3810698513805, utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(-3.9202205930785112, utils.get_altitude(sun).value, delta=2)
+
+
+class MiniMoon(unittest.TestCase):
+    """Test mini moon calculations"""
+
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 12
+
+        self.mlc404 = utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                             a_longitude=coords.angle(-122, 4, 56))
+
+
+    def test_2015_04_29T2200(self):
         """Test mini moon
 
-        verify with:
-            star walk
-            http://www.dailymoonposition.com/default.aspx
-            sextant reading
+        The sun angle is measured with a sextant using a swimming pool
+        as an artificial horizon.
+
+        A light wind blurred the reflected image
+
+        Sextant reading 105:51.4 (105.85666)/2 = 52.9283333333 degrees altitude
+        APC mini moon                          = 55.3244811435 degrees altitude
+        Star Walk                              = 52:53:10 degrees altitude, 172:15:43 degrees azimuth
+        http://www.dailymoonposition.com       = 52 altitude, 186 azimuth
         """
 
         a_datetime = coords.datetime('2015-04-29T22:00:00-07')
 
         moon_hz = APCBodies.MoonPosition(a_datetime, self.mlc404)
 
-        # Star Walk: 172:15:43
-        # dailymoonposition: 186
         self.assertAlmostEqual(182.38480914363294, utils.get_azimuth(moon_hz).value, self.places)
-
-        # Star Walk: 52:53:10
-        # dailymoonposition: 52
-        sextant_reading = utils.parse_angle_arg('105:51.4') # 52.928333333333335
-
         self.assertAlmostEqual(55.32447196217382, utils.get_altitude(moon_hz).value, self.places)
+
+
+    def test_2015_04_30T1830(self):
+        """Test mini moon
+
+        The moon angle is measured with a sextant using a swimming pool
+        as an artificial horizon.
+
+        Too bright to see the moon in the reflection. Estimated
+        location looking location between chimneys on surrounding roofs.
+
+        Sextant reading 40:04.1 (40.068)/2     = 20.034 degrees altitude
+        Compass reading 91 magnetic
+        APC mini moon                          = 23.17296504771049 degrees altitude
+        Star Walk                              = 17:14:46 degrees altitude, 107:19:08 degrees azimuth
+        http://www.dailymoonposition.com       = 16 degrees altitude, 121 degrees azimuth
+
+        """
+
+        a_datetime = coords.datetime('2015-04-30T18:30:00-07')
+
+        moon_hz = APCBodies.MoonPosition(a_datetime, self.mlc404)
+
+        self.assertAlmostEqual(109.72031148537829, utils.get_azimuth(moon_hz).value, self.places)
+        self.assertAlmostEqual(23.17296504771049, utils.get_altitude(moon_hz).value, self.places)
+
 
 
 if __name__ == '__main__':

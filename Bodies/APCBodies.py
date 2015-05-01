@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 
-""" Transforms from Astronomy on the Personal Computer (APC)
+"""Transforms from Astronomy on the Personal Computer (APC)
     by Montenbruck and Pfleger
+
+This does not give good results for minisun when compared to
+SunPosition or Star Walk or sextant readings.
 
 to run:
 
-TODO $ ./pylaunch.sh APCBodies.py -v -- 37:24 -122:04:57 2015-03-21T12:57:00-08
-
+    ./pylaunch.sh APCBodies.py -v -- 37:24 -122:04:57 2015-03-21T12:57:00-08
 
 to validate:
 
     http://www.esrl.noaa.gov/gmd/grad/solcalc/
 
-to test: ./pylaunch.sh test_APCBodies.py
+to test:
+
+    ./pylaunch.sh test_APCBodies.py
 
 """
 

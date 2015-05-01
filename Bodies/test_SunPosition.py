@@ -64,9 +64,15 @@ class SunPositionsTests(unittest.TestCase):
 
         A light wind blurred the reflected image, sextant calibration rough
 
-        Sextant reading 70:10 => 35:05 (35.0833333333) degrees altitude (/=2)
+        Sextant reading 70:10/2 = 35:05         (35.0833333333) degrees altitude
+        SunPosition             = 34:14:17.1205 (34.2380890297) degrees altitude
+        APC mini sun            = 71:24:47.9738 (71.41332606)   degrees altitude TODO way out!
 
-        Note time zone.
+        Star Walk               = 34:18:36 degrees altitude, 243:18:47 degrees azimuth 
+        TODO taken from 37:27N, -122:11 adjust, to 404 MLC
+
+
+        Note: PDT
 
         TODO improve precision, but problem largely in sextant user
         """
@@ -87,13 +93,16 @@ class SunPositionsTests(unittest.TestCase):
         The sun angle is measured with a sextant using a swimming pool
         as an artificial horizon.
 
-        A light wind blurred the reflected image, sextant calibration rough
+        A light wind blurred the reflected image
 
-        Sextant reading 44:32 => 22:15:60 (22.2666666667) degrees altitude (/=2)
+        Sextant reading 44:32/2 = 22:15:60      (22.2666666667) degrees altitude
+        SunPosition             = 21:51:14.4322 (21.8540089561) degrees altitude
+        APC mini sun            = 70:57:2.90548 (70.9508070789) degrees altitude TODO way out!
 
-        Note time zone.
+        Star Walk               = 22:22:12 degrees altitude, 267:44:43 degrees azimuth
+        TODO taken from 37:27N, -122:11 adjust, to 404 MLC
 
-        TODO improve precision, but problem largely in sextant user
+        Note: PDT
         """
 
         a_datetime = coords.datetime('2015-04-20T17:52:00-07')
@@ -105,6 +114,40 @@ class SunPositionsTests(unittest.TestCase):
         sextant_alt = coords.angle(utils.parse_angle_arg('44:32').value/2)
         self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun).value, delta=1)
 
+
+    def test_sextant_2015_05_01(self):
+        """Test against sextant measurement
+
+        The sun angle is measured with a sextant using a swimming pool
+        as an artificial horizon.
+
+        Calm morning, no wind, clear image.
+
+        Sextant reading 66:46/2 = 33:23         (33.3833333333)  degrees altitude
+        SunPosition             = 32:36:24.6968 (32.6068602091)  degrees altitude
+        APC mini sun            = -3:55:13.4557 (-3.92040435387) degrees altitude TODO way out!
+
+        Star Walk               = 32:49:24 degrees altitude, 95:55:24 degrees azimuth
+        TODO taken from 37:27N, -122:11, adjust to 404 MLC
+        """
+
+        a_datetime = coords.datetime('2015-05-01T09:05:00-07')
+
+        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
+
+        self.assertAlmostEqual(95.95981144985676, utils.get_azimuth(sun).value, self.places)
+
+        sextant_alt = coords.angle(utils.parse_angle_arg('66:46').value/2)
+        self.assertAlmostEqual(sextant_alt.value, utils.get_altitude(sun).value, delta=2)
+
+
+class EquationOfTimeTests(unittest.TestCase):
+    """Test Equatoin of Time calculations"""
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 12
 
     def test_EoT_2015_01_01T12_00(self):
         """Test Equation of time 2015-01-01T12:00:00
