@@ -80,18 +80,21 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): in degrees from RA/dec.
+    an_object (coords.spherical): the RA and Dec or ecliptic longitude
+    and latitude as a spherical coordinate where theta is the
+    complement of latitude and longitude is measured positive east in
+    degrees.
 
     an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a spherical
-    coordinate (unit radius), e.g. SF CA is 34 latitude, -122 longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
 
-    a_local_datetime (ISO8601 string): the local date, time and
-    timezone of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
     is_verbose (bool): verbose mode.
 
-    Returns: coords.spherical in the transformed coordinates.
+    Returns (coords.spherical): the object in the transformed coordinates.
     """
 
     if not isinstance(an_object, coords.spherical):
@@ -144,18 +147,21 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): in degrees from RA/dec.
+    an_object (coords.spherical): the RA and Dec or ecliptic longitude
+    and latitude as a spherical coordinate where theta is the
+    complement of latitude and longitude is measured positive east in
+    degrees.
 
     an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a spherical
-    coordinate (unit radius), e.g. SF CA is 34 latitude, -122 longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
 
-    a_local_datetime (ISO8601 string): the local date, time and
-    timezone of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
     is_verbose (bool): verbose mode.
 
-    Returns: coords.spherical in the transformed coordinates.
+    Returns (coords.spherical): the object in the transformed coordinates.
     """
 
     if not isinstance(an_object, coords.spherical):

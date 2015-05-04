@@ -41,9 +41,11 @@ def MiniSun(a_datetime):
 
     from APC p. 39
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
-    Returns the position of the sun in ecliptic coordinates (coords.spherical)
+    Returns (coords.spherical): the position of the sun in ecliptic
+    coordinates (ecliptic latitude and ecliptic longitude)
+
     """
 
     T = utils.JulianCentury(a_datetime)
@@ -69,12 +71,13 @@ def SunPosition(an_observer, a_datetime):
     Args:
 
     an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a spherical
-    coordinate (unit radius), e.g. SF CA is 34 latitude, -122 longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
-    Returns the position (coords.spherical) in horizon coordinates.
+    Returns (coords.spherical): the position in horizon coordinates.
     """
 
     sun_ec = MiniSun(a_datetime)
@@ -89,9 +92,9 @@ def MiniMoon(a_datetime):
 
     from APC pp. 38-39
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
-    Returns the position of the sun in ecliptic coordinates (coords.spherical)
+    Returns (coords.spherical): the position of the sun in ecliptic coordinates
     """
 
     T = utils.JulianCentury(a_datetime)
@@ -132,12 +135,13 @@ def MoonPosition(an_observer, a_datetime):
     """Calculates the Moon's position relative to the observer
 
     an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a spherical
-    coordinate (unit radius), e.g. SF CA is 34 latitude, -122 longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
-    Returns the position (coords.spherical) in horizon coordinates.
+    Returns (coords.spherical): the position  in horizon coordinates.
     """
 
     moon_ec = MiniMoon(a_datetime)
@@ -148,18 +152,33 @@ def MoonPosition(an_observer, a_datetime):
 
 
 
-def RisingAndSettingTimes(an_observer, a_datetime):
+def RiseAndSetTimes(an_object, an_observer, a_datetime):
     """Calculates the rising and setting times
 
     APC p. 46
 
     Ignores refraction and parallax
 
+    an_object (coords.spherical): in degrees from RA/dec.
+
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
+
+    a_datetime (coords.datetime): The time of the observation.
+
     Returns siderial time
     """
 
 
+    hour_angle = coords.angle()
 
+
+
+
+
+    return hour_angle
 
 
 

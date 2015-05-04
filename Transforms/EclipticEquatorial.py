@@ -52,7 +52,10 @@ obe.append(coords.angle(0, 0, 0.00181))
 
 
 def eps(a_datetime):
-    """Calculates the obliquity of the ecliptic given the datetime"""
+    """Calculates the obliquity of the ecliptic given the datetime
+
+    a_datetime (coords.datetime): The time of the observation.
+    """
     T = utils.JulianCentury(a_datetime)
     the_eps = 0
     for i in xrange(len(obe)):
@@ -65,11 +68,14 @@ def _xform(an_object, a_datetime, a_direction, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): in RA, dec. to azimuth and altitude.
+    an_object (coords.spherical): the RA and Dec or ecliptic longitude
+    and latitude as a spherical coordinate where theta is the
+    complement of latitude and longitude is measured positive east in
+    degrees.
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
-    a_direction: +1 to equatorial, -1 to ecliptic
+    a_direction (int): +1 to equatorial, -1 to ecliptic
 
     is_verbose(bool): verbose mode. TODO use?
 
@@ -94,9 +100,12 @@ def toEcliptic(an_object, a_datetime, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): in RA, dec. to azimuth and altitude.
+    an_object (coords.spherical): the RA and Dec or ecliptic longitude
+    and latitude as a spherical coordinate where theta is the
+    complement of latitude and longitude is measured positive east in
+    degrees.
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
     is_verbose(bool): verbose mode.
 
@@ -110,9 +119,12 @@ def toEquatorial(an_object, a_datetime, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): in RA, dec. to azimuth and altitude.
+    an_object (coords.spherical): the RA and Dec or ecliptic longitude
+    and latitude as a spherical coordinate where theta is the
+    complement of latitude and longitude is measured positive east in
+    degrees.
 
-    a_datetime (ISO8601 string): date and time of the observation.
+    a_datetime (coords.datetime): The time of the observation.
 
     is_verbose(bool): verbose mode.
 

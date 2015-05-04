@@ -87,9 +87,9 @@ def SolarLongitude(a_datetime):
 
     Args:
 
-    a_datetime: The time of the observation (coords.datetime).
+    a_datetime (coords.datetime): The time of the observation.
 
-    Returns: the sun's longitude and distance in AU
+    Returns (float, float): A tuple of the sun's longitude and distance in AU
     """
 
     n = a_datetime.toJulianDate() - a_datetime.J2000
@@ -116,11 +116,14 @@ def SunPosition(a_datetime, an_observer):
 
     Args:
 
-    a_datetime: The time of the observation (coords.datetime).
+    a_datetime (coords.datetime): The time of the observation.
 
-    an_observer: The observers location (coords.spherical).
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
 
-    Returns: the position of the sun (coords.spherical).
+    Returns (coords.spherical): the position of the sun in horizon coordinates.
     """
 
     ecliptic_longitude, R = SolarLongitude(a_datetime)
@@ -141,9 +144,9 @@ def EquationOfTime(a_datetime):
 
     Args:
 
-    a_datetime: The time of the observation (coords.datetime).
+    a_datetime (coords.datetime): The time of the observation.
 
-    Returns: equation of time as a coords angle in degrees. *60 for minutes.
+    Returns (coords.angle): equation of time as an angle in degrees. *60 for minutes.
     """
 
     noon = coords.datetime()

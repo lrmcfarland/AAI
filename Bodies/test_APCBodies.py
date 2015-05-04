@@ -108,6 +108,30 @@ class MiniSun(unittest.TestCase):
         self.assertAlmostEqual(-3.9202205930785112, utils.get_altitude(sun).value, delta=2)
 
 
+
+
+
+    def test_RiseAndSet(self):
+        """Rise and Set
+
+        TODO move to own class?
+        """
+
+        a_datetime = coords.datetime('2015-05-01T09:05:00-07')
+
+        sun_ec = APCBodies.MiniSun(a_datetime)
+        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+
+
+        foo = APCBodies.RiseAndSetTimes(sun_eq, self.mlc404, a_datetime)
+
+
+        print 'rise and set', foo # TODO
+
+
+
+
+
 class MiniMoon(unittest.TestCase):
     """Test mini moon calculations"""
 
