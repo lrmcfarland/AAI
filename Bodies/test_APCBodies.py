@@ -117,7 +117,7 @@ class MiniSun(unittest.TestCase):
         TODO move to own class?
         """
 
-        a_datetime = coords.datetime('2015-05-01T09:05:00-07')
+        a_datetime = coords.datetime('2015-05-04T00:00:00-07')
 
         sun_ec = APCBodies.MiniSun(a_datetime)
         sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)

@@ -23,6 +23,7 @@ to test:
 import math
 import coords
 
+from Transforms import APCTransforms
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
 from Transforms import utils
@@ -171,10 +172,37 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
     Returns siderial time
     """
 
+    altitude = 0 # TODO configurable to astro, nav, civil et al.,
 
-    hour_angle = coords.angle()
+    # TODO error check for circumpolar situations
+
+    cos_hour_angle = (math.sin(altitude) - \
+                      math.sin(utils.get_latitude(an_observer).radians)*math.sin(utils.get_declination(an_object).radians)) \
+        / math.cos(utils.get_latitude(an_observer).radians)*math.cos(utils.get_declination(an_object).radians)
 
 
+    hour_angle = coords.angle(math.acos(cos_hour_angle))
+
+
+    print 'hour angle', hour_angle, 'for altitude', altitude
+
+    object_ra = utils.get_RA(an_object)
+
+    print 'RA', object_ra
+
+
+    gmst = APCTransforms.GMST(a_datetime)
+
+    print 'gmst', gmst
+
+
+    rise_time = gmst - object_ra - hour_angle
+
+    print 'rise time', rise_time
+
+    set_time = gmst - object_ra + hour_angle
+
+    print 'set time', set_time
 
 
 
