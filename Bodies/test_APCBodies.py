@@ -50,7 +50,7 @@ class MiniSun(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T12:00:00-08')
 
-        sun_hz = APCBodies.SunPosition(a_datetime, self.mlc404)
+        sun_hz = APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # noaa: 176.85
         # SunPosition: 176.93209352
@@ -70,7 +70,7 @@ class MiniSun(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-29T12:00:00-07')
 
-        sun_hz = APCBodies.SunPosition(a_datetime, self.mlc404)
+        sun_hz = APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # noaa: 143.1
         # SunPosition: 143.257198509
@@ -101,7 +101,7 @@ class MiniSun(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-05-01T09:05:00-07')
 
-        sun = APCBodies.SunPosition(a_datetime, self.mlc404)
+        sun = APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # TODO way out from Star Walk
         self.assertAlmostEqual(56.3810698513805, utils.get_azimuth(sun).value, self.places)
@@ -137,7 +137,7 @@ class MiniMoon(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-29T22:00:00-07')
 
-        moon_hz = APCBodies.MoonPosition(a_datetime, self.mlc404)
+        moon_hz = APCBodies.MoonPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(182.38480914363294, utils.get_azimuth(moon_hz).value, self.places)
         self.assertAlmostEqual(55.32447196217382, utils.get_altitude(moon_hz).value, self.places)
@@ -162,7 +162,7 @@ class MiniMoon(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-30T18:30:00-07')
 
-        moon_hz = APCBodies.MoonPosition(a_datetime, self.mlc404)
+        moon_hz = APCBodies.MoonPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(109.72031148537829, utils.get_azimuth(moon_hz).value, self.places)
         self.assertAlmostEqual(23.17296504771049, utils.get_altitude(moon_hz).value, self.places)

@@ -41,6 +41,8 @@ def MiniSun(a_datetime):
 
     from APC p. 39
 
+    a_datetime (ISO8601 string): date and time of the observation.
+
     Returns the position of the sun in ecliptic coordinates (coords.spherical)
     """
 
@@ -61,8 +63,16 @@ def MiniSun(a_datetime):
     return sun_ec
 
 
-def SunPosition(a_datetime, an_observer):
+def SunPosition(an_observer, a_datetime):
     """Calculates the Sun's relative to the observer
+
+    Args:
+
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime meridian) of an observer as a spherical
+    coordinate (unit radius), e.g. SF CA is 34 latitude, -122 longitude
+
+    a_datetime (ISO8601 string): date and time of the observation.
 
     Returns the position (coords.spherical) in horizon coordinates.
     """
@@ -78,6 +88,8 @@ def MiniMoon(a_datetime):
     """Calculates the moon's RA and declination for the given datetime.
 
     from APC pp. 38-39
+
+    a_datetime (ISO8601 string): date and time of the observation.
 
     Returns the position of the sun in ecliptic coordinates (coords.spherical)
     """
@@ -116,8 +128,14 @@ def MiniMoon(a_datetime):
     return moon_ec
 
 
-def MoonPosition(a_datetime, an_observer):
+def MoonPosition(an_observer, a_datetime):
     """Calculates the Moon's position relative to the observer
+
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime meridian) of an observer as a spherical
+    coordinate (unit radius), e.g. SF CA is 34 latitude, -122 longitude
+
+    a_datetime (ISO8601 string): date and time of the observation.
 
     Returns the position (coords.spherical) in horizon coordinates.
     """
@@ -127,6 +145,22 @@ def MoonPosition(a_datetime, an_observer):
     moon_hz = EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
 
     return moon_hz
+
+
+
+def RisingAndSettingTimes(an_observer, a_datetime):
+    """Calculates the rising and setting times
+
+    APC p. 46
+
+    Ignores refraction and parallax
+
+    Returns siderial time
+    """
+
+
+
+
 
 
 
