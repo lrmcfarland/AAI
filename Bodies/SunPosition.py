@@ -277,7 +277,7 @@ if __name__ == '__main__':
 
         # azimuth, altitude
 
-        print 'A datetime: ', a_datetime
+        print 'A datetime: ', a_datetime, ''.join(('(', str(a_datetime.toJulianDate()), ')'))
         print 'An observer:', an_observer
 
         ecliptic_longitude, R = SolarLongitude(a_datetime)
