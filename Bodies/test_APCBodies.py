@@ -23,6 +23,10 @@ import unittest
 import coords
 import APCBodies
 
+
+import SunPosition # TODO?
+
+
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
 from Transforms import utils
@@ -117,10 +121,21 @@ class MiniSun(unittest.TestCase):
         TODO move to own class?
         """
 
-        a_datetime = coords.datetime('2015-05-04T00:00:00-07')
+        a_datetime = coords.datetime('2015-05-08T00:00:00-07')
 
-        sun_ec = APCBodies.MiniSun(a_datetime)
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+
+        apc_sun_ec = APCBodies.MiniSun(a_datetime)
+        print 'apc sun ec', apc_sun_ec
+
+        ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+
+        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+        print 'sun ec', sun_ec
+
+
+        sun_eq = EclipticEquatorial.toEquatorial(apc_sun_ec, a_datetime)
+
+        print sun_eq
 
 
         foo = APCBodies.RiseAndSetTimes(sun_eq, self.mlc404, a_datetime)

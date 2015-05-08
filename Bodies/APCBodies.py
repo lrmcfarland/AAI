@@ -27,6 +27,7 @@ import coords
 from Transforms import APCTransforms
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
+from Transforms import GMST # TODO rm?
 from Transforms import utils
 
 
@@ -173,7 +174,7 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
     Returns siderial time
     """
 
-    altitude = 0 # TODO configurable to astro, nav, civil et al.,
+    altitude = 0 # TODO configurable to astronomical, nautical, civil et al.,
 
     # TODO error check for circumpolar situations
 
@@ -183,28 +184,33 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
 
 
     hour_angle = coords.angle(math.acos(cos_hour_angle))
-
-
     print 'hour angle', hour_angle, 'for altitude', altitude
 
     object_ra = utils.get_RA(an_object)
-
     print 'RA', object_ra
 
 
     gmst = APCTransforms.GMST(a_datetime)
+    print 'apc gmst', gmst
 
-    print 'gmst', gmst
+    rise_time = gmst - object_ra + hour_angle
+    print 'gmst rise time', rise_time
+
+    set_time = object_ra + hour_angle - gmst
+    print 'gmst set time', set_time
 
 
-    rise_time = gmst - object_ra - hour_angle
+    gmst = GMST.USNO_C163.GMST(a_datetime)
+    print 'usno gmst', gmst
 
-    print 'rise time', rise_time
+    lstm = GMST.USNO_C163.LSTM(an_object, a_datetime)
+    print 'usno lstm', lstm
 
-    set_time = gmst - object_ra + hour_angle
+    rise_time = lstm - object_ra + hour_angle
+    print 'lstm rise time', rise_time
 
-    print 'set time', set_time
-
+    set_time = object_ra + hour_angle - lstm
+    print 'lstm set time', set_time
 
 
     return hour_angle
