@@ -203,8 +203,8 @@ class USNO_C163_Tests(unittest.TestCase):
         an_eqeq = a_gast - a_gmst
 
         an_observer = coords.spherical(1, coords.latitude(37, 23, 24), coords.angle(-122, 4, 48))
-        a_lstm = self.xforms.LSTM(a_datetime, an_observer)
-        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+        a_lstm = self.xforms.LSTM(an_observer, a_datetime)
+        a_lsta = self.xforms.LSTA(an_observer, a_datetime)
 
         self.assertEqual('03:21:46.443', str(a_gmst)) # Actual: 3 21 46.4412
         self.assertEqual('03:21:46.7422', str(a_gast)) # Actual: 3 21 46.7386
@@ -223,8 +223,8 @@ class USNO_C163_Tests(unittest.TestCase):
         an_eqeq = a_gast - a_gmst
 
         an_observer = coords.spherical(1, coords.latitude(37, 23, 24), coords.angle(-122, 4, 48))
-        a_lstm = self.xforms.LSTM(a_datetime, an_observer)
-        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+        a_lstm = self.xforms.LSTM(an_observer, a_datetime)
+        a_lsta = self.xforms.LSTA(an_observer, a_datetime)
 
         self.assertEqual('14:42:37.9854', str(a_gmst)) # Actual: 14 42 37.9836
         self.assertEqual('14:42:38.2855', str(a_gast)) # Actual: 14 42 38.2828
@@ -243,8 +243,8 @@ class USNO_C163_Tests(unittest.TestCase):
         an_eqeq = a_gast - a_gmst
 
         an_observer = coords.spherical(1, coords.latitude(37, 23, 24), coords.angle(-122, 4, 48))
-        a_lstm = self.xforms.LSTM(a_datetime, an_observer)
-        a_lsta = self.xforms.LSTA(a_datetime, an_observer)
+        a_lstm = self.xforms.LSTM(an_observer, a_datetime)
+        a_lsta = self.xforms.LSTA(an_observer, a_datetime)
 
         self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
         self.assertEqual('20:43:37.4247', str(a_gast)) # Actual: 20 43 37.4227

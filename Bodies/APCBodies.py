@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-"""Transforms from Astronomy on the Personal Computer (APC)
-    by Montenbruck and Pfleger
+"""Sun and moon position calculations
 
-This does not give good results for minisun when compared to
-SunPosition or Star Walk or sextant readings.
+from Astronomy on the Personal Computer (APC) by Montenbruck and Pfleger
+
+TODO: minisun and minimoon do not give as good results when compared
+to SunPosition or Star Walk or sextant readings.
 
 to run:
 

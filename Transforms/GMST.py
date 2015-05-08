@@ -50,9 +50,11 @@ class USNO_C163(object):
 
         Args:
 
-        a_datetime: local date and time of the observation.
+        a_datetime (coords.datetime): The time of the observation.
 
-        Returns a tuple of the Julian Date and its previous midnight
+        Returns (float, float): a tuple of the Julian Date and its
+        previous midnight
+
         """
 
         JD = a_datetime.toJulianDate()
@@ -75,9 +77,9 @@ class USNO_C163(object):
 
         Args:
 
-        a_datetime: local date and time of the observation.
+        a_datetime (coords.datetime): The time of the observation.
 
-        Returns GMST as an angle in hours
+        Returns (coords.angle): GMST as an angle in hours
         """
 
         JD, JDo = cls.JulianDate0(a_datetime)
@@ -103,9 +105,9 @@ class USNO_C163(object):
 
         Args:
 
-        a_datetime: local date and time of the observation.
+        a_datetime (coords.datetime): The time of the observation.
 
-        Returns GMST as an angle in hours
+        Returns (coords.angle): GMST as an angle in hours
         """
 
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
@@ -137,9 +139,9 @@ class USNO_C163(object):
 
         Args:
 
-        a_datetime: local date and time of the observation.
+        a_datetime (coords.datetime): The time of the observation.
 
-        Returns GMST as an angle in hours
+        Returns (coords.angle): GMST as an angle in hours
         """
 
         D = a_datetime.toJulianDate() - cls.J2000.toJulianDate()
@@ -179,18 +181,19 @@ class USNO_C163(object):
 
 
     @classmethod
-    def LSTM(cls, a_datetime, an_observer):
+    def LSTM(cls, an_observer, a_datetime):
         """Local sidereal time, mean
 
         Args:
 
-        a_datetime: local date and time of the observation.
+        an_observer (coords.spherical): the latitude and longitude
+        (positive east of the prime meridian) of an observer as a
+        spherical coordinate where theta is the complement of latitude and
+        longitude is measured positive east in degrees.
 
-        an_observer: the latitude (90 - theta) and longitude (phi,
-                     positive east of the prime meridian) of an
-                     observer as a spherical coordinate (unit radius)
+        a_datetime (coords.datetime): The time of the observation.
 
-        Returns LSTM as an angle in hours
+        Returns (coords.angle): LMST as an angle in hours
         """
 
         gmst = cls.GMST(a_datetime)
@@ -200,18 +203,19 @@ class USNO_C163(object):
 
 
     @classmethod
-    def LSTA(cls, a_datetime, an_observer):
+    def LSTA(cls, an_observer, a_datetime):
         """Local sidereal time, apparent
 
         Args:
 
-        a_datetime: local date and time of the observation.
+        an_observer (coords.spherical): the latitude and longitude
+        (positive east of the prime meridian) of an observer as a
+        spherical coordinate where theta is the complement of latitude and
+        longitude is measured positive east in degrees.
 
-        an_observer: the latitude (90 - theta) and longitude (phi,
-                     positive east of the prime meridian) of an
-                     observer as a spherical coordinate (unit radius)
+        a_datetime (coords.datetime): The time of the observation.
 
-        Returns LSTA as an angle in hours
+        Returns (coords.angle): LSTA as an angle in hours
         """
 
         gast = cls.GAST(a_datetime)

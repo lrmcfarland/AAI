@@ -111,17 +111,17 @@ def SolarLongitude(a_datetime):
     return ecliptic_longitude, R
 
 
-def SunPosition(a_datetime, an_observer):
+def SunPosition(an_observer, a_datetime):
     """Calculate the location of the sun relaive to an observer
 
     Args:
-
-    a_datetime (coords.datetime): The time of the observation.
 
     an_observer (coords.spherical): the latitude and longitude
     (positive east of the prime meridian) of an observer as a
     spherical coordinate where theta is the complement of latitude and
     longitude is measured positive east in degrees.
+
+    a_datetime (coords.datetime): The time of the observation.
 
     Returns (coords.spherical): the position of the sun in horizon coordinates.
     """

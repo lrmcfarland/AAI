@@ -48,7 +48,7 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-03-21T12:57:00-08')
 
-        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
+        sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(196.74093494548637, utils.get_azimuth(sun).value, self.places)
         self.assertAlmostEqual(51.50253975117711, utils.get_altitude(sun).value, self.places)
@@ -77,7 +77,7 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-03-27T16:24:00-07')
 
-        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
+        sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(243.07115892922118, utils.get_azimuth(sun).value, self.places)
 
@@ -105,7 +105,7 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-20T17:52:00-07')
 
-        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
+        sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(267.90829781482097, utils.get_azimuth(sun).value, self.places)
 
@@ -131,7 +131,7 @@ class SunPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-05-01T09:05:00-07')
 
-        sun = SunPosition.SunPosition(a_datetime, self.mlc404)
+        sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(95.95981144985676, utils.get_azimuth(sun).value, self.places)
 
