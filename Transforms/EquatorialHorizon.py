@@ -92,7 +92,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     a_datetime (coords.datetime): The time of the observation.
 
-    is_verbose (bool): verbose mode.
+    is_verbose(bool): print partial calculations to stdout for debugging.
 
     Returns (coords.spherical): the object in the transformed coordinates.
     """
@@ -159,7 +159,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     a_datetime (coords.datetime): The time of the observation.
 
-    is_verbose (bool): verbose mode.
+    is_verbose(bool): print partial calculations to stdout for debugging.
 
     Returns (coords.spherical): the object in the transformed coordinates.
     """

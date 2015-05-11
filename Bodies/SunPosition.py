@@ -287,7 +287,9 @@ if __name__ == '__main__':
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
         print 'Sun in ecliptic coordinates:\n\t', sun_ec
 
+
         sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        print 'Obliquity of the ecliptic:\n\t', EclipticEquatorial.eps(a_datetime)
         print 'Sun in equatorial coordinates:\n\t', sun_eq
 
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)

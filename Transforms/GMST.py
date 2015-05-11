@@ -239,8 +239,6 @@ if __name__ == '__main__':
 
     import optparse
 
-    defaults = {}
-
     usage = '%prog [options] <datetime> [<latitude> [<longitude>]]'
 
     parser = optparse.OptionParser(usage=usage)
@@ -274,5 +272,5 @@ if __name__ == '__main__':
     print 'Julian Date', a_datetime.toJulianDate()
     print 'GMST', USNO_C163.GMST(a_datetime)
     print 'GAST', USNO_C163.GAST(a_datetime)
-    print 'LSTM', USNO_C163.LSTM(a_datetime, an_observer)
-    print 'LSTA', USNO_C163.LSTA(a_datetime, an_observer)
+    print 'LSTM', USNO_C163.LSTM(an_observer, a_datetime)
+    print 'LSTA', USNO_C163.LSTA(an_observer, a_datetime)
