@@ -114,7 +114,7 @@ class MiniSun(unittest.TestCase):
 
 
 
-
+    @unittest.skip('TODO')
     def test_RiseAndSet(self):
         """Rise and Set
 
