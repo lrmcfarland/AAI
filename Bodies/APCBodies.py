@@ -52,7 +52,7 @@ def MiniSun(a_datetime):
     """
 
     T = utils.JulianCentury(a_datetime)
-    eps = coords.angle(EclipticEquatorial.eps(a_datetime))
+    eps = coords.angle(EclipticEquatorial.obliquity(a_datetime))
 
     M = 2*math.pi * Frac(0.993133 + 99.997361*T) # Mean anomaly
     L = 2*math.pi * Frac(0.7859453 * M/(2*math.pi)
@@ -161,6 +161,8 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
     APC p. 46
 
     Ignores refraction and parallax
+
+    Args:
 
     an_object (coords.spherical): in degrees from RA/dec.
 

@@ -30,7 +30,6 @@ Validation:
 import math
 import coords
 
-import GMST
 import utils
 
 
@@ -50,17 +49,16 @@ obe.append(coords.angle(0, 0, 0.00181))
 # TODO more terms, updated
 
 
-
-def eps(a_datetime):
+def obliquity(a_datetime):
     """Calculates the obliquity of the ecliptic given the datetime
 
     a_datetime (coords.datetime): The time of the observation.
     """
     T = utils.JulianCentury(a_datetime)
-    the_eps = 0
+    eps = 0
     for i in xrange(len(obe)):
-        the_eps += obe[i].value * math.pow(T, i)
-    return the_eps
+        eps += obe[i].value * math.pow(T, i)
+    return coords.angle(eps)
 
 
 def _xform(an_object, a_datetime, a_direction):
@@ -85,7 +83,7 @@ def _xform(an_object, a_datetime, a_direction):
 
     the_rotatee = coords.Cartesian(an_object)
 
-    the_rotated = equinox_axis.rotate(the_rotatee, coords.angle(a_direction * eps(a_datetime)))
+    the_rotated = equinox_axis.rotate(the_rotatee, coords.angle(a_direction) * obliquity(a_datetime))
 
     if isinstance(an_object, coords.spherical):
         return coords.spherical(the_rotated)

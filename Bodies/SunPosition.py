@@ -135,6 +135,33 @@ def SunPosition(an_observer, a_datetime):
     return sun_hz
 
 
+def RiseAndSet(an_object, an_observer, a_datetime):
+    """Rise and set times
+
+    Args:
+
+    an_object (coords.spherical): in degrees from RA/dec.
+
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
+
+    a_datetime (coords.datetime): The time of the observation.
+
+    Returns
+    """
+
+    altitude = 0 # TODO configurable to astronomical, nautical, civil et al.,
+
+    # TODO error check for circumpolar situations
+
+    print 'rise time called'
+
+
+    return None # TODO
+
+
 def EquationOfTime(a_datetime):
     """Calcuate the equation of time
 
@@ -289,7 +316,7 @@ if __name__ == '__main__':
 
 
         sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        print 'Obliquity of the ecliptic:\n\t', EclipticEquatorial.eps(a_datetime)
+        print 'Obliquity of the ecliptic:\n\t', EclipticEquatorial.obliquity(a_datetime)
         print 'Sun in equatorial coordinates:\n\t', sun_eq
 
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
@@ -302,3 +329,8 @@ if __name__ == '__main__':
         print ''.join(('(', str(utils.get_azimuth(sun_hz).value), ')'))
         print 'Altitude (degrees):', utils.get_altitude(sun_hz),
         print ''.join(('(', str(utils.get_altitude(sun_hz).value), ')'))
+
+
+        foo = RiseAndSet(sun_ec, an_observer, a_datetime)
+
+        print foo

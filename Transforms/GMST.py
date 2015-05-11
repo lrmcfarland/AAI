@@ -21,7 +21,9 @@ Validation:
 import math
 import coords
 
+from Transforms import EclipticEquatorial # for obliquity in __main__
 from Transforms import utils
+
 
 class Error(Exception):
     pass
@@ -154,6 +156,21 @@ class USNO_C163(object):
 
 
     @classmethod
+    def obliquity(cls, a_datetime):
+        """Calculates obliquity of the ecliptic
+
+        using USNO formula.
+
+        Returns (float): obliquity
+        """
+
+        JD, JDo = cls.JulianDate0(a_datetime)
+        D = JD - a_datetime.J2000
+
+        return coords.angle(23.4393 - 0.0000004*D)
+
+
+    @classmethod
     def GAST(cls, a_datetime):
         """Greenwich apparent sidereal time
 
@@ -170,7 +187,7 @@ class USNO_C163(object):
 
         JD, JDo = cls.JulianDate0(a_datetime)
         D = JD - a_datetime.J2000
-        eps = coords.angle(23.4393 - 0.0000004*D) # TODO JPL eps?
+        eps = cls.obliquity(a_datetime) # TODO JPL eps? EclipticEquatorial.eps(a_datetime)
         L = coords.angle(280.47 + 0.98565*D)
         omega = coords.angle(125.04 - 0.052954*D)
         eqeq = coords.angle((-0.000319*math.sin(omega.radians) - 0.000024*math.sin(2*L.radians))*math.cos(eps.radians))
@@ -270,6 +287,14 @@ if __name__ == '__main__':
     print an_observer
 
     print 'Julian Date', a_datetime.toJulianDate()
+
+    eps_jpl = EclipticEquatorial.obliquity(a_datetime)
+    print 'obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.value), ')'))
+
+    eps_usno = USNO_C163.obliquity(a_datetime)
+    print 'obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.value), ')'))
+
+
     print 'GMST', USNO_C163.GMST(a_datetime)
     print 'GAST', USNO_C163.GAST(a_datetime)
     print 'LSTM', USNO_C163.LSTM(an_observer, a_datetime)
