@@ -63,7 +63,7 @@ class USNO_C163(object):
         JDfloor = math.floor(JD)
 
         # Must end in 0.5
-        if JD - JDfloor > 0.5:
+        if JD - JDfloor >= 0.5:
             JDo = JDfloor + 0.5
         else:
             JDo = JDfloor - 0.5

@@ -79,8 +79,25 @@ class USNO_C163_Tests(unittest.TestCase):
         print 'LSTA', a_lsta, a_lsta.value
 
 
+    def test_JDo_0(self):
+        """Test JDo of 00:00 is the current time at midnight."""
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+        a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
+
+        a_JD_datetime = coords.datetime()
+        a_JD_datetime.fromJulianDate(a_JD)
+        a_JDo_datetime = coords.datetime()
+        a_JDo_datetime.fromJulianDate(a_JDo)
+
+        self.assertEqual(2457023.5, a_JD)
+        self.assertEqual('2015-01-01T00:00:00', str(a_JD_datetime))
+
+        self.assertEqual(2457023.5, a_JDo)
+        self.assertEqual('2015-01-01T00:00:00', str(a_JDo_datetime))
+
+
     def test_JDo_1(self):
-        """Test JDo is the previous midnight."""
+        """Test JDo of 01:00 is the previous midnight."""
         a_datetime = coords.datetime('2015-01-01T01:00:00')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
 
@@ -96,8 +113,8 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('2015-01-01T00:00:00', str(a_JDo_datetime))
 
 
-    def test_JDo_2(self):
-        """Test JDo is the previous midnight."""
+    def test_JDo_13(self):
+        """Test JDo of 13:00 is the previous midnight."""
 
         a_datetime = coords.datetime('2015-02-01T13:00:00')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
@@ -114,8 +131,8 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('2015-02-01T00:00:00', str(a_JDo_datetime))
 
 
-    def test_JDo_3(self):
-        """Test JDo is the previous midnight."""
+    def test_JDo_23(self):
+        """Test JDo of 23:00 is the previous midnight."""
 
         a_datetime = coords.datetime('2015-03-15T23:59:59')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
