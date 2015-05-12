@@ -154,9 +154,53 @@ def RiseAndSet(an_object, an_observer, a_datetime):
 
     altitude = 0 # TODO configurable to astronomical, nautical, civil et al.,
 
-    # TODO error check for circumpolar situations
 
-    print 'rise time called'
+    cos_hour_angle = (math.sin(altitude) - \
+                      math.sin(utils.get_latitude(an_observer).radians)*math.sin(utils.get_declination(an_object).radians)) \
+        / math.cos(utils.get_latitude(an_observer).radians)*math.cos(utils.get_declination(an_object).radians)
+
+    # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
+
+
+    hour_angle0 = coords.angle(math.acos(cos_hour_angle))
+    print 'hour angle0', hour_angle0, 'for altitude', altitude
+
+    JD, JDo = GMST.USNO_C163.JulianDate0(a_datetime)
+
+    midnight = coords.datetime()
+    midnight.fromJulianDate(JDo)
+
+    print midnight # TODO rm
+
+    gmst = GMST.USNO_C163.GMST(midnight)
+    print 'usno gmst', gmst
+
+    object_ra = coords.angle(utils.get_RA(an_object).value * 15) # in degrees
+    print 'RA', object_ra
+
+    observer_latitude = utils.get_latitude(an_observer)
+
+    m0 = coords.angle((object_ra - observer_latitude + gmst).value/360.0)
+
+    m0.normalize(0, 1)
+    print 'm0', m0.value # TODO rm
+
+    transit = gmst.value + 360.985647 * m0.value
+    print 'transit', transit, 'in hours', transit/15 - 8 # TODO time zone adjust
+
+
+    m1 = m0.value - hour_angle0.value/360
+    print 'm1', m1,  # TODO rm
+
+    sunrise = gmst.value + 360.985647 * m1
+    print 'sunrise', sunrise, 'in hours', sunrise/15 - 8 # TODO time zone adjust
+
+    m2 = m0.value + hour_angle0.value/360
+    print 'm2', m2 # TODO rm
+
+    sunset = gmst.value + 360.985647 * m2
+    print 'sunset', sunset
+
 
 
     return None # TODO
