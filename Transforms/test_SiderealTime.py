@@ -1,21 +1,21 @@
 """Unit tests for Right Ascension, declination, Ecliptic and Equatorial transforms
 
-to run:  ./pylaunch.sh test_GMST.py
-verbose: ./pylaunch.sh test_GMST.py -v
-filter:  ./pylaunch.sh test_GMST.py USNO_C163_Tests.test_GMST_J2000
-debug:   ./pylaunch.sh -m pdb test_GMST.py
+to run:  ./pylaunch.sh test_SiderealTime.py
+verbose: ./pylaunch.sh test_SiderealTime.py -v
+filter:  ./pylaunch.sh test_SiderealTime.py USNO_C163_Tests.test_GMST_J2000
+debug:   ./pylaunch.sh -m pdb test_SiderealTime.py
 
 (Pdb) n # until import
-> /Users/lrm/src/Astronomy/Transforms/test_GMST.py(24)<module>()
--> import GMST
+> /Users/lrm/src/Astronomy/Transforms/test_SiderealTime.py(24)<module>()
+-> import SiderealTime
 
-(Pdb) b GMST.USNO_C163.GMST
-Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/GMST.py:68
+(Pdb) b SiderealTime.USNO_C163.GMST
+Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/SiderealTime.py:68
 (Pdb) c
-s> /Users/lrm/src/Astronomy/Transforms/GMST.py(79)GMST()
+s> /Users/lrm/src/Astronomy/Transforms/SiderealTime.py(79)GMST()
 -> JD, JDo = cls.JulianDate0(a_datetime)
 (Pdb) n
-> /Users/lrm/src/Astronomy/Transforms/GMST.py(81)GMST()
+> /Users/lrm/src/Astronomy/Transforms/SiderealTime.py(81)GMST()
 -> D = JD - a_datetime.J2000
 (Pdb) p JD
 2457023.3618055554
@@ -28,7 +28,7 @@ import time
 import unittest
 
 import coords
-import GMST
+import SiderealTime
 
 class USNO_C163_Tests(unittest.TestCase):
 
@@ -49,7 +49,7 @@ class USNO_C163_Tests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5
-        self.xforms = GMST.USNO_C163()
+        self.xforms = SiderealTime.USNO_C163()
 
 
     @unittest.skip('hacking')

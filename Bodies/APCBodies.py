@@ -27,7 +27,7 @@ import coords
 from Transforms import APCTransforms
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
-from Transforms import GMST # TODO rm?
+from Transforms import SiderealTime # TODO rm?
 from Transforms import utils
 
 
@@ -202,10 +202,10 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
     print 'gmst set time', set_time
 
 
-    gmst = GMST.USNO_C163.GMST(a_datetime)
+    gmst = SiderealTime.USNO_C163.GMST(a_datetime)
     print 'usno gmst', gmst
 
-    lstm = GMST.USNO_C163.LSTM(an_object, a_datetime)
+    lstm = SiderealTime.USNO_C163.LSTM(an_object, a_datetime)
     print 'usno lstm', lstm
 
     rise_time = lstm - object_ra + hour_angle

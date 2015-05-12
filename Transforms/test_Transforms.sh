@@ -19,8 +19,8 @@ echo 'Equatorial Horizon'
 python test_EquatorialHorizon.py "$@"
 echo '- - - - - - '
 
-echo 'GMST'
-python test_GMST.py "$@"
+echo 'SiderealTime'
+python test_SiderealTime.py "$@"
 echo '- - - - - - '
 
 echo 'Utils'

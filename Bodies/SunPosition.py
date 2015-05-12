@@ -72,7 +72,7 @@ import coords
 
 from Transforms import EclipticEquatorial
 from Transforms import EquatorialHorizon
-from Transforms import GMST
+from Transforms import SiderealTime
 from Transforms import utils
 
 
@@ -165,14 +165,14 @@ def RiseAndSet(an_object, an_observer, a_datetime):
     hour_angle0 = coords.angle(math.acos(cos_hour_angle))
     print 'hour angle0', hour_angle0, 'for altitude', altitude
 
-    JD, JDo = GMST.USNO_C163.JulianDate0(a_datetime)
+    JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
 
     midnight = coords.datetime()
     midnight.fromJulianDate(JDo)
 
     print midnight # TODO rm
 
-    gmst = GMST.USNO_C163.GMST(midnight)
+    gmst = SiderealTime.USNO_C163.GMST(midnight)
     print 'usno gmst', gmst
 
     object_ra = coords.angle(utils.get_RA(an_object).value * 15) # in degrees
@@ -222,7 +222,7 @@ def EquationOfTime(a_datetime):
 
     noon = coords.datetime()
     noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
-    gast = GMST.USNO_C163.GAST(noon)
+    gast = SiderealTime.USNO_C163.GAST(noon)
 
     ecliptic_longitude, R = SolarLongitude(noon)
 
