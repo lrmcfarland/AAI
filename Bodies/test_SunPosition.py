@@ -147,7 +147,7 @@ class EquationOfTimeTests(unittest.TestCase):
 
         self.places = 12
 
-    def test_EoT_2015_01_01T12_00(self):
+    def test_2015_01_01T12_00(self):
         """Test Equation of time 2015-01-01T12:00:00
 
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
@@ -160,7 +160,7 @@ class EquationOfTimeTests(unittest.TestCase):
         self.assertAlmostEqual(-3.901196866415546, eot.value*60, self.places)
 
 
-    def test_EoT_2015_02_11T12_00(self):
+    def test_2015_02_11T12_00(self):
         """Test Equation of time 2015-02-11T12:00:00
 
         first local minimum of the year
@@ -175,7 +175,7 @@ class EquationOfTimeTests(unittest.TestCase):
         self.assertAlmostEqual(-14.212711856485711, eot.value*60, self.places)
 
 
-    def test_EoT_2015_03_20T12_00(self):
+    def test_2015_03_20T12_00(self):
         """Test Equation of time 2015-03-20T12:00:00
 
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
@@ -188,7 +188,7 @@ class EquationOfTimeTests(unittest.TestCase):
         self.assertAlmostEqual(-7.563513810377245, eot.value*60, self.places)
 
 
-    def test_EoT_2015_05_14T12_00(self):
+    def test_2015_05_14T12_00(self):
         """Test Equation of time 2015-05-14T12:00:00
 
         first local maximum of the year
@@ -203,7 +203,7 @@ class EquationOfTimeTests(unittest.TestCase):
         self.assertAlmostEqual(3.6588472510257475, eot.value*60, self.places)
 
 
-    def test_EoT_2015_07_26T12_00(self):
+    def test_2015_07_26T12_00(self):
         """Test Equation of time 2015-07-26T12:00:00
 
         second local minimum of the year
@@ -218,7 +218,7 @@ class EquationOfTimeTests(unittest.TestCase):
         self.assertAlmostEqual(-6.5354183954768175, eot.value*60, self.places)
 
 
-    def test_EoT_2015_11_03T12_00(self):
+    def test_2015_11_03T12_00(self):
         """Test Equation of time 2015-11-03T12:00:00
 
         second local maximum of the year
@@ -231,6 +231,33 @@ class EquationOfTimeTests(unittest.TestCase):
 
         # NOAA says 16.48 minutes
         self.assertAlmostEqual(16.43786410739647, eot.value*60, self.places)
+
+
+class RiseAndSetTests(unittest.TestCase):
+    """Test sun rise and set calculations"""
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 12
+
+    def test_Meeus_15a(self):
+        """Tests with Meeus 15.a data"""
+
+        a_datetime = coords.datetime('1988-03-20T00:00:00')
+
+        boston = utils.latlon2spherical(a_latitude = coords.angle(42.3333),
+                                        a_longitude = coords.angle(-71.0833))
+
+        venus = utils.radec2spherical(coords.angle(41.73129/15), coords.angle(18.44092))
+
+
+        rising, transit, setting = SunPosition.RiseAndSet(venus, boston, a_datetime)
+
+        self.assertEqual('1988-03-20T12:26:9.28415', str(rising))
+        self.assertEqual('1988-03-20T19:40:17.533', str(transit))
+        self.assertEqual('1988-03-20T02:54:25.782', str(setting))
+
 
 
 
