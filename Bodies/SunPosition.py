@@ -135,73 +135,6 @@ def SunPosition(an_observer, a_datetime):
     return sun_hz
 
 
-
-def RiseAndSet(an_object, an_observer, a_datetime):
-    """Rise and set times
-
-    # TODO more than just sun position, return local time, altitude
-    # configurable to astronomical, nautical, civil, star, sun, moon
-
-    Args:
-
-    an_object (coords.spherical): in degrees from RA/dec.
-
-    an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a
-    spherical coordinate where theta is the complement of latitude and
-    longitude is measured positive east in degrees.
-
-    a_datetime (coords.datetime): The time of the observation.
-
-    Returns (coords.datetime, coords.datetime, coords.datetime) of
-    rising, transit and setting in UT.
-
-    """
-
-
-    JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
-
-    midnight = coords.datetime()
-    midnight.fromJulianDate(JDo)
-
-    altitude = coords.angle(-0.5667) # TODO configurable to astronomical, nautical, civil et al.,
-
-    observer_latitude = utils.get_latitude(an_observer)
-    observer_longitude = utils.get_longitude(an_observer)
-
-    object_RA = coords.angle(utils.get_RA(an_object).value * 15) # in degrees
-    object_declination = utils.get_declination(an_object)
-
-    gmst = SiderealTime.USNO_C163.GMST(midnight)
-    gmst.value *= 15 # in degrees
-
-    cos_hour_angle = (math.sin(altitude.radians) \
-                      - math.sin(observer_latitude.radians) * math.sin(object_declination.radians)) \
-        / (math.cos(observer_latitude.radians) * math.cos(object_declination.radians))
-
-
-    # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
-
-    hour_angle = coords.angle()
-    hour_angle.radians = math.acos(cos_hour_angle)
-
-    # longitude sign convention is IAU, opposite Meeus
-    m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
-    m0.normalize(0, 1)
-
-    transit = midnight + m0.value
-
-    m1 = coords.angle(m0.value - hour_angle.value/360)
-    m1.normalize(0, 1)
-    rising = midnight + m1.value
-
-    m2 = coords.angle(m0.value + hour_angle.value/360)
-    m2.normalize(0, 1)
-    setting = midnight + m2.value
-
-    return rising, transit, setting
-
-
 def EquationOfTime(a_datetime):
     """Calcuate the equation of time
 
@@ -239,6 +172,87 @@ def EquationOfTime(a_datetime):
         raise Error('unsupported EoT case')
 
     return eot
+
+
+def SunRiseAndSet(an_observer, a_datetime):
+    """Sun rise and set times"""
+
+    ecliptic_longitude, R = SolarLongitude(a_datetime)
+    sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+
+    return RiseAndSet(sun_eq, an_observer, a_datetime, an_altitude=coords.angle(-0.8333))
+
+
+def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
+    """Rise and set times
+
+    # TODO more than just sun position, return local time, altitude
+    # configurable to astronomical, nautical, civil, star, sun, moon
+
+    Args:
+
+    an_object (coords.spherical): in degrees from RA/dec.
+
+    an_observer (coords.spherical): the latitude and longitude
+    (positive east of the prime meridian) of an observer as a
+    spherical coordinate where theta is the complement of latitude and
+    longitude is measured positive east in degrees.
+
+    a_datetime (coords.datetime): The time of the observation.
+
+    an_altitude (coords.angle): The geometric center of the body at
+    the time of rising (accounting for atmospheric refraction) where:
+        ho = -0.5667 for point sources like stars
+        ho = -0.8333 for the Sun.
+        ho = +0.125  for the the moon, approximately.
+
+
+    Returns (coords.datetime, coords.datetime, coords.datetime) of
+    rising, transit and setting in UT.
+
+    """
+
+
+    JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
+
+    midnight = coords.datetime()
+    midnight.fromJulianDate(JDo)
+
+    observer_latitude = utils.get_latitude(an_observer)
+    observer_longitude = utils.get_longitude(an_observer)
+
+    object_RA = coords.angle(utils.get_RA(an_object).value * 15) # in degrees
+    object_declination = utils.get_declination(an_object)
+
+    gmst = SiderealTime.USNO_C163.GMST(midnight)
+    gmst.value *= 15 # in degrees
+
+    cos_hour_angle = (math.sin(an_altitude.radians) \
+                      - math.sin(observer_latitude.radians) * math.sin(object_declination.radians)) \
+        / (math.cos(observer_latitude.radians) * math.cos(object_declination.radians))
+
+
+    # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
+
+    hour_angle = coords.angle()
+    hour_angle.radians = math.acos(cos_hour_angle)
+
+    # longitude sign convention is IAU, opposite Meeus
+    m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
+    m0.normalize(0, 1)
+
+    transit = midnight + m0.value
+
+    m1 = coords.angle(m0.value - hour_angle.value/360)
+    m1.normalize(0, 1)
+    rising = midnight + m1.value
+
+    m2 = coords.angle(m0.value + hour_angle.value/360)
+    m2.normalize(0, 1)
+    setting = midnight + m2.value
+
+    return rising, transit, setting
 
 
 # ================
@@ -371,7 +385,7 @@ if __name__ == '__main__':
         print ''.join(('(', str(utils.get_altitude(sun_hz).value), ')'))
 
 
-        rising, transit, setting = RiseAndSet(sun_eq, an_observer, a_datetime)
+        rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)
 
         print 'rising', rising
         print 'transit', transit

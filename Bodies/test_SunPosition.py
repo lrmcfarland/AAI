@@ -252,7 +252,7 @@ class RiseAndSetTests(unittest.TestCase):
         venus = utils.radec2spherical(coords.angle(41.73129/15), coords.angle(18.44092))
 
 
-        rising, transit, setting = SunPosition.RiseAndSet(venus, boston, a_datetime)
+        rising, transit, setting = SunPosition.RiseAndSet(venus, boston, a_datetime, coords.angle(-0.5667))
 
         self.assertEqual('1988-03-20T12:26:9.28415', str(rising))
         self.assertEqual('1988-03-20T19:40:17.533', str(transit))
