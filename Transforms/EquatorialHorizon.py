@@ -103,7 +103,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone()) # hours
+    gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
 
     local_hour_angle = coords.angle(gast.value*15 + an_observer.phi.value - an_object.phi.value)
     local_hour_angle.normalize(0, 360)
@@ -196,7 +196,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     local_hour_angle = coords.angle(coords.angle().rad2deg(math.atan2(nom, den)))
     local_hour_angle.normalize(0, 360)
 
-    gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone()) # hours
+    gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
 
     object_longitude = coords.angle(15.0*gast.value + an_observer.phi.value - local_hour_angle.value )
     object_longitude.normalize(0, 360)

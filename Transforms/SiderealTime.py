@@ -93,7 +93,7 @@ class USNO_C163(object):
 
         gmst = 6.697374558 + 0.06570982441908*Do + 1.00273790935*H + 0.000026*T*T
 
-        gmst_hours = coords.angle(gmst - a_datetime.timezone())
+        gmst_hours = coords.angle(gmst - a_datetime.timezone)
         gmst_hours.normalize(0, 24)
 
         return gmst_hours
