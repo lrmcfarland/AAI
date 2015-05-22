@@ -2,27 +2,27 @@
 
 . ./setenv.sh
 
-echo '============='
+echo '==='
 echo 'APC'
-echo '============='
+echo '==='
 python test_APCTransforms.py "$@"
 
-echo '============'
-echo 'Sun Position'
-echo '============'
-
+echo '==================='
 echo 'Ecliptic Equatorial'
+echo '==================='
 python test_EclipticEquatorial.py "$@"
-echo '- - - - - - '
 
+echo '=================='
 echo 'Equatorial Horizon'
+echo '=================='
 python test_EquatorialHorizon.py "$@"
-echo '- - - - - - '
 
+echo '============'
 echo 'SiderealTime'
+echo '============'
 python test_SiderealTime.py "$@"
-echo '- - - - - - '
 
+echo '====='
 echo 'Utils'
+echo '====='
 python test_utils.py "$@"
-echo '- - - - - - '
