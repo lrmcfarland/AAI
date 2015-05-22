@@ -234,7 +234,7 @@ class EquationOfTimeTests(unittest.TestCase):
 
 
 class RiseAndSetTests(unittest.TestCase):
-    """Test sun rise and set calculations"""
+    """Test rise and set calculations"""
 
     def setUp(self):
         """Set up test parameters."""
@@ -256,7 +256,76 @@ class RiseAndSetTests(unittest.TestCase):
 
         self.assertEqual('1988-03-20T12:26:9.28415', str(rising))
         self.assertEqual('1988-03-20T19:40:17.533', str(transit))
-        self.assertEqual('1988-03-20T02:54:25.782', str(setting))
+        self.assertEqual('1988-03-21T02:54:25.782', str(setting))
+
+
+
+class SunRiseAndSetTests(unittest.TestCase):
+    """Test sunrise and set calculations"""
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 12
+
+    def test_timezone_p1(self):
+        """Tests timezone +1"""
+
+        an_observer = utils.latlon2spherical(a_latitude = coords.angle(45),
+                                             a_longitude = coords.angle(15))
+
+        a_datetime = coords.datetime('2015-05-22T12:00:00+01')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
+
+        self.assertEqual('2015-05-22T04:26:4.97519+01', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:58:46.9625+01', str(transit)) # NOAA 11:56:39
+        self.assertEqual('2015-05-22T19:31:28.9499+01', str(setting)) # NOAA 19:30
+
+
+    def test_timezone_n1(self):
+        """Tests timezone -1"""
+
+        an_observer = utils.latlon2spherical(a_latitude = coords.angle(45),
+                                             a_longitude = coords.angle(-15))
+
+        a_datetime = coords.datetime('2015-05-22T12:00:00-01')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
+
+        self.assertEqual('2015-05-22T04:25:49.8101-01', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:58:26.8797-01', str(transit)) # NOAA 11:56:39
+        self.assertEqual('2015-05-22T19:31:3.94917-01', str(setting)) # NOAA 19:30
+
+
+    def test_timezone_p6(self):
+        """Tests timezone +6"""
+
+        an_observer = utils.latlon2spherical(a_latitude = coords.angle(45),
+                                             a_longitude = coords.angle(90))
+
+        a_datetime = coords.datetime('2015-05-22T12:00:00+06')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
+
+        self.assertEqual('2015-05-22T04:26:42.9486+06', str(rising))  # NOAA 04:25
+        self.assertEqual('2015-05-22T11:59:37.1856+06', str(transit)) # NOAA 11:56:38
+        self.assertEqual('2015-05-22T19:32:31.4226+06', str(setting)) # NOAA 19:29
+
+
+    def test_timezone_n6(self):
+        """Tests timezone -6"""
+
+        an_observer = utils.latlon2spherical(a_latitude = coords.angle(45),
+                                             a_longitude = coords.angle(-90))
+
+        a_datetime = coords.datetime('2015-05-22T12:00:00-06')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
+
+        self.assertEqual('2015-05-22T04:25:11.9585-06', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:57:36.6885-06', str(transit)) # NOAA 11:56:40
+        self.assertEqual('2015-05-22T19:30:1.41858-06', str(setting)) # NOAA 19:30
 
 
 

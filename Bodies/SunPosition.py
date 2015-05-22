@@ -209,10 +209,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
 
     Returns (coords.datetime, coords.datetime, coords.datetime) of
-    rising, transit and setting in UT.
-
+    rising, transit and setting in local time.
     """
-
 
     JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
 
@@ -234,6 +232,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
 
     # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
+    # TODO error check for timezone and observer location?
+
 
     hour_angle = coords.angle()
     hour_angle.radians = math.acos(cos_hour_angle)
@@ -242,15 +242,18 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
     m0.normalize(0, 1)
 
-    transit = midnight + m0.value
+    transit = midnight + m0.value + a_datetime.timezone/12
+    transit.timezone = a_datetime.timezone # local time
 
     m1 = coords.angle(m0.value - hour_angle.value/360)
-    m1.normalize(0, 1)
-    rising = midnight + m1.value
+
+    rising = midnight + m1.value + a_datetime.timezone/12
+    rising.timezone = a_datetime.timezone # local time
 
     m2 = coords.angle(m0.value + hour_angle.value/360)
-    m2.normalize(0, 1)
-    setting = midnight + m2.value
+
+    setting = midnight + m2.value + a_datetime.timezone/12
+    setting.timezone = a_datetime.timezone # local time
 
     return rising, transit, setting
 
@@ -387,6 +390,6 @@ if __name__ == '__main__':
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)
 
-        print 'rising', rising
-        print 'transit', transit
-        print 'setting', setting
+        print 'rising :', rising
+        print 'transit:', transit
+        print 'setting:', setting
