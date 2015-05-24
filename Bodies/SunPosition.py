@@ -2,23 +2,19 @@
 
 """Calculates the position of the sun for the given datetime.
 
-http://en.wikipedia.org/wiki/Position_of_the_Sun
-
-
-to calculate:
-    http://www.nrel.gov/docs/fy08osti/34302.pdf
+Uses algorithms from:
+    Astronomical Algorithms 2ed, Jean Meeus 1998
+    http://en.wikipedia.org/wiki/Position_of_the_Sun
+    http://aa.usno.navy.mil/faq/docs/GAST.php
 
 to validate:
-
     http://www.esrl.noaa.gov/gmd/grad/solcalc/
 
 to run:
 
 $ ./pylaunch.sh SunPosition.py -v -- 37:24 -122:04:57 2015-03-21T12:57:00-08
 
-
 Note: use -- to end options and allow for negative coordinates.
-
 
 to plot:
 
@@ -186,6 +182,8 @@ def SunRiseAndSet(an_observer, a_datetime):
 
 def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     """Rise and set times
+
+    from Meeus, ch. 15
 
     # TODO more than just sun position, return local time, altitude
     # configurable to astronomical, nautical, civil, star, sun, moon
@@ -368,16 +366,19 @@ if __name__ == '__main__':
         print 'Ecliptic longitude:', ecliptic_longitude
         print 'Distance in AU:', R
 
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        print 'Sun in ecliptic coordinates:\n\t', sun_ec
+        print 'Obliquity of the ecliptic:', EclipticEquatorial.obliquity(a_datetime)
 
+        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+        print 'Sun in ecliptic coordinates:', sun_ec
 
         sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        print 'Obliquity of the ecliptic:\n\t', EclipticEquatorial.obliquity(a_datetime)
-        print 'Sun in equatorial coordinates:\n\t', sun_eq
+        print 'Sun in equatorial coordinates:', sun_eq
 
         sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-        print 'Sun in horizon coordinates:\n\t', sun_hz
+        print 'Sun in horizon coordinates:', sun_hz
+
+        sun_dec = coords.angle(90) - sun_eq.theta
+        print 'Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.value), ')'))
 
         eot = EquationOfTime(a_datetime)
         print 'Equation of time (minutes):', eot.value * 60
@@ -390,6 +391,6 @@ if __name__ == '__main__':
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)
 
-        print 'rising :', rising
-        print 'transit:', transit
-        print 'setting:', setting
+        print 'Rising :', rising
+        print 'Transit:', transit
+        print 'Setting:', setting
