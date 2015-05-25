@@ -247,25 +247,28 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
     # TODO error check for timezone and observer location?
 
-
     hour_angle = coords.angle()
     hour_angle.radians = math.acos(cos_hour_angle)
 
-    # longitude sign convention is IAU, opposite Meeus
+    # longitude sign convention is IAU, opposite Meeus p. 93
     m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
     m0.normalize(0, 1)
 
-    transit = midnight + m0.value + a_datetime.timezone/12
+    transit = coords.datetime()
+    transit.fromJulianDate(midnight.toJulianDate() + m0.value + a_datetime.timezone/12)
     transit.timezone = a_datetime.timezone # local time
+
 
     m1 = coords.angle(m0.value - hour_angle.value/360)
 
-    rising = midnight + m1.value + a_datetime.timezone/12
+    rising = coords.datetime()
+    rising.fromJulianDate(midnight.toJulianDate() + m1.value + a_datetime.timezone/12)
     rising.timezone = a_datetime.timezone # local time
 
     m2 = coords.angle(m0.value + hour_angle.value/360)
 
-    setting = midnight + m2.value + a_datetime.timezone/12
+    setting = coords.datetime()
+    setting.fromJulianDate(midnight.toJulianDate() + m2.value + a_datetime.timezone/12)
     setting.timezone = a_datetime.timezone # local time
 
     return rising, transit, setting
