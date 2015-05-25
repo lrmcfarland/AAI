@@ -244,6 +244,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
         / (math.cos(observer_latitude.radians) * math.cos(object_declination.radians))
 
 
+    print 'cos hour angle', cos_hour_angle # TODO rm
+
     # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
     # TODO error check for timezone and observer location?
 
@@ -251,12 +253,21 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     hour_angle = coords.angle()
     hour_angle.radians = math.acos(cos_hour_angle)
 
-    # longitude sign convention is IAU, opposite Meeus
+    # longitude sign convention is IAU, opposite Meeus p. 93
     m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
     m0.normalize(0, 1)
 
+    print 'got here 1', midnight, m0
+
+    # Segmentation fault: 11 for polaris SunPosition.RiseAndSet: midnight + m0.value # TODO rm
+
+    print 'got here 2' # TODO rm
+
     transit = midnight + m0.value + a_datetime.timezone/12
+    print 'got here 3' # TODO rm
+
     transit.timezone = a_datetime.timezone # local time
+
 
     m1 = coords.angle(m0.value - hour_angle.value/360)
 
