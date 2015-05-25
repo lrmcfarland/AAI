@@ -242,7 +242,6 @@ class RiseAndSetTests(unittest.TestCase):
         self.places = 12
 
 
-    @unittest.skip('WTF?')
     def test_Meeus_15a(self):
         """Tests with Meeus 15.a data"""
 
@@ -261,7 +260,7 @@ class RiseAndSetTests(unittest.TestCase):
         self.assertEqual('1988-03-21T02:54:25.782', str(setting))
 
 
-    @unittest.skip('WTF?')
+    @unittest.skip('TODO')
     def test_polaris(self):
         """Tests circumpolar exception"""
 
@@ -274,10 +273,7 @@ class RiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.RiseAndSet(polaris, mlc404, a_datetime, coords.angle(-0.5667))
 
-        self.assertEqual('1988-03-20T12:26:9.28415', str(rising))
-        self.assertEqual('1988-03-20T19:40:17.533', str(transit))
-        self.assertEqual('1988-03-21T02:54:25.782', str(setting))
-
+        # TODO assert something
 
 
 class SunRiseAndSetTests(unittest.TestCase):
@@ -288,7 +284,7 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         self.places = 12
 
-    @unittest.skip('WTF?')
+
     def test_timezone_p1(self):
         """Tests timezone +1"""
 
@@ -304,7 +300,6 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T19:31:28.9499+01', str(setting)) # NOAA 19:30
 
 
-    @unittest.skip('WTF?')
     def test_timezone_n1(self):
         """Tests timezone -1"""
 
@@ -320,7 +315,6 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T19:31:3.94917-01', str(setting)) # NOAA 19:30
 
 
-    @unittest.skip('WTF?')
     def test_timezone_p6(self):
         """Tests timezone +6"""
 
