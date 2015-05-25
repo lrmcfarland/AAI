@@ -80,15 +80,13 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): the RA and Dec or ecliptic longitude
-    and latitude as a spherical coordinate where theta is the
-    complement of latitude and longitude is measured positive east in
-    degrees.
+    an_object: the vector to transform in theta (90 - declination),
+               phi (RA * 15). See self.radec2spherical.
 
-    an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a
-    spherical coordinate where theta is the complement of latitude and
-    longitude is measured positive east in degrees.
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
 
     a_datetime (coords.datetime): The time of the observation.
 
@@ -147,15 +145,13 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     Args:
 
-    an_object (coords.spherical): the RA and Dec or ecliptic longitude
-    and latitude as a spherical coordinate where theta is the
-    complement of latitude and longitude is measured positive east in
-    degrees.
+    an_object: the vector to transform in theta (90 - declination),
+               phi (RA * 15). See self.radec2spherical.
 
-    an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a
-    spherical coordinate where theta is the complement of latitude and
-    longitude is measured positive east in degrees.
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
 
     a_datetime (coords.datetime): The time of the observation.
 

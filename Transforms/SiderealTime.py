@@ -203,14 +203,15 @@ class USNO_C163(object):
 
         Args:
 
-        an_observer (coords.spherical): the latitude and longitude
-        (positive east of the prime meridian) of an observer as a
-        spherical coordinate where theta is the complement of latitude and
-        longitude is measured positive east in degrees.
+        an_observer (coords.spherical): the latitude (in degrees) and
+        longitude of an observer as a spherical coordinate where theta
+        is the complement of latitude and longitude is measured
+        positive east. See utils.latlon2spherical.
 
         a_datetime (coords.datetime): The time of the observation.
 
         Returns (coords.angle): LMST as an angle in hours
+
         """
 
         gmst = cls.GMST(a_datetime)
@@ -225,14 +226,15 @@ class USNO_C163(object):
 
         Args:
 
-        an_observer (coords.spherical): the latitude and longitude
-        (positive east of the prime meridian) of an observer as a
-        spherical coordinate where theta is the complement of latitude and
-        longitude is measured positive east in degrees.
+        an_observer (coords.spherical): the latitude (in degrees) and
+        longitude of an observer as a spherical coordinate where theta
+        is the complement of latitude and longitude is measured
+        positive east. See utils.latlon2spherical.
 
         a_datetime (coords.datetime): The time of the observation.
 
         Returns (coords.angle): LSTA as an angle in hours
+
         """
 
         gast = cls.GAST(a_datetime)

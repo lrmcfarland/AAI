@@ -73,10 +73,10 @@ def SunPosition(an_observer, a_datetime):
 
     Args:
 
-    an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a
-    spherical coordinate where theta is the complement of latitude and
-    longitude is measured positive east in degrees.
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
 
     a_datetime (coords.datetime): The time of the observation.
 
@@ -137,10 +137,10 @@ def MiniMoon(a_datetime):
 def MoonPosition(an_observer, a_datetime):
     """Calculates the Moon's position relative to the observer
 
-    an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a
-    spherical coordinate where theta is the complement of latitude and
-    longitude is measured positive east in degrees.
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
 
     a_datetime (coords.datetime): The time of the observation.
 
@@ -164,12 +164,13 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
 
     Args:
 
-    an_object (coords.spherical): in degrees from RA/dec.
+    an_object: the vector to transform in theta (90 - declination),
+    phi (RA * 15). See utils.radec2spherical.
 
-    an_observer (coords.spherical): the latitude and longitude
-    (positive east of the prime meridian) of an observer as a
-    spherical coordinate where theta is the complement of latitude and
-    longitude is measured positive east in degrees.
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
 
     a_datetime (coords.datetime): The time of the observation.
 
