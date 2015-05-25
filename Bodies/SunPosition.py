@@ -202,6 +202,9 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     # TODO more than just sun position, return local time, altitude
     # configurable to astronomical, nautical, civil, star, sun, moon
 
+    # TODO error check for timezone and observer location?
+
+
     Args:
 
     an_object: the vector to transform in theta (90 - declination),
@@ -243,9 +246,11 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
                       - math.sin(observer_latitude.radians) * math.sin(object_declination.radians)) \
         / (math.cos(observer_latitude.radians) * math.cos(object_declination.radians))
 
+    if cos_hour_angle > 1:
+        raise Error('object is circumpolar from this observation point')
 
-    # TODO error check for circumpolar situations: cos_hour_angle not > -1 and < 1.
-    # TODO error check for timezone and observer location?
+    if cos_hour_angle < -1:
+        raise Error('object is below the horizon from this observation point')
 
     hour_angle = coords.angle()
     hour_angle.radians = math.acos(cos_hour_angle)
@@ -258,16 +263,13 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     transit.fromJulianDate(midnight.toJulianDate() + m0.value + a_datetime.timezone/12)
     transit.timezone = a_datetime.timezone # local time
 
-
-    m1 = coords.angle(m0.value - hour_angle.value/360)
-
     rising = coords.datetime()
+    m1 = coords.angle(m0.value - hour_angle.value/360)
     rising.fromJulianDate(midnight.toJulianDate() + m1.value + a_datetime.timezone/12)
     rising.timezone = a_datetime.timezone # local time
 
-    m2 = coords.angle(m0.value + hour_angle.value/360)
-
     setting = coords.datetime()
+    m2 = coords.angle(m0.value + hour_angle.value/360)
     setting.fromJulianDate(midnight.toJulianDate() + m2.value + a_datetime.timezone/12)
     setting.timezone = a_datetime.timezone # local time
 

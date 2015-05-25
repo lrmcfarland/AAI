@@ -260,9 +260,8 @@ class RiseAndSetTests(unittest.TestCase):
         self.assertEqual('1988-03-21T02:54:25.782', str(setting))
 
 
-    @unittest.skip('TODO')
-    def test_polaris(self):
-        """Tests circumpolar exception"""
+    def test_polaris_1(self):
+        """Tests circumpolar exception to high"""
 
         polaris = utils.radec2spherical(coords.angle(2, 31, 49.09), coords.angle(89, 15, 50.8))
 
@@ -271,9 +270,20 @@ class RiseAndSetTests(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-05-25T00:00:00-07')
 
-        rising, transit, setting = SunPosition.RiseAndSet(polaris, mlc404, a_datetime, coords.angle(-0.5667))
+        self.assertRaises(SunPosition.Error, SunPosition.RiseAndSet, polaris, mlc404, a_datetime, coords.angle(-0.5667))
 
-        # TODO assert something
+
+    def test_polaris_2(self):
+        """Tests circumpolar exception to low"""
+
+        antipolaris = utils.radec2spherical(coords.angle(2, 31, 49.09), coords.angle(-89, 15, 50.8))
+
+        mlc404 = utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                        a_longitude=coords.angle(-122, 4, 56))
+
+        a_datetime = coords.datetime('2015-05-25T00:00:00-07')
+
+        self.assertRaises(SunPosition.Error, SunPosition.RiseAndSet, antipolaris, mlc404, a_datetime, coords.angle(-0.5667))
 
 
 class SunRiseAndSetTests(unittest.TestCase):
