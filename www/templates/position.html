@@ -1,0 +1,78 @@
+<!doctype html>
+<title>Sun Position</title>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+<div class=page>
+
+  <h1>Sun Position</h1>
+
+  <table id="sunposition">
+
+    <tr>
+      <td colspan=3>Observer</td>
+    </tr>
+
+    <tr>
+      <td>Latitude</td><td> {{ a_latitude }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Longitude</td><td> {{ a_longitude }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Datetime</td><td> {{ a_datetime }} </td><td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <td colspan=3></td>
+    </tr>
+
+    <tr>
+      <td colspan=3>Sun</td>
+    </tr>
+
+    <tr>
+      <td>Ecliptic Longitude</td><td> {{ an_ecl_long }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Distance</td><td> {{ an_r }} </td><td>AU</td>
+    </tr>
+
+    <tr>
+      <td>Obliquity of the Ecliptic</td><td> {{ an_obliquity }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Solar declination</td><td> {{ a_dec }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Equation of Time</td><td> {{ an_eot }} </td><td>hours:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Rising</td><td> {{ a_rising }} </td><td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <td>Transit</td><td> {{ a_transit }} </td><td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <td>Setting</td><td> {{ a_setting }} </td><td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <td>Azimuth</td><td> {{ an_azimuth }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+    <tr>
+      <td>Altitude</td><td> {{ an_altitude }} </td><td>degrees:minutes:seconds</td>
+    </tr>
+
+  <table>
+
+</div>
