@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-"""The SunPosition web UI using flask
+"""The Astronomy Web UI using Flask
 
-To run: ./pylaunch.sh SunPosition.py
+To run: ./pylaunch.sh astronomy.py
 
 """
 
@@ -19,6 +19,13 @@ from Bodies import SunPosition
 
 
 app = flask.Flask(__name__)
+
+@app.route("/")
+def home():
+    """Application's home"""
+
+    return flask.render_template('home.html')
+
 
 @app.route("/observer")
 def observer():

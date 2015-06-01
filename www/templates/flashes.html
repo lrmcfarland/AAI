@@ -1,22 +1,16 @@
-<!doctype html>
+{% extends "layout.html" %}
+{% block body %}
 
-<title>Oops!</title>
-
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-
-<div class=page>
-
-  <h1>Flash Messages</h1>
+<h1>Flash Messages</h1>
 
 {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+{% if messages %}
+<ul class=flashes>
+  {% for message in messages %}
+  <li>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
 {% endwith %}
-{% block body %}{% endblock %}
 
-</div>
+{% endblock %}
