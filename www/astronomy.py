@@ -17,8 +17,35 @@ from Transforms import utils
 
 from Bodies import SunPosition
 
+# ---------------------
+# ----- utilities -----
+# ---------------------
 
-app = flask.Flask(__name__)
+def get_float(a_key):
+    """Get a floating point number from the request
+
+    default to 0 if blank.
+
+    float() raises a ValueError exception if the input string not a
+    float.
+    """
+    if flask.request.values.get(a_key) == '':
+        return 0
+    else:
+        return float(flask.request.values.get(a_key))
+
+
+def get_string(a_string):
+    """Returns the escaped string"""
+
+    return flask.escape(str(a_string))
+
+
+# ---------------
+# ----- app -----
+# ---------------
+
+app = flask.Flask(__name__) # must be before decorators
 
 @app.route("/")
 def home():
@@ -31,9 +58,6 @@ def home():
 def observer():
     """observer's location in space and time"""
 
-    print 'sun position session:', flask.session # TODO rm
-    print 'observer request:', flask.request # TODO rm
-
     flask.session['foo'] = 'bar' # TODO rm
 
     return flask.render_template('observer.html')
@@ -42,30 +66,25 @@ def observer():
 @app.route("/sun_position")
 def sun_position():
 
-    print 'sun position session:', flask.session # TODO rm
-    print 'sun position request:', flask.request # TODO rm
-
-    # TODO blank is a value error, get with default 0?
-
     try:
-	a_latitude = coords.angle(float(flask.request.values['lat_deg']),
-				  float(flask.request.values['lat_min']),
-				  float(flask.request.values['lat_sec']))
+        a_latitude = coords.angle(get_float('lat_deg'),
+                                  get_float('lat_min'),
+                                  get_float('lat_sec'))
 
 
-	a_longitude = coords.angle(float(flask.request.values['lon_deg']),
-				   float(flask.request.values['lon_min']),
-				   float(flask.request.values['lon_sec']))
+        a_longitude = coords.angle(get_float('lon_deg'),
+                                   get_float('lon_min'),
+                                   get_float('lon_sec'))
 
-	a_datetime = coords.datetime(float(flask.request.values['a_year']),
-				     float(flask.request.values['a_month']),
-				     float(flask.request.values['a_day']),
-				     float(flask.request.values['an_hour']),
-				     float(flask.request.values['a_minute']),
-				     float(flask.request.values['a_second']),
-				     float(flask.request.values['a_timezone']))
+        a_datetime = coords.datetime(get_float('a_year'),
+                                     get_float('a_month'),
+                                     get_float('a_day'),
+                                     get_float('an_hour'),
+                                     get_float('a_minute'),
+                                     get_float('a_second'),
+                                     get_float('a_timezone'))
 
-	an_observer = utils.latlon2spherical(a_latitude, a_longitude)
+        an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 
         ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
 
@@ -88,27 +107,26 @@ def sun_position():
 
     except (ValueError, coords.Error), err:
 
-	app.logger.error(err)
-	flask.flash(err)
-	return flask.render_template('flashes.html')
+        app.logger.error(err)
+        flask.flash(err)
+        return flask.render_template('flashes.html')
 
 
     return flask.render_template('position.html',
-				 a_latitude=flask.escape(str(a_latitude)),
-				 a_longitude=flask.escape(str(a_longitude)),
-				 an_observer=flask.escape(str(an_observer)),
-				 a_datetime=flask.escape(str(a_datetime)),
-                                 an_ecl_long=flask.escape(str(ecliptic_longitude)),
-                                 an_r=flask.escape(str(R)),
-                                 an_obliquity=flask.escape(str(obliquity)),
-                                 a_dec=flask.escape(str(sun_dec)),
-                                 an_eot=flask.escape(str(eot)),
-                                 an_altitude=flask.escape(str(alt_str)),
-                                 an_azimuth=flask.escape(str(az_str)),
-                                 a_rising=flask.escape(str(rising)),
-                                 a_transit=flask.escape(str(transit)),
-                                 a_setting=flask.escape(str(setting))
-                             )
+                                 a_latitude=get_string(a_latitude),
+                                 a_longitude=get_string(a_longitude),
+                                 an_observer=get_string(an_observer),
+                                 a_datetime=get_string(a_datetime),
+                                 an_ecl_long=get_string(ecliptic_longitude),
+                                 an_r=get_string(R),
+                                 an_obliquity=get_string(obliquity),
+                                 a_dec=get_string(sun_dec),
+                                 an_eot=get_string(eot),
+                                 an_altitude=get_string(alt_str),
+                                 an_azimuth=get_string(az_str),
+                                 a_rising=get_string(rising),
+                                 a_transit=get_string(transit),
+                                 a_setting=get_string(setting))
 
 # ================
 # ===== main =====
