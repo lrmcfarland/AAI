@@ -1,62 +1,60 @@
-{% extends "layout.html" %}
-{% block body %}
+{# Observer Location input template #}
 
-  <h1>Observer Location</h1>
+<h1>Observer Location</h1>
 
-  <form action="{{ url_for('sun_position') }}">
+<form action="{{ url_for('sun_position') }}"> {# TODO configurable action #}
 
-    <table id="observer">
+  <table id="observer">
 
-      <th>
-	<td>degrees</td><td>minutes</td><td>seconds</td>
-      </th>
+    <tr>
+      <th></th><th>degrees</th><th>minutes</th><th>seconds</th>
+    </tr>
 
-      <tr>
-	<td>Latitude:</td>
-	<td><input type=text name=lat_deg></td>
-	<td><input type=text name=lat_min></td>
-	<td><input type=text name=lat_sec></td>
-      </tr>
+    <tr>
+      <th>Latitude:</th>
+      <td><input type=text name=lat_deg></td>
+      <td><input type=text name=lat_min></td>
+      <td><input type=text name=lat_sec></td>
+    </tr>
 
-      <tr>
-	<td>Longitude:</td>
-	<td><input type=text name=lon_deg></td>
-	<td><input type=text name=lon_min></td>
-	<td><input type=text name=lon_sec></td>
-      </tr>
+    <tr>
+      <th>Longitude:</th>
+      <td><input type=text name=lon_deg></td>
+      <td><input type=text name=lon_min></td>
+      <td><input type=text name=lon_sec></td>
+    </tr>
 
-      <th>
-	<td>year</td><td>month</td><td>day</td>
-      </th>
+    <tr>
+      <th></th><th>year</th><th>month</th><th>day</th>
+    </tr>
 
-      <tr>
-	<td>Date:</td>
-	<td><input type=text name=a_year></td>
-	<td><input type=text name=a_month></td>
-	<td><input type=text name=a_day></td>
-      </tr>
+    <tr>
+      <th>Date:</th>
+      <td><input type=text name=a_year></td>
+      <td><input type=text name=a_month></td>
+      <td><input type=text name=a_day></td>
+    </tr>
 
-      <th>
-	<td>hour</td><td>minute</td><td>second</td>
-      </th>
+    <tr>
+      <th></th><th>hour</th><th>minute</th><th>seconds</th>
+    </tr>
 
-      <tr>
-	<td>Time:</td>
-	<td><input type=text name=an_hour></td>
-	<td><input type=text name=a_minute></td>
-	<td><input type=text name=a_second></td>
-      </tr>
+    <tr>
+      <th>Time:</th>
+      <td><input type=text name=an_hour></td>
+      <td><input type=text name=a_minute></td>
+      <td><input type=text name=a_second></td>
+    </tr>
 
-	<td>Timezone:</td>
-	<td><input type=text name=a_timezone></td>
-      </tr>
+    <tr>
+      <th>Timezone:</th>
+      <td><input type=text name=a_timezone></td>
+    </tr>
 
-      <tr>
-	<td><input type=submit value=Submit></td>
-      </tr>
+    <tr>
+      <td><input type=submit value=Submit></td>
+    </tr>
 
-    </table>
+  </table>
 
-  </form>
-
-{% endblock %}
+</form>

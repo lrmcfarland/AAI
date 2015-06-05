@@ -54,13 +54,13 @@ def home():
     return flask.render_template('home.html')
 
 
-@app.route("/observer")
+@app.route("/get_observer")
 def observer():
     """observer's location in space and time"""
 
     flask.session['foo'] = 'bar' # TODO rm
 
-    return flask.render_template('observer.html')
+    return flask.render_template('get_observer.html')
 
 
 @app.route("/sun_position")
@@ -112,7 +112,7 @@ def sun_position():
         return flask.render_template('flashes.html')
 
 
-    return flask.render_template('position.html',
+    return flask.render_template('sun_position.html',
                                  a_latitude=get_string(a_latitude),
                                  a_longitude=get_string(a_longitude),
                                  an_observer=get_string(an_observer),
