@@ -3,74 +3,81 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Sun Position</h1>
+<div>
+  <table id="observerlocation">
 
-<table id="sunposition">
+    <tr>
+      <td colspan=3><h2>Observer Location</h2></td>
+    </tr>
 
-  <tr>
-    <td colspan=3><h2>Observer Location</h2></td>
-  </tr>
+    <tr>
+      <td>Latitude</td><td> {{ a_latitude }} </td><td>deg:min:sec</td>
+    </tr>
 
-  <tr>
-    <td>Latitude</td><td> {{ a_latitude }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Longitude</td><td> {{ a_longitude }} </td><td>deg:min:sec</td>
+    </tr>
 
-  <tr>
-    <td>Longitude</td><td> {{ a_longitude }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Datetime</td><td> {{ a_datetime }} </td><td>ISO8601</td>
+    </tr>
 
-  <tr>
-    <td>Datetime</td><td> {{ a_datetime }} </td><td>ISO8601</td>
-  </tr>
+  </table>
 
-  <tr>
-    <td colspan=3></td>
-  </tr>
+</div>
 
-  <tr>
-    <td colspan=3><h2>Sun</h2></td>
-  </tr>
+<div>
+  <table id="sunposition">
 
-  <tr>
-    <td>Distance</td><td> {{ an_r }} </td><td>AU</td>
-  </tr>
+    <tr>
+      <td colspan=3></td>
+    </tr>
 
-  <tr>
-    <td>Obliquity of the Ecliptic</td><td> {{ an_obliquity }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td colspan=3><h2>Sun Position</h2></td>
+    </tr>
 
-  <tr>
-    <td>Ecliptic Longitude</td><td> {{ an_ecl_long }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Distance</td><td> {{ an_r }} </td><td>AU</td>
+    </tr>
 
-  <tr>
-    <td>Solar Declination</td><td> {{ a_dec }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Obliquity</td><td> {{ an_obliquity }} </td><td>deg:min:sec</td>
+    </tr>
 
-  <tr>
-    <td>Equation of Time</td><td> {{ an_eot }} </td><td>hours:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Solar Declination</td><td> {{ a_dec }} </td><td>deg:min:sec</td>
+    </tr>
 
-  <tr>
-    <td>Rising</td><td> {{ a_rising }} </td><td>ISO8601</td>
-  </tr>
+    <tr>
+      <td>Ecliptic Longitude</td><td> {{ an_ecl_long }} </td><td>deg:min:sec</td>
+    </tr>
 
-  <tr>
-    <td>Transit</td><td> {{ a_transit }} </td><td>ISO8601</td>
-  </tr>
+    <tr>
+      <td>Equation of Time</td><td> {{ an_eot }} </td><td>hours:min:sec</td>
+    </tr>
 
-  <tr>
-    <td>Setting</td><td> {{ a_setting }} </td><td>ISO8601</td>
-  </tr>
+    <tr>
+      <td>Rising</td><td> {{ a_rising }} </td><td>ISO8601</td>
+    </tr>
 
-  <tr>
-    <td>Azimuth</td><td> {{ an_azimuth }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Transit</td><td> {{ a_transit }} </td><td>ISO8601</td>
+    </tr>
 
-  <tr>
-    <td>Altitude</td><td> {{ an_altitude }} </td><td>degrees:minutes:seconds</td>
-  </tr>
+    <tr>
+      <td>Setting</td><td> {{ a_setting }} </td><td>ISO8601</td>
+    </tr>
 
-</table>
+    <tr>
+      <td>Azimuth</td><td> {{ an_azimuth }} </td><td>deg:min:sec (deg)</td>
+    </tr>
+
+    <tr>
+      <td>Altitude</td><td> {{ an_altitude }} </td><td>deg:min:sec (deg)</td>
+    </tr>
+
+  </table>
+</div>
 
 {% endblock %}
