@@ -335,7 +335,7 @@ if __name__ == '__main__':
 
             current_datetime.fromJulianDate(a_datetime.toJulianDate() + 0.01*d)
 
-            sun = SunPosition(current_datetime, an_observer)
+            sun = SunPosition(an_observer, current_datetime)
 
             print 0.01*d,
             print current_datetime,
@@ -354,7 +354,7 @@ if __name__ == '__main__':
 
             current_datetime += 1
 
-            sun = SunPosition(current_datetime, an_observer)
+            sun = SunPosition(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
             print eot.value*60 + 180, utils.get_altitude(sun).value
