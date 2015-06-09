@@ -26,17 +26,17 @@ Note: Series starts at midnight and 0 longitude to center noon w/o time zone.
 
 $ r
 
-> altitude03 <- read.table("altitude_2015.03.20.txt")
-> altitude06 <- read.table("altitude_2015.06.21.txt")
-> altitude09 <- read.table("altitude_2015.09.23.txt")
-> altitude12 <- read.table("altitude_2015.12.22.txt")
-> plot(altitude03$V1, altitude03$V3, type="l", xlab="time of day", ylab="altitude in degrees", ylim=c(-100, 100), col="light green")
-> lines(altitude06$V1, altitude06$V3, type="l", col="pink")
-> lines(altitude09$V1, altitude09$V3, type="l", col="orange")
-> lines(altitude12$V1, altitude12$V3, type="l", col="light blue")
+> spring <- read.table("./Talley/talleyz_place.spring.txt")
+> summer <- read.table("./Talley/talleyz_place.summer.txt")
+> fall <- read.table("./Talley/talleyz_place.fall.txt")
+> winter <- read.table("./Talley/talleyz_place.winter.txt")
+> plot(spring$V1, spring$V4, type="l", xlab="time of day", ylab="altitude in degrees", ylim=c(-100, 100), col="light green")
+> lines(summer$V1, summer$V4, type="l", col="pink")
+> lines(fall$V1, fall$V4, type="l", col="orange")
+> lines(winter$V1, winter$V4, type="l", col="light blue")
 > legend("topright", c("vernal equinox", "summer solstice", "autumnal equinox", "winter solstice"), lwd=c(1,1), col=c("light green", "red", "orange", "light blue"))
-> title("Solar altitude at 37N latitude")
-> grid()
+> title("Solar altitude")
+
 
 
 Analemma:
@@ -339,7 +339,7 @@ if __name__ == '__main__':
 
             print 0.01*d,
             print current_datetime,
-            # print utils.get_azimuth(sun),
+            print utils.get_azimuth(sun).value,
             print utils.get_altitude(sun).value
 
 
