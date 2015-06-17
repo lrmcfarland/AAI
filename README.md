@@ -9,6 +9,12 @@ It serves as a test bed for my
 [Coordinates](https://github.com/lrmcfarland/Coordinates)
 library by using it as a submodule.
 
+Results are validated with [NOAA's
+solcalc](http://www.esrl.noaa.gov/gmd/grad/solcalc/) and using my
+[Davis Mark 15
+sextant](http://www.landfallnavigation.com/-nd026.html?cmp=froogle&kw=-nd026&utm_source=-nd026&utm_medium=shopping%2Bengine&utm_campaign=froogle)
+with a swimming pool as an artificial horizon.
+Details are recorded in the [unit tests](https://github.com/lrmcfarland/Astronomy/blob/master/Bodies/test_SunPosition.py).
 
 It is a work in progress.
 
