@@ -54,12 +54,15 @@ def split_date(a_datepicker_string):
 def split_angle(an_angle_string):
     """Splits an angle string of deg:min:sec
 
-    TODO: validate string here?
+    TODO: validate string format here?
 
     Returns a list of deg, min, sec
     """
     val = flask.request.values.get(an_angle_string)
-    return val.split(':')
+    dms = val.split(':')
+    while len(dms) < 3:
+        dms.append('0')
+    return dms
 
 
 # ---------------
@@ -125,9 +128,11 @@ def sun_position():
 
         eot = SunPosition.EquationOfTime(a_datetime)
 
-        az_str = ''.join((str(utils.get_azimuth(sun_hz)), ' (', str(utils.get_azimuth(sun_hz).value), ')'))
+        az_str = ''.join((str(utils.get_azimuth(sun_hz)),
+                          ' (', str(utils.get_azimuth(sun_hz).value), ')'))
 
-        alt_str = ''.join((str(utils.get_altitude(sun_hz)), ' (', str(utils.get_altitude(sun_hz).value), ')'))
+        alt_str = ''.join((str(utils.get_altitude(sun_hz)),
+                           ' (', str(utils.get_altitude(sun_hz).value), ')'))
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
