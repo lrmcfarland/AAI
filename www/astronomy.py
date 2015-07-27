@@ -41,6 +41,27 @@ def get_string(a_string):
     return flask.escape(str(a_string))
 
 
+def split_date(a_datepicker_string):
+    """Splits the datepicker string
+
+    ASSUMES format ISO8601
+    Returns a list of year, month, day
+    """
+    val = flask.request.values.get(a_datepicker_string)
+    return val.split('-')
+
+
+def split_angle(an_angle_string):
+    """Splits an angle string of deg:min:sec
+
+    TODO: validate string here?
+
+    Returns a list of deg, min, sec
+    """
+    val = flask.request.values.get(an_angle_string)
+    return val.split(':')
+
+
 # ---------------
 # ----- app -----
 # ---------------
@@ -54,34 +75,40 @@ def home():
     return flask.render_template('home.html')
 
 
-@app.route("/get_observer")
+@app.route("/observer")
 def observer():
     """observer's location in space and time"""
 
-    flask.session['foo'] = 'bar' # TODO rm
+    flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
 
-    return flask.render_template('get_observer.html')
+    return flask.render_template('observer.html')
 
 
 @app.route("/sun_position")
 def sun_position():
 
     try:
-        a_latitude = coords.angle(get_float('lat_deg'),
-                                  get_float('lat_min'),
-                                  get_float('lat_sec'))
+
+        dms = split_angle('obs_latitude')
+        a_latitude = coords.angle(float(dms[0]),
+                                  float(dms[1]),
+                                  float(dms[2]))
 
 
-        a_longitude = coords.angle(get_float('lon_deg'),
-                                   get_float('lon_min'),
-                                   get_float('lon_sec'))
+        dms = split_angle('obs_longitude')
+        a_longitude = coords.angle(float(dms[0]),
+                                   float(dms[1]),
+                                   float(dms[2]))
 
-        a_datetime = coords.datetime(get_float('a_year'),
-                                     get_float('a_month'),
-                                     get_float('a_day'),
-                                     get_float('an_hour'),
-                                     get_float('a_minute'),
-                                     get_float('a_second'),
+
+        ymd = split_date('obs_date')
+        hms = split_angle('obs_time')
+        a_datetime = coords.datetime(float(ymd[0]),
+                                     float(ymd[1]),
+                                     float(ymd[2]),
+                                     float(hms[0]),
+                                     float(hms[1]),
+                                     float(hms[2]),
                                      get_float('a_timezone'))
 
         an_observer = utils.latlon2spherical(a_latitude, a_longitude)
