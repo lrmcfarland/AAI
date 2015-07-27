@@ -1,5 +1,19 @@
 {# Observer Location input template #}
 
+{% extends "base.html" %}
+
+{% block scripts %}
+  <script type="text/javascript">
+    $(function() {
+      $( "#observation_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+  </script>
+{% endblock %}
+
+{% block title %} Astronomical Algorithms Implemented {% endblock %}
+
+{% block content %}
+
 <h1>Observer Location</h1>
 
 <form action="{{ url_for('sun_position') }}"> {# TODO configurable action #}
@@ -7,48 +21,42 @@
   <table id="observer">
 
     <tr>
-      <th></th><th>degrees</th><th>minutes</th><th>seconds</th>
-    </tr>
-
-    <tr>
-      <th>Latitude:</th>
-      <td><input type=text name=lat_deg></td>
-      <td><input type=text name=lat_min></td>
-      <td><input type=text name=lat_sec></td>
-    </tr>
-
-    <tr>
-      <th>Longitude:</th>
-      <td><input type=text name=lon_deg></td>
-      <td><input type=text name=lon_min></td>
-      <td><input type=text name=lon_sec></td>
+      <th></th><th>year-mm-dd</th><th></th><th>hr:min:sec</th>
     </tr>
 
     <tr>
       <th>Date:</th>
-      <td><input type=text name=an_observation_date id="observation_date"></td>
-    </tr>
+      <td><input type=text name=obs_date id="observation_datepicker"></td>
 
-    <tr>
-      <th></th><th>hour</th><th>minute</th><th>seconds</th>
-    </tr>
-
-    <tr>
       <th>Time:</th>
-      <td><input type=text name=an_hour></td>
-      <td><input type=text name=a_minute></td>
-      <td><input type=text name=a_second></td>
+      <td><input type=text name=obs_time></td>
+
+      <th>Zone:</th>
+      <td><input type=text name=a_timezone style="width:5em"></td>
     </tr>
 
     <tr>
-      <th>Timezone:</th>
-      <td><input type=text name=a_timezone></td>
+      <th></th><th>deg:min:sec</th>
     </tr>
 
     <tr>
+      <th>Latitude:</th>
+      <td><input type=text name=obs_latitude></td>
+    </tr>
+
+    <tr>
+      <th>Longitude:</th>
+      <td><input type=text name=obs_longitude></td>
+    </tr>
+
+
+    <tr>
+      <td></td><td></td><td></td><td></td><td></td>
       <td><input type=submit value=Submit></td>
     </tr>
 
   </table>
 
 </form>
+
+{% endblock %}
