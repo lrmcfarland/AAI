@@ -41,6 +41,13 @@ def get_string(a_string):
     return flask.escape(str(a_string))
 
 
+def parse_date(a_datepicker_string):
+    """Returns a tuple of date"""
+    val = flask.request.values.get(a_datepicker_string)
+    ymd = val.split('-') # ASSUMES format ISO8601
+    return ymd
+
+
 # ---------------
 # ----- app -----
 # ---------------
@@ -76,9 +83,11 @@ def sun_position():
                                    get_float('lon_min'),
                                    get_float('lon_sec'))
 
-        a_datetime = coords.datetime(get_float('a_year'),
-                                     get_float('a_month'),
-                                     get_float('a_day'),
+        ymd = parse_date('an_observation_date')
+
+        a_datetime = coords.datetime(float(ymd[0]),
+                                     float(ymd[1]),
+                                     float(ymd[2]),
                                      get_float('an_hour'),
                                      get_float('a_minute'),
                                      get_float('a_second'),

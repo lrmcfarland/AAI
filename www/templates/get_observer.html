@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+  <script type="text/javascript">
+    $(function() {
+      $( "#observation_date" ).datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+  </script>
+{% endblock %}
+
 {% block title %} Astronomical Algorithms Implemented {% endblock %}
 
 {% block content %}
