@@ -38,7 +38,7 @@ class Error(Exception):
 
 
 # x axis points to vernal equinox (the first point of Aries in this epoch)
-equinox_axis = coords.rotator(coords.Ux)
+equinox_axis = coords.rotator(coords.Cartesian.Ux)
 
 # obliquity of the ecliptic terms are from http://en.wikipedia.org/wiki/Axial_tilt
 obe = list()

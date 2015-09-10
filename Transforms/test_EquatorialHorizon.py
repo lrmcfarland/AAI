@@ -361,7 +361,7 @@ class EquatorialHorizonTests(unittest.TestCase):
         self.assertEqual(78.82965531052908, utils.get_latitude(castor_hz).value)
 
         # starwalk has 118:06:19, this is 116:03:33.4654
-        self.assertEqual(116.05929595036575, utils.get_longitude(castor_hz).value)
+        self.assertAlmostEqual(116.05929595036575, utils.get_longitude(castor_hz).value)
 
         castor_eq = EquatorialHorizon.toEquatorial(castor_hz, self.mlc404, a_datetime)
 

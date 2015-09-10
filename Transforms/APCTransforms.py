@@ -10,7 +10,7 @@ import math
 import coords
 
 
-horizon_axis = coords.rotator(coords.Uy)
+horizon_axis = coords.rotator(coords.Cartesian.Uy)
 
 
 def GMST(a_datetime):

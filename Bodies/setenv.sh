@@ -27,7 +27,7 @@ export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${CARTESIAN_LIBRARY_PATH}
 # ----- set python path -----
 # ---------------------------
 
-COORDS_PYTHON_ROOT=Coordinates/Python/Manual
+COORDS_PYTHON_ROOT=Coordinates/Python/Boost
 
 COORDS_SO=`find ${COORDS_ROOT}/${COORDS_PYTHON_ROOT} -name coords.so`
 
