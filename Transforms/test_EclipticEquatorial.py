@@ -46,7 +46,7 @@ class EclipticEquatorialTests(unittest.TestCase):
         """Test J2000 first point of Aries"""
 
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        an_object = coords.spherical(coords.Ux)
+        an_object = coords.spherical(coords.Cartesian.Ux)
 
         an_object_ec = EclipticEquatorial.toEcliptic(an_object, j2000)
         self.assertAlmostEqual(0, utils.get_latitude(an_object_ec).value, self.places)
