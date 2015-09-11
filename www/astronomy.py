@@ -106,11 +106,11 @@ def sun_position():
 
         ymd = split_date('obs_date')
         hms = split_angle('obs_time')
-        a_datetime = coords.datetime(float(ymd[0]),
-                                     float(ymd[1]),
-                                     float(ymd[2]),
-                                     float(hms[0]),
-                                     float(hms[1]),
+        a_datetime = coords.datetime(int(ymd[0]),
+                                     int(ymd[1]),
+                                     int(ymd[2]),
+                                     int(hms[0]),
+                                     int(hms[1]),
                                      float(hms[2]),
                                      get_float('a_timezone'))
 
@@ -137,7 +137,7 @@ def sun_position():
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
 
-    except (ValueError, coords.Error), err:
+    except (ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         flask.flash(err)
