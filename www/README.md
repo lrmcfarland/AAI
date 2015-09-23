@@ -1,12 +1,14 @@
 # SunPosition Web UI using Flask
 
-## [Flask](http://flask.pocoo.org)
+This is the initial Web UI for my astronomy tool kit.
 
+I use [Flask](http://flask.pocoo.org) to create the templates for the sun position
+calculation.
 
 
 ## To Install
 
-On older pythons with out pip installed:
+If it isn't already installed:
 
 ```
 sudo easy_install pip
@@ -18,7 +20,7 @@ then
 sudo pip install Flask
 ```
 
-## To Run
+## To Run from the command line
 
 ```
 $ ./pylaunch.sh SunPosition.py
@@ -32,21 +34,17 @@ $ ./pylaunch.sh SunPosition.py
 
 ## To Debug
 
-```
-if __name__ == "__main__":
-
-    app.debug = True # TODO Security HOLE!!!
-
-```
+Set app.debug = True, but remember to turn it off in production since
+it is a security issue.
 
 
-## Apache
+## To run in Apache
 
+On a CentOS system, you will need these packages:
 
-### Add Yum Packages
+### Yum Packages
 
 ```
-
 sudo yum update -y
 
 sudo yum groupinstall -y "Web Server"
@@ -68,28 +66,13 @@ sudo yum install emacs -y
 sudo yum install git -y
 
 sudo pip install flask
-
-
-Install Astronomy 
-
-
-sudo -s
-cd /var/www
-
-git clone https://github.com/lrmcfarland/Astronomy.git
-cd Astronomy/
-git submodule update --init --recursive
-cd Coordinates/
-./build.sh test
-
 ```
-
-this on the mod_wsgi branch at this time 2015sep21
-
 
 ### Configure Apache
 
-add to end of /etc/httpd/conf/httpd.conf
+To end of /etc/httpd/conf/httpd.conf, add these lines, with the
+location were you have checked out this repo, /var/www/Astronomy in
+this case.
 
 ```
 <VirtualHost *>
@@ -99,39 +82,59 @@ add to end of /etc/httpd/conf/httpd.conf
     WSGIScriptAlias / /var/www/Astronomy/www/astronomy.wsgi
 
     <Directory /var/www/Astronomy/www>
-        WSGIProcessGroup astronomy
-        WSGIApplicationGroup %{GLOBAL}
-        Order deny,allow
-        Allow from all
+	WSGIProcessGroup astronomy
+	WSGIApplicationGroup %{GLOBAL}
+	Order deny,allow
+	Allow from all
     </Directory>
 </VirtualHost>
 ```
 
+And one small hack for user apache to open a socket (see
+/etc/httpd/logs/error_log if this does not start).
 
-Start Service
+```
+sudo chmod -R 775 /var/log/httpd
+```
+
+TODO: right way to do this.
+
+### Install Astronomy
+
+Get the astronomy repo from github and follow the steps below.
+
+```
+sudo -s
+cd /var/www
+
+git clone https://github.com/lrmcfarland/Astronomy.git
+
+cd Astronomy/
+git submodule update --init --recursive
+
+cd Coordinates/
+./build.sh test
+
+cd ../Transforms
+./test_Transforms.sh
+
+cd ../Bodies
+./test_Bodies.sh
+
+```
+
+## Start Service
+
+Use the service commands to control
 
 ```
 sudo service httpd start
 sudo service httpd restart
 sudo service httpd stop
 ```
-look for errors in 
+look for errors in
 
 ```
 sudo cat /etc/httpd/logs/error_log
 
-[Tue Sep 22 04:20:37 2015] [error] [client 50.131.221.92] (13)Permission denied: mod_wsgi (pid=3302): Unable to connect to WSGI daemon process 'astronomy' on '/etc/httpd/logs/wsgi.3299.0.1.sock' after multiple attempts.
-
-
-sudo chmod -R 775 /var/log/httpd
 ```
-
-works!
-
-TODO too open? add www group?
-
-
-
-
-
-
