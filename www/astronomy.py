@@ -4,6 +4,7 @@
 
 To run: ./pylaunch.sh astronomy.py
 
+see README for running on apache with mod_wsgi
 """
 
 import flask
@@ -70,6 +71,12 @@ def split_angle(an_angle_string):
 # ---------------
 
 app = flask.Flask(__name__) # must be before decorators
+
+app.secret_key = 'seti2001' # TODO more random
+
+# when all else fails:  app.debug = True # TODO Security HOLE!!!
+
+
 
 @app.route("/")
 def home():
@@ -166,8 +173,7 @@ def sun_position():
 
 if __name__ == "__main__":
 
-    app.debug = True # TODO Security HOLE!!!
+    """Run stand alone in flask"""
 
-    app.secret_key = 'some key' # TODO more random
-
+    # TODO argparse host, port, log level
     app.run(host='0.0.0.0', port=5000)

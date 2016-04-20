@@ -7,13 +7,32 @@
 <h1>Astronomical Algorithms Implemented</h1>
 
 <p>
-Some text
+This is my implementation of various astronomical algorithms, mostly from
+<a href="http://www.willbell.com/math/mc1.htm">Astronomical
+Algorithms</a> by Jean Meeus, which is the source of most of the
+others I found on the web (although not all admit that).
+</p>
+
+<p>
+At the moment, it is mostly a proof of concept of a
+software <a href="https://en.wikipedia.org/wiki/Turducken">Turducken</a>.
+I started with my
+<a href="https://github.com/lrmcfarland/Coordinates">C++ Coordinates library</a>,
+<a href="https://github.com/lrmcfarland/Coordinates/tree/master/Python">stuffed in Python</a>
+which is used to <a href="https://github.com/lrmcfarland/Astronomy">implement astronomical
+algorithms</a>,
+poured into <a href="https://github.com/lrmcfarland/Astronomy/tree/master/www">Flask</a>,
+garnished with <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer.html">a JQuery datepicker</a>,
+and served by <a href="https://github.com/lrmcfarland/Astronomy/blob/mod_wsgi/www/astronomy.wsgi">mod_wsgi</a> in Apache.
+</p>
+
+<h2>Sun Position</h2>
+
+<p>
+Enter the observer location to start the sun position calculation:
 </p>
 
 <a href="{{ url_for('observer') }}">Observer</a>
 
-<p>
-Some more text
-</p>
 
 {% endblock %}
