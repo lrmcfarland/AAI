@@ -94,8 +94,47 @@ def observer():
     return flask.render_template('observer.html')
 
 
+@app.route("/observermap")
+def observer_map():
+    """observer's location in space and time"""
+
+    flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
+
+    return flask.render_template('observer_map.html')
+
+
+@app.route("/_get_sun_position")
+def get_sun_position():
+    """Get sun position
+
+    This uses AJAX to connect a button click event to do the
+    calculation and return the resut as a JSON object.
+    """
+
+    a_latitude = flask.request.args.get('latitude', 0, type=float)
+    a_longitude = flask.request.args.get('longitude', 0, type=float)
+
+    return flask.jsonify(result='latitude: %s, longitude: %s' % (a_latitude, a_longitude))
+
+
 @app.route("/sun_position")
 def sun_position():
+    """Get the sun position
+
+    This uses a html form to provide the input with the name to connect the
+
+        <input type=text name=obs_latitude>
+
+    via flask
+
+        my_latitude = flask.request.values.get('obs_latitude')
+
+
+    And returns a page of results:
+
+        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
+
+    """
 
     try:
 
