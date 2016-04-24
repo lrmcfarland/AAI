@@ -30,10 +30,10 @@ def get_float(a_key):
     float() raises a ValueError exception if the input string not a
     float.
     """
-    if flask.request.values.get(a_key) == '':
+    if a_key == '':
         return 0
     else:
-        return float(flask.request.values.get(a_key))
+        return float(a_key)
 
 
 def get_string(a_string):
@@ -48,8 +48,7 @@ def split_date(a_datepicker_string):
     ASSUMES format ISO8601
     Returns a list of year, month, day
     """
-    val = flask.request.values.get(a_datepicker_string)
-    return val.split('-')
+    return a_datepicker_string.split('-')
 
 
 def split_angle(an_angle_string):
@@ -59,8 +58,7 @@ def split_angle(an_angle_string):
 
     Returns a list of deg, min, sec
     """
-    val = flask.request.values.get(an_angle_string)
-    dms = val.split(':')
+    dms = an_angle_string.split(':')
     while len(dms) < 3:
         dms.append('0')
     return dms
@@ -85,22 +83,20 @@ def home():
     return flask.render_template('home.html')
 
 
-@app.route("/observer")
-def observer():
-    """observer's location in space and time"""
+@app.route("/observer_form")
+def observer_form():
+    """A form for submitting an observer's location in space and time"""
+
+    return flask.render_template('observer_form.html')
+
+
+@app.route("/observer_ajax")
+def observer_ajax():
+    """Use AJAX to send observer's location to the server"""
 
     flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
 
-    return flask.render_template('observer.html')
-
-
-@app.route("/observermap")
-def observer_map():
-    """observer's location in space and time"""
-
-    flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
-
-    return flask.render_template('observer_map.html')
+    return flask.render_template('observer_ajax.html')
 
 
 @app.route("/_get_sun_position")
@@ -109,12 +105,87 @@ def get_sun_position():
 
     This uses AJAX to connect a button click event to do the
     calculation and return the resut as a JSON object.
-    """
 
     a_latitude = flask.request.args.get('latitude', 0, type=float)
-    a_longitude = flask.request.args.get('longitude', 0, type=float)
 
-    return flask.jsonify(result='latitude: %s, longitude: %s' % (a_latitude, a_longitude))
+    """
+
+    a_latitude_str = flask.request.args.get('latitude')
+    a_longitude_str = flask.request.args.get('longitude')
+
+    a_date_str = flask.request.args.get('date')
+    a_time_str = flask.request.args.get('time')
+    a_timezone_str = flask.request.args.get('timezone')
+
+    rising, transit, setting, az_str, alt_str = calculate_sun_position(
+        a_latitude_str, a_longitude_str, a_date_str, a_time_str, a_timezone_str)
+
+    result = dict()
+
+    result['rising'] = rising
+    result['transit'] = transit
+    result['setting'] = setting
+    result['azimuth'] = az_str
+    result['altitude'] = alt_str
+
+    return flask.jsonify(**result)
+
+
+def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone):
+    """Calculate the sun position.
+
+    TODO reduce redundancy
+
+    Args are all strings
+
+    return rising, transit, setting, az_str, alt_str
+    """
+    dms = split_angle(a_latitude)
+    latitude = coords.angle(float(dms[0]),
+                            float(dms[1]),
+                            float(dms[2]))
+
+
+    dms = split_angle(a_longitude)
+    longitude = coords.angle(float(dms[0]),
+                             float(dms[1]),
+                             float(dms[2]))
+
+
+    ymd = split_date(a_date)
+    hms = split_angle(a_time)
+    a_datetime = coords.datetime(int(ymd[0]),
+                                 int(ymd[1]),
+                                 int(ymd[2]),
+                                 int(hms[0]),
+                                 int(hms[1]),
+                                 float(hms[2]),
+                                 get_float(a_timezone))
+
+    an_observer = utils.latlon2spherical(latitude, longitude)
+
+    ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+
+    obliquity = EclipticEquatorial.obliquity(a_datetime)
+
+    sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+
+    sun_dec = coords.angle(90) - sun_eq.theta
+
+    eot = SunPosition.EquationOfTime(a_datetime)
+
+    az_str = ''.join((str(utils.get_azimuth(sun_hz)),
+                      ' (', str(utils.get_azimuth(sun_hz).value), ')'))
+
+
+    alt_str = ''.join((str(utils.get_altitude(sun_hz)),
+                       ' (', str(utils.get_altitude(sun_hz).value), ')'))
+
+    rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
+
+    return get_string(rising), get_string(transit), get_string(setting), az_str, alt_str
 
 
 @app.route("/sun_position")
@@ -123,11 +194,11 @@ def sun_position():
 
     This uses a html form to provide the input with the name to connect the
 
-        <input type=text name=obs_latitude>
+        <input type=text name=of_latitude>
 
     via flask
 
-        my_latitude = flask.request.values.get('obs_latitude')
+        my_latitude = flask.request.values.get('of_latitude')
 
 
     And returns a page of results:
@@ -138,27 +209,27 @@ def sun_position():
 
     try:
 
-        dms = split_angle('obs_latitude')
+        dms = split_angle(flask.request.values.get('of_latitude'))
         a_latitude = coords.angle(float(dms[0]),
                                   float(dms[1]),
                                   float(dms[2]))
 
 
-        dms = split_angle('obs_longitude')
+        dms = split_angle(flask.request.values.get('of_longitude'))
         a_longitude = coords.angle(float(dms[0]),
                                    float(dms[1]),
                                    float(dms[2]))
 
 
-        ymd = split_date('obs_date')
-        hms = split_angle('obs_time')
+        ymd = split_date(flask.request.values.get('of_date'))
+        hms = split_angle(flask.request.values.get('of_time'))
         a_datetime = coords.datetime(int(ymd[0]),
                                      int(ymd[1]),
                                      int(ymd[2]),
                                      int(hms[0]),
                                      int(hms[1]),
                                      float(hms[2]),
-                                     get_float('a_timezone'))
+                                     get_float(flask.request.values.get('of_timezone')))
 
         an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 

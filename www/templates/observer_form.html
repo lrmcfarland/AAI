@@ -1,0 +1,171 @@
+{# Observer Location input template #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+  <script type="text/javascript">
+
+    {# TODO implicit ready function? #}
+    $(function() {
+
+      $( "#of_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+
+      {# TODO how is this unambiguous with other ajax set location button? #}
+      $("#set_location_button").click(function(e) { 
+	    astronomy.setLocation("of_latitude", "of_longitude", e);
+	});
+
+
+    });
+
+  </script>
+{% endblock %}
+
+{% block title %} Astronomical Algorithms Implemented {% endblock %}
+
+{% block content %}
+
+<h1>Flask Form Pattern</h1>
+
+
+<h2>Observer Location</h2>
+
+<br>
+
+<button id="set_location_button">set location</button> {# TODO too many actions to be in one form? #}
+
+<br>
+
+<form action="{{ url_for('sun_position') }}">
+
+  <table>
+
+    <tr>
+      <th></th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+    </tr>
+
+
+    <tr>
+
+      <th>
+	Observer
+      </th>
+
+      <td>
+	<input type=text id="of_latitude" name="of_latitude">
+      </td>
+
+      <td>
+	<input type=text id="of_longitude" name="of_longitude">
+      </td>
+
+      <td>deg:min:sec</td>
+
+    </tr>
+
+
+    <tr>
+      <th></th>
+      <th></th>
+    </tr>
+
+
+    <tr>
+      <th>Date</th>
+      <td>
+	<input type=text name=of_date id="of_datepicker">
+      </td>
+      <td>year-mm-dd</td>
+
+    </tr>
+
+    <tr>
+      <th>Time</th>
+      <td><input type=text name=of_time value="12:00"></td>
+      <td>hr:min:sec</td>
+
+    </tr>
+    <tr>
+      <th>Zone</th>
+      <td><input type=text name=of_timezone value="-8"></td>
+      <td>hr</td>
+    </tr>
+
+    <tr>
+      <td></td><td></td><td></td>
+      <td><input type=submit value=SunPosition></td>
+    </tr>
+
+  </table>
+
+</form>
+
+<hr>
+
+<p>
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_form.html">
+This
+</a>
+is an example from the
+<a href="http://flask.pocoo.org/docs/0.10/tutorial/templates/">flask tutorial</a>
+using html forms.
+</p>
+
+<p>
+Observer data are read from the input elements form on this page by
+name and sent to the sun_position url as the submit action of the form
+with this <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a> code
+</p>
+
+<pre>
+
+    &lt;form action="&#123;&#123; url_for('sun_position') &#125;&#125;"&gt;
+
+</pre>
+
+<p>
+In the sun_position url on the
+ <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
+side, the form data are accessed as key value pairs of strings
+</p>
+
+<pre>
+
+    val = flask.request.values.get('observer_latitude')
+
+</pre>
+
+<p>
+The input is converted to numbers and used to calculate the results. These are
+passed as keyword arguments to flask.render_template:
+</p>
+
+<pre>
+
+    return flask.render_template('sun_position.html',
+				 a_latitude=get_string(a_latitude),
+				 a_longitude=get_string(a_longitude),
+				 ...
+				 a_rising=get_string(rising),
+				 a_transit=get_string(transit),
+				 a_setting=get_string(setting))
+</pre>
+
+<p>
+Inside the template, these keyword arguments are accessable via Jinja2 macros
+</p>
+
+<pre>
+      &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; a_latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
+</pre>
+
+<p>
+And used this way to display the results on the
+
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position.html">sun position page</a>.
+</b>
+
+
+{% endblock %}
