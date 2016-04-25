@@ -14,25 +14,64 @@ others I found on the web (although not all admit that).
 </p>
 
 <p>
-At the moment, it is mostly a proof of concept of a
-software <a href="https://en.wikipedia.org/wiki/Turducken">Turducken</a>.
+I am using this as a test bed for exploring how to integrate C++, Python and JavaScript.
+
 I started with my
 <a href="https://github.com/lrmcfarland/Coordinates">C++ Coordinates library</a>,
-<a href="https://github.com/lrmcfarland/Coordinates/tree/master/Python">stuffed in Python</a>
-which is used to <a href="https://github.com/lrmcfarland/Astronomy">implement astronomical
-algorithms</a>,
-poured into <a href="https://github.com/lrmcfarland/Astronomy/tree/master/www">Flask</a>,
-garnished with <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer.html">a JQuery datepicker</a>,
-and served by <a href="https://github.com/lrmcfarland/Astronomy/blob/mod_wsgi/www/astronomy.wsgi">mod_wsgi</a> in Apache.
+<a href="https://github.com/lrmcfarland/Coordinates/tree/master/Python">and
+wrapped it in Python</a> which is used
+to <a href="https://github.com/lrmcfarland/Astronomy">implement
+astronomical algorithms</a>. I then
+used <a href="https://github.com/lrmcfarland/Astronomy/tree/master/www">Flask</a>,
+to mix python and html which is then served by
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.wsgi">mod_wsgi</a>
+in Apache.
 </p>
 
-<h2>Sun Position</h2>
+<br>
 
-<p>
-Enter the observer location to start the sun position calculation:
-</p>
+<table>
 
-<a href="{{ url_for('observer') }}">Observer</a>
+  <tr>
+
+    <th>
+      Pattern
+    </th>
+
+    <th>
+      Notes
+    </th>
+
+  </tr>
+
+  <tr>
+
+    <td>
+      <a href="{{ url_for('observer_form') }}">Observer Form</a>
+    </td>
+
+    <td>
+      This is an example of a html form submition.
+    </td>
+
+  </tr>
+
+
+  <tr>
+
+    <td>
+      <a href="{{ url_for('observer_ajax') }}">Observer AJAX</a>
+    </td>
+
+    <td>
+      This is an example of a JavaScript AJAX call and JSON response.
+    </td>
+
+  </tr>
+
+
+
+</table>
 
 
 {% endblock %}
