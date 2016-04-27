@@ -5,12 +5,10 @@
 {% block scripts %}
   <script type="text/javascript">
 
-    {# TODO implicit ready function? #}
     $(function() {
 
       $( "#of_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
 
-      {# TODO how is this unambiguous with other ajax set location button? #}
       $("#set_location_button").click(function(e) { 
 	    astronomy.setLocation("of_latitude", "of_longitude", e);
 	});
@@ -32,7 +30,7 @@
 
 <br>
 
-<button id="set_location_button">set location</button> {# TODO too many actions to be in one form? #}
+<button id="set_location_button">set location</button>
 
 <br>
 
@@ -45,7 +43,6 @@
       <th>Latitude</th>
       <th>Longitude</th>
     </tr>
-
 
     <tr>
 
@@ -67,8 +64,6 @@
 
 
     <tr>
-      <th></th>
-      <th></th>
     </tr>
 
 
@@ -132,9 +127,7 @@ side, the form data are accessed as key value pairs of strings
 </p>
 
 <pre>
-
-    val = flask.request.values.get('observer_latitude')
-
+        dms = split_angle(flask.request.values.get('of_latitude'))
 </pre>
 
 <p>
