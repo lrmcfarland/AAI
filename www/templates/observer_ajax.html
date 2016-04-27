@@ -10,18 +10,20 @@
 
     $(document).ready(function() {
 
-      $( "#_date" ).datepicker({ dateFormat: 'yy-mm-dd' });
+      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
 
       $("#set_location").click(function(e) {
         {# astronomy.js uses document.getElementById #}
-	astronomy.setLocation("_latitude", "_longitude", e);
+	astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
       });
+
 
       $("#set_time").click(function(e) {
         var now = new Date();
         var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
         $("#_time").val(time_str);
       });
+
 
       $("#get_sun_position").click(function(e) {
 
@@ -113,7 +115,7 @@
     </tr>
     <tr>
       <th>Zone</th>
-      <td><input type="text" name="timezone" value="-7"></td>
+      <td><input type="text" id="_timezone" name="timezone" value="-7"></td>
       <td>hr</td>
     </tr>
 
