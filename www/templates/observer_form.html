@@ -12,8 +12,13 @@
       $("#set_location").click(function(e) {
           {# astronomy.js uses document.getElementById #}
           astronomy.setLocation("_latitude", "_longitude", e);
-        });
+      });
 
+      $("#set_time").click(function(e) {
+        var now = new Date();
+        var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+        $("#_time").val(time_str);
+      });
 
     });
 
@@ -32,6 +37,7 @@
 <br>
 
 <button id="set_location">set location</button>
+<button id="set_time">set time</button>
 
 <br>
 
@@ -52,11 +58,11 @@
       </th>
 
       <td>
-        <input type=text id="_latitude" name="latitude">
+        <input type="text" id="_latitude" name="latitude">
       </td>
 
       <td>
-        <input type=text id="_longitude" name="longitude">
+        <input type="text" id="_longitude" name="longitude">
       </td>
 
       <td>deg:min:sec</td>
@@ -71,7 +77,7 @@
     <tr>
       <th>Date</th>
       <td>
-        <input type=text id="_date" name="date"> {# id needed for date picker, name for form #}
+        <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
 
@@ -79,13 +85,13 @@
 
     <tr>
       <th>Time</th>
-      <td><input type=text name="time" value="12:00"></td>
+      <td><input type="text" id="_time" name="time" value="12:00"></td>
       <td>hr:min:sec</td>
 
     </tr>
     <tr>
       <th>Zone</th>
-      <td><input type=text name="timezone" value="-7"></td>
+      <td><input type="text" name="timezone" value="-7"></td>
       <td>hr</td>
     </tr>
 
