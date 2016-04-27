@@ -7,11 +7,12 @@
 
     $(function() {
 
-      $( "#of_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+      $( "#_date" ).datepicker({ dateFormat: 'yy-mm-dd' });
 
-      $("#set_location_button").click(function(e) { 
-	    astronomy.setLocation("of_latitude", "of_longitude", e);
-	});
+      $("#set_location").click(function(e) {
+          {# astronomy.js uses document.getElementById #}
+          astronomy.setLocation("_latitude", "_longitude", e);
+        });
 
 
     });
@@ -30,11 +31,11 @@
 
 <br>
 
-<button id="set_location_button">set location</button>
+<button id="set_location">set location</button>
 
 <br>
 
-<form action="{{ url_for('sun_position') }}">
+<form action="{{ url_for('sun_position_form') }}">
 
   <table>
 
@@ -47,15 +48,15 @@
     <tr>
 
       <th>
-	Observer
+        Observer
       </th>
 
       <td>
-	<input type=text id="of_latitude" name="of_latitude">
+        <input type=text id="_latitude" name="latitude">
       </td>
 
       <td>
-	<input type=text id="of_longitude" name="of_longitude">
+        <input type=text id="_longitude" name="longitude">
       </td>
 
       <td>deg:min:sec</td>
@@ -70,7 +71,7 @@
     <tr>
       <th>Date</th>
       <td>
-	<input type=text name=of_date id="of_datepicker">
+        <input type=text id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
 
@@ -78,18 +79,20 @@
 
     <tr>
       <th>Time</th>
-      <td><input type=text name=of_time value="12:00"></td>
+      <td><input type=text name="time" value="12:00"></td>
       <td>hr:min:sec</td>
 
     </tr>
     <tr>
       <th>Zone</th>
-      <td><input type=text name=of_timezone value="-8"></td>
+      <td><input type=text name="timezone" value="-7"></td>
       <td>hr</td>
     </tr>
 
     <tr>
-      <td></td><td></td><td></td>
+      <td></td>
+      <td></td>
+      <td></td>
       <td><input type=submit value=SunPosition></td>
     </tr>
 
@@ -127,7 +130,7 @@ side, the form data are accessed as key value pairs of strings
 </p>
 
 <pre>
-        dms = split_angle(flask.request.values.get('of_latitude'))
+        dms = split_angle(flask.request.values.get('latitude'))
 </pre>
 
 <p>
@@ -138,12 +141,12 @@ passed as keyword arguments to flask.render_template:
 <pre>
 
     return flask.render_template('sun_position.html',
-				 a_latitude=get_string(a_latitude),
-				 a_longitude=get_string(a_longitude),
-				 ...
-				 a_rising=get_string(rising),
-				 a_transit=get_string(transit),
-				 a_setting=get_string(setting))
+                                 a_latitude=get_string(a_latitude),
+                                 a_longitude=get_string(a_longitude),
+                                 ...
+                                 a_rising=get_string(rising),
+                                 a_transit=get_string(transit),
+                                 a_setting=get_string(setting))
 </pre>
 
 <p>

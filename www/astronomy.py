@@ -188,9 +188,9 @@ def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone):
     return get_string(rising), get_string(transit), get_string(setting), az_str, alt_str
 
 
-@app.route("/sun_position")
-def sun_position():
-    """Get the sun position
+@app.route("/sun_position_form")
+def sun_position_form():
+    """Get the sun position for the form example.
 
     This uses a html form to provide the input with the name to connect the
 
@@ -198,8 +198,7 @@ def sun_position():
 
     via flask
 
-        my_latitude = flask.request.values.get('of_latitude')
-
+        val = flask.request.values.get('latitude')
 
     And returns a page of results:
 
@@ -209,27 +208,27 @@ def sun_position():
 
     try:
 
-        dms = split_angle(flask.request.values.get('of_latitude'))
+        dms = split_angle(flask.request.values.get('latitude'))
         a_latitude = coords.angle(float(dms[0]),
                                   float(dms[1]),
                                   float(dms[2]))
 
 
-        dms = split_angle(flask.request.values.get('of_longitude'))
+        dms = split_angle(flask.request.values.get('longitude'))
         a_longitude = coords.angle(float(dms[0]),
                                    float(dms[1]),
                                    float(dms[2]))
 
 
-        ymd = split_date(flask.request.values.get('of_date'))
-        hms = split_angle(flask.request.values.get('of_time'))
+        ymd = split_date(flask.request.values.get('date'))
+        hms = split_angle(flask.request.values.get('time'))
         a_datetime = coords.datetime(int(ymd[0]),
                                      int(ymd[1]),
                                      int(ymd[2]),
                                      int(hms[0]),
                                      int(hms[1]),
                                      float(hms[2]),
-                                     get_float(flask.request.values.get('of_timezone')))
+                                     get_float(flask.request.values.get('timezone')))
 
         an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 

@@ -10,30 +10,31 @@
 
     $(document).ready(function() {
 
-      $( "#oa_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+      $( "#_date" ).datepicker({ dateFormat: 'yy-mm-dd' });
 
       $("#set_location_button").click(function(e) {
-	astronomy.setLocation("oa_latitude", "oa_longitude", e);
+        {# astronomy.js uses document.getElementById #}
+	astronomy.setLocation("_latitude", "_longitude", e);
       });
 
       $("#get_sun_position").click(function(e) {
 
 	$.getJSON($SCRIPT_ROOT + "/_get_sun_position",
 	  {
-	    latitude: $('input[name="oa_latitude"]').val(),
-	    longitude: $('input[name="oa_longitude"]').val(),
-	    date: $('input[name="oa_date"]').val(),
-	    time: $('input[name="oa_time"]').val(),
-	    timezone: $('input[name="oa_timezone"]').val()
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val()
 
 	  },
 	  function(data) {
 
-	    $("#oa_rising").text(data.rising);
-	    $("#oa_transit").text(data.transit);
-	    $("#oa_setting").text(data.setting);
-	    $("#oa_azimuth").text(data.azimuth);
-	    $("#oa_altitude").text(data.altitude);
+	    $("#rising").text(data.rising);
+	    $("#transit").text(data.transit);
+	    $("#setting").text(data.setting);
+	    $("#azimuth").text(data.azimuth);
+	    $("#altitude").text(data.altitude);
 
 	  });
 	return false;
@@ -69,11 +70,11 @@
       </th>
 
       <td>
-	<input type=text id="oa_latitude" name="oa_latitude">
+	<input type=text id="_latitude" name="latitude">
       </td>
 
       <td>
-	<input type=text id="oa_longitude" name="oa_longitude">
+	<input type=text id="_longitude" name="longitude">
       </td>
 
       <td>deg:min:sec</td>
@@ -90,7 +91,7 @@
     <tr>
       <th>Date</th>
       <td>
-	<input type=text name=oa_date id="oa_datepicker">
+        <input type=text id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
 
@@ -98,13 +99,13 @@
 
     <tr>
       <th>Time</th>
-      <td><input type=text name=oa_time value="12:00"></td>
+      <td><input type=text name=time value="12:00"></td>
       <td>hr(24):min:sec</td>
 
     </tr>
     <tr>
       <th>Zone</th>
-      <td><input type=text name=oa_timezone value="-8"></td>
+      <td><input type=text name=timezone value="-7"></td>
       <td>hr</td>
     </tr>
 
@@ -119,32 +120,32 @@
 
     <tr>
       <th>Azimuth</th>
-      <td id="oa_azimuth" colspan="2">TBD</td>
+      <td id="azimuth" colspan="2">TBD</td>
       <td>deg:min:sec (deg)</td>
     </tr>
 
     <tr>
       <th>Altitude</th>
-      <td id="oa_altitude" colspan="2">TBD</td>
+      <td id="altitude" colspan="2">TBD</td>
       <td>deg:min:sec (deg)</td>
     </tr>
 
     <tr>
       <th>Rising</th>
-      <td id="oa_rising" colspan="2">TBD</td>
+      <td id="rising" colspan="2">TBD</td>
       <td>ISO8601</td>
     </tr>
 
 
     <tr>
       <th>Transit</th>
-      <td id="oa_transit" colspan="2">TBD</td>
+      <td id="transit" colspan="2">TBD</td>
       <td>ISO8601</td>
     </tr>
 
     <tr>
       <th>Setting</th>
-      <td id="oa_setting" colspan="2">TBD</td>
+      <td id="setting" colspan="2">TBD</td>
       <td>ISO8601</td>
     </tr>
 
@@ -175,19 +176,19 @@ event:
 
 	$.getJSON($SCRIPT_ROOT + "/_get_sun_position",
 	  {
-	    latitude: $('input[name="oa_latitude"]').val(),
-	    longitude: $('input[name="oa_longitude"]').val(),
-	    date: $('input[name="oa_date"]').val(),
-	    time: $('input[name="oa_time"]').val(),
-	    timezone: $('input[name="oa_timezone"]').val()
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val()
 
 	  },
 	  function(data) {
-	    $("#oa_rising").text(data.rising);
-	    $("#oa_transit").text(data.transit);
-	    $("#oa_setting").text(data.setting);
-	    $("#oa_azimuth").text(data.azimuth);
-	    $("#oa_altitude").text(data.altitude);
+	    $("#rising").text(data.rising);
+	    $("#transit").text(data.transit);
+	    $("#setting").text(data.setting);
+	    $("#azimuth").text(data.azimuth);
+	    $("#altitude").text(data.altitude);
 
 	  });
 
