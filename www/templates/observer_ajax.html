@@ -33,7 +33,8 @@
 	    longitude: $('input[name="longitude"]').val(),
 	    date: $('input[name="date"]').val(),
 	    time: $('input[name="time"]').val(),
-	    timezone: $('input[name="timezone"]').val()
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked')
 
 	  },
 	  function(data) {
@@ -62,24 +63,35 @@
 
 <h1>Flask AJAX and jQuery Pattern</h1>
 
+<p>
+This is an example of using AJAX and JSON to use the observer's
+location to update the contents of the current page.
+</p>
+
+
   <table>
-
-    <tr>
-      <th></th>
-      <th>Latitude</th>
-      <th>Longitude</th>
-    </tr>
-
 
     <tr>
 
       <th>
-	<button id="set_location">set location</button>
+	<button type="button" id="set_location">set location</button>
       </th>
+
+      <th>Latitude</th>
 
       <td>
 	<input type="text" id="_latitude" name="latitude">
       </td>
+
+      <td>deg:min:sec</td>
+
+    </tr>
+
+
+    <tr>
+      <th></th>
+
+      <th>Longitude</th>
 
       <td>
 	<input type="text" id="_longitude" name="longitude">
@@ -91,33 +103,49 @@
 
 
     <tr>
-      <th></th>
-      <th></th>
-    </tr>
+      <td></td>
 
-
-    <tr>
       <th>Date</th>
+
       <td>
         <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
+
       <td>year-mm-dd</td>
 
     </tr>
 
     <tr>
+
       <th>
 	<button id="set_time">set time</button>
       </th>
+
+      <th>Time</th>
+
       <td><input type="text" id="_time" name="time" value="12:00"></td>
+
       <td>hr(24):min:sec</td>
 
     </tr>
+
     <tr>
-      <th>Zone</th>
+      <td></td>
+
+      <th>Time Zone</th>
       <td><input type="text" id="_timezone" name="timezone" value="-7"></td>
       <td>hr</td>
     </tr>
+
+
+    <tr>
+      <td></td>
+      <th>Daylight Savings</th>
+      <td>
+	<input type="checkbox" id="_dst" name="dst">
+      </td>
+    </tr>
+
 
     <tr>
 

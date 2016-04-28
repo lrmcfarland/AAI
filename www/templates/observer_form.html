@@ -11,8 +11,8 @@
 
 
       $("#set_location").click(function(e) {
-	  {# astronomy.js uses document.getElementById #}
-	  astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
+        {# astronomy.js uses document.getElementById #}
+        astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
       });
 
 
@@ -35,8 +35,8 @@
 <h1>Flask Form Pattern</h1>
 
 <p>
-This example of a html form will return the position of the sun given
-the observer's location on earth.
+This is an example of a html form that takes the observer's location
+on earth and returns a new page with the position of the sun.
 </p>
 
 <h2>Observer Location</h2>
@@ -105,9 +105,18 @@ the observer's location on earth.
 
       <th>Time Zone</th>
       <td>
-	<input type="text" id="_timezone" name="timezone" value="-7">
+	<input type="text" id="_timezone" name="timezone" value="0">
       </td>
       <td>hr</td>
+
+    </tr>
+
+    <tr>
+      <td></td>
+      <th>Daylight Savings</th>
+      <td>
+	<input type="checkbox" id="_dst" name="dst">
+      </td>
     </tr>
 
     <tr>

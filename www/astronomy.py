@@ -116,9 +116,10 @@ def get_sun_position():
     a_date_str = flask.request.args.get('date')
     a_time_str = flask.request.args.get('time')
     a_timezone_str = flask.request.args.get('timezone')
+    a_dst_str = flask.request.args.get('dst')
 
     rising, transit, setting, az_str, alt_str = calculate_sun_position(
-        a_latitude_str, a_longitude_str, a_date_str, a_time_str, a_timezone_str)
+        a_latitude_str, a_longitude_str, a_date_str, a_time_str, a_timezone_str, a_dst_str)
 
     result = dict()
 
@@ -131,7 +132,7 @@ def get_sun_position():
     return flask.jsonify(**result)
 
 
-def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone):
+def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone, a_dst):
     """Calculate the sun position.
 
     TODO reduce redundancy
@@ -161,6 +162,10 @@ def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone):
                                  int(hms[1]),
                                  float(hms[2]),
                                  get_float(a_timezone))
+
+
+    if a_dst == 'true':
+        a_datetime.timezone += 1 # hack hour not timezone
 
     an_observer = utils.latlon2spherical(latitude, longitude)
 
@@ -230,6 +235,9 @@ def sun_position_form():
                                      float(hms[2]),
                                      get_float(flask.request.values.get('timezone')))
 
+        if flask.request.values.get('dst') == 'on':
+            a_datetime.timezone += 1 # hack hour not timezone
+
         an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 
         ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
@@ -285,4 +293,5 @@ if __name__ == "__main__":
     """Run stand alone in flask"""
 
     # TODO argparse host, port, log level
-    app.run(host='0.0.0.0', port=5000)
+
+    app.run(host='0.0.0.0', port=5000, debug=False)
