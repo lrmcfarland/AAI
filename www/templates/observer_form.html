@@ -43,7 +43,7 @@ on earth and returns a new page with the position of the sun.
 
 <br>
 
-<form action="{{ url_for('sun_position_form') }}">
+<form action="{{ url_for('get_sun_position_form') }}">
 
   <table>
 
@@ -151,33 +151,56 @@ with this <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a> code
 <pre>
 
     &lt;form action="&#123;&#123; url_for('sun_position') &#125;&#125;"&gt;
+...
+    &lt;input type="text" id="_longitude" name="longitude"&gt;
+
 
 </pre>
 
 <p>
 In the sun_position url on the
  <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
-side, the form data are accessed as key value pairs of strings
-</p>
-
-<pre>
-	dms = split_angle(flask.request.values.get('latitude'))
-</pre>
-
-<p>
+side, the form data are accessed as key value pairs of strings.
 The input is converted to numbers and used to calculate the results. These are
 passed as keyword arguments to flask.render_template:
 </p>
 
 <pre>
+@app.route("/get_sun_position_form")
+def get_sun_position_form():
+    """Get the sun position for the form example."""
 
-    return flask.render_template('sun_position.html',
-				 a_latitude=get_string(a_latitude),
-				 a_longitude=get_string(a_longitude),
-				 ...
-				 a_rising=get_string(rising),
-				 a_transit=get_string(transit),
-				 a_setting=get_string(setting))
+    try:
+
+        a_latitude_str = flask.request.args.get('latitude')
+        a_longitude_str = flask.request.args.get('longitude')
+
+        a_date_str = flask.request.args.get('date')
+        a_time_str = flask.request.args.get('time')
+        a_timezone_str = flask.request.args.get('timezone')
+
+        # TODO meh
+        if flask.request.args.get('dst') == 'on':
+            a_dst_str = 'true'
+        else:
+            a_dst_str = 'false'
+
+
+        result = calculate_sun_position(a_latitude_str,
+                                        a_longitude_str,
+                                        a_date_str,
+                                        a_time_str,
+                                        a_timezone_str,
+                                        a_dst_str)
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        flask.flash(err)
+        return flask.render_template('flashes.html')
+
+    return flask.render_template('sun_position_form.html', **result)
+
 </pre>
 
 <p>
@@ -185,7 +208,7 @@ Inside the template, these keyword arguments are accessable via Jinja2 macros
 </p>
 
 <pre>
-      &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; a_latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
+      &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
 </pre>
 
 <p>

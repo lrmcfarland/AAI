@@ -27,18 +27,17 @@
 
       $("#get_sun_position").click(function(e) {
 
-	$.getJSON($SCRIPT_ROOT + "/_get_sun_position",
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
 	  {
 	    latitude: $('input[name="latitude"]').val(),
 	    longitude: $('input[name="longitude"]').val(),
 	    date: $('input[name="date"]').val(),
 	    time: $('input[name="time"]').val(),
 	    timezone: $('input[name="timezone"]').val(),
-	    dst: $("#_dst").is(':checked')
+	    dst: $("#_dst").is(':checked') {# jQuery selector #}
 
 	  },
 	  function(data) {
-
 	    $("#rising").text(data.rising);
 	    $("#transit").text(data.transit);
 	    $("#setting").text(data.setting);
@@ -46,7 +45,9 @@
 	    $("#altitude").text(data.altitude);
 
 	  });
+
 	return false;
+
       });
 
 
@@ -133,7 +134,7 @@ location to update the contents of the current page.
       <td></td>
 
       <th>Time Zone</th>
-      <td><input type="text" id="_timezone" name="timezone" value="-7"></td>
+      <td><input type="text" id="_timezone" name="timezone" value="0"></td>
       <td>hr</td>
     </tr>
 
@@ -211,14 +212,16 @@ event:
 </p>
 
 <pre>
+     $("#get_sun_position").click(function(e) {
 
-	$.getJSON($SCRIPT_ROOT + "/_get_sun_position",
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
 	  {
 	    latitude: $('input[name="latitude"]').val(),
 	    longitude: $('input[name="longitude"]').val(),
 	    date: $('input[name="date"]').val(),
 	    time: $('input[name="time"]').val(),
-	    timezone: $('input[name="timezone"]').val()
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked') {# jQuery selector #}
 
 	  },
 	  function(data) {
@@ -229,8 +232,6 @@ event:
 	    $("#altitude").text(data.altitude);
 
 	  });
-
-
 </pre>
 
 <p>
@@ -240,9 +241,8 @@ side, this is read in from the flask request args and the results are returned a
 </p>
 
 <pre>
-
-@app.route("/_get_sun_position")
-def get_sun_position():
+@app.route("/get_sun_position_ajax")
+def get_sun_position_ajax():
     """Get sun position
 
     This uses AJAX to connect a button click event to do the
@@ -252,27 +252,30 @@ def get_sun_position():
 
     """
 
-    a_latitude_str = flask.request.args.get('latitude')
-    a_longitude_str = flask.request.args.get('longitude')
+    try:
 
-    a_date_str = flask.request.args.get('date')
-    a_time_str = flask.request.args.get('time')
-    a_timezone_str = flask.request.args.get('timezone')
+        a_latitude_str = flask.request.args.get('latitude')
+        a_longitude_str = flask.request.args.get('longitude')
 
-    rising, transit, setting, az_str, alt_str = calculate_sun_position(
-        a_latitude_str, a_longitude_str,
-        a_date_str, a_time_str, a_timezone_str)
+        a_date_str = flask.request.args.get('date')
+        a_time_str = flask.request.args.get('time')
+        a_timezone_str = flask.request.args.get('timezone')
+        a_dst_str = flask.request.args.get('dst')
 
-    result = dict()
+        result = calculate_sun_position(a_latitude_str,
+                                        a_longitude_str,
+                                        a_date_str,
+                                        a_time_str,
+                                        a_timezone_str,
+                                        a_dst_str)
 
-    result['rising'] = rising
-    result['transit'] = transit
-    result['setting'] = setting
-    result['azimuth'] = az_str
-    result['altitude'] = alt_str
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        flask.flash(err)
+        return flask.render_template('flashes.html')
 
     return flask.jsonify(**result)
-
 </pre>
 
 <p>
