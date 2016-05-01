@@ -38,11 +38,25 @@
 
 	  },
 	  function(data) {
-	    $("#rising").text(data.rising);
-	    $("#transit").text(data.transit);
-	    $("#setting").text(data.setting);
-	    $("#azimuth").text(data.azimuth);
-	    $("#altitude").text(data.altitude);
+
+            if ("error" in data) {
+
+              alert("Error: " + data.error);
+
+              $("#rising").text("TBD");
+	      $("#transit").text("TBD");
+	      $("#setting").text("TBD");
+	      $("#azimuth").text("TBD");
+	      $("#altitude").text("TBD");
+
+            } else {
+
+              $("#rising").text(data.rising);
+	      $("#transit").text(data.transit);
+	      $("#setting").text(data.setting);
+	      $("#azimuth").text(data.azimuth);
+	      $("#altitude").text(data.altitude);
+            };
 
 	  });
 

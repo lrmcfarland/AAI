@@ -5,9 +5,14 @@
 To run: ./pylaunch.sh astronomy.py
 
 see README for running on apache with mod_wsgi
+
+Notes:
+
+
 """
 
 import flask
+import re
 
 import coords
 
@@ -18,34 +23,138 @@ from Transforms import utils
 
 from Bodies import SunPosition
 
+
+# ----- module scope -----
+
+dms_re = re.compile(r'(?P<degrees>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
+                      '((:(?P<minutes>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?)'
+                       '(:(?P<seconds>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?')
+
+# TODO re.VERBOSE
+# TODO stricter formatting 12:3x4:45 passes
+
+# works for 10, 1:23, 12:23:45
+
+# TODO limit range to 24 hrs., 60 minutes and seconds. missing lower parts
+# TODO utf-8 degrees
+
+
 # ---------------------
 # ----- utilities -----
 # ---------------------
 
-def get_float(a_key):
-    """Get a floating point number from the request
+def request_float(a_float_str):
+    """Gets the float of string from the request args
 
-    TODO only one caller
-
-    default to 0 if blank.
-
-    float() raises a ValueError exception if the input string not a
-    float.
+    Returns: the float
+    Raises: ValueError if not found
     """
-    if a_key == '':
+
+    a_float = flask.request.args.get(a_float_str, type=float)
+
+    if a_float is None:
+        raise ValueError('{a_float_str} is not a float: {a_value}'.format(
+            a_float_str=a_float_str, a_value=flask.request.args.get(a_float_str)))
+
+    return a_float
+
+
+def safe_get_float(a_match, a_key):
+    """Safe get float
+
+    Args:
+    a_match (re.match result dictonary): regex with named groups
+    a_float_key (str): value to get
+
+    Returns 0 if not found
+    Raises error if not float-able
+    """
+
+    a_val = a_match.groupdict()[a_key]
+
+    if a_val is None:
         return 0
     else:
-        return float(a_key)
+        return float(a_val)
+
+
+
+def request_angle(an_angle_key):
+    """Gets the degree minute second values from the request args
+
+    Arg:
+    an_angle_key (str): one of deg, deg:min, deg:min:sec
+
+    Returns: coords.angle
+    Raises: value exception on format error
+    """
+
+    an_angle_value = flask.request.args.get(an_angle_key)
+
+    app.logger.debug('{an_angle_key}: {an_angle_value}'.format(**locals()))
+
+    found_dms = dms_re.match(an_angle_value)
+
+    if not found_dms:
+        raise ValueError(
+            'unsupported format for {an_angle_key}: {an_angle_value}'.format(**locals()))
+
+    degrees = safe_get_float(found_dms, 'degrees')
+    minutes = safe_get_float(found_dms, 'minutes')
+    seconds = safe_get_float(found_dms, 'seconds')
+
+    return coords.angle(degrees, minutes, seconds)
+
+
+def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
+    """Gets the degree minute second values from the request args
+
+    Arg:
+    a_date_key (str): yyyy-mm-dd
+    a_time_key (str): hr:min:sec
+    a_timezone (float): -12 to 12
+    is_dst (bool): daylight savings time
+
+    Returns: coords.datetime
+    Raises: value exception on format error
+    """
+
+    # TODO regex validation
+
+    ymd = split_date(flask.request.args.get(a_date_key))
+    hms = split_angle(flask.request.args.get(a_time_key)) # TODO request_angle?
+
+    if is_dst:
+        hms[0] = int(hms[0]) - 1
+
+    a_datetime = coords.datetime(int(ymd[0]),
+                                 int(ymd[1]),
+                                 int(ymd[2]),
+                                 int(hms[0]),
+                                 int(hms[1]),
+                                 float(hms[2]),
+                                 a_timezone)
+
+
+    app.logger.debug('datetime: {a_datetime}'.format(**locals())) # TODO rm
+
+    return a_datetime
+
 
 
 def get_string(a_string):
-    """Returns the escaped string"""
+    """Returns the escaped string
+
+    TODO: meh
+    """
 
     return flask.escape(str(a_string))
 
 
 def split_date(a_datepicker_string):
     """Splits the datepicker string
+
+    TODO incorporate above
 
     ASSUMES format ISO8601
     Returns a list of year, month, day
@@ -56,53 +165,36 @@ def split_date(a_datepicker_string):
 def split_angle(an_angle_string):
     """Splits an angle string of deg:min:sec
 
+    TODO incorporate above, regex request_angle?
+
     TODO: validate string format here?
 
-    Returns a list of deg, min, sec
+    Returns a list of deg, min, sec as floats
     """
     dms = an_angle_string.split(':')
     while len(dms) < 3:
         dms.append('0')
+
     return dms
 
 
 
-def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone, a_dst):
+def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
-    Args are all strings
+    TODO: more floats
 
-    TODO should args be all strings?
+    Args:
+    a_latitude (coords.angle): observer's latitude
+    a_longitude (coords.angle): observer's longitude
+    a_datetime (coords.datetime): observer's time
+    a_dst (bool): daylight savings time
 
-    return rising, transit, setting, az_str, alt_str
+
+    return results dictionary
     """
-    dms = split_angle(a_latitude)
-    latitude = coords.angle(float(dms[0]),
-                            float(dms[1]),
-                            float(dms[2]))
 
-
-    dms = split_angle(a_longitude)
-    longitude = coords.angle(float(dms[0]),
-                             float(dms[1]),
-                             float(dms[2]))
-
-
-    ymd = split_date(a_date)
-    hms = split_angle(a_time)
-    a_datetime = coords.datetime(int(ymd[0]),
-                                 int(ymd[1]),
-                                 int(ymd[2]),
-                                 int(hms[0]),
-                                 int(hms[1]),
-                                 float(hms[2]),
-                                 get_float(a_timezone))
-
-
-    if a_dst == 'true':
-        a_datetime.timezone += 1 # hack hour not timezone
-
-    an_observer = utils.latlon2spherical(latitude, longitude)
+    an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 
     ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
 
@@ -125,10 +217,20 @@ def calculate_sun_position(a_latitude, a_longitude, a_date, a_time, a_timezone, 
 
     rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-    # TODO more direct
+
+    app.logger.debug('rising st: {rising}'.format(**locals())) # TODO rm
+
+    if is_dst:
+        pass
+        # rising += 0.1 # one day, TODO += fails? julian day rounding error?
+
+    app.logger.debug('rising dt: {rising}'.format(**locals())) # TODO rm
+
+
+    # TODO more direct?
     result = dict()
-    result['latitude'] = a_latitude
-    result['longitude'] = a_longitude
+    result['latitude'] = str(a_latitude)
+    result['longitude'] = str(a_longitude)
     result['datetime'] = get_string(a_datetime)
     result['r'] = get_string(R)
     result['obliquity'] = get_string(obliquity)
@@ -182,35 +284,40 @@ def observer_ajax():
 def get_sun_position_ajax():
     """Get sun position
 
-    This uses AJAX to connect a button click event to do the
-    calculation and return the resut as a JSON object.
+    This was written to handle a JQuery AJAX call to connect a button
+    click event to send a get request with parameters for:
 
-    a_latitude = flask.request.args.get('latitude', 0, type=float)
+    latitude, longitude, date, time timezone, dst
+
+    The server does calculation and return the sun position data as a
+    JSON object.
+
+    If there is an exception, this returns an error key with the
+    message as the value in the same JSON object. The caller is
+    expected to handle it as they see fit.
 
     """
 
     try:
 
-        a_latitude_str = flask.request.args.get('latitude') # TODO use float?
-        a_longitude_str = flask.request.args.get('longitude')
+        # TODO difference in template agax input :checked selector and form
+        if flask.request.args.get('dst') == 'true':
+            is_dst = True
+        else:
+            is_dst = False
 
-        a_date_str = flask.request.args.get('date')
-        a_time_str = flask.request.args.get('time')
-        a_timezone_str = flask.request.args.get('timezone')
-        a_dst_str = flask.request.args.get('dst')
-
-        result = calculate_sun_position(a_latitude_str,
-                                        a_longitude_str,
-                                        a_date_str,
-                                        a_time_str,
-                                        a_timezone_str,
-                                        a_dst_str)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
     except (ValueError, RuntimeError) as err:
 
         app.logger.error(err)
-        flask.flash(err)
-        return flask.render_template('flashes.html')
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
 
@@ -235,26 +342,23 @@ def get_sun_position_form():
 
     try:
 
-        a_latitude_str = flask.request.args.get('latitude') # TODO use float?
-        a_longitude_str = flask.request.args.get('longitude')
-
-        a_date_str = flask.request.args.get('date')
-        a_time_str = flask.request.args.get('time')
-        a_timezone_str = flask.request.args.get('timezone')
 
         # TODO meh
+        # TODO difference in template agax input :checked selector and form
         if flask.request.args.get('dst') == 'on':
-            a_dst_str = 'true'
+            is_dst = True
         else:
-            a_dst_str = 'false'
+            is_dst = False
+
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
 
-        result = calculate_sun_position(a_latitude_str,
-                                        a_longitude_str,
-                                        a_date_str,
-                                        a_time_str,
-                                        a_timezone_str,
-                                        a_dst_str)
 
     except (ValueError, RuntimeError) as err:
 
