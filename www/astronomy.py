@@ -135,9 +135,6 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
                                  float(hms[2]),
                                  a_timezone)
 
-
-    app.logger.debug('datetime: {a_datetime}'.format(**locals())) # TODO rm
-
     return a_datetime
 
 
@@ -182,7 +179,9 @@ def split_angle(an_angle_string):
 def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
-    TODO: more floats
+    Notes:
+    app.logger.debug('datetime: {a_datetime}'.format(**locals())) # TODO rm
+
 
     Args:
     a_latitude (coords.angle): observer's latitude
@@ -194,55 +193,74 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     return results dictionary
     """
 
+    result = dict()
+    result['latitude'] = str(a_latitude)
+    result['longitude'] = str(a_longitude)
+    result['datetime'] = get_string(a_datetime)
+    result['dst'] = get_string(is_dst)
+
+    result['eot'] = get_string(SunPosition.EquationOfTime(a_datetime))
+    result['obliquity'] = get_string(EclipticEquatorial.obliquity(a_datetime))
+
     an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 
-    ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+    rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-    obliquity = EclipticEquatorial.obliquity(a_datetime)
+    if is_dst:
+        # TODO += 1.0/24.0 fails? julian day rounding error? works in c++
+
+        rising = coords.datetime(rising.year,
+                                 rising.month,
+                                 rising.day,
+                                 rising.hour + 1,
+                                 rising.minute,
+                                 rising.second,
+                                 rising.timezone)
+
+        transit = coords.datetime(transit.year,
+                                  transit.month,
+                                  transit.day,
+                                  transit.hour + 1,
+                                  transit.minute,
+                                  transit.second,
+                                  transit.timezone)
+
+
+        setting = coords.datetime(setting.year,
+                                  setting.month,
+                                  setting.day,
+                                  setting.hour + 1,
+                                  setting.minute,
+                                  setting.second,
+                                  setting.timezone)
+
+
+        app.logger.debug('rising dst: {rising}'.format(**locals())) # TODO rm
+
+
+    result['rising'] = get_string(rising)
+    result['transit'] = get_string(transit)
+    result['setting'] = get_string(setting)
+
+
+    ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
     sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
     sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
-    sun_dec = coords.angle(90) - sun_eq.theta
+    result['dec'] = get_string(coords.angle(90) - sun_eq.theta)
 
-    eot = SunPosition.EquationOfTime(a_datetime)
-
-    az_str = ''.join((str(utils.get_azimuth(sun_hz)),
-                      ' (', str(utils.get_azimuth(sun_hz).value), ')'))
-
-
-    alt_str = ''.join((str(utils.get_altitude(sun_hz)),
-                       ' (', str(utils.get_altitude(sun_hz).value), ')'))
-
-    rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
-
-
-    app.logger.debug('rising st: {rising}'.format(**locals())) # TODO rm
-
-    if is_dst:
-        pass
-        # rising += 0.1 # one day, TODO += fails? julian day rounding error?
-
-    app.logger.debug('rising dt: {rising}'.format(**locals())) # TODO rm
-
-
-    # TODO more direct?
-    result = dict()
-    result['latitude'] = str(a_latitude)
-    result['longitude'] = str(a_longitude)
-    result['datetime'] = get_string(a_datetime)
     result['r'] = get_string(R)
-    result['obliquity'] = get_string(obliquity)
-    result['dec'] = get_string(sun_dec)
     result['ecliptic_longitude'] = get_string(ecliptic_longitude)
-    result['eot'] = get_string(eot)
 
-    result['rising'] = get_string(rising)
-    result['transit'] = get_string(transit)
-    result['setting'] = get_string(setting)
-    result['azimuth'] = az_str
-    result['altitude'] = alt_str
+    result['azimuth'] = ''.join((str(utils.get_azimuth(sun_hz)),
+                                 ' (', str(utils.get_azimuth(sun_hz).value), ')'))
+
+
+    result['altitude'] = ''.join((str(utils.get_altitude(sun_hz)),
+                                  ' (', str(utils.get_altitude(sun_hz).value), ')'))
+
 
     return result
 
