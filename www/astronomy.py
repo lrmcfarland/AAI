@@ -78,7 +78,6 @@ def safe_get_float(a_match, a_key):
         return float(a_val)
 
 
-
 def request_angle(an_angle_key):
     """Gets the degree minute second values from the request args
 
@@ -121,8 +120,11 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
 
     # TODO regex validation
 
-    ymd = split_date(flask.request.args.get(a_date_key))
-    hms = split_angle(flask.request.args.get(a_time_key)) # TODO request_angle?
+    ymd = flask.request.args.get(a_date_key).split('-') # ASSUMES: yyyy-mm-dd format
+
+    hms = flask.request.args.get(a_time_key).split(':') # ASSUMES: hh:mm:ss.ss
+    while len(hms) < 3:
+        hms.append('0')
 
     if is_dst:
         hms[0] = int(hms[0]) - 1
@@ -136,44 +138,6 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
                                  a_timezone)
 
     return a_datetime
-
-
-
-def get_string(a_string):
-    """Returns the escaped string
-
-    TODO: meh
-    """
-
-    return flask.escape(str(a_string))
-
-
-def split_date(a_datepicker_string):
-    """Splits the datepicker string
-
-    TODO incorporate above
-
-    ASSUMES format ISO8601
-    Returns a list of year, month, day
-    """
-    return a_datepicker_string.split('-')
-
-
-def split_angle(an_angle_string):
-    """Splits an angle string of deg:min:sec
-
-    TODO incorporate above, regex request_angle?
-
-    TODO: validate string format here?
-
-    Returns a list of deg, min, sec as floats
-    """
-    dms = an_angle_string.split(':')
-    while len(dms) < 3:
-        dms.append('0')
-
-    return dms
-
 
 
 def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
@@ -196,11 +160,11 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     result = dict()
     result['latitude'] = str(a_latitude)
     result['longitude'] = str(a_longitude)
-    result['datetime'] = get_string(a_datetime)
-    result['dst'] = get_string(is_dst)
+    result['datetime'] = str(a_datetime)
+    result['dst'] = is_dst
 
-    result['eot'] = get_string(SunPosition.EquationOfTime(a_datetime))
-    result['obliquity'] = get_string(EclipticEquatorial.obliquity(a_datetime))
+    result['eot'] = str(SunPosition.EquationOfTime(a_datetime))
+    result['obliquity'] = str(EclipticEquatorial.obliquity(a_datetime))
 
     an_observer = utils.latlon2spherical(a_latitude, a_longitude)
 
@@ -225,7 +189,6 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
                                   transit.second,
                                   transit.timezone)
 
-
         setting = coords.datetime(setting.year,
                                   setting.month,
                                   setting.day,
@@ -235,12 +198,9 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
                                   setting.timezone)
 
 
-        app.logger.debug('rising dst: {rising}'.format(**locals())) # TODO rm
-
-
-    result['rising'] = get_string(rising)
-    result['transit'] = get_string(transit)
-    result['setting'] = get_string(setting)
+    result['rising'] = str(rising)
+    result['transit'] = str(transit)
+    result['setting'] = str(setting)
 
 
     ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
@@ -249,10 +209,10 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
     sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
-    result['dec'] = get_string(coords.angle(90) - sun_eq.theta)
+    result['dec'] = str(coords.angle(90) - sun_eq.theta)
 
-    result['r'] = get_string(R)
-    result['ecliptic_longitude'] = get_string(ecliptic_longitude)
+    result['R'] = R
+    result['ecliptic_longitude'] = str(ecliptic_longitude)
 
     result['azimuth'] = ''.join((str(utils.get_azimuth(sun_hz)),
                                  ' (', str(utils.get_azimuth(sun_hz).value), ')'))
