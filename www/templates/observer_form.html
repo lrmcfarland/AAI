@@ -168,30 +168,39 @@ passed as keyword arguments to flask.render_template:
 <pre>
 @app.route("/get_sun_position_form")
 def get_sun_position_form():
-    """Get the sun position for the form example."""
+    """Get the sun position for the form example.
+
+    This uses a html form to provide the input with the name to connect the
+
+        &lt;input type=text name=of_latitude&gt;
+
+    via flask
+
+        val = flask.request.values.get('latitude')
+
+    And returns a page of results:
+
+        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
+
+    """
 
     try:
 
-        a_latitude_str = flask.request.args.get('latitude')
-        a_longitude_str = flask.request.args.get('longitude')
-
-        a_date_str = flask.request.args.get('date')
-        a_time_str = flask.request.args.get('time')
-        a_timezone_str = flask.request.args.get('timezone')
 
         # TODO meh
+        # TODO difference in template ajax input :checked selector and form
         if flask.request.args.get('dst') == 'on':
-            a_dst_str = 'true'
+            is_dst = True
         else:
-            a_dst_str = 'false'
+            is_dst = False
 
-
-        result = calculate_sun_position(a_latitude_str,
-                                        a_longitude_str,
-                                        a_date_str,
-                                        a_time_str,
-                                        a_timezone_str,
-                                        a_dst_str)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
     except (ValueError, RuntimeError) as err:
 

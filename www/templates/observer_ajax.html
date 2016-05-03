@@ -226,8 +226,6 @@ event:
 </p>
 
 <pre>
-     $("#get_sun_position").click(function(e) {
-
 	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
 	  {
 	    latitude: $('input[name="latitude"]').val(),
@@ -239,13 +237,28 @@ event:
 
 	  },
 	  function(data) {
-	    $("#rising").text(data.rising);
-	    $("#transit").text(data.transit);
-	    $("#setting").text(data.setting);
-	    $("#azimuth").text(data.azimuth);
-	    $("#altitude").text(data.altitude);
+
+            if ("error" in data) {
+
+              alert("Error: " + data.error);
+
+              $("#rising").text("TBD");
+	      $("#transit").text("TBD");
+	      $("#setting").text("TBD");
+	      $("#azimuth").text("TBD");
+	      $("#altitude").text("TBD");
+
+            } else {
+
+              $("#rising").text(data.rising);
+	      $("#transit").text(data.transit);
+	      $("#setting").text(data.setting);
+	      $("#azimuth").text(data.azimuth);
+	      $("#altitude").text(data.altitude);
+            };
 
 	  });
+
 </pre>
 
 <p>
@@ -259,37 +272,42 @@ side, this is read in from the flask request args and the results are returned a
 def get_sun_position_ajax():
     """Get sun position
 
-    This uses AJAX to connect a button click event to do the
-    calculation and return the resut as a JSON object.
+    This was written to handle a JQuery AJAX call to connect a button
+    click event to send a get request with parameters for:
 
-    a_latitude = flask.request.args.get('latitude', 0, type=float)
+    latitude, longitude, date, time timezone, dst
 
+    The server does calculation and return the sun position data as a
+    JSON object.
+
+    If there is an exception, this returns an error key with the
+    message as the value in the same JSON object. The caller is
+    expected to handle it as they see fit.
     """
 
     try:
 
-        a_latitude_str = flask.request.args.get('latitude')
-        a_longitude_str = flask.request.args.get('longitude')
+        # TODO difference in template ajax input :checked selector and form
+        if flask.request.args.get('dst') == 'true':
+            is_dst = True
+        else:
+            is_dst = False
 
-        a_date_str = flask.request.args.get('date')
-        a_time_str = flask.request.args.get('time')
-        a_timezone_str = flask.request.args.get('timezone')
-        a_dst_str = flask.request.args.get('dst')
-
-        result = calculate_sun_position(a_latitude_str,
-                                        a_longitude_str,
-                                        a_date_str,
-                                        a_time_str,
-                                        a_timezone_str,
-                                        a_dst_str)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
     except (ValueError, RuntimeError) as err:
 
         app.logger.error(err)
-        flask.flash(err)
-        return flask.render_template('flashes.html')
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
+
 </pre>
 
 <p>

@@ -90,7 +90,7 @@ def request_angle(an_angle_key):
 
     an_angle_value = flask.request.args.get(an_angle_key)
 
-    app.logger.debug('{an_angle_key}: {an_angle_value}'.format(**locals()))
+    app.logger.debug('request angle: {an_angle_key}: {an_angle_value}'.format(**locals()))
 
     found_dms = dms_re.match(an_angle_value)
 
@@ -118,7 +118,11 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
     Raises: value exception on format error
     """
 
+    app.logger.debug('request date: {a_date_key} {a_time_key} {a_timezone} {is_dst}'.format(
+        **locals()))
+
     # TODO regex validation
+
 
     ymd = flask.request.args.get(a_date_key).split('-') # ASSUMES: yyyy-mm-dd format
 
@@ -278,7 +282,7 @@ def get_sun_position_ajax():
 
     try:
 
-        # TODO difference in template agax input :checked selector and form
+        # TODO difference in template ajax input :checked selector and form
         if flask.request.args.get('dst') == 'true':
             is_dst = True
         else:
@@ -322,7 +326,7 @@ def get_sun_position_form():
 
 
         # TODO meh
-        # TODO difference in template agax input :checked selector and form
+        # TODO difference in template ajax input :checked selector and form
         if flask.request.args.get('dst') == 'on':
             is_dst = True
         else:

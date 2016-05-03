@@ -4,7 +4,7 @@ var astronomy = astronomy || {}; // namespace TODO starbug specific?
 
 astronomy.setLocation = function() { // TODO set location
 
-    console.log("astronomy.getLocation called");
+    console.log("astronomy.setLocation called"); // debug?
 
     // TODO validation: error if length not 3, args not strings
 
@@ -32,7 +32,11 @@ astronomy.setLocation = function() { // TODO set location
 	document.getElementById(longitude_id).value = longitude;
 
 	// TODO floor < 0, ceiling > 0 better fit?
-	document.getElementById(timezone_id).value = Math.round(longitude / 15); // assumes degrees
+
+	timezone = Math.ceil(Math.round(longitude / 15)); // assumes degrees
+
+
+	document.getElementById(timezone_id).value = timezone;
 
     });
 
