@@ -1,0 +1,86 @@
+{# comment #}
+
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  <table id="observerlocation">
+
+    <tr>
+      <td colspan=3><h2>Observer Location</h2></td>
+    </tr>
+
+    <tr>
+      <td>Latitude</td><td> {{ latitude }} </td><td>deg:min:sec</td>
+    </tr>
+
+    <tr>
+      <td>Longitude</td><td> {{ longitude }} </td><td>deg:min:sec</td>
+    </tr>
+
+    <tr>
+      <td>Datetime</td><td> {{ datetime }} </td><td>ISO8601</td>
+    </tr>
+
+  </table>
+
+</div>
+
+<hr>
+
+<div>
+  <table id="sunposition">
+
+    <tr>
+      <td colspan=3></td>
+    </tr>
+
+    <tr>
+      <td colspan=3><h2>Sun Position</h2></td>
+    </tr>
+
+    <tr>
+      <td>Distance</td><td> {{ R }} </td><td>AU</td>
+    </tr>
+
+    <tr>
+      <td>Obliquity</td><td> {{ obliquity }} </td><td>deg:min:sec</td>
+    </tr>
+
+    <tr>
+      <td>Solar Declination</td><td> {{ dec }} </td><td>deg:min:sec</td>
+    </tr>
+
+    <tr>
+      <td>Ecliptic Longitude</td><td> {{ ecliptic_longitude }} </td><td>deg:min:sec</td>
+    </tr>
+
+    <tr>
+      <td>Equation of Time</td><td> {{ eot }} </td><td>hours:min:sec</td>
+    </tr>
+
+    <tr>
+      <td>Azimuth</td><td> {{ azimuth }} </td><td>deg:min:sec (deg)</td>
+    </tr>
+
+    <tr>
+      <td>Altitude</td><td> {{ altitude }} </td><td>deg:min:sec (deg)</td>
+    </tr>
+
+    <tr>
+      <td>Rising</td><td> {{ rising }} </td><td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <td>Transit</td><td> {{ transit }} </td><td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <td>Setting</td><td> {{ setting }} </td><td>ISO8601</td>
+    </tr>
+
+
+  </table>
+</div>
+
+{% endblock %}

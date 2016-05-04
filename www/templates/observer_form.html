@@ -5,15 +5,28 @@
 {% block scripts %}
   <script type="text/javascript">
 
-    {# TODO implicit ready function? #}
     $(function() {
 
-      $( "#of_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
 
-      {# TODO how is this unambiguous with other ajax set location button? #}
-      $("#set_location_button").click(function(e) { 
-	    astronomy.setLocation("of_latitude", "of_longitude", e);
-	});
+
+      $("#set_location").click(function(e) {
+        {# astronomy.js uses document.getElementById #}
+        astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
+      });
+
+
+      $("#set_time").click(function(e) {
+	var now = new Date();
+	var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+	$("#_time").val(time_str);
+      });
+
+
+      $("#_longitude").change(function() {
+        var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
+        $("#_timezone").val(timezone);
+      });
 
 
     });
@@ -27,75 +40,99 @@
 
 <h1>Flask Form Pattern</h1>
 
+<p>
+Enter the observer's location in space and time in the form and the
+submit button will take the user to a page with the sun's position.
+Timezone is estimated from the longitude, but should be adjusted as
+needed.
+</p>
 
 <h2>Observer Location</h2>
 
 <br>
 
-<button id="set_location_button">set location</button> {# TODO too many actions to be in one form? #}
-
-<br>
-
-<form action="{{ url_for('sun_position') }}">
+<form action="{{ url_for('get_sun_position_form') }}">
 
   <table>
 
     <tr>
-      <th></th>
-      <th>Latitude</th>
-      <th>Longitude</th>
-    </tr>
-
-
-    <tr>
-
-      <th>
-	Observer
-      </th>
 
       <td>
-	<input type=text id="of_latitude" name="of_latitude">
+	<button type="button" id="set_location">set location</button>
       </td>
 
+      <th>Latitude</th>
+
       <td>
-	<input type=text id="of_longitude" name="of_longitude">
+	<input type="text" id="_latitude" name="latitude">
       </td>
 
       <td>deg:min:sec</td>
 
     </tr>
 
-
     <tr>
-      <th></th>
-      <th></th>
+
+      <td>
+      </td>
+
+      <th>Longitude</th>
+
+      <td>
+	<input type="text" id="_longitude" name="longitude">
+      </td>
+
+      <td>deg:min:sec</td>
+
     </tr>
 
-
     <tr>
+      <td></td>
+
       <th>Date</th>
+
       <td>
-	<input type=text name=of_date id="of_datepicker">
+	<input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
-
     </tr>
 
     <tr>
-      <th>Time</th>
-      <td><input type=text name=of_time value="12:00"></td>
+
+      <td>
+	<button type="button" id="set_time">set time</button>
+      </td>
+
+      <th>Local Time</th>
+      <td><input type="text" id="_time" name="time" value="12:00"></td>
       <td>hr:min:sec</td>
-
     </tr>
+
     <tr>
-      <th>Zone</th>
-      <td><input type=text name=of_timezone value="-8"></td>
+      <td></td>
+
+      <th>Time Zone</th>
+      <td>
+	<input type="text" id="_timezone" name="timezone" value="0">
+      </td>
       <td>hr</td>
+
     </tr>
 
     <tr>
-      <td></td><td></td><td></td>
-      <td><input type=submit value=SunPosition></td>
+      <td></td>
+      <th>Daylight Savings</th>
+      <td>
+	<input type="checkbox" id="_dst" name="dst">
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td><input type="submit" value=SunPosition></td>
     </tr>
 
   </table>
@@ -122,35 +159,65 @@ with this <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a> code
 <pre>
 
     &lt;form action="&#123;&#123; url_for('sun_position') &#125;&#125;"&gt;
+...
+    &lt;input type="text" id="_longitude" name="longitude"&gt;
+
 
 </pre>
 
 <p>
 In the sun_position url on the
  <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
-side, the form data are accessed as key value pairs of strings
-</p>
-
-<pre>
-
-    val = flask.request.values.get('observer_latitude')
-
-</pre>
-
-<p>
+side, the form data are accessed as key value pairs of strings.
 The input is converted to numbers and used to calculate the results. These are
 passed as keyword arguments to flask.render_template:
 </p>
 
 <pre>
+@app.route("/get_sun_position_form")
+def get_sun_position_form():
+    """Get the sun position for the form example.
 
-    return flask.render_template('sun_position.html',
-				 a_latitude=get_string(a_latitude),
-				 a_longitude=get_string(a_longitude),
-				 ...
-				 a_rising=get_string(rising),
-				 a_transit=get_string(transit),
-				 a_setting=get_string(setting))
+    This uses a html form to provide the input with the name to connect the
+
+        &lt;input type=text name=of_latitude&gt;
+
+    via flask
+
+        val = flask.request.values.get('latitude')
+
+    And returns a page of results:
+
+        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
+
+    """
+
+    try:
+
+
+        # TODO meh
+        # TODO difference in template ajax input :checked selector and form
+        if flask.request.args.get('dst') == 'on':
+            is_dst = True
+        else:
+            is_dst = False
+
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        flask.flash(err)
+        return flask.render_template('flashes.html')
+
+    return flask.render_template('sun_position_form.html', **result)
+
 </pre>
 
 <p>
@@ -158,7 +225,7 @@ Inside the template, these keyword arguments are accessable via Jinja2 macros
 </p>
 
 <pre>
-      &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; a_latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
+      &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
 </pre>
 
 <p>

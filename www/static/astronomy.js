@@ -4,11 +4,9 @@ var astronomy = astronomy || {}; // namespace TODO starbug specific?
 
 astronomy.setLocation = function() { // TODO set location
 
-    console.log("astronomy.getLocation called");
+    console.log("astronomy.setLocation called"); // debug?
 
-    console.log("arguments length " + arguments.length);
-
-    // TODO error if length not 2, args not strings
+    // TODO validation: error if length not 3, args not strings
 
     for (var i = 0; i < arguments.length; i++) {
 	console.log("arg[" + i + "] = " + arguments[i]);
@@ -16,6 +14,7 @@ astronomy.setLocation = function() { // TODO set location
 
     var latitude_id = arguments[0]; // closure for function
     var longitude_id = arguments[1];
+    var timezone_id = arguments[2];
 
     if (!navigator.geolocation)
 	console.log("Geolocation not supported"); // TODO raise error
@@ -31,6 +30,13 @@ astronomy.setLocation = function() { // TODO set location
 
 	document.getElementById(latitude_id).value = latitude;
 	document.getElementById(longitude_id).value = longitude;
+
+	// TODO floor < 0, ceiling > 0 better fit?
+
+	timezone = Math.ceil(Math.round(longitude / 15)); // assumes degrees
+
+
+	document.getElementById(timezone_id).value = timezone;
 
     });
 

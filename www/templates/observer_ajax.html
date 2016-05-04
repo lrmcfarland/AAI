@@ -10,33 +10,65 @@
 
     $(document).ready(function() {
 
-      $( "#oa_datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
 
-      $("#set_location_button").click(function(e) {
-	astronomy.setLocation("oa_latitude", "oa_longitude", e);
+      $("#set_location").click(function(e) {
+        {# astronomy.js uses document.getElementById #}
+	astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
       });
+
+
+      $("#set_time").click(function(e) {
+        var now = new Date();
+        {# TODO pad time with leading 0s #}
+        var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+        $("#_time").val(time_str);
+      });
+
+
+      $("#_longitude").change(function() {
+        var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
+        $("#_timezone").val(timezone);
+      });
+
 
       $("#get_sun_position").click(function(e) {
 
-	$.getJSON($SCRIPT_ROOT + "/_get_sun_position",
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
 	  {
-	    latitude: $('input[name="oa_latitude"]').val(),
-	    longitude: $('input[name="oa_longitude"]').val(),
-	    date: $('input[name="oa_date"]').val(),
-	    time: $('input[name="oa_time"]').val(),
-	    timezone: $('input[name="oa_timezone"]').val()
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked') {# jQuery selector #}
 
 	  },
 	  function(data) {
 
-	    $("#oa_rising").text(data.rising);
-	    $("#oa_transit").text(data.transit);
-	    $("#oa_setting").text(data.setting);
-	    $("#oa_azimuth").text(data.azimuth);
-	    $("#oa_altitude").text(data.altitude);
+            if ("error" in data) {
+
+              alert("Error: " + data.error);
+
+              $("#rising").text("TBD");
+	      $("#transit").text("TBD");
+	      $("#setting").text("TBD");
+	      $("#azimuth").text("TBD");
+	      $("#altitude").text("TBD");
+
+            } else {
+
+              $("#rising").text(data.rising);
+	      $("#transit").text(data.transit);
+	      $("#setting").text(data.setting);
+	      $("#azimuth").text(data.azimuth);
+	      $("#altitude").text(data.altitude);
+            };
 
 	  });
+
 	return false;
+
       });
 
 
@@ -53,27 +85,26 @@
 
 <h1>Flask AJAX and jQuery Pattern</h1>
 
+<p>
+Enter the observer's location in space and time and the get sun
+position button will update the current page the sun's position.
+Timezone is estimated from the longitude, but should be adjusted as
+needed.
+</p>
+
+
   <table>
-
-    <tr>
-      <th></th>
-      <th>Latitude</th>
-      <th>Longitude</th>
-    </tr>
-
 
     <tr>
 
       <th>
-	<button id="set_location_button">set location</button>
+	<button type="button" id="set_location">set location</button>
       </th>
 
-      <td>
-	<input type=text id="oa_latitude" name="oa_latitude">
-      </td>
+      <th>Latitude</th>
 
       <td>
-	<input type=text id="oa_longitude" name="oa_longitude">
+	<input type="text" id="_latitude" name="latitude">
       </td>
 
       <td>deg:min:sec</td>
@@ -83,30 +114,62 @@
 
     <tr>
       <th></th>
-      <th></th>
+
+      <th>Longitude</th>
+
+      <td>
+	<input type="text" id="_longitude" name="longitude">
+      </td>
+
+      <td>deg:min:sec</td>
+
     </tr>
 
 
     <tr>
+      <td></td>
+
       <th>Date</th>
+
       <td>
-	<input type=text name=oa_date id="oa_datepicker">
+        <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
+
       <td>year-mm-dd</td>
 
     </tr>
 
     <tr>
-      <th>Time</th>
-      <td><input type=text name=oa_time value="12:00"></td>
+
+      <th>
+	<button id="set_time">set time</button>
+      </th>
+
+      <th>Local Time</th>
+
+      <td><input type="text" id="_time" name="time" value="12:00"></td>
+
       <td>hr(24):min:sec</td>
 
     </tr>
+
     <tr>
-      <th>Zone</th>
-      <td><input type=text name=oa_timezone value="-8"></td>
+      <td></td>
+
+      <th>Time Zone</th>
+      <td><input type="text" id="_timezone" name="timezone" value="0"></td>
       <td>hr</td>
     </tr>
+
+
+    <tr>
+      <td></td>
+      <th>Daylight Savings</th>
+      <td>
+	<input type="checkbox" id="_dst" name="dst">
+      </td>
+    </tr>
+
 
     <tr>
 
@@ -119,32 +182,32 @@
 
     <tr>
       <th>Azimuth</th>
-      <td id="oa_azimuth" colspan="2">TBD</td>
+      <td id="azimuth" colspan="2">TBD</td>
       <td>deg:min:sec (deg)</td>
     </tr>
 
     <tr>
       <th>Altitude</th>
-      <td id="oa_altitude" colspan="2">TBD</td>
+      <td id="altitude" colspan="2">TBD</td>
       <td>deg:min:sec (deg)</td>
     </tr>
 
     <tr>
       <th>Rising</th>
-      <td id="oa_rising" colspan="2">TBD</td>
+      <td id="rising" colspan="2">TBD</td>
       <td>ISO8601</td>
     </tr>
 
 
     <tr>
       <th>Transit</th>
-      <td id="oa_transit" colspan="2">TBD</td>
+      <td id="transit" colspan="2">TBD</td>
       <td>ISO8601</td>
     </tr>
 
     <tr>
       <th>Setting</th>
-      <td id="oa_setting" colspan="2">TBD</td>
+      <td id="setting" colspan="2">TBD</td>
       <td>ISO8601</td>
     </tr>
 
@@ -172,25 +235,38 @@ event:
 </p>
 
 <pre>
-
-	$.getJSON($SCRIPT_ROOT + "/_get_sun_position",
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
 	  {
-	    latitude: $('input[name="oa_latitude"]').val(),
-	    longitude: $('input[name="oa_longitude"]').val(),
-	    date: $('input[name="oa_date"]').val(),
-	    time: $('input[name="oa_time"]').val(),
-	    timezone: $('input[name="oa_timezone"]').val()
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked') {# jQuery selector #}
 
 	  },
 	  function(data) {
-	    $("#oa_rising").text(data.rising);
-	    $("#oa_transit").text(data.transit);
-	    $("#oa_setting").text(data.setting);
-	    $("#oa_azimuth").text(data.azimuth);
-	    $("#oa_altitude").text(data.altitude);
+
+            if ("error" in data) {
+
+              alert("Error: " + data.error);
+
+              $("#rising").text("TBD");
+	      $("#transit").text("TBD");
+	      $("#setting").text("TBD");
+	      $("#azimuth").text("TBD");
+	      $("#altitude").text("TBD");
+
+            } else {
+
+              $("#rising").text(data.rising);
+	      $("#transit").text(data.transit);
+	      $("#setting").text(data.setting);
+	      $("#azimuth").text(data.azimuth);
+	      $("#altitude").text(data.altitude);
+            };
 
 	  });
-
 
 </pre>
 
@@ -201,36 +277,43 @@ side, this is read in from the flask request args and the results are returned a
 </p>
 
 <pre>
-
-@app.route("/_get_sun_position")
-def get_sun_position():
+@app.route("/get_sun_position_ajax")
+def get_sun_position_ajax():
     """Get sun position
 
-    This uses AJAX to connect a button click event to do the
-    calculation and return the resut as a JSON object.
+    This was written to handle a JQuery AJAX call to connect a button
+    click event to send a get request with parameters for:
 
-    a_latitude = flask.request.args.get('latitude', 0, type=float)
+    latitude, longitude, date, time timezone, dst
 
+    The server does calculation and return the sun position data as a
+    JSON object.
+
+    If there is an exception, this returns an error key with the
+    message as the value in the same JSON object. The caller is
+    expected to handle it as they see fit.
     """
 
-    a_latitude_str = flask.request.args.get('latitude')
-    a_longitude_str = flask.request.args.get('longitude')
+    try:
 
-    a_date_str = flask.request.args.get('date')
-    a_time_str = flask.request.args.get('time')
-    a_timezone_str = flask.request.args.get('timezone')
+        # TODO difference in template ajax input :checked selector and form
+        if flask.request.args.get('dst') == 'true':
+            is_dst = True
+        else:
+            is_dst = False
 
-    rising, transit, setting, az_str, alt_str = calculate_sun_position(
-        a_latitude_str, a_longitude_str,
-        a_date_str, a_time_str, a_timezone_str)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
-    result = dict()
+    except (ValueError, RuntimeError) as err:
 
-    result['rising'] = rising
-    result['transit'] = transit
-    result['setting'] = setting
-    result['azimuth'] = az_str
-    result['altitude'] = alt_str
+        app.logger.error(err)
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
 
