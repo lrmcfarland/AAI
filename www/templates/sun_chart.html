@@ -128,88 +128,9 @@
 
   <h2>Observer's Location</h2>
 
-  <table>
 
-    <tr>
+  {% include "observer_input.html" %}
 
-      <th>
-	<button type="button" id="set_location">set location</button>
-      </th>
-
-      <th>Latitude</th>
-
-      <td>
-	<input type="text" id="_latitude" name="latitude">
-      </td>
-
-      <td>deg:min:sec</td>
-
-    </tr>
-
-
-    <tr>
-      <th></th>
-
-      <th>Longitude</th>
-
-      <td>
-	<input type="text" id="_longitude" name="longitude">
-      </td>
-
-      <td>deg:min:sec</td>
-
-    </tr>
-
-
-    <tr>
-      <td></td>
-
-      <th>Date</th>
-
-      <td>
-        <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
-      </td>
-
-      <td>year-mm-dd</td>
-
-    </tr>
-
-    <tr>
-
-      <th>
-	<button id="set_time">set time</button>
-      </th>
-
-      <th>Local Time</th>
-
-      <td><input type="text" id="_time" name="time" value="12:00"></td>
-
-      <td>hr(24):min:sec</td>
-
-    </tr>
-
-    <tr>
-      <td></td>
-
-      <th>Time Zone</th>
-      <td><input type="text" id="_timezone" name="timezone" value="0"></td>
-      <td>hr</td>
-    </tr>
-
-
-    <tr>
-      <td></td>
-      <th>Daylight Savings</th>
-      <td>
-	<input type="checkbox" id="_dst" name="dst">
-      </td>
-    </tr>
-
-
-
-    </table>
-
-</div>
 
   <br>
 

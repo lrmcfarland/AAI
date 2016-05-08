@@ -10,35 +10,6 @@
 
     $(document).ready(function() {
 
-      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
-
-      $("#set_location").click(function(e) {
-        {# astronomy.js uses document.getElementById #}
-	astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
-      });
-
-
-      $("#set_time").click(function(e) {
-
-        {# TODO pad time with leading 0s #}
-
-        var now = new Date();
-
-        var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) +
-                       "-" + now.getDate();
-        $("#_date").val(date_str);
-
-        var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-        $("#_time").val(time_str);
-      });
-
-
-      $("#_longitude").change(function() {
-        var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
-        $("#_timezone").val(timezone);
-      });
-
-
       $("#get_sun_position").click(function(e) {
 
 	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
@@ -103,86 +74,9 @@
 
   <h2>Observer's Location</h2>
 
-  <table>
 
-    <tr>
+  {% include "observer_input.html" %}
 
-      <th>
-	<button type="button" id="set_location">set location</button>
-      </th>
-
-      <th>Latitude</th>
-
-      <td>
-	<input type="text" id="_latitude" name="latitude">
-      </td>
-
-      <td>deg:min:sec</td>
-
-    </tr>
-
-
-    <tr>
-      <th></th>
-
-      <th>Longitude</th>
-
-      <td>
-	<input type="text" id="_longitude" name="longitude">
-      </td>
-
-      <td>deg:min:sec</td>
-
-    </tr>
-
-
-    <tr>
-      <td></td>
-
-      <th>Date</th>
-
-      <td>
-        <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
-      </td>
-
-      <td>year-mm-dd</td>
-
-    </tr>
-
-    <tr>
-
-      <th>
-	<button id="set_time">set time</button>
-      </th>
-
-      <th>Local Time</th>
-
-      <td><input type="text" id="_time" name="time" value="12:00"></td>
-
-      <td>hr(24):min:sec</td>
-
-    </tr>
-
-    <tr>
-      <td></td>
-
-      <th>Time Zone</th>
-      <td><input type="text" id="_timezone" name="timezone" value="0"></td>
-      <td>hr</td>
-    </tr>
-
-
-    <tr>
-      <td></td>
-      <th>Daylight Savings</th>
-      <td>
-	<input type="checkbox" id="_dst" name="dst">
-      </td>
-    </tr>
-
-
-
-    </table>
 
   <br>
 

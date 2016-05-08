@@ -3,44 +3,21 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-  <script type="text/javascript">
+
+<script type="text/javascript">
 
     $(function() {
 
-      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
-
-
-      $("#set_location").click(function(e) {
-        {# astronomy.js uses document.getElementById #}
-        astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
+      $("#get_sun_position").click(function(e) {
+	document.forms["observer_form"].submit();
       });
-
-
-      $("#set_time").click(function(e) {
-
-        {# TODO pad time with leading 0s #}
-
-        var now = new Date();
-
-        var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) +
-                       "-" + now.getDate();
-        $("#_date").val(date_str);
-
-        var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-        $("#_time").val(time_str);
-
-      });
-
-
-      $("#_longitude").change(function() {
-        var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
-        $("#_timezone").val(timezone);
-      });
-
 
     });
 
-  </script>
+
+</script>
+
+
 {% endblock %}
 
 {% block title %} Astronomical Algorithms Implemented {% endblock %}
@@ -62,92 +39,16 @@ needed.
 
 <br>
 
-<form action="{{ url_for('get_sun_position_form') }}">
+<form name="observer_form" action="{{ url_for('get_sun_position_form') }}">
 
-  <table>
-
-    <tr>
-
-      <td>
-	<button type="button" id="set_location">set location</button>
-      </td>
-
-      <th>Latitude</th>
-
-      <td>
-	<input type="text" id="_latitude" name="latitude">
-      </td>
-
-      <td>deg:min:sec</td>
-
-    </tr>
-
-    <tr>
-
-      <td>
-      </td>
-
-      <th>Longitude</th>
-
-      <td>
-	<input type="text" id="_longitude" name="longitude">
-      </td>
-
-      <td>deg:min:sec</td>
-
-    </tr>
-
-    <tr>
-      <td></td>
-
-      <th>Date</th>
-
-      <td>
-	<input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
-      </td>
-      <td>year-mm-dd</td>
-    </tr>
-
-    <tr>
-
-      <td>
-	<button type="button" id="set_time">set time</button>
-      </td>
-
-      <th>Local Time</th>
-      <td><input type="text" id="_time" name="time" value="12:00"></td>
-      <td>hr:min:sec</td>
-    </tr>
-
-    <tr>
-      <td></td>
-
-      <th>Time Zone</th>
-      <td>
-	<input type="text" id="_timezone" name="timezone" value="0">
-      </td>
-      <td>hr</td>
-
-    </tr>
-
-    <tr>
-      <td></td>
-      <th>Daylight Savings</th>
-      <td>
-	<input type="checkbox" id="_dst" name="dst">
-      </td>
-    </tr>
-
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td><input type="submit" value="Get Sun Position"></td>
-    </tr>
-
-  </table>
+  {% include "observer_input.html" %}
 
 </form>
+
+<br>
+
+<button id="get_sun_position">get sun position</button>
+
 
 </div>
 
@@ -172,7 +73,7 @@ with this <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a> code
 
 <pre>
 
-    &lt;form action="&#123;&#123; url_for('sun_position') &#125;&#125;"&gt;
+    &lt;form name="observer_form" action="&#123;&#123; url_for('sun_position') &#125;&#125;"&gt;
 ...
     &lt;input type="text" id="_longitude" name="longitude"&gt;
 
@@ -194,41 +95,41 @@ def get_sun_position_form():
 
     This uses a html form to provide the input with the name to connect the
 
-        &lt;input type=text name=of_latitude&gt;
+	&lt;input type=text name=of_latitude&gt;
 
     via flask
 
-        val = flask.request.values.get('latitude')
+	val = flask.request.values.get('latitude')
 
     And returns a page of results:
 
-        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
+	flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
 
     """
 
     try:
 
 
-        # TODO meh
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'on':
-            is_dst = True
-        else:
-            is_dst = False
+	# TODO meh
+	# TODO difference in template ajax input :checked selector and form
+	if flask.request.args.get('dst') == 'on':
+	    is_dst = True
+	else:
+	    is_dst = False
 
-        result = calculate_sun_position(request_angle('latitude'),
-                                        request_angle('longitude'),
-                                        request_datetime('date',
-                                                         'time',
-                                                         request_float('timezone'),
-                                                         is_dst),
-                                        is_dst)
+	result = calculate_sun_position(request_angle('latitude'),
+					request_angle('longitude'),
+					request_datetime('date',
+							 'time',
+							 request_float('timezone'),
+							 is_dst),
+					is_dst)
 
     except (ValueError, RuntimeError) as err:
 
-        app.logger.error(err)
-        flask.flash(err)
-        return flask.render_template('flashes.html')
+	app.logger.error(err)
+	flask.flash(err)
+	return flask.render_template('flashes.html')
 
     return flask.render_template('sun_position_form.html', **result)
 
