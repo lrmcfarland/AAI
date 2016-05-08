@@ -245,13 +245,6 @@ def home():
     return flask.render_template('home.html')
 
 
-@app.route("/observer_form")
-def observer_form():
-    """A form for submitting an observer's location in space and time"""
-
-    return flask.render_template('observer_form.html')
-
-
 @app.route("/observer_ajax")
 def observer_ajax():
     """Use AJAX to send observer's location to the server"""
@@ -259,7 +252,6 @@ def observer_ajax():
     flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
 
     return flask.render_template('observer_ajax.html')
-
 
 
 @app.route("/get_sun_position_ajax")
@@ -302,6 +294,13 @@ def get_sun_position_ajax():
         result = {'error': str(err)}
 
     return flask.jsonify(**result)
+
+
+@app.route("/observer_form")
+def observer_form():
+    """A form for submitting an observer's location in space and time"""
+
+    return flask.render_template('observer_form.html')
 
 
 @app.route("/get_sun_position_form")
@@ -349,6 +348,13 @@ def get_sun_position_form():
         return flask.render_template('flashes.html')
 
     return flask.render_template('sun_position_form.html', **result)
+
+
+@app.route("/sun_chart")
+def sun_chart():
+    """Plot the sun position for the observer's location in space and time"""
+
+    return flask.render_template('sun_chart.html')
 
 
 # ================
