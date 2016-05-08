@@ -1,4 +1,4 @@
-{# Observer Location input template #}
+{# flask ajax example #}
 
 {% extends "base.html" %}
 
@@ -19,8 +19,15 @@
 
 
       $("#set_time").click(function(e) {
-        var now = new Date();
+
         {# TODO pad time with leading 0s #}
+
+        var now = new Date();
+
+        var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) +
+                       "-" + now.getDate();
+        $("#_date").val(date_str);
+
         var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
         $("#_time").val(time_str);
       });
@@ -83,15 +90,18 @@
 
 {% block content %}
 
-<h1>Flask AJAX and jQuery Pattern</h1>
+<h1>Sun Position (AJAX example)</h1>
 
-<p>
-Enter the observer's location in space and time and the get sun
-position button will update the current page with the sun's position.
-Timezone is estimated from the longitude, but should be adjusted as
-needed.
-</p>
+<div>
 
+  <p>
+    Enter the observer's location in space and time and the get sun
+    position button will update the current page with the sun's position.
+    Timezone is estimated from the longitude, but should be adjusted as
+    needed.
+  </p>
+
+  <h2>Observer's Location</h2>
 
   <table>
 
@@ -171,6 +181,15 @@ needed.
     </tr>
 
 
+
+    </table>
+
+  <br>
+
+  <h2>Sun's Position</h2>
+
+    <table>
+
     <tr>
 
       <th>
@@ -213,28 +232,28 @@ needed.
 
   </table>
 
+</div>
 
 <hr>
 
+<div>
 
-<p>
+  <p>
 
-<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_ajax.html">
-This
-</a>
-is an example of the
-<a href="http://flask.pocoo.org/docs/0.10/patterns/jquery/">flask
-AJAX with jQuery pattern</a>.
+    <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_ajax.html">
+      This
+    </a> is an example of the
+    <a href="http://flask.pocoo.org/docs/0.10/patterns/jquery/">flask
+      AJAX with jQuery pattern</a>.
+  </p>
 
-</p>
+  <p>
+    Observer data are read from the observer's input elements by name and
+    sent as a JSON object to the get_sun_position page on the server as
+    a button click event:
+  </p>
 
-<p>
-Observer data are read from the observer's input elements by id and sent as a
-JSON get query to the get_sun_position page on the server as a button click
-event:
-</p>
-
-<pre>
+  <pre>
 	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
 	  {
 	    latitude: $('input[name="latitude"]').val(),
@@ -268,15 +287,16 @@ event:
 
 	  });
 
-</pre>
+  </pre>
 
-<p>
-On the
- <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
-side, this is read in from the flask request args and the results are returned as a JSON string
-</p>
+  <p>
+    On the
+    <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
+    side, this is read in from the flask request args and the results
+    are returned as a JSON string
+  </p>
 
-<pre>
+  <pre>
 @app.route("/get_sun_position_ajax")
 def get_sun_position_ajax():
     """Get sun position
@@ -319,10 +339,11 @@ def get_sun_position_ajax():
 
 </pre>
 
-<p>
-  The results are then used to update the display.
-</p>
+  <p>
+    The results are then used to update the display.
+  </p>
 
+</div>
 
 
 {% endblock %}
