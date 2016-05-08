@@ -123,15 +123,11 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
 
     # TODO regex validation
 
-
     ymd = flask.request.args.get(a_date_key).split('-') # ASSUMES: yyyy-mm-dd format
 
     hms = flask.request.args.get(a_time_key).split(':') # ASSUMES: hh:mm:ss.ss
     while len(hms) < 3:
         hms.append('0')
-
-    if is_dst:
-        hms[0] = int(hms[0]) - 1
 
     a_datetime = coords.datetime(int(ymd[0]),
                                  int(ymd[1]),
@@ -140,6 +136,8 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
                                  int(hms[1]),
                                  float(hms[2]),
                                  a_timezone)
+    if is_dst:
+        a_datetime -= 1.0/24
 
     return a_datetime
 
