@@ -173,7 +173,6 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
     if is_dst:
-        # TODO += 1.0/24.0 fails? julian day rounding error? works in c++
 
         rising = coords.datetime(rising.year,
                                  rising.month,
@@ -227,9 +226,9 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     return result
 
 
-# ---------------
-# ----- app -----
-# ---------------
+# ===============
+# ===== app =====
+# ===============
 
 app = flask.Flask(__name__) # must be before decorators
 
@@ -242,6 +241,9 @@ def home():
 
     return flask.render_template('home.html')
 
+# -----------------------------
+# ----- sun position ajax -----
+# -----------------------------
 
 @app.route("/sun_position_ajax")
 def sun_position_ajax():
@@ -293,6 +295,9 @@ def get_sun_position_ajax():
 
     return flask.jsonify(**result)
 
+# ------------------------------
+# ----- sun position forms -----
+# ------------------------------
 
 @app.route("/sun_position_form_in")
 def sun_position_form_in():
@@ -321,8 +326,6 @@ def get_sun_position_form():
 
     try:
 
-
-        # TODO meh
         # TODO difference in template ajax input :checked selector and form
         if flask.request.args.get('dst') == 'on':
             is_dst = True
@@ -337,8 +340,6 @@ def get_sun_position_form():
                                                          is_dst),
                                         is_dst)
 
-
-
     except (ValueError, RuntimeError) as err:
 
         app.logger.error(err)
@@ -348,7 +349,9 @@ def get_sun_position_form():
     return flask.render_template('sun_position_form_out.html', **result)
 
 
-
+# ---------------------
+# ----- sun chart -----
+# ---------------------
 
 
 @app.route("/sun_chart")
@@ -356,6 +359,87 @@ def sun_chart():
     """Plot the sun position for the observer's location in space and time"""
 
     return flask.render_template('sun_chart.html')
+
+
+@app.route("/get_sun_position_chart")
+def sun_position_chart():
+    """Get the sun position chart for the given day"""
+
+    try:
+
+        result = dict()
+
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
+
+
+        result['observer'] = str(an_observer) # TODO
+
+        # TODO difference in template ajax input :checked selector and form
+        if flask.request.args.get('dst') == 'true':
+            is_dst = True
+        else:
+            is_dst = False
+
+
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
+
+        result['datetime'] = str(a_datetime)
+
+
+        # TODO current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
+        # TODO this has problems with timezone?
+
+
+        print 'a datetime', a_datetime # TODO rm
+
+        JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
+
+        current_time = coords.datetime()
+        current_time.fromJulianDate(JDo) # the last midnight of the current datetime
+        current_time.timezone = a_datetime.timezone
+
+        current_time += a_datetime.timezone * 1.0/24 # to center plot at noon
+
+        sun_position = list()
+
+        sun_position.append(['time', 'altitude'])
+
+        for d in range(0, 48):
+
+            sun = SunPosition.SunPosition(an_observer, current_time)
+
+            # TODO sun_position.append([current_time.toJulianDate(), utils.get_altitude(sun).value])
+
+            # correct for timezone
+            foo = coords.datetime()
+            foo.fromJulianDate(current_time.toJulianDate())
+            foo.timezone = a_datetime.timezone
+
+
+            sun_position.append([str(foo), utils.get_altitude(sun).value])
+
+
+            print current_time, foo, current_time.toJulianDate(), utils.get_altitude(sun).value # TODO rm
+
+            current_time += 1.0/48
+
+
+        result['position'] = sun_position
+
+        print 'result:', result # TODO rm
+
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        result = {'error': str(err)}
+
+    return flask.jsonify(**result)
+
 
 
 # ================
