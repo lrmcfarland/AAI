@@ -390,9 +390,6 @@ def sun_position_chart():
         result['datetime'] = str(a_datetime)
 
 
-        # TODO current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
-        # TODO this has problems with timezone?
-
 
         print 'a datetime', a_datetime # TODO rm
 
@@ -408,29 +405,29 @@ def sun_position_chart():
 
         sun_position.append(['time', 'altitude'])
 
-        for d in range(0, 48):
+
+        npts = 24*4
+
+        for d in range(0, npts):
 
             sun = SunPosition.SunPosition(an_observer, current_time)
 
             # TODO sun_position.append([current_time.toJulianDate(), utils.get_altitude(sun).value])
 
-            # correct for timezone
-            foo = coords.datetime()
-            foo.fromJulianDate(current_time.toJulianDate())
-            foo.timezone = a_datetime.timezone
+            if is_dst:
+                dtime = current_time.hour + 1 + current_time.minute/60.0
+            else:
+                dtime = current_time.hour + current_time.minute/60.0
 
+            sun_position.append([dtime, utils.get_altitude(sun).value])
 
-            sun_position.append([str(foo), utils.get_altitude(sun).value])
+            print current_time, dtime,  utils.get_altitude(sun).value # TODO rm
 
-
-            print current_time, foo, current_time.toJulianDate(), utils.get_altitude(sun).value # TODO rm
-
-            current_time += 1.0/48
+            current_time += 1.0/npts
 
 
         result['position'] = sun_position
 
-        print 'result:', result # TODO rm
 
 
     except (ValueError, RuntimeError) as err:

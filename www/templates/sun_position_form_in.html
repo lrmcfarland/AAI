@@ -28,13 +28,23 @@
 
 <div>
 
+<p>
+This is an example of an HTML form.
+The submit action sends a request url to the server with parameters
+from the input elements on the location form. The server returns a new
+page with the results.
+I did add some JavaScript to put the submit
+button outside the form to prevent confusion with the set location and time buttons
+inside the form. I left the form's submit attribute unset.
+</p>
+
 <h2>Observer's Location</h2>
 
 <p>
 Enter the observer's location in space and time in the form and the
-submit button will take the user to a page with the sun's position.
-Timezone is estimated from the longitude, but should be adjusted as
-needed.
+"get sun position" button will take the user to a page with the sun's
+position results. The timezone is estimated from the longitude, but
+should be adjusted as needed.
 </p>
 
 <br>
@@ -60,62 +70,55 @@ needed.
 <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position_form_in.html">
 This
 </a>
-is an example from the
+follows the example in the
 <a href="http://flask.pocoo.org/docs/0.10/tutorial/templates/">flask tutorial</a>
-using html forms.
+for using html forms.
 </p>
 
 <p>
 Observer data are read from the input elements form on this page by
 name and sent to the sun_position url as the submit action of the form
-with this <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a> code
+using the python templating
+language <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a>
 </p>
 
 <pre>
 
-    &lt;form name="observer_form" action="&#123;&#123; url_for('sun_position') &#125;&#125;"&gt;
-...
+    &lt;form name="observer_form" action="&#123;&#123; url_for('get_sun_position_form') &#125;&#125;"&gt;
+
+      &#123;&#37; include "observer_input.html" &#37;&#125;
+
+    &lt;&#47;form&gt;
+
+</pre>
+
+And from
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_input.html">
+ observer_input.html
+</a>
+
+<pre>
+
     &lt;input type="text" id="_longitude" name="longitude"&gt;
 
+    et al.
 
 </pre>
 
 <p>
-In the sun_position url on the
+In the sun_position url, on the
  <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
 side, the form data are accessed as key value pairs of strings.
-The input is converted to numbers and used to calculate the results. These are
+They are converted to numbers and used to calculate the results. These are
 passed as keyword arguments to flask.render_template:
 </p>
 
 <pre>
+
 @app.route("/get_sun_position_form")
 def get_sun_position_form():
-    """Get the sun position for the form example.
 
-    This uses a html form to provide the input with the name to connect the
-
-	&lt;input type=text name=of_latitude&gt;
-
-    via flask
-
-	val = flask.request.values.get('latitude')
-
-    And returns a page of results:
-
-	flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
-
-    """
-
-    try:
-
-
-	# TODO meh
-	# TODO difference in template ajax input :checked selector and form
-	if flask.request.args.get('dst') == 'on':
-	    is_dst = True
-	else:
-	    is_dst = False
+    ...
 
 	result = calculate_sun_position(request_angle('latitude'),
 					request_angle('longitude'),
@@ -125,29 +128,41 @@ def get_sun_position_form():
 							 is_dst),
 					is_dst)
 
-    except (ValueError, RuntimeError) as err:
+    ...
 
-	app.logger.error(err)
-	flask.flash(err)
-	return flask.render_template('flashes.html')
-
-    return flask.render_template('sun_position_form.html', **result)
+    return flask.render_template('sun_position_form_out.html', **result)
 
 </pre>
 
 <p>
-Inside the template, these keyword arguments are accessable via Jinja2 macros
+The results dictionary is populated like this:
+</p>
+
+<pre>
+
+    result = dict()
+    result['latitude'] = str(a_latitude)
+    result['longitude'] = str(a_longitude)
+    result['datetime'] = str(a_datetime)
+    result['dst'] = is_dst
+
+    result['eot'] = str(SunPosition.EquationOfTime(a_datetime))
+    result['obliquity'] = str(EclipticEquatorial.obliquity(a_datetime))
+
+
+</pre>
+
+<p>
+Inside the
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position.html">sun
+position page</a>, these keyword arguments are accessable via Jinja2
+macros to display the results.
 </p>
 
 <pre>
       &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
 </pre>
 
-<p>
-And used this way to display the results on the
-
-<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position.html">sun position page</a>.
-</b>
 
 </div>
 

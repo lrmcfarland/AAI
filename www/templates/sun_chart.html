@@ -44,26 +44,20 @@
 
       function drawChart(data) {
 
-
 	var data = google.visualization.arrayToDataTable(data.position)
 
-	var odata = google.visualization.arrayToDataTable([
-	  ['Year', 'Altitude'],
-	  [2004,  1000],
-	  [2005,  1170],
-	  [2006,  660],
-	  [2007,  1030]
-	 ]);
+	var options = {
 
-	 var options = {
-	   title: 'Sun Position',
-	   curveType: 'function',
-	   legend: { position: 'bottom' }
-	 };
+            "title": "Sun Position",
 
-	 var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
+            "hAxis": { "title": "hour"},
+            "vAxis": { "title": "altitude in degrees", "minValue": -100, "maxValue": 100}
 
-	 chart.draw(data, options);
+	};
+
+	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
+
+	chart.draw(data, options);
 
       }
 
@@ -112,6 +106,10 @@
 
 <h1>Sun Position (google charts example)</h1>
 
+<br>
+
+  <h2>Observer's Location</h2>
+
 <div>
 
   <p>
@@ -120,8 +118,6 @@
     Timezone is estimated from the longitude, but should be adjusted as
     needed.
   </p>
-
-  <h2>Observer's Location</h2>
 
 
   {% include "observer_input.html" %}
