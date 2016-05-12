@@ -19,29 +19,29 @@
 	    date: $('input[name="date"]').val(),
 	    time: $('input[name="time"]').val(),
 	    timezone: $('input[name="timezone"]').val(),
-	    dst: $("#_dst").is(':checked') {# jQuery selector #}
+	    dst: $("#_dst").is(':checked')  {# jquery selector: resoves to 'true' or 'false' #}
 
 	  },
 	  function(data) {
 
-            if ("error" in data) {
+	    if ("error" in data) {
 
-              alert("Error: " + data.error);
+	      alert("Error: " + data.error);
 
-              $("#rising").text("TBD");
+	      $("#rising").text("TBD");
 	      $("#transit").text("TBD");
 	      $("#setting").text("TBD");
 	      $("#azimuth").text("TBD");
 	      $("#altitude").text("TBD");
 
-            } else {
+	    } else {
 
-              $("#rising").text(data.rising);
+	      $("#rising").text(data.rising);
 	      $("#transit").text(data.transit);
 	      $("#setting").text(data.setting);
 	      $("#azimuth").text(data.azimuth);
 	      $("#altitude").text(data.altitude);
-            };
+	    };
 
 	  });
 
@@ -170,24 +170,24 @@ form example which takes you to a new page).
 	  },
 	  function(data) {
 
-            if ("error" in data) {
+	    if ("error" in data) {
 
-              alert("Error: " + data.error);
+	      alert("Error: " + data.error);
 
-              $("#rising").text("TBD");
+	      $("#rising").text("TBD");
 	      $("#transit").text("TBD");
 	      $("#setting").text("TBD");
 	      $("#azimuth").text("TBD");
 	      $("#altitude").text("TBD");
 
-            } else {
+	    } else {
 
-              $("#rising").text(data.rising);
+	      $("#rising").text(data.rising);
 	      $("#transit").text(data.transit);
 	      $("#setting").text(data.setting);
 	      $("#azimuth").text(data.azimuth);
 	      $("#altitude").text(data.altitude);
-            };
+	    };
 
 	  });
 
@@ -220,24 +220,24 @@ def get_sun_position_ajax():
 
     try:
 
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'true':
-            is_dst = True
-        else:
-            is_dst = False
+	# TODO difference in template ajax input :checked selector and form
+	if flask.request.args.get('dst') == 'true':
+	    is_dst = True
+	else:
+	    is_dst = False
 
-        result = calculate_sun_position(request_angle('latitude'),
-                                        request_angle('longitude'),
-                                        request_datetime('date',
-                                                         'time',
-                                                         request_float('timezone'),
-                                                         is_dst),
-                                        is_dst)
+	result = calculate_sun_position(request_angle('latitude'),
+					request_angle('longitude'),
+					request_datetime('date',
+							 'time',
+							 request_float('timezone'),
+							 is_dst),
+					is_dst)
 
     except (ValueError, RuntimeError) as err:
 
-        app.logger.error(err)
-        result = {'error': str(err)}
+	app.logger.error(err)
+	result = {'error': str(err)}
 
     return flask.jsonify(**result)
 

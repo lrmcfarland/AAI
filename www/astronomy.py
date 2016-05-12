@@ -274,11 +274,9 @@ def get_sun_position_ajax():
 
     try:
 
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'true':
-            is_dst = True
-        else:
-            is_dst = False
+        # input :checked selector returns 'true' and 'false'
+        # val() is 'no' or None
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
         result = calculate_sun_position(request_angle('latitude'),
                                         request_angle('longitude'),
@@ -326,11 +324,9 @@ def get_sun_position_form():
 
     try:
 
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'on':
-            is_dst = True
-        else:
-            is_dst = False
+        # input :checked selector returns 'true' and 'false'
+        # val() is 'no' or None
+        is_dst = True if flask.request.args.get('dst') == 'on' else False
 
         result = calculate_sun_position(request_angle('latitude'),
                                         request_angle('longitude'),
@@ -372,15 +368,9 @@ def sun_position_chart():
         an_observer = utils.latlon2spherical(request_angle('latitude'),
                                              request_angle('longitude'))
 
+        result['observer'] = str(an_observer) # TODO format?
 
-        result['observer'] = str(an_observer) # TODO
-
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'true':
-            is_dst = True
-        else:
-            is_dst = False
-
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
         a_datetime = request_datetime('date',
                                       'time',
@@ -388,10 +378,6 @@ def sun_position_chart():
                                       is_dst)
 
         result['datetime'] = str(a_datetime)
-
-
-
-        print 'a datetime', a_datetime # TODO rm
 
         JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
 
