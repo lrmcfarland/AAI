@@ -52,6 +52,8 @@ def request_float(a_float_str):
 
     a_float = flask.request.args.get(a_float_str, type=float)
 
+    app.logger.debug('request float: {a_float_str}: {a_float}'.format(**locals()))
+
     if a_float is None:
         raise ValueError('{a_float_str} is not a float: {a_value}'.format(
             a_float_str=a_float_str, a_value=flask.request.args.get(a_float_str)))
@@ -117,9 +119,6 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
     Returns: coords.datetime
     Raises: value exception on format error
     """
-
-    app.logger.debug('request date: {a_date_key} {a_time_key} {a_timezone} {is_dst}'.format(
-        **locals()))
 
     # TODO regex validation
 
@@ -379,37 +378,76 @@ def sun_position_chart():
 
         result['datetime'] = str(a_datetime)
 
-        JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
 
-        current_time = coords.datetime()
-        current_time.fromJulianDate(JDo) # the last midnight of the current datetime
+        current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
         current_time.timezone = a_datetime.timezone
+        current_time += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        current_time += a_datetime.timezone * 1.0/24 # to center plot at noon
+        vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
+        vernal_equinox.timezone = a_datetime.timezone
+        vernal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        summer_solstice = coords.datetime(a_datetime.year, 6, 20) # TODO not every year
+        summer_solstice.timezone = a_datetime.timezone
+        summer_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        autumnal_equinox = coords.datetime(a_datetime.year, 9, 22) # TODO not every year
+        autumnal_equinox.timezone = a_datetime.timezone
+        autumnal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        winter_solstice = coords.datetime(a_datetime.year, 12, 21) # TODO not every year
+        winter_solstice.timezone = a_datetime.timezone
+        winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+
 
         sun_position = list()
 
-        sun_position.append(['time', 'altitude'])
+        sun_position.append(['time',
+                             '{year}-{month}-{day}'.format(year=current_time.year,
+                                                           month=current_time.month,
+                                                           day=current_time.day),
+                             'Vernal Equinox',
+                             'Summer Solstice',
+                             'Autumnal Equinox',
+                             'Winter Solstice'
+                         ]
+                        )
 
 
         npts = 24*4
 
-        for d in range(0, npts):
+        if is_dst:
+            dtime = 1
+        else:
+            dtime = 0
 
-            sun = SunPosition.SunPosition(an_observer, current_time)
+        for d in range(0, npts + 1):
 
-            # TODO sun_position.append([current_time.toJulianDate(), utils.get_altitude(sun).value])
+            sun_ct = SunPosition.SunPosition(an_observer, current_time)
+            sun_ve = SunPosition.SunPosition(an_observer, vernal_equinox)
+            sun_ss = SunPosition.SunPosition(an_observer, summer_solstice)
+            sun_ae = SunPosition.SunPosition(an_observer, autumnal_equinox)
+            sun_ws = SunPosition.SunPosition(an_observer, winter_solstice)
 
-            if is_dst:
-                dtime = current_time.hour + 1 + current_time.minute/60.0
-            else:
-                dtime = current_time.hour + current_time.minute/60.0
 
-            sun_position.append([dtime, utils.get_altitude(sun).value])
+            sun_position.append([dtime,
+                                 utils.get_altitude(sun_ct).value,
+                                 utils.get_altitude(sun_ve).value,
+                                 utils.get_altitude(sun_ss).value,
+                                 utils.get_altitude(sun_ae).value,
+                                 utils.get_altitude(sun_ws).value
+                             ]
+                            )
 
-            print current_time, dtime,  utils.get_altitude(sun).value # TODO rm
+
+            dtime += 1.0/npts*24
 
             current_time += 1.0/npts
+            vernal_equinox += 1.0/npts
+            summer_solstice += 1.0/npts
+            autumnal_equinox += 1.0/npts
+            winter_solstice += 1.0/npts
 
 
         result['position'] = sun_position
