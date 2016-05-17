@@ -204,6 +204,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     # TODO error check for timezone and observer location?
 
+    # TODO more steps on p. 103?
+    # TODO set timezone on rising, transit, setting value
 
     Args:
 
@@ -257,21 +259,27 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     # longitude sign convention is IAU, opposite Meeus p. 93
     m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
+
     m0.normalize(0, 1)
 
-    transit = coords.datetime()
-    transit.fromJulianDate(midnight.toJulianDate() + m0.value + a_datetime.timezone/12)
-    transit.timezone = a_datetime.timezone # local time
+    transit = coords.datetime(midnight.year, midnight.month, midnight.day)
+    transit += m0.value
+    transit += a_datetime.timezone/24
 
-    rising = coords.datetime()
     m1 = coords.angle(m0.value - hour_angle.value/360)
-    rising.fromJulianDate(midnight.toJulianDate() + m1.value + a_datetime.timezone/12)
-    rising.timezone = a_datetime.timezone # local time
+    m1.normalize(0, 1)
 
-    setting = coords.datetime()
+    rising = coords.datetime(midnight.year, midnight.month, midnight.day)
+    rising += m1.value
+    rising += a_datetime.timezone/24
+
     m2 = coords.angle(m0.value + hour_angle.value/360)
-    setting.fromJulianDate(midnight.toJulianDate() + m2.value + a_datetime.timezone/12)
-    setting.timezone = a_datetime.timezone # local time
+    # TODO m2.normalize(0, 1) ?
+
+    setting = coords.datetime(midnight.year, midnight.month, midnight.day)
+    setting += m2.value
+    setting += a_datetime.timezone/24
+
 
     return rising, transit, setting
 

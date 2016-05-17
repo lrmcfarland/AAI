@@ -1,0 +1,169 @@
+{# flask form example #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+    $(function() {
+
+      $("#get_sun_position").click(function(e) {
+	document.forms["observer_form"].submit();
+      });
+
+    });
+
+
+</script>
+
+
+{% endblock %}
+
+{% block title %} Astronomical Algorithms Implemented {% endblock %}
+
+{% block content %}
+
+<h1>Sun Position (form example)</h1>
+
+<div>
+
+<p>
+This is an example of an HTML form.
+The submit action sends a request url to the server with parameters
+from the input elements on the location form. The server returns a new
+page with the results.
+I did add some JavaScript to put the submit
+button outside the form to prevent confusion with the set location and time buttons
+inside the form. I left the form's submit attribute unset.
+</p>
+
+<h2>Observer's Location</h2>
+
+<p>
+Enter the observer's location in space and time in the form and the
+"get sun position" button will take the user to a page with the sun's
+position results. The timezone is estimated from the longitude, but
+should be adjusted as needed.
+</p>
+
+<br>
+
+<form name="observer_form" action="{{ url_for('get_sun_position_form') }}">
+
+  {% include "observer_input.html" %}
+
+</form>
+
+<br>
+
+<button id="get_sun_position">get sun position</button>
+
+
+</div>
+
+<hr>
+
+<div>
+
+<p>
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position_form_in.html">
+This
+</a>
+follows the example in the
+<a href="http://flask.pocoo.org/docs/0.10/tutorial/templates/">flask tutorial</a>
+for using html forms.
+</p>
+
+<p>
+Observer data are read from the input elements form on this page by
+name and sent to the sun_position url as the submit action of the form
+using the python templating
+language <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a>
+</p>
+
+<pre>
+
+    &lt;form name="observer_form" action="&#123;&#123; url_for('get_sun_position_form') &#125;&#125;"&gt;
+
+      &#123;&#37; include "observer_input.html" &#37;&#125;
+
+    &lt;&#47;form&gt;
+
+</pre>
+
+And from
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_input.html">
+ observer_input.html
+</a>
+
+<pre>
+
+    &lt;input type="text" id="_longitude" name="longitude"&gt;
+
+    et al.
+
+</pre>
+
+<p>
+In the sun_position url, on the
+ <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
+side, the form data are accessed as key value pairs of strings.
+They are converted to numbers and used to calculate the results. These are
+passed as keyword arguments to flask.render_template:
+</p>
+
+<pre>
+
+@app.route("/get_sun_position_form")
+def get_sun_position_form():
+
+    ...
+
+	result = calculate_sun_position(request_angle('latitude'),
+					request_angle('longitude'),
+					request_datetime('date',
+							 'time',
+							 request_float('timezone'),
+							 is_dst),
+					is_dst)
+
+    ...
+
+    return flask.render_template('sun_position_form_out.html', **result)
+
+</pre>
+
+<p>
+The results dictionary is populated like this:
+</p>
+
+<pre>
+
+    result = dict()
+    result['latitude'] = str(a_latitude)
+    result['longitude'] = str(a_longitude)
+    result['datetime'] = str(a_datetime)
+    result['dst'] = is_dst
+
+    result['eot'] = str(SunPosition.EquationOfTime(a_datetime))
+    result['obliquity'] = str(EclipticEquatorial.obliquity(a_datetime))
+
+
+</pre>
+
+<p>
+Inside the
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position.html">sun
+position page</a>, these keyword arguments are accessable via Jinja2
+macros to display the results.
+</p>
+
+<pre>
+      &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
+</pre>
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,253 @@
+{# flask ajax example #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+  <script type="text/javascript">
+
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    $(document).ready(function() {
+
+      $("#get_sun_position").click(function(e) {
+
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
+	  {
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked')  {# jquery selector: resoves to 'true' or 'false' #}
+
+	  },
+	  function(data) {
+
+	    if ("error" in data) {
+
+	      alert("Error: " + data.error);
+
+	      $("#rising").text("TBD");
+	      $("#transit").text("TBD");
+	      $("#setting").text("TBD");
+	      $("#azimuth").text("TBD");
+	      $("#altitude").text("TBD");
+
+	    } else {
+
+	      $("#rising").text(data.rising);
+	      $("#transit").text(data.transit);
+	      $("#setting").text(data.setting);
+	      $("#azimuth").text(data.azimuth);
+	      $("#altitude").text(data.altitude);
+	    };
+
+	  });
+
+	return false;
+
+      });
+
+
+    }); {# end ready method #}
+
+
+  </script>
+
+{% endblock %}
+
+{% block title %} Astronomical Algorithms Implemented {% endblock %}
+
+{% block content %}
+
+<h1>Sun Position (AJAX example)</h1>
+
+<p>
+This is a example of using AJAX to update the page.
+
+The submit button sends a request to the server which returns the result data as a JSON
+object which is used to update the sun position information on this page (unlike the
+form example which takes you to a new page).
+</p>
+
+
+
+<div>
+
+  <h2>Observer's Location</h2>
+
+  <p>
+    Enter the observer's location in space and time and the get sun
+    position button will update the current page with the sun's position.
+    Timezone is estimated from the longitude, but should be adjusted as
+    needed.
+  </p>
+
+
+  {% include "observer_input.html" %}
+
+
+  <br>
+
+  <h2>Sun's Position</h2>
+
+    <table>
+
+    <tr>
+
+      <th>
+	<button id="get_sun_position">get sun position</button>
+      </th>
+
+
+    </tr>
+
+    <tr>
+      <th>Azimuth</th>
+      <td id="azimuth" colspan="2">TBD</td>
+      <td>deg:min:sec (deg)</td>
+    </tr>
+
+    <tr>
+      <th>Altitude</th>
+      <td id="altitude" colspan="2">TBD</td>
+      <td>deg:min:sec (deg)</td>
+    </tr>
+
+    <tr>
+      <th>Rising</th>
+      <td id="rising" colspan="2">TBD</td>
+      <td>ISO8601</td>
+    </tr>
+
+
+    <tr>
+      <th>Transit</th>
+      <td id="transit" colspan="2">TBD</td>
+      <td>ISO8601</td>
+    </tr>
+
+    <tr>
+      <th>Setting</th>
+      <td id="setting" colspan="2">TBD</td>
+      <td>ISO8601</td>
+    </tr>
+
+  </table>
+
+</div>
+
+<hr>
+
+<div>
+
+  <p>
+
+    <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position_ajax.html">
+      This
+    </a> is an example of the
+    <a href="http://flask.pocoo.org/docs/0.10/patterns/jquery/">flask
+      AJAX with jQuery pattern</a>.
+  </p>
+
+  <p>
+    The observer's location data are read from the observer's input
+    elements by name and sent as a JSON object to the get_sun_position
+    page on the server as a button click event:
+  </p>
+
+  <pre>
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
+	  {
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked') {# jQuery selector #}
+
+	  },
+	  function(data) {
+
+	    if ("error" in data) {
+
+	      alert("Error: " + data.error);
+
+	      $("#rising").text("TBD");
+	      $("#transit").text("TBD");
+	      $("#setting").text("TBD");
+	      $("#azimuth").text("TBD");
+	      $("#altitude").text("TBD");
+
+	    } else {
+
+	      $("#rising").text(data.rising);
+	      $("#transit").text(data.transit);
+	      $("#setting").text(data.setting);
+	      $("#azimuth").text(data.azimuth);
+	      $("#altitude").text(data.altitude);
+	    };
+
+	  });
+
+  </pre>
+
+  <p>
+    On the
+    <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
+    side, this is read in from the flask request args and the results
+    are returned as a JSON string
+  </p>
+
+  <pre>
+@app.route("/get_sun_position_ajax")
+def get_sun_position_ajax():
+    """Get sun position
+
+    This was written to handle a JQuery AJAX call to connect a button
+    click event to send a get request with parameters for:
+
+    latitude, longitude, date, time timezone, dst
+
+    The server does calculation and return the sun position data as a
+    JSON object.
+
+    If there is an exception, this returns an error key with the
+    message as the value in the same JSON object. The caller is
+    expected to handle it as they see fit.
+    """
+
+    try:
+
+	# TODO difference in template ajax input :checked selector and form
+	if flask.request.args.get('dst') == 'true':
+	    is_dst = True
+	else:
+	    is_dst = False
+
+	result = calculate_sun_position(request_angle('latitude'),
+					request_angle('longitude'),
+					request_datetime('date',
+							 'time',
+							 request_float('timezone'),
+							 is_dst),
+					is_dst)
+
+    except (ValueError, RuntimeError) as err:
+
+	app.logger.error(err)
+	result = {'error': str(err)}
+
+    return flask.jsonify(**result)
+
+</pre>
+
+  <p>
+    The results are then used to update the display.
+  </p>
+
+</div>
+
+
+{% endblock %}

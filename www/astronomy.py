@@ -52,6 +52,8 @@ def request_float(a_float_str):
 
     a_float = flask.request.args.get(a_float_str, type=float)
 
+    app.logger.debug('request float: {a_float_str}: {a_float}'.format(**locals()))
+
     if a_float is None:
         raise ValueError('{a_float_str} is not a float: {a_value}'.format(
             a_float_str=a_float_str, a_value=flask.request.args.get(a_float_str)))
@@ -118,20 +120,13 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
     Raises: value exception on format error
     """
 
-    app.logger.debug('request date: {a_date_key} {a_time_key} {a_timezone} {is_dst}'.format(
-        **locals()))
-
     # TODO regex validation
-
 
     ymd = flask.request.args.get(a_date_key).split('-') # ASSUMES: yyyy-mm-dd format
 
     hms = flask.request.args.get(a_time_key).split(':') # ASSUMES: hh:mm:ss.ss
     while len(hms) < 3:
         hms.append('0')
-
-    if is_dst:
-        hms[0] = int(hms[0]) - 1
 
     a_datetime = coords.datetime(int(ymd[0]),
                                  int(ymd[1]),
@@ -140,6 +135,8 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
                                  int(hms[1]),
                                  float(hms[2]),
                                  a_timezone)
+    if is_dst:
+        a_datetime -= 1.0/24
 
     return a_datetime
 
@@ -175,7 +172,6 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
     if is_dst:
-        # TODO += 1.0/24.0 fails? julian day rounding error? works in c++
 
         rising = coords.datetime(rising.year,
                                  rising.month,
@@ -229,9 +225,9 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     return result
 
 
-# ---------------
-# ----- app -----
-# ---------------
+# ===============
+# ===== app =====
+# ===============
 
 app = flask.Flask(__name__) # must be before decorators
 
@@ -244,22 +240,17 @@ def home():
 
     return flask.render_template('home.html')
 
+# -----------------------------
+# ----- sun position ajax -----
+# -----------------------------
 
-@app.route("/observer_form")
-def observer_form():
-    """A form for submitting an observer's location in space and time"""
-
-    return flask.render_template('observer_form.html')
-
-
-@app.route("/observer_ajax")
-def observer_ajax():
+@app.route("/sun_position_ajax")
+def sun_position_ajax():
     """Use AJAX to send observer's location to the server"""
 
     flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
 
-    return flask.render_template('observer_ajax.html')
-
+    return flask.render_template('sun_position_ajax.html')
 
 
 @app.route("/get_sun_position_ajax")
@@ -282,11 +273,9 @@ def get_sun_position_ajax():
 
     try:
 
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'true':
-            is_dst = True
-        else:
-            is_dst = False
+        # input :checked selector returns 'true' and 'false'
+        # val() is 'no' or None
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
         result = calculate_sun_position(request_angle('latitude'),
                                         request_angle('longitude'),
@@ -302,6 +291,16 @@ def get_sun_position_ajax():
         result = {'error': str(err)}
 
     return flask.jsonify(**result)
+
+# ------------------------------
+# ----- sun position forms -----
+# ------------------------------
+
+@app.route("/sun_position_form_in")
+def sun_position_form_in():
+    """A form for submitting an observer's location in space and time"""
+
+    return flask.render_template('sun_position_form_in.html')
 
 
 @app.route("/get_sun_position_form")
@@ -324,13 +323,9 @@ def get_sun_position_form():
 
     try:
 
-
-        # TODO meh
-        # TODO difference in template ajax input :checked selector and form
-        if flask.request.args.get('dst') == 'on':
-            is_dst = True
-        else:
-            is_dst = False
+        # input :checked selector returns 'true' and 'false'
+        # val() is 'no' or None
+        is_dst = True if flask.request.args.get('dst') == 'on' else False
 
         result = calculate_sun_position(request_angle('latitude'),
                                         request_angle('longitude'),
@@ -340,15 +335,132 @@ def get_sun_position_form():
                                                          is_dst),
                                         is_dst)
 
-
-
     except (ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         flask.flash(err)
         return flask.render_template('flashes.html')
 
-    return flask.render_template('sun_position_form.html', **result)
+    return flask.render_template('sun_position_form_out.html', **result)
+
+
+# ---------------------
+# ----- sun chart -----
+# ---------------------
+
+
+@app.route("/sun_chart")
+def sun_chart():
+    """Plot the sun position for the observer's location in space and time"""
+
+    return flask.render_template('sun_chart.html')
+
+
+@app.route("/get_sun_position_chart")
+def sun_position_chart():
+    """Get the sun position chart for the given day"""
+
+    try:
+
+        result = dict()
+
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
+
+        result['observer'] = str(an_observer) # TODO format?
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
+
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
+
+        result['datetime'] = str(a_datetime)
+
+
+        current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
+        current_time.timezone = a_datetime.timezone
+        current_time += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
+        vernal_equinox.timezone = a_datetime.timezone
+        vernal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        summer_solstice = coords.datetime(a_datetime.year, 6, 20) # TODO not every year
+        summer_solstice.timezone = a_datetime.timezone
+        summer_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        autumnal_equinox = coords.datetime(a_datetime.year, 9, 22) # TODO not every year
+        autumnal_equinox.timezone = a_datetime.timezone
+        autumnal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+        winter_solstice = coords.datetime(a_datetime.year, 12, 21) # TODO not every year
+        winter_solstice.timezone = a_datetime.timezone
+        winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
+
+
+        sun_position = list()
+
+        sun_position.append(['time',
+                             '{year}-{month}-{day}'.format(year=current_time.year,
+                                                           month=current_time.month,
+                                                           day=current_time.day),
+                             'Vernal Equinox',
+                             'Summer Solstice',
+                             'Autumnal Equinox',
+                             'Winter Solstice'
+                         ]
+                        )
+
+
+        npts = 24*4
+
+        if is_dst:
+            dtime = 1
+        else:
+            dtime = 0
+
+        for d in range(0, npts + 1):
+
+            sun_ct = SunPosition.SunPosition(an_observer, current_time)
+            sun_ve = SunPosition.SunPosition(an_observer, vernal_equinox)
+            sun_ss = SunPosition.SunPosition(an_observer, summer_solstice)
+            sun_ae = SunPosition.SunPosition(an_observer, autumnal_equinox)
+            sun_ws = SunPosition.SunPosition(an_observer, winter_solstice)
+
+
+            sun_position.append([dtime,
+                                 utils.get_altitude(sun_ct).value,
+                                 utils.get_altitude(sun_ve).value,
+                                 utils.get_altitude(sun_ss).value,
+                                 utils.get_altitude(sun_ae).value,
+                                 utils.get_altitude(sun_ws).value
+                             ]
+                            )
+
+
+            dtime += 1.0/npts*24
+
+            current_time += 1.0/npts
+            vernal_equinox += 1.0/npts
+            summer_solstice += 1.0/npts
+            autumnal_equinox += 1.0/npts
+            winter_solstice += 1.0/npts
+
+
+        result['position'] = sun_position
+
+
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        result = {'error': str(err)}
+
+    return flask.jsonify(**result)
+
 
 
 # ================
