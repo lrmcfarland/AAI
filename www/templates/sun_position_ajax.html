@@ -4,56 +4,64 @@
 
 {% block scripts %}
 
-  <script type="text/javascript">
+<style>
 
-    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+table#results_table {
+    width: 60%;
+    margin-left: 20%;
+    margin-right: 20%;
 
-    $(document).ready(function() {
+}
 
-      $("#get_sun_position").click(function(e) {
+</style>
 
-	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
-	  {
-	    latitude: $('input[name="latitude"]').val(),
-	    longitude: $('input[name="longitude"]').val(),
-	    date: $('input[name="date"]').val(),
-	    time: $('input[name="time"]').val(),
-	    timezone: $('input[name="timezone"]').val(),
-	    dst: $("#_dst").is(':checked')  {# jquery selector: resoves to 'true' or 'false' #}
+<script type="text/javascript">
 
-	  },
-	  function(data) {
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
-	    if ("error" in data) {
+  $(document).ready(function() {
 
-	      alert("Error: " + data.error);
+    $("#get_sun_position").click(function(e) {
 
-	      $("#rising").text("TBD");
-	      $("#transit").text("TBD");
-	      $("#setting").text("TBD");
-	      $("#azimuth").text("TBD");
-	      $("#altitude").text("TBD");
+      $.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
+      {
+        latitude: $('input[name="latitude"]').val(),
+        longitude: $('input[name="longitude"]').val(),
+        date: $('input[name="date"]').val(),
+        time: $('input[name="time"]').val(),
+        timezone: $('input[name="timezone"]').val(),
+        dst: $("#_dst").is(':checked')  {# jquery selector: resoves to 'true' or 'false' #}
+      },
+      function(data) {
 
-	    } else {
+        if ("error" in data) {
 
-	      $("#rising").text(data.rising);
-	      $("#transit").text(data.transit);
-	      $("#setting").text(data.setting);
-	      $("#azimuth").text(data.azimuth);
-	      $("#altitude").text(data.altitude);
-	    };
+          alert("Error: " + data.error);
 
-	  });
+          $("#rising").text("TBD");
+          $("#transit").text("TBD");
+          $("#setting").text("TBD");
+          $("#azimuth").text("TBD");
+          $("#altitude").text("TBD");
 
-	return false;
+        } else {
+
+          $("#rising").text(data.rising);
+          $("#transit").text(data.transit);
+          $("#setting").text(data.setting);
+          $("#azimuth").text(data.azimuth);
+          $("#altitude").text(data.altitude);
+        };
 
       });
 
+      return false;
 
-    }); {# end ready method #}
+    }); {# end click #}
 
+  }); {# end ready method #}
 
-  </script>
+</script>
 
 {% endblock %}
 
@@ -63,45 +71,36 @@
 
 <h1>Sun Position (AJAX example)</h1>
 
-<p>
-This is a example of using AJAX to update the page.
+<br>
+
+<div class="twocolumn">
+
+This page is an example of using AJAX to update the page.
 
 The submit button sends a request to the server which returns the result data as a JSON
 object which is used to update the sun position information on this page (unlike the
 form example which takes you to a new page).
-</p>
 
+</div>
 
+<br>
+
+{% include "observer_location.html" %}
+
+<br>
+
+<button id="get_sun_position">get sun position</button>
+
+<br>
 
 <div>
 
-  <h2>Observer's Location</h2>
-
-  <p>
-    Enter the observer's location in space and time and the get sun
-    position button will update the current page with the sun's position.
-    Timezone is estimated from the longitude, but should be adjusted as
-    needed.
-  </p>
-
-
-  {% include "observer_location.html" %}
-
+  <h2>Sun's Position</h2>
 
   <br>
 
-  <h2>Sun's Position</h2>
+    <table id="results_table">
 
-    <table>
-
-    <tr>
-
-      <th>
-	<button id="get_sun_position">get sun position</button>
-      </th>
-
-
-    </tr>
 
     <tr>
       <th>Azimuth</th>
@@ -142,65 +141,71 @@ form example which takes you to a new page).
 
 <div>
 
-  <p>
+
+  <p class="twocolumn">
 
     <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position_ajax.html">
-      This
+      The source for this page
     </a> is an example of the
     <a href="http://flask.pocoo.org/docs/0.10/patterns/jquery/">flask
       AJAX with jQuery pattern</a>.
-  </p>
 
-  <p>
     The observer's location data are read from the observer's input
-    elements by name and sent as a JSON object to the get_sun_position
+    elements by name and sent as a JSON object to the get_sun_position_ajax
     page on the server as a button click event:
   </p>
 
-  <pre>
-	$.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
-	  {
-	    latitude: $('input[name="latitude"]').val(),
-	    longitude: $('input[name="longitude"]').val(),
-	    date: $('input[name="date"]').val(),
-	    time: $('input[name="time"]').val(),
-	    timezone: $('input[name="timezone"]').val(),
-	    dst: $("#_dst").is(':checked') {# jQuery selector #}
+  <pre class="code">
 
-	  },
-	  function(data) {
+    $("#get_sun_position").click(function(e) {
 
-	    if ("error" in data) {
+      $.getJSON($SCRIPT_ROOT + "/get_sun_position_ajax",
+      {
+        latitude: $('input[name="latitude"]').val(),
+        longitude: $('input[name="longitude"]').val(),
+        date: $('input[name="date"]').val(),
+        time: $('input[name="time"]').val(),
+        timezone: $('input[name="timezone"]').val(),
+        dst: $("#_dst").is(':checked')  {# jquery selector: resoves to 'true' or 'false' #}
+      },
+      function(data) {
 
-	      alert("Error: " + data.error);
+        if ("error" in data) {
 
-	      $("#rising").text("TBD");
-	      $("#transit").text("TBD");
-	      $("#setting").text("TBD");
-	      $("#azimuth").text("TBD");
-	      $("#altitude").text("TBD");
+          alert("Error: " + data.error);
 
-	    } else {
+          $("#rising").text("TBD");
+          $("#transit").text("TBD");
+          $("#setting").text("TBD");
+          $("#azimuth").text("TBD");
+          $("#altitude").text("TBD");
 
-	      $("#rising").text(data.rising);
-	      $("#transit").text(data.transit);
-	      $("#setting").text(data.setting);
-	      $("#azimuth").text(data.azimuth);
-	      $("#altitude").text(data.altitude);
-	    };
+        } else {
 
-	  });
+          $("#rising").text(data.rising);
+          $("#transit").text(data.transit);
+          $("#setting").text(data.setting);
+          $("#azimuth").text(data.azimuth);
+          $("#altitude").text(data.altitude);
+        };
+
+      });
+
+      return false;
+
+    }); {# end click #}
 
   </pre>
 
-  <p>
+  <p class="twocolumn">
     On the
     <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
     side, this is read in from the flask request args and the results
-    are returned as a JSON string
+    are returned as a JSON string:
   </p>
 
-  <pre>
+  <pre class="code">
+
 @app.route("/get_sun_position_ajax")
 def get_sun_position_ajax():
     """Get sun position
@@ -216,28 +221,27 @@ def get_sun_position_ajax():
     If there is an exception, this returns an error key with the
     message as the value in the same JSON object. The caller is
     expected to handle it as they see fit.
+
     """
 
     try:
 
-	# TODO difference in template ajax input :checked selector and form
-	if flask.request.args.get('dst') == 'true':
-	    is_dst = True
-	else:
-	    is_dst = False
+        # input :checked selector returns 'true' and 'false'
+        # val() is 'no' or None
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-	result = calculate_sun_position(request_angle('latitude'),
-					request_angle('longitude'),
-					request_datetime('date',
-							 'time',
-							 request_float('timezone'),
-							 is_dst),
-					is_dst)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
     except (ValueError, RuntimeError) as err:
 
-	app.logger.error(err)
-	result = {'error': str(err)}
+        app.logger.error(err)
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
 
