@@ -51,7 +51,7 @@ should be adjusted as needed.
 
 <form name="observer_form" action="{{ url_for('get_sun_position_form') }}">
 
-  {% include "observer_input.html" %}
+  {% include "observer_location.html" %}
 
 </form>
 
@@ -86,15 +86,15 @@ language <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a>
 
     &lt;form name="observer_form" action="&#123;&#123; url_for('get_sun_position_form') &#125;&#125;"&gt;
 
-      &#123;&#37; include "observer_input.html" &#37;&#125;
+      &#123;&#37; include "observer_location.html" &#37;&#125;
 
     &lt;&#47;form&gt;
 
 </pre>
 
 And from
-<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_input.html">
- observer_input.html
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_location.html">
+ observer_location.html
 </a>
 
 <pre>
