@@ -24,34 +24,34 @@
 
 {% block content %}
 
-<h1>Sun Position (form example)</h1>
+<h1>Sun Position (html form example)</h1>
 
-<div>
+<br>
 
-<p>
-This is an example of an HTML form.
+<div class="twocolumn">
+
+This page follows from the example in the
+<a href="http://flask.pocoo.org/docs/0.10/tutorial/templates/">flask tutorial</a>
+for using html forms.
+
+The user fills in the observer's location information, either by
+typing in the values or using the buttons.
+
 The submit action sends a request url to the server with parameters
 from the input elements on the location form. The server returns a new
 page with the results.
-I did add some JavaScript to put the submit
-button outside the form to prevent confusion with the set location and time buttons
-inside the form. I left the form's submit attribute unset.
-</p>
 
-<h2>Observer's Location</h2>
+To avoid confusion with the location and time buttons inside the
+form, add some JavaScript to put the submit
+button outside the form and left the form's submit attribute unset.
 
-<p>
-Enter the observer's location in space and time in the form and the
-"get sun position" button will take the user to a page with the sun's
-position results. The timezone is estimated from the longitude, but
-should be adjusted as needed.
-</p>
+</div>
 
 <br>
 
 <form name="observer_form" action="{{ url_for('get_sun_position_form') }}">
 
-  {% include "observer_input.html" %}
+  {% include "observer_location.html" %}
 
 </form>
 
@@ -59,45 +59,40 @@ should be adjusted as needed.
 
 <button id="get_sun_position">get sun position</button>
 
-
-</div>
+<br>
 
 <hr>
 
 <div>
 
-<p>
+<p class="twocolumn">
 <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position_form_in.html">
-This
+In the source
 </a>
-follows the example in the
-<a href="http://flask.pocoo.org/docs/0.10/tutorial/templates/">flask tutorial</a>
-for using html forms.
-</p>
-
-<p>
-Observer data are read from the input elements form on this page by
+the observer data are read from the input elements form on this page by
 name and sent to the sun_position url as the submit action of the form
 using the python templating
-language <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a>
+language <a href="http://jinja.pocoo.org/docs/dev/">Jinja2</a> like this:
 </p>
 
-<pre>
+<pre class="code">
 
     &lt;form name="observer_form" action="&#123;&#123; url_for('get_sun_position_form') &#125;&#125;"&gt;
 
-      &#123;&#37; include "observer_input.html" &#37;&#125;
+      &#123;&#37; include "observer_location.html" &#37;&#125;
 
     &lt;&#47;form&gt;
 
 </pre>
 
+<p>
 And from
-<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_input.html">
- observer_input.html
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/observer_location.html">
+observer_location.html
 </a>
+</p>
 
-<pre>
+<pre class="code">
 
     &lt;input type="text" id="_longitude" name="longitude"&gt;
 
@@ -105,7 +100,7 @@ And from
 
 </pre>
 
-<p>
+<p class="twocolumn">
 In the sun_position url, on the
  <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.py">astronomy.py</a>
 side, the form data are accessed as key value pairs of strings.
@@ -113,7 +108,7 @@ They are converted to numbers and used to calculate the results. These are
 passed as keyword arguments to flask.render_template:
 </p>
 
-<pre>
+<pre class="code">
 
 @app.route("/get_sun_position_form")
 def get_sun_position_form():
@@ -138,7 +133,7 @@ def get_sun_position_form():
 The results dictionary is populated like this:
 </p>
 
-<pre>
+<pre class="code">
 
     result = dict()
     result['latitude'] = str(a_latitude)
@@ -152,14 +147,15 @@ The results dictionary is populated like this:
 
 </pre>
 
-<p>
+<p class="twocolumn">
+
 Inside the
-<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position.html">sun
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_position_form_out.html">sun
 position page</a>, these keyword arguments are accessable via Jinja2
 macros to display the results.
 </p>
 
-<pre>
+<pre class="code">
       &lt;td&gt;Latitude&lt;/td&gt;&lt;td&gt; &#123;&#123; latitude &#125;&#125; &lt;/td&gt;&lt;td&gt;deg:min:sec&lt;/td&gt;
 </pre>
 

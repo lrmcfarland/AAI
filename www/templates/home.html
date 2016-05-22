@@ -7,35 +7,68 @@
 
 <h1>Astronomical Algorithms Implemented</h1>
 
-<div id="intro">
+<br>
 
-<p>
-This is my implementation of various astronomical algorithms, mostly from
+<h2>Introduction</h2>
+
+<br>
+
+<div id="intro" class="twocolumn">
+
+This is my implementation of various astronomical algorithms, mostly
 <a href="http://www.willbell.com/math/mc1.htm">Astronomical
-Algorithms</a> by Jean Meeus, which is the source of most of the
-others I found on the web (although not all admit that).
-</p>
+Algorithms by Jean Meeus</a>, with parts found around the home and
+across the internet.
+
+This web page pulls together examples of the techniques I have learned
+for how to combine C++, Python and JavaScript in a single
+application.
+
+It is also created using those techniques.
 
 <p>
-I am using this as a test bed for exploring how to integrate C++, Python and JavaScript.
+My purpose is to provide a complete, non-trivial example that is
+complex enough to challenge the approach but easy to verify, in this
+case by looking out a window.
 
-I started with my
-<a href="https://github.com/lrmcfarland/Coordinates">C++ Coordinates library</a>,
-<a href="https://github.com/lrmcfarland/Coordinates/tree/master/Python">and
-wrapped it in Python</a> which is used
-to <a href="https://github.com/lrmcfarland/Astronomy">implement
-astronomical algorithms</a>. I then
-used <a href="https://github.com/lrmcfarland/Astronomy/tree/master/www">Flask</a>,
-to mix python and html which is then served by
-<a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/astronomy.wsgi">mod_wsgi</a>
-in Apache.
-</p>
+The goal is to provide a good reference and demonstrate a
+robust product with good error handling across the platform.
+
+For example, the exception thrown by June 31
+originates in my
+<a href="https://github.com/lrmcfarland/Coordinates">
+C++ coordinates library</a>, is caught on the server in the Python
+wrapper, sent as a HTTP response to the client and displayed as a
+JavaScript alert.
+<p>
+I developed this on OS X.
+
+My public server is on Linux in AWS.
+
+The code is built “by hand” with Emacs from open source projects and
+is, of course, itself open source and available on GitHub
+<a href="https://github.com/lrmcfarland/Astronomy">
+here</a>.
+
+I use test driven development to find and remove errors.
+
+The mistakes that are left in here are all mine.
+
+If you find them, please feel free to let me know.
+
+<p>
+
+<a href="http://www.starbug.com">-lrm</a>, <i>2016 May 21</i>
 
 </div>
 
 <hr>
 
 <div id="examples">
+
+<h2>Contents</h2>
+
+<br>
 
 <table>
 
@@ -83,7 +116,7 @@ in Apache.
     </td>
 
     <td>
-      This is an example of google charts
+      This is an example using google charts.
     </td>
 
   </tr>
@@ -93,5 +126,59 @@ in Apache.
 </table>
 
 </div>
+
+<hr>
+
+
+<h2>On Accuracy</h2>
+
+<br>
+
+<div id="accuracy" class="twocolumn">
+
+I have been working on several ways to test the accuracy of the model.
+Beyond noting the sun rise and set times along with local noon on an
+improvised sun dial (the sunbeam from the skylight on my south facing
+stairs), I have used a
+<a href="https://www.starpath.com/catalog/accessories/1840d15.htm">Davis
+Mark-15 Plastic Sextant</a>
+with a swimming pool as an artificial horizon.
+While I have no training other than what came in the instructions with
+the sextant, on a clam day with a stable reflection I get results
+within a couple arc minutes of my calculations.
+I use these results in the
+<a href="https://github.com/lrmcfarland/Astronomy/blob/master/Bodies/test_SunPosition.py">source
+code unit tests</a>.
+
+<p>
+I also have agreement within a couple minutes of other sites like the
+<a href="http://www.esrl.noaa.gov/gmd/grad/solcalc/">NOAA solar calculator</a>
+and the
+<a href="http://aa.usno.navy.mil/index.php">Astronomical Applications
+Department of the U.S. Naval Observatory</a>
+
+And in references like Wikipedia's
+<a href="https://en.wikipedia.org/wiki/Midnight_sun">midnight sun
+reference</a>, I get the results they have for the rise, transit and
+set times for Fairbanks, Alaska, when making the adjustments for time
+zone they list.
+
+<p>
+The picture below was taken (on 2016-05-08) with the iOS
+<a href="https://itunes.apple.com/us/app/theodolite/id339393884?mt=8">
+Theodolite</a> app (I have no connection to them other than as a
+satisfied customer.)  When I enter the time and location coordinates,
+I get good agreement in azimuth (my 22.87&deg; vs. their 22.3&deg;)
+and am only off by about 10&deg; azimuth (274.73&deg; vs. 265&deg;),
+and much of that I would attribute to some "stickiness" in the
+sensors.
+
+</div>
+
+<br>
+
+<img src="static/images/sun_position_1.jpg" height="500" width="100%">
+
+
 
 {% endblock %}

@@ -104,39 +104,31 @@
 
 {% block content %}
 
+<style>
+
+.page {
+    width: 60em;
+}
+
+</style>
+
+
+
 <h1>Sun Position (google charts example)</h1>
 
 <br>
 
-  <h2>Observer's Location</h2>
+{% include "observer_location.html" %}
 
-<div>
+<br>
 
-  <p>
-    Enter the observer's location in space and time and the get sun
-    position button will update the current page with the sun's position.
-    Timezone is estimated from the longitude, but should be adjusted as
-    needed.
-  </p>
+<button id="get_sun_position">get sun position</button>
 
+<h2>Sun's Position</h2>
 
-  {% include "observer_input.html" %}
-
-
-  <br>
-
-  <h2>Sun's Position</h2>
-
-  <button id="get_sun_position">get sun position</button>
 
 <div id="sun_chart" style="width: 900px; height: 500px"></div>
 
-
-<hr>
-
-<div>
-
-</div>
 
 
 {% endblock %}
