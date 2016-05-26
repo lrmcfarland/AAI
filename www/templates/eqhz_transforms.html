@@ -1,0 +1,230 @@
+{# flask ajax example #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+<style>
+
+
+table#coordinates_table {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+
+}
+
+</style>
+
+<script type="text/javascript">
+
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+
+  $(document).ready(function() {
+
+    $("#radec2azalt").click(function(e) {
+
+      $.getJSON($SCRIPT_ROOT + "/radec2azalt",
+      {
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val()
+
+
+      },
+
+      function(data) {
+
+	if ("error" in data) {
+
+	  alert("Error: " + data.error);
+
+	  $("#_azimuth").val("TBD");
+	  $("#_altitude").val("TBD");
+
+	} else {
+
+	  $("#_azimuth").val(data.azimuth);
+	  $("#_altitude").val(data.altitude);
+
+	};
+
+      });
+
+      return false;
+
+    }); {# end radec2azalt click #}
+
+
+
+    $("#azalt2radec").click(function(e) {
+
+      $.getJSON($SCRIPT_ROOT + "/azalt2radec",
+      {
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	azimuth: $('input[name="azimuth"]').val(),
+	altitude: $('input[name="altitude"]').val()
+
+
+      },
+
+      function(data) {
+
+	if ("error" in data) {
+
+	  alert("Error: " + data.error);
+
+	  $("#_RA").val("TBD");
+	  $("#_dec").val("TBD");
+
+	} else {
+
+	  $("#_RA").val(data.ra);
+	  $("#_dec").val(data.dec);
+
+	};
+
+      });
+
+      return false;
+
+    }); {# end radec2azalt click #}
+
+
+
+  }); {# end ready method #}
+
+</script>
+
+{% endblock %}
+
+{% block title %} Equatorial - Horizontal Transforms {% endblock %}
+
+{% block content %}
+
+<h1>Equatorial - Horizontal transforms</h1>
+
+<br>
+
+<div class="twocolumn">
+
+  This page transforms coordinates between
+<a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
+and
+<a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">horizontal</a>
+coordinate systems.
+
+If you know the
+<a href="https://en.wikipedia.org/wiki/Right_ascension">right ascension</a>
+and
+<a href="https://en.wikipedia.org/wiki/Declination">declination</a>
+of your celestial object, this will calculate the
+<a href="https://en.wikipedia.org/wiki/Azimuth">azimuth</a>
+and
+<a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
+at the observer's location.
+
+Conversely, given the azimuth and altitude, this will calculate the
+right ascension and declination.
+
+</div>
+
+<br>
+
+{% include "observer_location.html" %}
+
+<br>
+
+
+<br>
+
+<div class="resultbox">
+
+  <table id="coordinates_table">
+
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td> <button id="radec2azalt">to az/alt</button> </td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <th>Right Ascension</th>
+      <td><input type="text" name="RA" id="_RA"></td>
+      <td>hours</td>
+
+      <td></td>
+
+      <th>Azimuth</th>
+      <td><input type="text" name="azimuth" id="_azimuth"></td>
+      <td>degrees</td>
+
+
+    </tr>
+
+    <tr>
+      <th>Declination</th>
+      <td><input type="text" name="dec" id="_dec"></td>
+      <td>degrees</td>
+
+      <td></td>
+
+
+      <th>Altitude</th>
+      <td><input type="text" name="altitude" id="_altitude"></td>
+      <td>degrees</td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td> <button id="azalt2radec">to ra/dec</button> </td>
+      <td></td>
+      <td></td>
+    </tr>
+
+
+  </table>
+
+</div>
+
+<hr>
+<br>
+
+<div class="twocolumn">
+
+From Meeus' Example 13.b, the observer's location is at the U.S. Naval
+Observatory at Washington, D.C.: Latitude 38:55:17, Longitude
+-77:03:56 (in my ":" notation for degrees, minutes, seconds and using
+the IAU positive east convention for latitude instead of Meeus');
+Venus' right ascension is 23:09:16.641 hours and declination
+-6:43:11.61 degrees.  On April 10, 1987 at 19:21:00 UT (time zone 0,
+daylight savings off), Venus was 15.215 degrees above the horizon,
+bearing 248.0335 from the north, which matches Meeus' results after
+adjusting his bearing of 68.0337 degrees from the south.
+
+</div>
+
+<hr>
+
+
+
+{% endblock %}

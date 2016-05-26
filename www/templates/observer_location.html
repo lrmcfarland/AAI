@@ -9,9 +9,9 @@
 }
 
 table#observer_location {
-    width: 80%;
-    margin-left: 10%;
-    margin-right: 10%;
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
 
 }
 
@@ -60,14 +60,27 @@ table#observer_location {
 
     <h2>Observer's Location</h2>
 
-    <p class="twocolumn">
-      Enter the observer's location in space and time.  The timezone,
-      in hours, is estimated from the longitude, but should be
-      adjusted as needed. Fractional values, like India's UTC+5:30,
-      are supported as decimals, e.g. 5.5 in this case.
-    </p>
+    <br>
+
+    <div class="twocolumn">
+
+	Enter the observer's location on earth and the local time.
+	Degrees, and optional minutes and seconds are accepted as a
+	time format with : between each element, e.g. 37:47:30 instead
+	of 37&deg; 47&#39; 30&#34; for San Francisco's latitude.
+
+	The timezone, in hours, is estimated from the longitude, but
+	should be adjusted as needed. Fractional values, like India's
+	UTC+5:30, are supported as decimals, e.g. 5.5 in this case.
+
+	I have found some firewalls block the current location data.
+	In which case, entering the values directly should still work.
+
+      </div>
 
   </div>
+
+  <br>
 
   <table id="observer_location">
 
@@ -83,7 +96,7 @@ table#observer_location {
 	<input type="text" id="_latitude" name="latitude">
       </td>
 
-      <td>deg:min:sec</td>
+      <td>deg[:min[:sec]]</td>
 
     </tr>
 
@@ -98,7 +111,7 @@ table#observer_location {
 	<input type="text" id="_longitude" name="longitude">
       </td>
 
-      <td>deg:min:sec</td>
+      <td>deg[:min[:sec]]</td>
 
     </tr>
 
@@ -121,7 +134,7 @@ table#observer_location {
 
       <th>Local Time</th>
       <td><input type="text" id="_time" name="time" value="12:00"></td>
-      <td>hr:min:sec</td>
+      <td>hr[:min[:sec]]</td>
     </tr>
 
     <tr>
