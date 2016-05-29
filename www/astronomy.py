@@ -463,6 +463,100 @@ def sun_position_chart():
 
 
 
+# ----------------------------
+# ----- eq hz transforms -----
+# ----------------------------
+
+
+@app.route("/eqhz_transforms")
+def eqhz_transforms():
+    """Transform equatorial to horizontal coordinates at observer's location in space and time"""
+
+    return flask.render_template('eqhz_transforms.html')
+
+
+
+
+
+@app.route("/radec2azalt")
+def radec2azalt():
+    """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates"""
+
+    try:
+
+        result = dict()
+
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
+
+        result['observer'] = str(an_observer)
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
+
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
+
+        result['datetime'] = str(a_datetime)
+
+        body_eq = utils.radec2spherical(request_angle('ra'), request_angle('dec'))
+
+        body_hz = EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
+
+        result['azimuth'] = utils.get_azimuth(body_hz).value
+        result['altitude'] = utils.get_altitude(body_hz).value
+
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        result = {'error': str(err)}
+
+    return flask.jsonify(**result)
+
+
+
+@app.route("/azalt2radec")
+def azalt2radec():
+    """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates"""
+
+    try:
+
+        result = dict()
+
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
+
+        result['observer'] = str(an_observer)
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
+
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
+
+        result['datetime'] = str(a_datetime)
+
+
+        body_hz = utils.azalt2spherical(request_angle('azimuth'), request_angle('altitude'))
+
+        body_eq = EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
+
+        result['ra'] = utils.get_RA(body_eq).value
+        result['dec'] = utils.get_declination(body_eq).value
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        result = {'error': str(err)}
+
+    return flask.jsonify(**result)
+
+
+
+
 # ================
 # ===== main =====
 # ================
