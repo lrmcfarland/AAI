@@ -89,29 +89,110 @@
 
       {# ----- draw chart ----- #}
 
+
       google.charts.load('current', {'packages':['corechart']});
 
-      function drawChart(sun_position) {
 
-	var altitude_table = google.visualization.arrayToDataTable(sun_position.altitude);
+      function getAltitudeView (altitude_table) {
+
+	var view_data = {};
+
+	var current_color = "blue";
+	var vernal_color = "green";
+	var summer_color = "red";
+	var autumnal_color = "orange";
+	var winter_color = "cyan";
+
 
 	var options = {
 
-	    "title": "Altitude over time for one day",
+	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
 
-	    "hAxis": { "title": "hour"},
-	    "vAxis": { "title": "altitude in degrees", "minValue": -100, "maxValue": 100}
+	    title: "Altitude over time for one day",
+
+	    legend: "none",
+
+	    hAxis: { title: "hour"},
+	    vAxis: { title: "altitude in degrees", minValue: -100, maxValue: 100},
+
+	    series: {
+		0: { lineDashStyle: [] }
+	    },
+
+	    colors: [current_color],
 
 	};
 
 
-	var altitude_view = new google.visualization.DataView(altitude_table);
+	var altitude = new google.visualization.DataView(altitude_table);
 
-	altitude_view.hideColumns([2,4]); {# TODO from ui #}
+	var hides = [];
+	var line_count = 1;
+
+	if ($("#_vernal_equinox_cb").is(':checked')) {
+	    options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
+	} else {
+	    hides.push(2);
+	};
+
+
+	if ($("#_summer_solstice_cb").is(':checked')) {
+	    options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
+	} else {
+	    hides.push(3);
+	};
+
+
+	if ($("#_autumnal_equinox_cb").is(':checked')) {
+	    options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
+	} else {
+	    hides.push(4);
+	};
+
+
+	if ($("#_winter_solstice_cb").is(':checked')) {
+	    options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
+	} else {
+	    hides.push(5);
+	};
+
+	altitude.hideColumns(hides);
+
+	view_data['altitude'] = altitude;
+	view_data['options'] = options;
+
+	return view_data;
+
+      };
+
+      function drawChart(sun_position) {
 
 	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
+	var altitude_table = google.visualization.arrayToDataTable(sun_position.altitude);
+	var altitude_view = getAltitudeView(altitude_table);
 
-	chart.draw(altitude_view, options);
+	chart.draw(altitude_view.altitude, altitude_view.options);
+
+	$("#_vernal_equinox_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+	$("#_summer_solstice_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+	$("#_autumnal_equinox_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+	$("#_winter_solstice_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
 
       }
 
@@ -131,6 +212,31 @@
 
 .page {
     width: 60em;
+}
+
+div#sun_chart {
+    width: 800px;
+    height: 500px;
+}
+
+table#sun_chart_legend {
+    width: 10em;
+}
+
+#_vernal_equinox {
+    color: green;
+}
+
+#_summer_solstice {
+    color: red;
+}
+
+#_autumnal_equinox {
+    color: orange;
+}
+
+#_winter_solstice {
+    color: cyan;
 }
 
 </style>
@@ -169,8 +275,77 @@
 <h2>Sun's Position</h2>
 
 
-<div id="sun_chart" style="width: 900px; height: 500px"></div>
+<table>
 
+  <tr>
+
+    <td>
+      <div id="sun_chart"></div>
+    </td>
+
+    <td>
+
+      <table id="sun_chart_legend">
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
+	  </td>
+
+	  <td id="_vernal_equinox">
+	    Vernal Equinox
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
+	  </td>
+
+	  <td id="_summer_solstice">
+	    Summer Solstice
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
+	  </td>
+
+	  <td id="_autumnal_equinox">
+	    Autumnal Equinox
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
+	  </td>
+
+	  <td id="_winter_solstice">
+	    Winter Solstice
+	  </td>
+
+	</tr>
+
+
+      </table>
+
+    </td>
+
+
+  </tr>
+
+
+
+</table>
 
 <div class="twocolumn">
 
