@@ -123,7 +123,7 @@
 
 {% endblock %}
 
-{% block title %} Astronomical Algorithms Implemented {% endblock %}
+{% block title %}Sun Position (google charts){% endblock %}
 
 {% block content %}
 
@@ -141,6 +141,25 @@
 
 <br>
 
+<div class="twocolumn">
+
+  <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_chart.html">
+    The source for this page
+  </a> is an example of plotting a days worth of sun position data with
+  <a href="https://developers.google.com/chart/">google charts</a>.
+
+  <p>
+    The plot shows the altitude over time starting at local midnight.
+    The point where the altitude crosses the zero line indicates sun
+    rise and sun set (not adjusted for atmospheric refraction).
+    The distance between them is the length of the day.
+    The peak is local noon adjusted, for daylight savings time.
+    The solstice lines indicate the maximum and minimum range
+    of the sun position through out the year.
+
+</div>
+
+
 {% include "observer_location.html" %}
 
 <br>
@@ -151,6 +170,13 @@
 
 
 <div id="sun_chart" style="width: 900px; height: 500px"></div>
+
+
+<div class="twocolumn">
+
+Enter high latitudes to see the midnight sun.
+
+</div>
 
 
 
