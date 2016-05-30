@@ -401,18 +401,18 @@ def sun_position_chart():
 
 
 
-        sun_position = list()
+        altitude = list()
 
-        sun_position.append(['time',
-                             '{year}-{month}-{day}'.format(year=current_time.year,
-                                                           month=current_time.month,
-                                                           day=current_time.day),
-                             'Vernal Equinox',
-                             'Summer Solstice',
-                             'Autumnal Equinox',
-                             'Winter Solstice'
-                         ]
-                        )
+        altitude.append(['time',
+                         '{year}-{month}-{day}'.format(year=current_time.year,
+                                                       month=current_time.month,
+                                                       day=current_time.day),
+                         'Vernal Equinox',
+                         'Summer Solstice',
+                         'Autumnal Equinox',
+                         'Winter Solstice'
+                     ]
+        )
 
 
         npts = 24*4
@@ -431,14 +431,14 @@ def sun_position_chart():
             sun_ws = SunPosition.SunPosition(an_observer, winter_solstice)
 
 
-            sun_position.append([dtime,
-                                 utils.get_altitude(sun_ct).value,
-                                 utils.get_altitude(sun_ve).value,
-                                 utils.get_altitude(sun_ss).value,
-                                 utils.get_altitude(sun_ae).value,
-                                 utils.get_altitude(sun_ws).value
-                             ]
-                            )
+            altitude.append([dtime,
+                             utils.get_altitude(sun_ct).value,
+                             utils.get_altitude(sun_ve).value,
+                             utils.get_altitude(sun_ss).value,
+                             utils.get_altitude(sun_ae).value,
+                             utils.get_altitude(sun_ws).value
+                         ]
+            )
 
 
             dtime += 1.0/npts*24
@@ -450,7 +450,7 @@ def sun_position_chart():
             winter_solstice += 1.0/npts
 
 
-        result['position'] = sun_position
+        result['altitude'] = altitude
 
 
 

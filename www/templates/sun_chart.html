@@ -8,15 +8,28 @@
 
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
+
+    {# ----------------- #}
+    {# ----- ready ----- #}
+    {# ----------------- #}
+
     $(document).ready(function() {
 
+
+      {# ----- set date ----- #}
+
       $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
+
+
+      {# ----- set location ----- #}
 
       $("#set_location").click(function(e) {
 	{# astronomy.js uses document.getElementById #}
 	astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
       });
 
+
+      {# ----- set time ----- #}
 
       $("#set_time").click(function(e) {
 
@@ -33,34 +46,15 @@
       });
 
 
+      {# ----- set timezone from longitude ----- #}
+
       $("#_longitude").change(function() {
 	var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
 	$("#_timezone").val(timezone);
       });
 
 
-      google.charts.load('current', {'packages':['corechart']});
-
-
-      function drawChart(data) {
-
-	var data = google.visualization.arrayToDataTable(data.position)
-
-	var options = {
-
-            "title": "Sun Position",
-
-            "hAxis": { "title": "hour"},
-            "vAxis": { "title": "altitude in degrees", "minValue": -100, "maxValue": 100}
-
-	};
-
-	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
-
-	chart.draw(data, options);
-
-      }
-
+      {# ----- get data ----- #}
 
       $("#get_sun_position").click(function(e) {
 
@@ -74,15 +68,15 @@
 	    dst: $("#_dst").is(':checked') {# jQuery selector #}
 
 	  },
-	  function(data) {
+	  function(sun_position) {
 
-	    if ("error" in data) {
+	    if ("error" in sun_position) {
 
-	      alert("Error: " + data.error);
+	      alert("Error: " + sun_position.error);
 
 	    } else {
 
-	      drawChart(data);
+	      drawChart(sun_position);
 
 	    };
 
@@ -91,6 +85,35 @@
 	return false;
 
       });
+
+
+      {# ----- draw chart ----- #}
+
+      google.charts.load('current', {'packages':['corechart']});
+
+      function drawChart(sun_position) {
+
+	var altitude_table = google.visualization.arrayToDataTable(sun_position.altitude);
+
+	var options = {
+
+	    "title": "Altitude over time for one day",
+
+	    "hAxis": { "title": "hour"},
+	    "vAxis": { "title": "altitude in degrees", "minValue": -100, "maxValue": 100}
+
+	};
+
+
+	var altitude_view = new google.visualization.DataView(altitude_table);
+
+	altitude_view.hideColumns([2,4]); {# TODO from ui #}
+
+	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
+
+	chart.draw(altitude_view, options);
+
+      }
 
 
     }); {# end ready method #}
