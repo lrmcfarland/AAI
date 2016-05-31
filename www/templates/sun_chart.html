@@ -8,15 +8,28 @@
 
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
+
+    {# ----------------- #}
+    {# ----- ready ----- #}
+    {# ----------------- #}
+
     $(document).ready(function() {
 
+
+      {# ----- set date ----- #}
+
       $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
+
+
+      {# ----- set location ----- #}
 
       $("#set_location").click(function(e) {
 	{# astronomy.js uses document.getElementById #}
 	astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
       });
 
+
+      {# ----- set time ----- #}
 
       $("#set_time").click(function(e) {
 
@@ -33,34 +46,15 @@
       });
 
 
+      {# ----- set timezone from longitude ----- #}
+
       $("#_longitude").change(function() {
 	var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
 	$("#_timezone").val(timezone);
       });
 
 
-      google.charts.load('current', {'packages':['corechart']});
-
-
-      function drawChart(data) {
-
-	var data = google.visualization.arrayToDataTable(data.position)
-
-	var options = {
-
-            "title": "Sun Position",
-
-            "hAxis": { "title": "hour"},
-            "vAxis": { "title": "altitude in degrees", "minValue": -100, "maxValue": 100}
-
-	};
-
-	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
-
-	chart.draw(data, options);
-
-      }
-
+      {# ----- get data ----- #}
 
       $("#get_sun_position").click(function(e) {
 
@@ -74,15 +68,15 @@
 	    dst: $("#_dst").is(':checked') {# jQuery selector #}
 
 	  },
-	  function(data) {
+	  function(sun_position) {
 
-	    if ("error" in data) {
+	    if ("error" in sun_position) {
 
-	      alert("Error: " + data.error);
+	      alert("Error: " + sun_position.error);
 
 	    } else {
 
-	      drawChart(data);
+	      drawChart(sun_position);
 
 	    };
 
@@ -93,6 +87,116 @@
       });
 
 
+      {# ----- draw chart ----- #}
+
+
+      google.charts.load('current', {'packages':['corechart']});
+
+
+      function getAltitudeView (altitude_table) {
+
+	var view_data = {};
+
+	var current_color = "blue";
+	var vernal_color = "green";
+	var summer_color = "red";
+	var autumnal_color = "orange";
+	var winter_color = "cyan";
+
+
+	var options = {
+
+	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
+
+	    title: "Altitude over time for one day",
+
+	    legend: "none",
+
+	    hAxis: { title: "hour"},
+	    vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
+
+	    series: {
+		0: { lineDashStyle: [] }
+	    },
+
+	    colors: [current_color],
+
+	};
+
+
+	var altitude = new google.visualization.DataView(altitude_table);
+
+	var hides = [];
+	var line_count = 1;
+
+	if ($("#_vernal_equinox_cb").is(':checked')) {
+	    options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
+	} else {
+	    hides.push(2);
+	};
+
+
+	if ($("#_summer_solstice_cb").is(':checked')) {
+	    options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
+	} else {
+	    hides.push(3);
+	};
+
+
+	if ($("#_autumnal_equinox_cb").is(':checked')) {
+	    options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
+	} else {
+	    hides.push(4);
+	};
+
+
+	if ($("#_winter_solstice_cb").is(':checked')) {
+	    options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
+	} else {
+	    hides.push(5);
+	};
+
+	altitude.hideColumns(hides);
+
+	view_data['altitude'] = altitude;
+	view_data['options'] = options;
+
+	return view_data;
+
+      };
+
+      function drawChart(sun_position) {
+
+	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
+	var altitude_table = google.visualization.arrayToDataTable(sun_position.altitude);
+	var altitude_view = getAltitudeView(altitude_table);
+
+	chart.draw(altitude_view.altitude, altitude_view.options);
+
+	$("#_vernal_equinox_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+	$("#_summer_solstice_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+	$("#_autumnal_equinox_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+	$("#_winter_solstice_cb").change(function() {
+	  var altitude_view = getAltitudeView(altitude_table);
+	  chart.draw(altitude_view.altitude, altitude_view.options);
+	});
+
+
+      }
+
+
     }); {# end ready method #}
 
 
@@ -100,7 +204,7 @@
 
 {% endblock %}
 
-{% block title %} Astronomical Algorithms Implemented {% endblock %}
+{% block title %}Sun Position (google charts){% endblock %}
 
 {% block content %}
 
@@ -110,11 +214,53 @@
     width: 60em;
 }
 
+div#sun_chart {
+    width: 800px;
+    height: 500px;
+}
+
+table#sun_chart_legend {
+    width: 10em;
+}
+
+#_vernal_equinox {
+    color: green;
+}
+
+#_summer_solstice {
+    color: red;
+}
+
+#_autumnal_equinox {
+    color: orange;
+}
+
+#_winter_solstice {
+    color: cyan;
+}
+
 </style>
 
 
 
 <h1>Sun Position (google charts example)</h1>
+
+<br>
+
+<div class="twocolumn">
+
+  The plot shows the
+  sun's <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
+  (as the angle above the horizon) changing over a day starting at
+  local midnight.  The point where the altitude crosses the zero line
+  indicates sun rise and sun set (not adjusted for atmospheric
+  refraction).  The distance between them is the length of the day.
+  The peak is local noon adjusted, for daylight savings time.  The
+  solstice lines indicate the maximum and minimum range of the sun
+  position through out the year. The equinox lines show the middle of
+  the cycle.
+
+</div>
 
 <br>
 
@@ -127,7 +273,117 @@
 <h2>Sun's Position</h2>
 
 
-<div id="sun_chart" style="width: 900px; height: 500px"></div>
+<table>
+
+  <tr>
+
+    <td>
+      <div id="sun_chart"></div>
+    </td>
+
+    <td>
+
+      <table id="sun_chart_legend">
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
+	  </td>
+
+	  <td id="_vernal_equinox">
+	    Vernal Equinox
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
+	  </td>
+
+	  <td id="_summer_solstice">
+	    Summer Solstice
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
+	  </td>
+
+	  <td id="_autumnal_equinox">
+	    Autumnal Equinox
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
+	  </td>
+
+	  <td id="_winter_solstice">
+	    Winter Solstice
+	  </td>
+
+	</tr>
+
+
+      </table>
+
+    </td>
+
+
+  </tr>
+
+
+
+</table>
+
+<hr>
+<br>
+
+<div class="twocolumn">
+
+  To see
+  the <a href="https://en.wikipedia.org/wiki/Midnight_sun">midnight
+  sun</a> enter an extreme latitude near a
+  <a href="https://en.wikipedia.org/wiki/Polar_circle">polar
+  circle</a> around 66:33:46.2 north or south.
+  In the north, the winter solstice barely makes it above the horizon at noon.
+  The summer solstice sun drops below the horizon briefly around midnight.
+  The situation is reversed in the southern hemisphere, as expected.
+
+  <p>
+    Closer to the equator with in either the
+    <a href="https://en.wikipedia.org/wiki/Tropic_of_Cancer">Tropic of Cancer</a>
+    23:26 N
+    or
+    <a href="https://en.wikipedia.org/wiki/Tropic_of_Capricorn">Tropic of Capricorn</a>
+    23:26 S
+    the equinox lines pass directly overhead.
+    On finding out a well in the Egyptian city of Syene had no shadow
+    at on noon on the solstice,
+    <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth.27s_circumference">Eratosthenes</a>
+    realized that Syene must be on the Tropic of Cancer and used that information
+    to calculate the earth's circumference within less than 1% of the modern value,
+    back in third century B.C.
+
+  <p>
+    <a href="https://github.com/lrmcfarland/Astronomy/blob/master/www/templates/sun_chart.html">
+      The source for this page
+    </a> is an example of plotting a days worth of sun position data with
+    <a href="https://developers.google.com/chart/">google charts</a>.
+    Data views are used to control the display on the client with the legend,
+    i.e. the equinox and solstice lines.
+
+
+</div>
 
 
 

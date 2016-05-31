@@ -245,7 +245,7 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     gmst.value *= 15 # in degrees
 
     cos_hour_angle = (math.sin(an_altitude.radians) \
-                      - math.sin(observer_latitude.radians) * math.sin(object_declination.radians)) \
+        - math.sin(observer_latitude.radians) * math.sin(object_declination.radians)) \
         / (math.cos(observer_latitude.radians) * math.cos(object_declination.radians))
 
     if cos_hour_angle > 1:
@@ -259,27 +259,34 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     # longitude sign convention is IAU, opposite Meeus p. 93
     m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
-
     m0.normalize(0, 1)
 
-    transit = coords.datetime(midnight.year, midnight.month, midnight.day)
+    transit = coords.datetime(midnight.year, midnight.month, midnight.day,
+                              0, 0, 0, a_datetime.timezone)
     transit += m0.value
     transit += a_datetime.timezone/24
+
 
     m1 = coords.angle(m0.value - hour_angle.value/360)
     m1.normalize(0, 1)
 
-    rising = coords.datetime(midnight.year, midnight.month, midnight.day)
+    rising = coords.datetime(midnight.year, midnight.month, midnight.day,
+                             0, 0, 0, a_datetime.timezone)
     rising += m1.value
-    rising += a_datetime.timezone/24
+    rising += a_datetime.timezone/24.0
+
+    # TODO a day too early on test_timezone_p6
+
 
     m2 = coords.angle(m0.value + hour_angle.value/360)
     # TODO m2.normalize(0, 1) ?
+    # TODO a day to late in december if normalizing
 
-    setting = coords.datetime(midnight.year, midnight.month, midnight.day)
+
+    setting = coords.datetime(midnight.year, midnight.month, midnight.day,
+                              0, 0, 0, a_datetime.timezone)
     setting += m2.value
     setting += a_datetime.timezone/24
-
 
     return rising, transit, setting
 

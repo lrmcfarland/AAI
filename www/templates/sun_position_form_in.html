@@ -20,11 +20,11 @@
 
 {% endblock %}
 
-{% block title %} Sun Position (html form example) {% endblock %}
+{% block title %}Sun Position (HTML form example){% endblock %}
 
 {% block content %}
 
-<h1>Sun Position (html form example)</h1>
+<h1>Sun Position (HTML form example)</h1>
 
 <br>
 
@@ -32,18 +32,21 @@
 
 This page follows from the example in the
 <a href="http://flask.pocoo.org/docs/0.10/tutorial/templates/">flask tutorial</a>
-for using html forms.
+for using
+<a href="http://www.w3schools.com/html/html_forms.asp">HTML forms</a>.
 
 The user fills in the observer's location information, either by
 typing in the values or using the buttons.
 
 The submit action sends a request url to the server with parameters
 from the input elements on the location form. The server returns a new
-page with the results.
+page with the results. This contrasts with the AJAX example that
+updates the current page.
 
-To avoid confusion with the location and time buttons inside the
-form, add some JavaScript to put the submit
-button outside the form and left the form's submit attribute unset.
+To avoid confusion with the set location and time button events inside
+the form that wrapps the observer location table, I connected the
+observer form submit action with get sun position button outside the
+form and left the form's submit attribute unset.
 
 </div>
 
