@@ -46,6 +46,9 @@ dms_re = re.compile(r'(?P<degrees>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
 def request_float(a_float_str):
     """Gets the float of string from the request args
 
+    Args:
+        a_float_str (str): float as string
+
     Returns: the float
     Raises: ValueError if not found
     """
@@ -65,8 +68,8 @@ def safe_get_float(a_match, a_key):
     """Safe get float
 
     Args:
-    a_match (re.match result dictonary): regex with named groups
-    a_float_key (str): value to get
+        a_match (re.match result dictonary): regex with named groups
+        a_float_key (str): value to get
 
     Returns 0 if not found
     Raises error if not float-able
@@ -84,7 +87,7 @@ def request_angle(an_angle_key):
     """Gets the degree minute second values from the request args
 
     Arg:
-    an_angle_key (str): one of deg, deg:min, deg:min:sec
+        an_angle_key (str): one of deg, deg:min, deg:min:sec
 
     Returns: coords.angle
     Raises: value exception on format error
@@ -111,10 +114,10 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
     """Gets the degree minute second values from the request args
 
     Arg:
-    a_date_key (str): yyyy-mm-dd
-    a_time_key (str): hr:min:sec
-    a_timezone (float): -12 to 12
-    is_dst (bool): daylight savings time
+        a_date_key (str): yyyy-mm-dd
+        a_time_key (str): hr:min:sec
+        a_timezone (float): -12 to 12
+        is_dst (bool): daylight savings time
 
     Returns: coords.datetime
     Raises: value exception on format error
@@ -138,21 +141,19 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
     if is_dst:
         a_datetime -= 1.0/24
 
+    app.logger.debug('datetime: {a_datetime}'.format(**locals())) # TODO rm
+
     return a_datetime
 
 
 def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
-    Notes:
-    app.logger.debug('datetime: {a_datetime}'.format(**locals())) # TODO rm
-
-
     Args:
-    a_latitude (coords.angle): observer's latitude
-    a_longitude (coords.angle): observer's longitude
-    a_datetime (coords.datetime): observer's time
-    a_dst (bool): daylight savings time
+        a_latitude (coords.angle): observer's latitude
+        a_longitude (coords.angle): observer's longitude
+        a_datetime (coords.datetime): observer's time
+        a_dst (bool): daylight savings time
 
 
     return results dictionary
@@ -240,6 +241,56 @@ def home():
 
     return flask.render_template('home.html')
 
+# ------------------------------
+# ----- sun position forms -----
+# ------------------------------
+
+@app.route("/sun_position_form_in")
+def sun_position_form_in():
+    """A form for submitting an observer's location in space and time"""
+
+    return flask.render_template('sun_position_form_in.html')
+
+
+@app.route("/get_sun_position_form")
+def get_sun_position_form():
+    """Get the sun position for the form example.
+
+    This uses a html form to provide the input with the name to connect the
+
+        <input type=text name=of_latitude>
+
+    via flask
+
+        val = flask.request.values.get('latitude')
+
+    And returns a page of results:
+
+        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
+
+    """
+
+    try:
+
+        is_dst = True if flask.request.args.get('dst') == 'on' else False
+
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
+
+    except (ValueError, RuntimeError) as err:
+
+        app.logger.error(err)
+        flask.flash(err)
+        return flask.render_template('flashes.html')
+
+    return flask.render_template('sun_position_form_out.html', **result)
+
+
 # -----------------------------
 # ----- sun position ajax -----
 # -----------------------------
@@ -273,8 +324,6 @@ def get_sun_position_ajax():
 
     try:
 
-        # input :checked selector returns 'true' and 'false'
-        # val() is 'no' or None
         is_dst = True if flask.request.args.get('dst') == 'true' else False
 
         result = calculate_sun_position(request_angle('latitude'),
@@ -292,72 +341,20 @@ def get_sun_position_ajax():
 
     return flask.jsonify(**result)
 
-# ------------------------------
-# ----- sun position forms -----
-# ------------------------------
-
-@app.route("/sun_position_form_in")
-def sun_position_form_in():
-    """A form for submitting an observer's location in space and time"""
-
-    return flask.render_template('sun_position_form_in.html')
-
-
-@app.route("/get_sun_position_form")
-def get_sun_position_form():
-    """Get the sun position for the form example.
-
-    This uses a html form to provide the input with the name to connect the
-
-        <input type=text name=of_latitude>
-
-    via flask
-
-        val = flask.request.values.get('latitude')
-
-    And returns a page of results:
-
-        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
-
-    """
-
-    try:
-
-        # input :checked selector returns 'true' and 'false'
-        # val() is 'no' or None
-        is_dst = True if flask.request.args.get('dst') == 'on' else False
-
-        result = calculate_sun_position(request_angle('latitude'),
-                                        request_angle('longitude'),
-                                        request_datetime('date',
-                                                         'time',
-                                                         request_float('timezone'),
-                                                         is_dst),
-                                        is_dst)
-
-    except (ValueError, RuntimeError) as err:
-
-        app.logger.error(err)
-        flask.flash(err)
-        return flask.render_template('flashes.html')
-
-    return flask.render_template('sun_position_form_out.html', **result)
-
-
 # ---------------------
 # ----- sun chart -----
 # ---------------------
 
 
-@app.route("/sun_chart")
-def sun_chart():
+@app.route("/sun_position_chart")
+def sun_position_chart():
     """Plot the sun position for the observer's location in space and time"""
 
-    return flask.render_template('sun_chart.html')
+    return flask.render_template('sun_position_chart.html')
 
 
-@app.route("/get_sun_position_chart")
-def sun_position_chart():
+@app.route("/get_sun_position_chart_data")
+def sun_position_chart_data():
     """Get the sun position chart for the given day"""
 
     try:

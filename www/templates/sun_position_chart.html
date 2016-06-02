@@ -56,9 +56,9 @@
 
       {# ----- get data ----- #}
 
-      $("#get_sun_position").click(function(e) {
+      $("#get_sun_position_data").click(function(e) {
 
-	$.getJSON($SCRIPT_ROOT + "/get_sun_position_chart",
+	$.getJSON($SCRIPT_ROOT + "/get_sun_position_chart_data",
 	  {
 	    latitude: $('input[name="latitude"]').val(),
 	    longitude: $('input[name="longitude"]').val(),
@@ -165,10 +165,12 @@
 
       };
 
-      function drawChart(sun_position) {
+      function drawChart(sun_position_data) {
 
-	var chart = new google.visualization.LineChart(document.getElementById('sun_chart'));
-	var altitude_table = google.visualization.arrayToDataTable(sun_position.altitude);
+	var chart = new google.visualization.LineChart(
+	    document.getElementById('sun_chart_display'));
+
+	var altitude_table = google.visualization.arrayToDataTable(sun_position_data.altitude);
 	var altitude_view = getAltitudeView(altitude_table);
 
 	chart.draw(altitude_view.altitude, altitude_view.options);
@@ -214,7 +216,7 @@
     width: 60em;
 }
 
-div#sun_chart {
+div#sun_chart_display {
     width: 800px;
     height: 500px;
 }
@@ -268,7 +270,7 @@ table#sun_chart_legend {
 
 <br>
 
-<button id="get_sun_position">get sun position</button>
+<button id="get_sun_position_data">get sun position</button>
 
 <h2>Sun's Position</h2>
 
@@ -278,7 +280,7 @@ table#sun_chart_legend {
   <tr>
 
     <td>
-      <div id="sun_chart"></div>
+      <div id="sun_chart_display"></div>
     </td>
 
     <td>
