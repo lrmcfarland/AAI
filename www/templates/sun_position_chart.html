@@ -93,7 +93,7 @@
       google.charts.load('current', {'packages':['corechart']});
 
 
-      function getAltitudeView (altitude_table) {
+      function getSunChartView (data_table, chart_title, hAxis_title) {
 
 	var view_data = {};
 
@@ -106,13 +106,13 @@
 
 	var options = {
 
-	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
-
-	    title: "Altitude over time for one day",
-
 	    legend: "none",
 
-	    hAxis: { title: "hour"},
+	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
+
+	    title: chart_title,
+
+	    hAxis: { title: hAxis_title},
 	    vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
 
 	    series: {
@@ -124,7 +124,7 @@
 	};
 
 
-	var altitude = new google.visualization.DataView(altitude_table);
+	var data = new google.visualization.DataView(data_table);
 
 	var hides = [];
 	var line_count = 1;
@@ -156,43 +156,66 @@
 	    hides.push(5);
 	};
 
-	altitude.hideColumns(hides);
+	data.hideColumns(hides);
 
-	view_data['altitude'] = altitude;
+	view_data['data'] = data;
 	view_data['options'] = options;
 
 	return view_data;
 
       };
 
+
+
+
       function drawChart(sun_position_data) {
 
-	var chart = new google.visualization.LineChart(
-	    document.getElementById('sun_chart_display'));
+	var altitudeVtime_chart = new google.visualization.LineChart(
+	    document.getElementById('altitudeVtime'));
 
 	var altitude_table = google.visualization.arrayToDataTable(sun_position_data.altitude);
-	var altitude_view = getAltitudeView(altitude_table);
+	var altitude_view = getSunChartView(altitude_table,
+                                            "Altitude over time for one day", "hour");
 
-	chart.draw(altitude_view.altitude, altitude_view.options);
+	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+
+
+	var altitudeVazimuth_chart = new google.visualization.LineChart(
+	    document.getElementById('altitudeVazimuth'));
+
+	var azimuth_table = google.visualization.arrayToDataTable(sun_position_data.azimuth);
+	var azimuth_view = getSunChartView(azimuth_table,
+                                           "Altitude vs. Azimuth for one day", "degrees");
+
+	altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
+
 
 	$("#_vernal_equinox_cb").change(function() {
-	  var altitude_view = getAltitudeView(altitude_table);
-	  chart.draw(altitude_view.altitude, altitude_view.options);
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	  var azimuth_view = getSunChartView(azimuth_table);
+	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
 	});
 
 	$("#_summer_solstice_cb").change(function() {
-	  var altitude_view = getAltitudeView(altitude_table);
-	  chart.draw(altitude_view.altitude, altitude_view.options);
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	  var azimuth_view = getSunChartView(azimuth_table);
+	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
 	});
 
 	$("#_autumnal_equinox_cb").change(function() {
-	  var altitude_view = getAltitudeView(altitude_table);
-	  chart.draw(altitude_view.altitude, altitude_view.options);
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	  var azimuth_view = getSunChartView(azimuth_table);
+	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
 	});
 
 	$("#_winter_solstice_cb").change(function() {
-	  var altitude_view = getAltitudeView(altitude_table);
-	  chart.draw(altitude_view.altitude, altitude_view.options);
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	  var azimuth_view = getSunChartView(azimuth_table);
+	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
 	});
 
 
@@ -216,7 +239,7 @@
     width: 60em;
 }
 
-div#sun_chart_display {
+.linechart {
     width: 800px;
     height: 500px;
 }
@@ -225,19 +248,19 @@ table#sun_chart_legend {
     width: 10em;
 }
 
-#_vernal_equinox {
+#_vernal_equinox_txt {
     color: green;
 }
 
-#_summer_solstice {
+#_summer_solstice_txt {
     color: red;
 }
 
-#_autumnal_equinox {
+#_autumnal_equinox_txt {
     color: orange;
 }
 
-#_winter_solstice {
+#_winter_solstice_txt {
     color: cyan;
 }
 
@@ -280,7 +303,7 @@ table#sun_chart_legend {
   <tr>
 
     <td>
-      <div id="sun_chart_display"></div>
+      <div id="altitudeVtime" class="linechart"></div>
     </td>
 
     <td>
@@ -293,7 +316,7 @@ table#sun_chart_legend {
 	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
 	  </td>
 
-	  <td id="_vernal_equinox">
+	  <td id="_vernal_equinox_txt">
 	    Vernal Equinox
 	  </td>
 
@@ -305,7 +328,7 @@ table#sun_chart_legend {
 	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
 	  </td>
 
-	  <td id="_summer_solstice">
+	  <td id="_summer_solstice_txt">
 	    Summer Solstice
 	  </td>
 
@@ -317,7 +340,7 @@ table#sun_chart_legend {
 	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
 	  </td>
 
-	  <td id="_autumnal_equinox">
+	  <td id="_autumnal_equinox_txt">
 	    Autumnal Equinox
 	  </td>
 
@@ -329,7 +352,7 @@ table#sun_chart_legend {
 	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
 	  </td>
 
-	  <td id="_winter_solstice">
+	  <td id="_winter_solstice_txt">
 	    Winter Solstice
 	  </td>
 
@@ -343,7 +366,12 @@ table#sun_chart_legend {
 
   </tr>
 
+  <tr>
 
+    <td>
+      <div id="altitudeVazimuth" class="linechart"></div>
+    </td>
+  </tr>
 
 </table>
 
