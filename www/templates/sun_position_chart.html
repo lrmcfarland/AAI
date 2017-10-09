@@ -185,7 +185,8 @@
 
 	var azimuth_table = google.visualization.arrayToDataTable(sun_position_data.azimuth);
 	var azimuth_view = getSunChartView(azimuth_table,
-                                           "Altitude vs. Azimuth for one day", "degrees");
+                                           "Altitude vs. Azimuth for one day",
+                                           "Azimuth in degrees");
 
 	altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
 
@@ -241,7 +242,7 @@
 
 .linechart {
     width: 800px;
-    height: 500px;
+    height: 700px;
 }
 
 table#sun_chart_legend {
