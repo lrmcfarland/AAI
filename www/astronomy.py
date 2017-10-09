@@ -397,19 +397,25 @@ def sun_position_chart_data():
         winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
 
+        altitude = [['time',
+                    '{year}-{month}-{day}'.format(year=current_time.year,
+                                                  month=current_time.month,
+                                                  day=current_time.day),
+                    'Vernal Equinox',
+                    'Summer Solstice',
+                    'Autumnal Equinox',
+                    'Winter Solstice'
+                 ]]
 
-        altitude = list()
-
-        altitude.append(['time',
-                         '{year}-{month}-{day}'.format(year=current_time.year,
-                                                       month=current_time.month,
-                                                       day=current_time.day),
-                         'Vernal Equinox',
-                         'Summer Solstice',
-                         'Autumnal Equinox',
-                         'Winter Solstice'
-                     ]
-        )
+        azimuth = [['azimuth',
+                    '{year}-{month}-{day}'.format(year=current_time.year,
+                                                  month=current_time.month,
+                                                  day=current_time.day),
+                    'Vernal Equinox',
+                    'Summer Solstice',
+                    'Autumnal Equinox',
+                    'Winter Solstice'
+                ]]
 
 
         npts = 24*4
@@ -438,6 +444,17 @@ def sun_position_chart_data():
             )
 
 
+            if d > 0: # TODO hack for line wrap. This is fubar below 23 degrees latitude.
+                azimuth.append([utils.get_azimuth(sun_ct).value,
+                                utils.get_altitude(sun_ct).value,
+                                utils.get_altitude(sun_ve).value,
+                                utils.get_altitude(sun_ss).value,
+                                utils.get_altitude(sun_ae).value,
+                                utils.get_altitude(sun_ws).value
+                            ]
+                           )
+
+
             dtime += 1.0/npts*24
 
             current_time += 1.0/npts
@@ -447,7 +464,11 @@ def sun_position_chart_data():
             winter_solstice += 1.0/npts
 
 
+
+        # altitude = altitude[:-2] # TODO hack for line wrap, winter edition.
+
         result['altitude'] = altitude
+        result['azimuth'] = azimuth
 
 
 

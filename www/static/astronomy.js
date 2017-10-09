@@ -21,7 +21,8 @@ astronomy.setLocation = function() { // TODO set location
     else
 	console.log("Geolocation supported");
 
-    navigator.geolocation.getCurrentPosition(function(pos) {
+
+    function success(pos) {
 
 	var latitude = pos.coords.latitude;
 	var longitude = pos.coords.longitude;
@@ -35,10 +36,19 @@ astronomy.setLocation = function() { // TODO set location
 
 	timezone = Math.ceil(Math.round(longitude / 15)); // assumes degrees
 
-
 	document.getElementById(timezone_id).value = timezone;
 
-    });
+    };
 
+    function error(err) {
+	console.warn("Error: " + err.message);
+	alert(err.message +
+	      ".\nTODO I need set up starbug's CA certificate to support https." +
+	      "\nManual entry is required at this time.");
+    };
+
+    navigator.geolocation.getCurrentPosition(success, error);
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
 
 };
