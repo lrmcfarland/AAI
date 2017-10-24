@@ -11,7 +11,9 @@ Notes:
 
 """
 
+import argparse
 import flask
+import logging
 import re
 
 import coords
@@ -583,8 +585,55 @@ if __name__ == "__main__":
 
     """Run stand alone in flask"""
 
-    # TODO argparse host, port, log level
 
-    # when all else fails:  app.debug = True # TODO Security HOLE!!!
+    loglevels = {'debug': logging.DEBUG,
+                 'info': logging.INFO,
+                 'warn': logging.WARN,
+                 'error': logging.ERROR}
 
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    defaults = {'host':'0.0.0.0',
+                'loglevel': 'warn',
+                'port': 8080,
+                'debug': False}
+
+    parser = argparse.ArgumentParser(description='vArmour simple flask server')
+
+    parser.add_argument('-d', '--debug', action='store_true',
+                        dest='debug', default=defaults['debug'],
+                        help='flask debug (default: %(default)s)')
+
+    parser.add_argument('--host', type=str, dest='host', default=defaults['host'],
+                        metavar='host',
+                        help='host IP to serve (default: %(default)s)')
+
+    parser.add_argument('-l', '--loglevel', choices=list(loglevels.keys()),
+                        dest='loglevel', default=defaults['loglevel'],
+                        metavar='LEVEL',
+                        help='logging level choice: %(keys)s (default: %(default)s)' % {
+                            'keys':', '.join(list(loglevels.keys())), 'default':'%(default)s'})
+
+    parser.add_argument('-p', '--port', type=int, dest='port', default=defaults['port'],
+                        help='port (default: %(default)s)')
+
+    args = parser.parse_args()
+
+
+
+    # ----- set up default logging -----
+
+    # TODO syslog, rotating
+
+    log_handler = logging.StreamHandler()
+    log_handler.setFormatter(
+        logging.Formatter(
+            '[%(asctime)s %(levelname)s %(filename)s %(lineno)s] %(message)s'))
+
+    logging.getLogger().addHandler(log_handler)
+    logging.getLogger().setLevel(loglevels[args.loglevel])
+
+    # -------------------
+    # ----- run app -----
+    # -------------------
+
+    app.run(host=args.host, port=args.port, debug=args.debug)
+

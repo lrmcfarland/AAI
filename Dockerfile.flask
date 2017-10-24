@@ -1,0 +1,94 @@
+# This is the starbug.com implementation of Astronomical Algorithms by Meeus
+#
+# This will build the aai app in a container and served by flask.
+# It is intended for debugging.
+#
+# it has c++ parts that are wrapped by python
+#
+# to build:            docker build -f Dockerfile.flask -t aai-flask .
+#
+# to run flask:        docker run --name aai-flask-00 -d -p 5000:5000 aai-flask
+# to daemonize:        docker run --name aai-flask-00 -d -p 5000:5000  --restart=always aai-flask
+#
+#   assumes 80 outside to 5000 inside, see CMD below
+#
+# to stop:             docker stop aai-flask-00
+#
+# to view logs:        docker logs <container id>
+# to run bash:         docker run -it --entrypoint /bin/bash aai-flask
+#
+# to delete container: docker rm aai-flask-00
+# to delete image:     docker rmi aai-flask
+#
+# to delete all containers:  docker rm $(docker ps -a -q)
+# to delete all images:      docker rmi $(docker images -q)
+# to delete dangling images: docker rmi $(docker images -q -f dangling=true)
+#
+
+
+FROM centos
+
+LABEL maintainer "lrm@starbug.com"
+LABEL service "Astronomical Algorithms Implemented"
+
+# packages
+
+RUN yum update -y
+RUN yum install -y gcc gcc-c++ python-devel boost boost-devel make cmake git
+
+RUN yum -y install epel-release && yum clean all
+RUN yum -y install python-pip && yum clean all
+
+RUN pip install --upgrade pip && pip install flask
+
+# --------------------
+# ----- AAI home -----
+# --------------------
+
+ENV AAI_HOME="/opt/starbug.com/AAI" \
+    AAI_USER="starbug" \
+    AAI_GRP="starbug"
+
+RUN groupadd ${AAI_GRP} \
+    && adduser -g ${AAI_GRP} ${AAI_USER} \
+    && mkdir -p ${AAI_HOME}/data \
+    && mkdir -p ${AAI_HOME}/logs \
+    && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
+
+
+USER ${AAI_USER}:${AAI_GRP}
+
+
+WORKDIR ${AAI_HOME}
+
+# built with git
+RUN git clone https://github.com/lrmcfarland/Astronomy.git
+
+WORKDIR ${AAI_HOME}/Astronomy/
+
+# assumes the latest checked on the master branch otherwise
+# RUN git checkout <your branch>
+
+RUN git submodule update --init --recursive
+
+
+# TODO assumes submodule update has been run locally, but has other problems
+# COPY . ${AAI_HOME}/Astronomy
+
+
+# -----------------
+# ----- build -----
+# -----------------
+
+WORKDIR ${AAI_HOME}/Astronomy/Coordinates
+RUN ./build.sh # optional test
+
+# -----------------------
+# ----- run web app -----
+# -----------------------
+
+WORKDIR ${AAI_HOME}/Astronomy/www
+
+ENTRYPOINT ["bash"]
+
+CMD [ "flask.sh", "-p", "5000" ]
