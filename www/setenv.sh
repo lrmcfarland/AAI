@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 #
-# Shell wrapper to set up OS X python environment
+# Shell wrapper to set up the python environment
 #
-# TODO: add linux support
-#
+
 
 # -----------------------
 # ----- Coords root -----

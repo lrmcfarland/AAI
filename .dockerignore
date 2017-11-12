@@ -1,0 +1,18 @@
+# exclude from docker COPY
+
+.DS_Store
+
+.git
+.gitignore
+.gitmodules
+
+# emacs
+*~
+
+# binaries
+*.dynlib
+*.a
+*.o
+
+www/pyenv
+

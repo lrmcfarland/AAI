@@ -1,0 +1,37 @@
+# This builds the stabug.com nginx reverse proxy.
+#
+# starbug.com static content is loaded from http on port 80
+#
+# AAI TLS content (for browser location) is reverse proxied to the aai
+# gunicorn app.  It expects this app to be running on aai-gunicorn-00
+#
+# Names must be coordinated with the gunicorn WSGI server. See also www/gunicorn.sh
+#
+# TODO load balanced nginx
+#
+# from https://hub.docker.com/_/nginx/
+#
+# create network:   docker network create nginx-proxy
+#
+# to build:         docker build -f Dockerfile.nginx -t aai-nginx .
+#
+#
+# with TLS:         docker run --net nginx-proxy --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
+#
+#
+# bad old link as reverse proxy 404 error in page context: docker run --name aai-nginx-00 --link aai-gunicorn-00:aai-gunicorn-00 -d -p 80:80 aai-nginx
+#
+# to run bash:      docker run -it --entrypoint /bin/bash aai-nginx
+# to run:           docker run --name aai-nginx-00 -d -p 80:80 aai-nginx
+# to view logs:     docker logs aai-nginx-00
+#
+# to delete dangling images: docker rmi $(docker images -q -f dangling=true)
+#
+
+FROM nginx
+
+COPY www/nginx.conf /etc/nginx/nginx.conf
+
+# TODO new conf per instance? must match run --name and what is in www/aai-nginx.conf
+COPY www/aai-nginx.conf /etc/nginx/conf.d/aai-nginx-00.conf
+
