@@ -243,6 +243,13 @@ def home():
 
     return flask.render_template('home.html')
 
+
+@app.route("/accuracy")
+def accuracy():
+    """Accuracy page"""
+
+    return flask.render_template('accuracy.html')
+
 # ------------------------------
 # ----- sun position forms -----
 # ------------------------------
