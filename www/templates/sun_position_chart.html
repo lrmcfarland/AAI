@@ -72,11 +72,23 @@
 
 	    if ("error" in sun_position) {
 
+               $("#rising").text("TBD");
+               $("#transit").text("TBD");
+               $("#setting").text("TBD");
+               $("#azimuth").text("TBD");
+               $("#altitude").text("TBD");
+
 	      alert("Error: " + sun_position.error);
 
 	    } else {
 
-	      drawChart(sun_position);
+               $("#rising").text(sun_position.rising);
+               $("#transit").text(sun_position.transit);
+               $("#setting").text(sun_position.setting);
+               $("#azimuth").text(sun_position.current_azimuth);
+               $("#altitude").text(sun_position.current_altitude);
+
+               drawChart(sun_position);
 
 	    };
 
@@ -175,49 +187,9 @@
 
 	var altitude_table = google.visualization.arrayToDataTable(sun_position_data.altitude);
 	var altitude_view = getSunChartView(altitude_table,
-                                            "Altitude over time for one day", "hour");
+					    "Altitude over time for one day", "hour");
 
 	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-
-
-	var altitudeVazimuth_chart = new google.visualization.LineChart(
-	    document.getElementById('altitudeVazimuth'));
-
-	var azimuth_table = google.visualization.arrayToDataTable(sun_position_data.azimuth);
-	var azimuth_view = getSunChartView(azimuth_table,
-                                           "Altitude vs. Azimuth for one day",
-                                           "Azimuth in degrees");
-
-	altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
-
-
-	$("#_vernal_equinox_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	  var azimuth_view = getSunChartView(azimuth_table);
-	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
-	});
-
-	$("#_summer_solstice_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	  var azimuth_view = getSunChartView(azimuth_table);
-	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
-	});
-
-	$("#_autumnal_equinox_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	  var azimuth_view = getSunChartView(azimuth_table);
-	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
-	});
-
-	$("#_winter_solstice_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	  var azimuth_view = getSunChartView(azimuth_table);
-	  altitudeVazimuth_chart.draw(azimuth_view.data, azimuth_view.options);
-	});
 
 
       }
@@ -365,14 +337,50 @@ table#sun_chart_legend {
     </td>
 
 
-  </tr>
 
   <tr>
+    <td colspan="2">
 
-    <td>
-      <div id="altitudeVazimuth" class="linechart"></div>
+      <table id="results_table">
+
+
+	<tr>
+	  <th>Azimuth</th>
+	  <td id="azimuth" colspan="2">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Altitude</th>
+	  <td id="altitude" colspan="2">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Rising</th>
+	  <td id="rising" colspan="2">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+
+	<tr>
+	  <th>Transit</th>
+	  <td id="transit" colspan="2">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+	<tr>
+	  <th>Setting</th>
+	  <td id="setting" colspan="2">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+      </table>
+
     </td>
   </tr>
+
+
 
 </table>
 
@@ -383,9 +391,9 @@ table#sun_chart_legend {
 
   To see
   the <a href="https://en.wikipedia.org/wiki/Midnight_sun">midnight
-  sun</a> enter an extreme latitude near a
+    sun</a> enter an extreme latitude near a
   <a href="https://en.wikipedia.org/wiki/Polar_circle">polar
-  circle</a> around 66:33:46.2 north or south.
+    circle</a> around 66:33:46.2 north or south.
   In the north, the winter solstice barely makes it above the horizon at noon.
   The summer solstice sun drops below the horizon briefly around midnight.
   The situation is reversed in the southern hemisphere, as expected.

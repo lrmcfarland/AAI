@@ -476,9 +476,23 @@ def sun_position_chart_data():
 
         # altitude = altitude[:-2] # TODO hack for line wrap, winter edition.
 
-        result['altitude'] = altitude
-        result['azimuth'] = azimuth
+        result['altitude'] = altitude # list
+        result['azimuth'] = azimuth   # list
 
+        # get rise, transit, set time
+        rts = calculate_sun_position(request_angle('latitude'),
+                                     request_angle('longitude'),
+                                     request_datetime('date',
+                                                      'time',
+                                                      request_float('timezone'),
+                                                      is_dst),
+                                     is_dst)
+
+        result['current_altitude'] = rts['altitude']
+        result['current_azimuth']  = rts['azimuth']
+        result['rising']   = rts['rising']
+        result['transit']  = rts['transit']
+        result['setting']  = rts['setting']
 
 
     except (ValueError, RuntimeError) as err:

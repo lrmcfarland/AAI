@@ -21,8 +21,10 @@ Algorithms by Jean Meeus</a>, with parts found around the home and
 across the internet.
 
 This web page pulls together examples of the techniques I have learned
-for how to combine C++, Python and JavaScript in a single
-application.
+for how to combine C++, Python and JavaScript. It also puts the
+AAI server in a docker container as a micro-service (a really fat
+micro-service in need of a multi stage build soon)
+with <a href="http://www.nginx.com">Nginx</a> running as a reverse proxy.
 
 It is also created using those techniques.
 
@@ -58,7 +60,7 @@ If you find them, please feel free to let me know.
 
 <p>
 
-<a href="http://www.starbug.com">-lrm</a>, <i>2016 May 21</i>
+<a href="http://www.starbug.com">-lrm</a>, <i>2017 Nov 15</i>
 
 </div>
 
@@ -87,40 +89,7 @@ If you find them, please feel free to let me know.
   <tr>
 
     <td>
-      <a href="{{ url_for('accuracy') }}">On Accuracy</a>
-    </td>
-
-    <td>
-      This is an example of a html form submission.
-    </td>
-
-    <td>
-      <a href="{{ url_for('sun_position_form_in') }}">Sun Position (form)</a>
-    </td>
-
-    <td>
-      This is an example of a html form submission.
-    </td>
-
-  </tr>
-
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('sun_position_ajax') }}">Sun Position (AJAX)</a>
-    </td>
-
-    <td>
-      This is an example of a JavaScript AJAX call and JSON response.
-    </td>
-
-  </tr>
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('sun_position_chart') }}">Sun Position (google chart)</a>
+      <a href="{{ url_for('sun_position_chart') }}">Sun Position</a>
     </td>
 
     <td>
@@ -141,7 +110,13 @@ If you find them, please feel free to let me know.
 
   </tr>
 
+  <tr>
 
+    <td>
+      <a href="{{ url_for('accuracy') }}">On Accuracy</a>
+    </td>
+
+  </tr>
 
 </table>
 
