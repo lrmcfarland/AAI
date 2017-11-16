@@ -42,9 +42,7 @@ astronomy.setLocation = function() { // TODO set location
 
     function error(err) {
 	console.warn("Error: " + err.message);
-	alert(err.message +
-	      ".\nTODO I need set up starbug's CA certificate to support https." +
-	      "\nManual entry is required at this time.");
+	alert(err.message + "\nManual entry is required at this time.");
     };
 
     navigator.geolocation.getCurrentPosition(success, error);
