@@ -384,10 +384,11 @@ def sun_position_chart_data():
 
         result['datetime'] = str(a_datetime)
 
+        plot_time_marker = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
+        plot_time_marker.timezone = a_datetime.timezone
+        plot_time_marker += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
-        current_time.timezone = a_datetime.timezone
-        current_time += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        result['sun_marker_time'] = a_datetime - plot_time_marker # distance on x-axis to plot sun marker
 
         vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
         vernal_equinox.timezone = a_datetime.timezone
@@ -407,25 +408,14 @@ def sun_position_chart_data():
 
 
         altitude = [['time',
-                    '{year}-{month}-{day}'.format(year=current_time.year,
-                                                  month=current_time.month,
-                                                  day=current_time.day),
+                    '{year}-{month}-{day}'.format(year=plot_time_marker.year,
+                                                  month=plot_time_marker.month,
+                                                  day=plot_time_marker.day),
                     'Vernal Equinox',
                     'Summer Solstice',
                     'Autumnal Equinox',
                     'Winter Solstice'
                  ]]
-
-        azimuth = [['azimuth',
-                    '{year}-{month}-{day}'.format(year=current_time.year,
-                                                  month=current_time.month,
-                                                  day=current_time.day),
-                    'Vernal Equinox',
-                    'Summer Solstice',
-                    'Autumnal Equinox',
-                    'Winter Solstice'
-                ]]
-
 
         npts = 24*4
 
@@ -436,7 +426,7 @@ def sun_position_chart_data():
 
         for d in range(0, npts + 1):
 
-            sun_ct = SunPosition.SunPosition(an_observer, current_time)
+            sun_ct = SunPosition.SunPosition(an_observer, plot_time_marker)
             sun_ve = SunPosition.SunPosition(an_observer, vernal_equinox)
             sun_ss = SunPosition.SunPosition(an_observer, summer_solstice)
             sun_ae = SunPosition.SunPosition(an_observer, autumnal_equinox)
@@ -453,31 +443,15 @@ def sun_position_chart_data():
             )
 
 
-            if d > 0: # TODO hack for line wrap. This is fubar below 23 degrees latitude.
-                azimuth.append([utils.get_azimuth(sun_ct).value,
-                                utils.get_altitude(sun_ct).value,
-                                utils.get_altitude(sun_ve).value,
-                                utils.get_altitude(sun_ss).value,
-                                utils.get_altitude(sun_ae).value,
-                                utils.get_altitude(sun_ws).value
-                            ]
-                           )
-
-
             dtime += 1.0/npts*24
 
-            current_time += 1.0/npts
+            plot_time_marker += 1.0/npts
             vernal_equinox += 1.0/npts
             summer_solstice += 1.0/npts
             autumnal_equinox += 1.0/npts
             winter_solstice += 1.0/npts
 
-
-
-        # altitude = altitude[:-2] # TODO hack for line wrap, winter edition.
-
-        result['altitude'] = altitude # list
-        result['azimuth'] = azimuth   # list
+        result['altitude_data_24h'] = altitude # list
 
         # get rise, transit, set time
         rts = calculate_sun_position(request_angle('latitude'),
@@ -488,8 +462,8 @@ def sun_position_chart_data():
                                                       is_dst),
                                      is_dst)
 
-        result['current_altitude'] = rts['altitude']
-        result['current_azimuth']  = rts['azimuth']
+        result['sun_marker_altitude'] = rts['altitude']
+        result['sun_marker_azimuth']  = rts['azimuth']
         result['rising']   = rts['rising']
         result['transit']  = rts['transit']
         result['setting']  = rts['setting']
