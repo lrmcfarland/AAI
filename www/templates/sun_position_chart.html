@@ -72,23 +72,23 @@
 
 	    if ("error" in sun_position) {
 
-               $("#rising").text("TBD");
-               $("#transit").text("TBD");
-               $("#setting").text("TBD");
-               $("#azimuth").text("TBD");
-               $("#altitude").text("TBD");
+	       $("#rising").text("TBD");
+	       $("#transit").text("TBD");
+	       $("#setting").text("TBD");
+	       $("#azimuth").text("TBD");
+	       $("#altitude").text("TBD");
 
 	      alert("Error: " + sun_position.error);
 
 	    } else {
 
-               $("#rising").text(sun_position.rising);
-               $("#transit").text(sun_position.transit);
-               $("#setting").text(sun_position.setting);
-               $("#azimuth").text(sun_position.current_azimuth);
-               $("#altitude").text(sun_position.current_altitude);
+	       $("#rising").text(sun_position.rising);
+	       $("#transit").text(sun_position.transit);
+	       $("#setting").text(sun_position.setting);
+	       $("#azimuth").text(sun_position.current_azimuth);
+	       $("#altitude").text(sun_position.current_altitude);
 
-               drawChart(sun_position);
+	       drawChart(sun_position);
 
 	    };
 
@@ -178,21 +178,40 @@
       };
 
 
-
-
       function drawChart(sun_position_data) {
 
 	var altitudeVtime_chart = new google.visualization.LineChart(
 	    document.getElementById('altitudeVtime'));
 
 	var altitude_table = google.visualization.arrayToDataTable(sun_position_data.altitude);
-	var altitude_view = getSunChartView(altitude_table,
-					    "Altitude over time for one day", "hour");
+	var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour");
 
 	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
 
+        {# ----- make toggles active ----- #}
 
-      }
+        $("#_vernal_equinox_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+	$("#_summer_solstice_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+	$("#_autumnal_equinox_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+	$("#_winter_solstice_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+
+      };
 
 
     }); {# end ready method #}
