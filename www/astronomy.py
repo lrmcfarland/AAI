@@ -464,7 +464,7 @@ def sun_position_chart_data():
 	result['setting']  = rts['setting']
 
 
-    except (ValueError, RuntimeError) as err:
+    except (ValueError, RuntimeError, SunPosition.Error) as err:
 
 	app.logger.error(err)
 	result = {'error': str(err)}
