@@ -24,8 +24,8 @@
       {# ----- set location ----- #}
 
       $("#set_location").click(function(e) {
-	{# astronomy.js uses document.getElementById #}
-	astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
+        {# astronomy.js uses document.getElementById #}
+        astronomy.setLocation("_latitude", "_longitude", "_timezone", e);
       });
 
 
@@ -33,24 +33,24 @@
 
       $("#set_time").click(function(e) {
 
-	{# TODO pad time with leading 0s #}
+        {# TODO pad time with leading 0s #}
 
-	var now = new Date();
+        var now = new Date();
 
-	var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) +
-		       "-" + now.getDate();
-	$("#_date").val(date_str);
+        var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) +
+                       "-" + now.getDate();
+        $("#_date").val(date_str);
 
-	var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-	$("#_time").val(time_str);
+        var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+        $("#_time").val(time_str);
       });
 
 
       {# ----- set timezone from longitude ----- #}
 
       $("#_longitude").change(function() {
-	var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
-	$("#_timezone").val(timezone);
+        var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
+        $("#_timezone").val(timezone);
       });
 
 
@@ -58,43 +58,43 @@
 
       $("#get_sun_position_data").click(function(e) {
 
-	$.getJSON($SCRIPT_ROOT + "/get_sun_position_chart_data",
-	  {
-	    latitude: $('input[name="latitude"]').val(),
-	    longitude: $('input[name="longitude"]').val(),
-	    date: $('input[name="date"]').val(),
-	    time: $('input[name="time"]').val(),
-	    timezone: $('input[name="timezone"]').val(),
-	    dst: $("#_dst").is(':checked') {# jQuery selector #}
+        $.getJSON($SCRIPT_ROOT + "/get_sun_position_chart_data",
+          {
+            latitude: $('input[name="latitude"]').val(),
+            longitude: $('input[name="longitude"]').val(),
+            date: $('input[name="date"]').val(),
+            time: $('input[name="time"]').val(),
+            timezone: $('input[name="timezone"]').val(),
+            dst: $("#_dst").is(':checked') {# jQuery selector #}
 
-	  },
-	  function(sun_position) {
+          },
+          function(sun_position) {
 
-	    if ("error" in sun_position) {
+            if ("error" in sun_position) {
 
-	       $("#rising").text("TBD");
-	       $("#transit").text("TBD");
-	       $("#setting").text("TBD");
-	       $("#azimuth").text("TBD");
-	       $("#altitude").text("TBD");
+               $("#rising").text("TBD");
+               $("#transit").text("TBD");
+               $("#setting").text("TBD");
+               $("#azimuth").text("TBD");
+               $("#altitude").text("TBD");
 
-	      alert("Error: " + sun_position.error);
+              alert("Error: " + sun_position.error);
 
-	    } else {
+            } else {
 
-	       $("#rising").text(sun_position.rising);
-	       $("#transit").text(sun_position.transit);
-	       $("#setting").text(sun_position.setting);
-	       $("#azimuth").text(sun_position.current_azimuth);
-	       $("#altitude").text(sun_position.current_altitude);
+               $("#rising").text(sun_position.rising);
+               $("#transit").text(sun_position.transit);
+               $("#setting").text(sun_position.setting);
+               $("#azimuth").text(sun_position.sun_marker_azimuth);
+               $("#altitude").text(sun_position.sun_marker_altitude);
 
-	       drawChart(sun_position);
+               drawChart(sun_position);
 
-	    };
+            };
 
-	  });
+          });
 
-	return false;
+        return false;
 
       });
 
@@ -105,111 +105,150 @@
       google.charts.load('current', {'packages':['corechart']});
 
 
-      function getSunChartView (data_table, chart_title, hAxis_title) {
-
-	var view_data = {};
-
-	var current_color = "blue";
-	var vernal_color = "green";
-	var summer_color = "red";
-	var autumnal_color = "orange";
-	var winter_color = "cyan";
-
-
-	var options = {
-
-	    legend: "none",
-
-	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
-
-	    title: chart_title,
-
-	    hAxis: { title: hAxis_title},
-	    vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
-
-	    series: {
-		0: { lineDashStyle: [] }
-	    },
-
-	    colors: [current_color],
-
-	};
-
-
-	var data = new google.visualization.DataView(data_table);
-
-	var hides = [];
-	var line_count = 1;
-
-	if ($("#_vernal_equinox_cb").is(':checked')) {
-	    options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
-	} else {
-	    hides.push(2);
-	};
-
-
-	if ($("#_summer_solstice_cb").is(':checked')) {
-	    options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
-	} else {
-	    hides.push(3);
-	};
-
-
-	if ($("#_autumnal_equinox_cb").is(':checked')) {
-	    options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
-	} else {
-	    hides.push(4);
-	};
-
-
-	if ($("#_winter_solstice_cb").is(':checked')) {
-	    options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
-	} else {
-	    hides.push(5);
-	};
-
-	data.hideColumns(hides);
-
-	view_data['data'] = data;
-	view_data['options'] = options;
-
-	return view_data;
-
-      };
-
-
       function drawChart(sun_position_data) {
 
-	var altitudeVtime_chart = new google.visualization.LineChart(
-	    document.getElementById('altitudeVtime'));
+        {# ----- TODO add goggle chart formatting here not in astronomy.py ----- #}
+        var sun_plot_data = [['time',
+                              'Vernal Equinox',
+                              'Summer Solstice',
+                              'Autumnal Equinox',
+                              'Winter Solstice',
+                              sun_position_data.sun_date_label,
+                              {'type': 'string', 'role': 'style'}]];
 
-	var altitude_table = google.visualization.arrayToDataTable(sun_position_data.altitude);
-	var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour");
+        var sun_marker_set = false;
+        for (var i = 0; i < sun_position_data.altitude_data_24h.length; i++) {
 
-	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+            var plot_record = sun_position_data.altitude_data_24h[i];
+
+            {# ----- TODO if sun position put point format ----- #}
+
+            if (sun_marker_set === false && plot_record[0] < sun_position_data.sun_marker_time) {
+
+                plot_record.push(null);
+
+            } else if (sun_marker_set === false && plot_record[0] > sun_position_data.sun_marker_time) {
+
+                sun_marker_set = 1;
+                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+            } else {
+
+                plot_record.push(null);
+
+            }
+
+
+            sun_plot_data.push(plot_record);
+
+        }
+
+        var altitudeVtime_chart = new google.visualization.LineChart(
+            document.getElementById('altitudeVtime'));
+
+        var altitude_table = google.visualization.arrayToDataTable(sun_plot_data);
+        var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour");
+
+        altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
 
         {# ----- make toggles active ----- #}
 
         $("#_vernal_equinox_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	});
+          var altitude_view = getSunChartView(altitude_table);
+          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+        });
 
-	$("#_summer_solstice_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	});
+        $("#_summer_solstice_cb").change(function() {
+          var altitude_view = getSunChartView(altitude_table);
+          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+        });
 
-	$("#_autumnal_equinox_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	});
+        $("#_autumnal_equinox_cb").change(function() {
+          var altitude_view = getSunChartView(altitude_table);
+          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+        });
 
-	$("#_winter_solstice_cb").change(function() {
-	  var altitude_view = getSunChartView(altitude_table);
-	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-	});
+        $("#_winter_solstice_cb").change(function() {
+          var altitude_view = getSunChartView(altitude_table);
+          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+        });
 
+
+      };
+
+
+      function getSunChartView (data_table, chart_title, hAxis_title) {
+
+        var view_data = {};
+
+        var current_color = "blue";
+        var vernal_color = "green";
+        var summer_color = "red";
+        var autumnal_color = "orange";
+        var winter_color = "cyan";
+
+
+        var options = {
+
+            legend: "none",
+
+            chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
+
+            title: chart_title,
+
+            hAxis: { title: hAxis_title},
+            vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
+
+            series: {
+                0: { lineDashStyle: [] }
+            },
+
+            colors: [current_color],
+
+            pointSize: 1,
+            dataOpacity: 0.7
+
+        };
+
+
+        var data = new google.visualization.DataView(data_table);
+
+        var hides = [];
+        var line_count = 0; {# assumes order ve, ss, ae, ws, current time #}
+
+        if ($("#_vernal_equinox_cb").is(':checked')) {
+            options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
+        } else {
+            hides.push(1);
+        };
+
+
+        if ($("#_summer_solstice_cb").is(':checked')) {
+            options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
+        } else {
+            hides.push(2);
+        };
+
+
+        if ($("#_autumnal_equinox_cb").is(':checked')) {
+            options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
+        } else {
+            hides.push(3);
+        };
+
+
+        if ($("#_winter_solstice_cb").is(':checked')) {
+            options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
+        } else {
+            hides.push(4);
+        };
+
+        data.hideColumns(hides);
+
+        view_data['data'] = data;
+        view_data['options'] = options;
+
+        return view_data;
 
       };
 
@@ -302,53 +341,53 @@ table#sun_chart_legend {
 
       <table id="sun_chart_legend">
 
-	<tr>
+        <tr>
 
-	  <td>
-	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
-	  </td>
+          <td>
+            <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
+          </td>
 
-	  <td id="_vernal_equinox_txt">
-	    Vernal Equinox
-	  </td>
+          <td id="_vernal_equinox_txt">
+            Vernal Equinox
+          </td>
 
-	</tr>
+        </tr>
 
-	<tr>
+        <tr>
 
-	  <td>
-	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
-	  </td>
+          <td>
+            <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
+          </td>
 
-	  <td id="_summer_solstice_txt">
-	    Summer Solstice
-	  </td>
+          <td id="_summer_solstice_txt">
+            Summer Solstice
+          </td>
 
-	</tr>
+        </tr>
 
-	<tr>
+        <tr>
 
-	  <td>
-	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
-	  </td>
+          <td>
+            <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
+          </td>
 
-	  <td id="_autumnal_equinox_txt">
-	    Autumnal Equinox
-	  </td>
+          <td id="_autumnal_equinox_txt">
+            Autumnal Equinox
+          </td>
 
-	</tr>
+        </tr>
 
-	<tr>
+        <tr>
 
-	  <td>
-	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
-	  </td>
+          <td>
+            <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
+          </td>
 
-	  <td id="_winter_solstice_txt">
-	    Winter Solstice
-	  </td>
+          <td id="_winter_solstice_txt">
+            Winter Solstice
+          </td>
 
-	</tr>
+        </tr>
 
 
       </table>
@@ -363,36 +402,36 @@ table#sun_chart_legend {
       <table id="results_table">
 
 
-	<tr>
-	  <th>Azimuth</th>
-	  <td id="azimuth" colspan="2">TBD</td>
-	  <td>deg:min:sec (deg)</td>
-	</tr>
+        <tr>
+          <th>Azimuth</th>
+          <td id="azimuth" colspan="2">TBD</td>
+          <td>deg:min:sec (deg)</td>
+        </tr>
 
-	<tr>
-	  <th>Altitude</th>
-	  <td id="altitude" colspan="2">TBD</td>
-	  <td>deg:min:sec (deg)</td>
-	</tr>
+        <tr>
+          <th>Altitude</th>
+          <td id="altitude" colspan="2">TBD</td>
+          <td>deg:min:sec (deg)</td>
+        </tr>
 
-	<tr>
-	  <th>Rising</th>
-	  <td id="rising" colspan="2">TBD</td>
-	  <td>ISO8601</td>
-	</tr>
+        <tr>
+          <th>Rising</th>
+          <td id="rising" colspan="2">TBD</td>
+          <td>ISO8601</td>
+        </tr>
 
 
-	<tr>
-	  <th>Transit</th>
-	  <td id="transit" colspan="2">TBD</td>
-	  <td>ISO8601</td>
-	</tr>
+        <tr>
+          <th>Transit</th>
+          <td id="transit" colspan="2">TBD</td>
+          <td>ISO8601</td>
+        </tr>
 
-	<tr>
-	  <th>Setting</th>
-	  <td id="setting" colspan="2">TBD</td>
-	  <td>ISO8601</td>
-	</tr>
+        <tr>
+          <th>Setting</th>
+          <td id="setting" colspan="2">TBD</td>
+          <td>ISO8601</td>
+        </tr>
 
       </table>
 
