@@ -108,9 +108,39 @@
       function drawChart(sun_position_data) {
 
         {# ----- TODO add goggle chart formatting here not in astronomy.py ----- #}
-        var sun_plot_data = [];
+        var sun_plot_data = [['time',
+                              sun_position_data.sun_date_label,
+                              'Vernal Equinox',
+                              'Summer Solstice',
+                              'Autumnal Equinox',
+                              'Winter Solstice',
+                              {'type': 'string', 'role': 'style'}]];
+
+        var sun_marker_set = false;
         for (var i = 0; i < sun_position_data.altitude_data_24h.length; i++) {
-            sun_plot_data.push(sun_position_data.altitude_data_24h[i]);
+
+            var plot_record = sun_position_data.altitude_data_24h[i];
+
+            {# ----- TODO if sun position put point format ----- #}
+
+            if (sun_marker_set === false && plot_record[0] < sun_position_data.sun_marker_time) {
+
+                plot_record.push(null);
+
+            } else if (sun_marker_set === false && plot_record[0] > sun_position_data.sun_marker_time) {
+
+                sun_marker_set = 1;
+                plot_record.push('point { size: 18; shape-type: star; fill-color: #a52714; }');
+
+            } else {
+
+                plot_record.push(null);
+
+            }
+
+
+            sun_plot_data.push(plot_record);
+
         }
 
         var altitudeVtime_chart = new google.visualization.LineChart(
