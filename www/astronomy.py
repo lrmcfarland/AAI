@@ -413,6 +413,7 @@ def sun_position_chart_data():
 
 	if is_dst:
 	    dtime = 1
+            result['sun_marker_time'] += 1
 	else:
 	    dtime = 0
 
@@ -428,11 +429,11 @@ def sun_position_chart_data():
 
 
 	    altitude.append([dtime,
-			     utils.get_altitude(sun_ct).value,
 			     utils.get_altitude(sun_ve).value,
 			     utils.get_altitude(sun_ss).value,
 			     utils.get_altitude(sun_ae).value,
-			     utils.get_altitude(sun_ws).value
+			     utils.get_altitude(sun_ws).value,
+			     utils.get_altitude(sun_ct).value # needs to be last for sun position marker
 			 ]
 	    )
 

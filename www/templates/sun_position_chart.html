@@ -85,8 +85,8 @@
                $("#rising").text(sun_position.rising);
                $("#transit").text(sun_position.transit);
                $("#setting").text(sun_position.setting);
-               $("#azimuth").text(sun_position.current_azimuth);
-               $("#altitude").text(sun_position.current_altitude);
+               $("#azimuth").text(sun_position.sun_marker_azimuth);
+               $("#altitude").text(sun_position.sun_marker_altitude);
 
                drawChart(sun_position);
 
@@ -109,11 +109,11 @@
 
         {# ----- TODO add goggle chart formatting here not in astronomy.py ----- #}
         var sun_plot_data = [['time',
-                              sun_position_data.sun_date_label,
                               'Vernal Equinox',
                               'Summer Solstice',
                               'Autumnal Equinox',
                               'Winter Solstice',
+                              sun_position_data.sun_date_label,
                               {'type': 'string', 'role': 'style'}]];
 
         var sun_marker_set = false;
@@ -130,7 +130,7 @@
             } else if (sun_marker_set === false && plot_record[0] > sun_position_data.sun_marker_time) {
 
                 sun_marker_set = 1;
-                plot_record.push('point { size: 18; shape-type: star; fill-color: #a52714; }');
+                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
 
             } else {
 
@@ -205,39 +205,42 @@
 
             colors: [current_color],
 
+            pointSize: 1,
+            dataOpacity: 0.7
+
         };
 
 
         var data = new google.visualization.DataView(data_table);
 
         var hides = [];
-        var line_count = 1;
+        var line_count = 0; {# assumes order ve, ss, ae, ws, current time #}
 
         if ($("#_vernal_equinox_cb").is(':checked')) {
             options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
         } else {
-            hides.push(2);
+            hides.push(1);
         };
 
 
         if ($("#_summer_solstice_cb").is(':checked')) {
             options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
         } else {
-            hides.push(3);
+            hides.push(2);
         };
 
 
         if ($("#_autumnal_equinox_cb").is(':checked')) {
             options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
         } else {
-            hides.push(4);
+            hides.push(3);
         };
 
 
         if ($("#_winter_solstice_cb").is(':checked')) {
             options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
         } else {
-            hides.push(5);
+            hides.push(4);
         };
 
         data.hideColumns(hides);
