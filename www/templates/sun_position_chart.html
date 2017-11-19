@@ -107,7 +107,7 @@
 
       function drawChart(sun_position_data) {
 
-        {# ----- TODO add goggle chart formatting here not in astronomy.py ----- #}
+        {# ----- formatting for google chart ----- #}
         var sun_plot_data = [['time',
                               'Vernal Equinox',
                               'Summer Solstice',
@@ -116,21 +116,30 @@
                               sun_position_data.sun_date_label,
                               {'type': 'string', 'role': 'style'}]];
 
-        var sun_marker_set = false;
-        for (var i = 0; i < sun_position_data.altitude_data_24h.length; i++) {
+        {# ----- special format for sun marker ----- #}
+
+        for (var i = 0; i < sun_position_data.altitude_data_24h.length - 1; i++) {
 
             var plot_record = sun_position_data.altitude_data_24h[i];
+            var next_plot_record = sun_position_data.altitude_data_24h[i+1];
 
-            {# ----- TODO if sun position put point format ----- #}
+            if (sun_position_data.sun_marker_time == plot_record[0]) {
 
-            if (sun_marker_set === false && plot_record[0] < sun_position_data.sun_marker_time) {
+                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+            } else if (sun_position_data.sun_marker_time > plot_record[0] &&
+                       sun_position_data.sun_marker_time < next_plot_record[0]) {
+
+                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+            } else if (i == sun_position_data.altitude_data_24h.length - 1 &&
+                       sun_position_data.sun_marker_time == next_plot_record[0]) {
+
+                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+            } else if (sun_position_data.sun_marker_time > next_plot_record[0]) {
 
                 plot_record.push(null);
-
-            } else if (sun_marker_set === false && plot_record[0] > sun_position_data.sun_marker_time) {
-
-                sun_marker_set = 1;
-                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
 
             } else {
 
@@ -320,7 +329,7 @@ button#get_sun_position_data {
 
 
 
-<h1>Sun Position (google charts example)</h1>
+<h1>Sun Position</h1>
 
 <br>
 
