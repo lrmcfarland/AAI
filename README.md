@@ -45,7 +45,7 @@ Here are some screen shots:
 
 ## San Franciso 2017-11-19
 
-![San Francisco 2017-11-19](https://github.com/lrmcfarland/Astronomy/blob/update-layout-v1/images/san-francisco-2017-11-19.png?raw=true)
+![San Francisco 2017-11-19](https://github.com/lrmcfarland/Astronomy/blob/master/images/san-francisco-2017-11-19.png?raw=true)
 
 ## Syene on the summer solstice
 
@@ -54,7 +54,7 @@ solstice when the sun is directly overhead and casts no shadow in a deep well.
 [Eratosthenes](https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth.27s_circumference)
 used this observation to calculate the Earth's circumference.
 
-![Aswan 2017-11-19](https://github.com/lrmcfarland/Astronomy/blob/update-layout-v1/images/aswan-2017-06-21.png?raw=true)
+![Aswan 2017-11-19](https://github.com/lrmcfarland/Astronomy/blob/master/images/aswan-2017-06-21.png?raw=true)
 
 ## TODO Stonehenge Manhattenhenge
 
