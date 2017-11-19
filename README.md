@@ -29,19 +29,19 @@ With this, I generated the following plots:
 
 Solar Altitude
 
-![Solar Altitude vs Time] (Images/solar_altitude_vs_time.png)
+![Solar Altitude vs Time] (https://github.com/lrmcfarland/Astronomy/blob/master/Images/solar_altitude_vs_time.png)
 
-![Solar Altitude vs Azimuth] (Images/solar_altitude_vs_azimuth.png)
+![Solar Altitude vs Azimuth] (https://github.com/lrmcfarland/Astronomy/blob/master/Images/solar_altitude_vs_azimuth.png)
 
 
 [Equation of Time](https://en.wikipedia.org/wiki/Equation_of_time)
 
-![Equation of Time] (Images/eot_2015.png)
+![Equation of Time] (https://github.com/lrmcfarland/Astronomy/blob/master/Images/eot_2015.png)
 
 
 [Analemma](https://en.wikipedia.org/wiki/Analemma)
 
-![Analemma] (Images/analemma_45N.png)
+![Analemma] (https://github.com/lrmcfarland/Astronomy/blob/master/Images/analemma_45N.png)
 
 
 
@@ -51,4 +51,4 @@ Solar Altitude
 
 Lunar Altitude
 
-![Lunar Altitude] (Images/lunar_altitude_20150429.png)
+![Lunar Altitude] (https://github.com/lrmcfarland/Astronomy/blob/master/Images/lunar_altitude_20150429.png)
