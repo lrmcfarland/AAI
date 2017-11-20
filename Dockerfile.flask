@@ -5,27 +5,26 @@
 #
 # it has c++ parts that are wrapped by python
 #
+# persistent storage:  docker volume create aai-flask-logs
+# one time setup
+#
 # to build:            docker build -f Dockerfile.flask -t aai-flask .
-# persistent storage:  docker create -v /opt/starbug.com/AAI/logs/flask --name aai-flask-logs aai-flask
 #
-# to run flask:        docker run --name aai-flask-00 --volumes-from aai-flask-logs -d -p 5000:5000 aai-flask
-# to daemonize:        docker run --name aai-flask-00 --volumes-from aai-flask-logs -d -p 5000:5000  --restart=always aai-flask
+# to run flask:        docker run --name aai-flask-00 -v aai-flask-logs:/opt/starbug.com/AAI/logs/flask -d -p 5000:5000 aai-flask
 #
-# to stop:             docker stop aai-flask-00
 #
-# to view docker logs:    docker logs <container id>
-# to run bash:            docker run -it --entrypoint /bin/bash aai-flask
-# to view aai-flask logs: docker run -it --volumes-from aai-flask-logs --entrypoint /bin/bash aai-flask
+# to view aai-flask logs:     docker run -it -v aai-flask-logs:/opt/starbug.com/AAI/logs/flask --entrypoint /bin/bash aai-flask
 #
-# to delete container: docker rm aai-flask-00
-# to delete image:     docker rmi aai-flask
+# to stop:                   docker stop aai-flask-00
+# to delete container:       docker rm aai-flask-00
+# to delete image:           docker rmi aai-flask
+#
+# to show volume:            docker volume ls
+# to delete volume:          docker volume rm aai-flask-logs
 #
 # to delete all containers:  docker rm $(docker ps -a -q)
 # to delete all images:      docker rmi $(docker images -q)
 # to delete dangling images: docker rmi $(docker images -q -f dangling=true)
-#
-# to inspect volume:         docker volume ls
-# to delete  volume:         docker volume rm <id>
 
 
 FROM centos
@@ -68,7 +67,7 @@ RUN git clone https://github.com/lrmcfarland/Astronomy.git
 WORKDIR ${AAI_HOME}/Astronomy/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout log-rotation # TODO !!!!
+# RUN git checkout docker-volumes # TODO !!!!
 
 RUN git submodule update --init --recursive
 
