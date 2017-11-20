@@ -4,16 +4,13 @@
 
 To run: ./pylaunch.sh astronomy.py
 
-see README for running on apache with mod_wsgi
-
-Notes:
-
-
+with rotating logging: ./pylaunch.sh astronomy.py -l debug --loghandler rotating --logfilename ./logs/aai-flask.log
 """
 
 import argparse
 import flask
 import logging
+import logging.handlers
 import re
 
 import coords
@@ -29,8 +26,8 @@ from Bodies import SunPosition
 # ----- module scope -----
 
 dms_re = re.compile(r'(?P<degrees>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
-		      '((:(?P<minutes>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?)'
-		       '(:(?P<seconds>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?')
+                      '((:(?P<minutes>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?)'
+                       '(:(?P<seconds>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?')
 
 # TODO re.VERBOSE
 # TODO stricter formatting 12:3x4:45 passes
@@ -49,7 +46,7 @@ def request_float(a_float_str):
     """Gets the float of string from the request args
 
     Args:
-	a_float_str (str): float as string
+        a_float_str (str): float as string
 
     Returns: the float
     Raises: ValueError if not found
@@ -57,11 +54,11 @@ def request_float(a_float_str):
 
     a_float = flask.request.args.get(a_float_str, type=float)
 
-    app.logger.debug('request float: {a_float_str}: {a_float}'.format(**locals()))
+    app.logger.debug('request float: %s: %s', a_float_str, a_float)
 
     if a_float is None:
-	raise ValueError('{a_float_str} is not a float: {a_value}'.format(
-	    a_float_str=a_float_str, a_value=flask.request.args.get(a_float_str)))
+        raise ValueError('{a_float_str} is not a float: {a_value}'.format(
+            a_float_str=a_float_str, a_value=flask.request.args.get(a_float_str)))
 
     return a_float
 
@@ -70,8 +67,8 @@ def safe_get_float(a_match, a_key):
     """Safe get float
 
     Args:
-	a_match (re.match result dictonary): regex with named groups
-	a_float_key (str): value to get
+        a_match (re.match result dictonary): regex with named groups
+        a_float_key (str): value to get
 
     Returns 0 if not found
     Raises error if not float-able
@@ -80,16 +77,16 @@ def safe_get_float(a_match, a_key):
     a_val = a_match.groupdict()[a_key]
 
     if a_val is None:
-	return 0
+        return 0
     else:
-	return float(a_val)
+        return float(a_val)
 
 
 def request_angle(an_angle_key):
     """Gets the degree minute second values from the request args
 
     Arg:
-	an_angle_key (str): one of deg, deg:min, deg:min:sec
+        an_angle_key (str): one of deg, deg:min, deg:min:sec
 
     Returns: coords.angle
     Raises: value exception on format error
@@ -97,13 +94,13 @@ def request_angle(an_angle_key):
 
     an_angle_value = flask.request.args.get(an_angle_key)
 
-    app.logger.debug('request angle: {an_angle_key}: {an_angle_value}'.format(**locals()))
+    app.logger.debug('request angle: %s: %s', an_angle_key, an_angle_value)
 
     found_dms = dms_re.match(an_angle_value)
 
     if not found_dms:
-	raise ValueError(
-	    'unsupported format for {an_angle_key}: {an_angle_value}'.format(**locals()))
+        raise ValueError(
+            'unsupported format for {an_angle_key}: {an_angle_value}'.format(**locals()))
 
     degrees = safe_get_float(found_dms, 'degrees')
     minutes = safe_get_float(found_dms, 'minutes')
@@ -116,10 +113,10 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
     """Gets the degree minute second values from the request args
 
     Arg:
-	a_date_key (str): yyyy-mm-dd
-	a_time_key (str): hr:min:sec
-	a_timezone (float): -12 to 12
-	is_dst (bool): daylight savings time
+        a_date_key (str): yyyy-mm-dd
+        a_time_key (str): hr:min:sec
+        a_timezone (float): -12 to 12
+        is_dst (bool): daylight savings time
 
     Returns: coords.datetime
     Raises: value exception on format error
@@ -131,19 +128,19 @@ def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
 
     hms = flask.request.args.get(a_time_key).split(':') # ASSUMES: hh:mm:ss.ss
     while len(hms) < 3:
-	hms.append('0')
+        hms.append('0')
 
     a_datetime = coords.datetime(int(ymd[0]),
-				 int(ymd[1]),
-				 int(ymd[2]),
-				 int(hms[0]),
-				 int(hms[1]),
-				 float(hms[2]),
-				 a_timezone)
+                                 int(ymd[1]),
+                                 int(ymd[2]),
+                                 int(hms[0]),
+                                 int(hms[1]),
+                                 float(hms[2]),
+                                 a_timezone)
     if is_dst:
-	a_datetime -= 1.0/24
+        a_datetime -= 1.0/24
 
-    app.logger.debug('datetime: {a_datetime}'.format(**locals())) # TODO rm
+    app.logger.debug('datetime: %s', a_datetime)
 
     return a_datetime
 
@@ -152,14 +149,17 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
     Args:
-	a_latitude (coords.angle): observer's latitude
-	a_longitude (coords.angle): observer's longitude
-	a_datetime (coords.datetime): observer's time
-	a_dst (bool): daylight savings time
+        a_latitude (coords.angle): observer's latitude
+        a_longitude (coords.angle): observer's longitude
+        a_datetime (coords.datetime): observer's time
+        a_dst (bool): daylight savings time
 
 
     return results dictionary
     """
+
+    app.logger.debug('calculate sun position lat: %s,  long: %s, datetime: %s',
+                     a_latitude, a_longitude, a_datetime)
 
     result = dict()
     result['latitude'] = str(a_latitude)
@@ -176,29 +176,29 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
 
     if is_dst:
 
-	rising = coords.datetime(rising.year,
-				 rising.month,
-				 rising.day,
-				 rising.hour + 1,
-				 rising.minute,
-				 rising.second,
-				 rising.timezone)
+        rising = coords.datetime(rising.year,
+                                 rising.month,
+                                 rising.day,
+                                 rising.hour + 1,
+                                 rising.minute,
+                                 rising.second,
+                                 rising.timezone)
 
-	transit = coords.datetime(transit.year,
-				  transit.month,
-				  transit.day,
-				  transit.hour + 1,
-				  transit.minute,
-				  transit.second,
-				  transit.timezone)
+        transit = coords.datetime(transit.year,
+                                  transit.month,
+                                  transit.day,
+                                  transit.hour + 1,
+                                  transit.minute,
+                                  transit.second,
+                                  transit.timezone)
 
-	setting = coords.datetime(setting.year,
-				  setting.month,
-				  setting.day,
-				  setting.hour + 1,
-				  setting.minute,
-				  setting.second,
-				  setting.timezone)
+        setting = coords.datetime(setting.year,
+                                  setting.month,
+                                  setting.day,
+                                  setting.hour + 1,
+                                  setting.minute,
+                                  setting.second,
+                                  setting.timezone)
 
 
     result['rising'] = str(rising)
@@ -218,11 +218,11 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     result['ecliptic_longitude'] = str(ecliptic_longitude)
 
     result['azimuth'] = ''.join((str(utils.get_azimuth(sun_hz)),
-				 ' (', str(utils.get_azimuth(sun_hz).value), ')'))
+                                 ' (', str(utils.get_azimuth(sun_hz).value), ')'))
 
 
     result['altitude'] = ''.join((str(utils.get_altitude(sun_hz)),
-				  ' (', str(utils.get_altitude(sun_hz).value), ')'))
+                                  ' (', str(utils.get_altitude(sun_hz).value), ')'))
 
 
     return result
@@ -267,35 +267,35 @@ def get_sun_position_form():
 
     This uses a html form to provide the input with the name to connect the
 
-	<input type=text name=of_latitude>
+        <input type=text name=of_latitude>
 
     via flask
 
-	val = flask.request.values.get('latitude')
+        val = flask.request.values.get('latitude')
 
     And returns a page of results:
 
-	flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
+        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
 
     """
 
     try:
 
-	is_dst = True if flask.request.args.get('dst') == 'on' else False
+        is_dst = True if flask.request.args.get('dst') == 'on' else False
 
-	result = calculate_sun_position(request_angle('latitude'),
-					request_angle('longitude'),
-					request_datetime('date',
-							 'time',
-							 request_float('timezone'),
-							 is_dst),
-					is_dst)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
     except (ValueError, RuntimeError) as err:
 
-	app.logger.error(err)
-	flask.flash(err)
-	return flask.render_template('flashes.html')
+        app.logger.error(err)
+        flask.flash(err)
+        return flask.render_template('flashes.html')
 
     return flask.render_template('sun_position_form_out.html', **result)
 
@@ -333,20 +333,20 @@ def get_sun_position_ajax():
 
     try:
 
-	is_dst = True if flask.request.args.get('dst') == 'true' else False
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-	result = calculate_sun_position(request_angle('latitude'),
-					request_angle('longitude'),
-					request_datetime('date',
-							 'time',
-							 request_float('timezone'),
-							 is_dst),
-					is_dst)
+        result = calculate_sun_position(request_angle('latitude'),
+                                        request_angle('longitude'),
+                                        request_datetime('date',
+                                                         'time',
+                                                         request_float('timezone'),
+                                                         is_dst),
+                                        is_dst)
 
     except (ValueError, RuntimeError) as err:
 
-	app.logger.error(err)
-	result = {'error': str(err)}
+        app.logger.error(err)
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
 
@@ -366,108 +366,110 @@ def sun_position_chart():
 def sun_position_chart_data():
     """Get the sun position chart for the given day"""
 
+    app.logger.info('get_sun_positon_chart_data: %s', flask.request.args)
+
     try:
 
-	result = dict()
+        result = dict()
 
-	an_observer = utils.latlon2spherical(request_angle('latitude'),
-					     request_angle('longitude'))
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
 
-	result['observer'] = str(an_observer) # TODO format?
+        result['observer'] = str(an_observer) # TODO format?
 
-	is_dst = True if flask.request.args.get('dst') == 'true' else False
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-	a_datetime = request_datetime('date',
-				      'time',
-				      request_float('timezone'),
-				      is_dst)
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
 
-	result['datetime'] = str(a_datetime)
+        result['datetime'] = str(a_datetime)
 
-	plot_time_marker = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
-	plot_time_marker.timezone = a_datetime.timezone
-	plot_time_marker += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        plot_time_marker = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
+        plot_time_marker.timezone = a_datetime.timezone
+        plot_time_marker += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-	result['sun_marker_time'] = 24.0 * (a_datetime - plot_time_marker) # distance on x-axis to plot sun marker
+        result['sun_marker_time'] = 24.0 * (a_datetime - plot_time_marker) # distance on x-axis to plot sun marker
 
-	vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
-	vernal_equinox.timezone = a_datetime.timezone
-	vernal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
+        vernal_equinox.timezone = a_datetime.timezone
+        vernal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-	summer_solstice = coords.datetime(a_datetime.year, 6, 20) # TODO not every year
-	summer_solstice.timezone = a_datetime.timezone
-	summer_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        summer_solstice = coords.datetime(a_datetime.year, 6, 20) # TODO not every year
+        summer_solstice.timezone = a_datetime.timezone
+        summer_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-	autumnal_equinox = coords.datetime(a_datetime.year, 9, 22) # TODO not every year
-	autumnal_equinox.timezone = a_datetime.timezone
-	autumnal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        autumnal_equinox = coords.datetime(a_datetime.year, 9, 22) # TODO not every year
+        autumnal_equinox.timezone = a_datetime.timezone
+        autumnal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-	winter_solstice = coords.datetime(a_datetime.year, 12, 21) # TODO not every year
-	winter_solstice.timezone = a_datetime.timezone
-	winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        winter_solstice = coords.datetime(a_datetime.year, 12, 21) # TODO not every year
+        winter_solstice.timezone = a_datetime.timezone
+        winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-	result['sun_date_label'] = '{year}-{month}-{day}'.format(year=plot_time_marker.year,
-								 month=plot_time_marker.month,
-								 day=plot_time_marker.day),
-	npts = 24*4
+        result['sun_date_label'] = '{year}-{month}-{day}'.format(year=plot_time_marker.year,
+                                                                 month=plot_time_marker.month,
+                                                                 day=plot_time_marker.day),
+        npts = 24*4
 
-	if is_dst:
-	    dtime = 1
+        if is_dst:
+            dtime = 1
             result['sun_marker_time'] += 1
-	else:
-	    dtime = 0
+        else:
+            dtime = 0
 
-	altitude = list()
+        altitude = list()
 
-	for d in range(0, npts + 1):
+        for d in range(0, npts + 1):
 
-	    sun_ct = SunPosition.SunPosition(an_observer, plot_time_marker)
-	    sun_ve = SunPosition.SunPosition(an_observer, vernal_equinox)
-	    sun_ss = SunPosition.SunPosition(an_observer, summer_solstice)
-	    sun_ae = SunPosition.SunPosition(an_observer, autumnal_equinox)
-	    sun_ws = SunPosition.SunPosition(an_observer, winter_solstice)
-
-
-	    altitude.append([dtime,
-			     utils.get_altitude(sun_ve).value,
-			     utils.get_altitude(sun_ss).value,
-			     utils.get_altitude(sun_ae).value,
-			     utils.get_altitude(sun_ws).value,
-			     utils.get_altitude(sun_ct).value # needs to be last for sun position marker
-			 ]
-	    )
+            sun_ct = SunPosition.SunPosition(an_observer, plot_time_marker)
+            sun_ve = SunPosition.SunPosition(an_observer, vernal_equinox)
+            sun_ss = SunPosition.SunPosition(an_observer, summer_solstice)
+            sun_ae = SunPosition.SunPosition(an_observer, autumnal_equinox)
+            sun_ws = SunPosition.SunPosition(an_observer, winter_solstice)
 
 
-	    dtime += 1.0/npts*24
+            altitude.append([dtime,
+                             utils.get_altitude(sun_ve).value,
+                             utils.get_altitude(sun_ss).value,
+                             utils.get_altitude(sun_ae).value,
+                             utils.get_altitude(sun_ws).value,
+                             utils.get_altitude(sun_ct).value # needs to be last for sun position marker
+                         ]
+            )
 
-	    plot_time_marker += 1.0/npts
-	    vernal_equinox += 1.0/npts
-	    summer_solstice += 1.0/npts
-	    autumnal_equinox += 1.0/npts
-	    winter_solstice += 1.0/npts
 
-	result['altitude_data_24h'] = altitude # list
+            dtime += 1.0/npts*24
 
-	# get rise, transit, set time
-	rts = calculate_sun_position(request_angle('latitude'),
-				     request_angle('longitude'),
-				     request_datetime('date',
-						      'time',
-						      request_float('timezone'),
-						      is_dst),
-				     is_dst)
+            plot_time_marker += 1.0/npts
+            vernal_equinox += 1.0/npts
+            summer_solstice += 1.0/npts
+            autumnal_equinox += 1.0/npts
+            winter_solstice += 1.0/npts
 
-	result['sun_marker_altitude'] = rts['altitude']
-	result['sun_marker_azimuth']  = rts['azimuth']
-	result['rising']   = rts['rising']
-	result['transit']  = rts['transit']
-	result['setting']  = rts['setting']
+        result['altitude_data_24h'] = altitude # list
+
+        # get rise, transit, set time
+        rts = calculate_sun_position(request_angle('latitude'),
+                                     request_angle('longitude'),
+                                     request_datetime('date',
+                                                      'time',
+                                                      request_float('timezone'),
+                                                      is_dst),
+                                     is_dst)
+
+        result['sun_marker_altitude'] = rts['altitude']
+        result['sun_marker_azimuth']  = rts['azimuth']
+        result['rising']   = rts['rising']
+        result['transit']  = rts['transit']
+        result['setting']  = rts['setting']
 
 
     except (ValueError, RuntimeError, SunPosition.Error) as err:
 
-	app.logger.error(err)
-	result = {'error': str(err)}
+        app.logger.error(err)
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
 
@@ -492,36 +494,38 @@ def eqhz_transforms():
 def radec2azalt():
     """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates"""
 
+    app.logger.info('rdec2azalt: %s', flask.request.args)
+
     try:
 
-	result = dict()
+        result = dict()
 
-	an_observer = utils.latlon2spherical(request_angle('latitude'),
-					     request_angle('longitude'))
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
 
-	result['observer'] = str(an_observer)
+        result['observer'] = str(an_observer)
 
-	is_dst = True if flask.request.args.get('dst') == 'true' else False
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-	a_datetime = request_datetime('date',
-				      'time',
-				      request_float('timezone'),
-				      is_dst)
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
 
-	result['datetime'] = str(a_datetime)
+        result['datetime'] = str(a_datetime)
 
-	body_eq = utils.radec2spherical(request_angle('ra'), request_angle('dec'))
+        body_eq = utils.radec2spherical(request_angle('ra'), request_angle('dec'))
 
-	body_hz = EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
+        body_hz = EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
-	result['azimuth'] = utils.get_azimuth(body_hz).value
-	result['altitude'] = utils.get_altitude(body_hz).value
+        result['azimuth'] = utils.get_azimuth(body_hz).value
+        result['altitude'] = utils.get_altitude(body_hz).value
 
 
     except (ValueError, RuntimeError) as err:
 
-	app.logger.error(err)
-	result = {'error': str(err)}
+        app.logger.error(err)
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
 
@@ -531,40 +535,40 @@ def radec2azalt():
 def azalt2radec():
     """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates"""
 
+    app.logger.info('azalt2radec: %s', flask.request.args)
+
     try:
 
-	result = dict()
+        result = dict()
 
-	an_observer = utils.latlon2spherical(request_angle('latitude'),
-					     request_angle('longitude'))
+        an_observer = utils.latlon2spherical(request_angle('latitude'),
+                                             request_angle('longitude'))
 
-	result['observer'] = str(an_observer)
+        result['observer'] = str(an_observer)
 
-	is_dst = True if flask.request.args.get('dst') == 'true' else False
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-	a_datetime = request_datetime('date',
-				      'time',
-				      request_float('timezone'),
-				      is_dst)
+        a_datetime = request_datetime('date',
+                                      'time',
+                                      request_float('timezone'),
+                                      is_dst)
 
-	result['datetime'] = str(a_datetime)
+        result['datetime'] = str(a_datetime)
 
 
-	body_hz = utils.azalt2spherical(request_angle('azimuth'), request_angle('altitude'))
+        body_hz = utils.azalt2spherical(request_angle('azimuth'), request_angle('altitude'))
 
-	body_eq = EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
+        body_eq = EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
-	result['ra'] = utils.get_RA(body_eq).value
-	result['dec'] = utils.get_declination(body_eq).value
+        result['ra'] = utils.get_RA(body_eq).value
+        result['dec'] = utils.get_declination(body_eq).value
 
     except (ValueError, RuntimeError) as err:
 
-	app.logger.error(err)
-	result = {'error': str(err)}
+        app.logger.error(err)
+        result = {'error': str(err)}
 
     return flask.jsonify(**result)
-
-
 
 
 # ================
@@ -577,49 +581,80 @@ if __name__ == "__main__":
 
 
     loglevels = {'debug': logging.DEBUG,
-		 'info': logging.INFO,
-		 'warn': logging.WARN,
-		 'error': logging.ERROR}
+                 'info': logging.INFO,
+                 'warn': logging.WARN,
+                 'error': logging.ERROR}
 
-    defaults = {'host':'0.0.0.0',
-		'loglevel': 'warn',
-		'port': 8080,
-		'debug': False}
+
+    loghandlers = {'stream': 'stream',
+                   'rotating': 'rotating'}
+
+
+    defaults = {'debug': False,
+                'host':'0.0.0.0',
+                'logfilename': '/opt/starbug.com/AAI/logs/flask',
+                'loghandler': 'stream',
+                'loglevel': 'warn',
+                'port': 8080,
+    }
 
     parser = argparse.ArgumentParser(description='vArmour simple flask server')
 
     parser.add_argument('-d', '--debug', action='store_true',
-			dest='debug', default=defaults['debug'],
-			help='flask debug (default: %(default)s)')
+                        dest='debug', default=defaults['debug'],
+                        help='flask debug (default: %(default)s)')
 
     parser.add_argument('--host', type=str, dest='host', default=defaults['host'],
-			metavar='host',
-			help='host IP to serve (default: %(default)s)')
+                        metavar='host',
+                        help='host IP to serve (default: %(default)s)')
+
+    parser.add_argument('--logfilename', type=str, dest='logfilename', default=defaults['logfilename'],
+                        metavar='logfilename',
+                        help='name of log file (default: %(default)s)')
+
+    parser.add_argument('--loghandler', choices=list(loghandlers.keys()),
+                        dest='loghandler', default=defaults['loghandler'],
+                        metavar='HANDLER',
+                        help='logging handler choice: %(keys)s (default: %(default)s)' % {
+                            'keys':', '.join(list(loghandlers.keys())), 'default':'%(default)s'})
 
     parser.add_argument('-l', '--loglevel', choices=list(loglevels.keys()),
-			dest='loglevel', default=defaults['loglevel'],
-			metavar='LEVEL',
-			help='logging level choice: %(keys)s (default: %(default)s)' % {
-			    'keys':', '.join(list(loglevels.keys())), 'default':'%(default)s'})
+                        dest='loglevel', default=defaults['loglevel'],
+                        metavar='LEVEL',
+                        help='logging level choice: %(keys)s (default: %(default)s)' % {
+                            'keys':', '.join(list(loglevels.keys())), 'default':'%(default)s'})
 
     parser.add_argument('-p', '--port', type=int, dest='port', default=defaults['port'],
-			help='port (default: %(default)s)')
+                        help='port (default: %(default)s)')
 
     args = parser.parse_args()
 
 
 
-    # ----- set up default logging -----
+    # ----- set up logging -----
 
-    # TODO syslog, rotating
+    if args.loghandler == 'stream':
 
-    log_handler = logging.StreamHandler()
+        log_handler = logging.StreamHandler()
+
+    elif args.loghandler == 'rotating':
+
+        log_handler = logging.handlers.RotatingFileHandler(args.logfilename,
+                                                           maxBytes=1000000,
+                                                           backupCount=10) # TODO from cli
+
+    else:
+        parser.error('unsupported log handler %s', args.loghandler)
+
+
     log_handler.setFormatter(
-	logging.Formatter(
-	    '[%(asctime)s %(levelname)s %(filename)s %(lineno)s] %(message)s'))
+        logging.Formatter(
+            '[%(asctime)s %(levelname)s %(filename)s %(lineno)s] %(message)s'))
 
-    logging.getLogger().addHandler(log_handler)
-    logging.getLogger().setLevel(loglevels[args.loglevel])
+    app.logger.addHandler(log_handler)
+    app.logger.setLevel(loglevels[args.loglevel])
+
+
 
     # -------------------
     # ----- run app -----
