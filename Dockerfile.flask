@@ -6,16 +6,16 @@
 # it has c++ parts that are wrapped by python
 #
 # to build:            docker build -f Dockerfile.flask -t aai-flask .
+# persistent storage:  docker create -v /opt/starbug.com/AAI/logs/flask --name aai-flask-logs aai-flask
 #
-# to run flask:        docker run --name aai-flask-00 -d -p 5000:5000 aai-flask
-# to daemonize:        docker run --name aai-flask-00 -d -p 5000:5000  --restart=always aai-flask
-#
-#   assumes 80 outside to 5000 inside, see CMD below
+# to run flask:        docker run --name aai-flask-00 --volumes-from aai-flask-logs -d -p 5000:5000 aai-flask
+# to daemonize:        docker run --name aai-flask-00 --volumes-from aai-flask-logs -d -p 5000:5000  --restart=always aai-flask
 #
 # to stop:             docker stop aai-flask-00
 #
-# to view logs:        docker logs <container id>
-# to run bash:         docker run -it --entrypoint /bin/bash aai-flask
+# to view docker logs:    docker logs <container id>
+# to run bash:            docker run -it --entrypoint /bin/bash aai-flask
+# to view aai-flask logs: docker run -it --volumes-from aai-flask-logs --entrypoint /bin/bash aai-flask
 #
 # to delete container: docker rm aai-flask-00
 # to delete image:     docker rmi aai-flask
@@ -24,6 +24,8 @@
 # to delete all images:      docker rmi $(docker images -q)
 # to delete dangling images: docker rmi $(docker images -q -f dangling=true)
 #
+# to inspect volume:         docker volume ls
+# to delete  volume:         docker volume rm <id>
 
 
 FROM centos
@@ -51,8 +53,7 @@ ENV AAI_HOME="/opt/starbug.com/AAI" \
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/data \
-    && mkdir -p ${AAI_HOME}/logs \
+    && mkdir -p ${AAI_HOME}/logs/flask \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
 
@@ -67,7 +68,7 @@ RUN git clone https://github.com/lrmcfarland/Astronomy.git
 WORKDIR ${AAI_HOME}/Astronomy/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout help-button # TODO !!!!
+# RUN git checkout log-rotation # TODO !!!!
 
 RUN git submodule update --init --recursive
 
@@ -91,4 +92,5 @@ WORKDIR ${AAI_HOME}/Astronomy/www
 
 ENTRYPOINT ["bash"]
 
-CMD [ "flask.sh", "-p", "5000", "-d", "-l", "debug" ]
+CMD [ "flask.sh", "-p", "5000", "--loghandler", "rotating", "--logfilename", "/opt/starbug.com/AAI/logs/flask/aai-flask.log", "-d", "-l", "debug" ]
+
