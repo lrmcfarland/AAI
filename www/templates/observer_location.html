@@ -15,6 +15,62 @@ table#observer_location {
 
 }
 
+/* ----------------------- */
+/* ----- date picker ----- */
+/* ----------------------- */
+
+.ui-datepicker {
+
+    background: #f7f7f7;
+    width: 216px;
+    height: auto;
+    margin: 5px auto 0;
+    font: 9pt Arial, sans-serif;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+
+}
+
+.ui-datepicker-header {
+    color: #e0e0e0;
+    font-weight: bold;
+    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, 2);
+    -moz-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
+    box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
+    text-shadow: 1px -1px 0px #000;
+    filter: dropshadow(color=#000, offx=1, offy=-1);
+    line-height: 30px;
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: #111;
+}
+
+.ui-datepicker table {
+    width: 100%;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+}
+
+.ui-datepicker-prev, .ui-datepicker-next {
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    background-repeat: no-repeat;
+
+}
+
+.ui-datepicker-prev {
+    float: left;
+    background-position: center -30px;
+}
+.ui-datepicker-next {
+    float: right;
+    background-position: center 0px;
+}
+
 </style>
 
 <script type="text/javascript">
@@ -50,50 +106,46 @@ table#observer_location {
       $("#_timezone").val(timezone);
     });
 
+
+    $("#show_help").click(function(e) {
+
+        var help_message = [
+            "Degrees, and optional minutes and seconds are accepted as a ",
+            "time format with : between each element, e.g. 37:47:30 instead ",
+            "of 37\u00b0 47\u2032 30\u2033 for San Francisco's latitude. ",
+            "The timezone, in hours, is estimated from the longitude, but ",
+            "should be adjusted as needed. Fractional values, like India's ",
+            "UTC+5:30, are supported as decimals, e.g. 5.5 in this case. ",
+            "I have found some firewalls block the current location data. ",
+            "In which case, entering the values directly should still work."].join("");
+
+        alert(help_message);
+
+    });
+
+
+
   }); {# end jquery init function #}
 
 </script>
 
 <div class="observerbox">
 
-  <div>
 
-    <h2>Observer's Location</h2>
-
-    <br>
-
-    <div class="twocolumn">
-
-	Enter the observer's location on earth and the local time.
-	Degrees, and optional minutes and seconds are accepted as a
-	time format with : between each element, e.g. 37:47:30 instead
-	of 37&deg; 47&#39; 30&#34; for San Francisco's latitude.
-
-	The timezone, in hours, is estimated from the longitude, but
-	should be adjusted as needed. Fractional values, like India's
-	UTC+5:30, are supported as decimals, e.g. 5.5 in this case.
-
-	I have found some firewalls block the current location data.
-	In which case, entering the values directly should still work.
-
-      </div>
-
-  </div>
-
-  <br>
+  <h2>Observer's Location</h2>
 
   <table id="observer_location">
 
     <tr>
 
       <td>
-	<button type="button" id="set_location">Current Location</button>
+        <button type="button" id="set_location">Current Location</button>
       </td>
 
       <th>Latitude</th>
 
       <td>
-	<input type="text" id="_latitude" name="latitude">
+        <input type="text" id="_latitude" name="latitude">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -108,7 +160,7 @@ table#observer_location {
       <th>Longitude</th>
 
       <td>
-	<input type="text" id="_longitude" name="longitude">
+        <input type="text" id="_longitude" name="longitude">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -121,7 +173,7 @@ table#observer_location {
       <th>Date</th>
 
       <td>
-	<input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
+        <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
     </tr>
@@ -129,7 +181,7 @@ table#observer_location {
     <tr>
 
       <td>
-	<button type="button" id="set_time">Current Time</button>
+        <button type="button" id="set_time">Current Time</button>
       </td>
 
       <th>Local Time</th>
@@ -142,7 +194,7 @@ table#observer_location {
 
       <th>Time Zone</th>
       <td>
-	<input type="text" id="_timezone" name="timezone" value="0">
+        <input type="text" id="_timezone" name="timezone" value="0">
       </td>
       <td>hr</td>
 
@@ -152,10 +204,15 @@ table#observer_location {
       <td></td>
       <th>Daylight Savings</th>
       <td>
-	<input type="checkbox" id="_dst" name="dst">
+        <input type="checkbox" id="_dst" name="dst">
       </td>
     </tr>
 
+    <tr>
+      <td>
+        <button type="button" id="show_help">Help</button>
+      </td>
+    </tr>
 
   </table>
 
