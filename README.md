@@ -5,15 +5,16 @@ on line and in books, in particular
 [Astronomical Algorithms](http://www.willbell.com/math/mc1.htm)
 by [Jean Meeus](https://en.wikipedia.org/wiki/Jean_Meeus)
 
-I use this to collect my thoughts about various programming problems into
+I use this to collect what I learned about various programming problems into
 a coherent whole in service of an application.
 
-I started with some object oriented ideas about using C++ to
-build a [Coordinates library](https://github.com/lrmcfarland/Coordinates)
-to do basic physics.
-I use the operator overloading feature of C++ to abstract away the vector
-arithmatic and focus on the physics.
-I back this up with a full set of unit tests.
+I started with some object oriented ideas about using C++ to build a
+[Coordinates library](https://github.com/lrmcfarland/Coordinates) to
+do basic physics but use Scott Meyer's Effective C++ and other
+recommended techniques.
+I use the operator overloading feature of C++
+to abstract away the vector arithmetic and focus on the physics.  I
+back this up with a full set of unit tests.
 
 Next I investigated wrapping these C++ objects in python.
 They are too small for this to be much of a performance advantage,
@@ -21,11 +22,12 @@ but I wanted to see how hard it would be to bring in more complex C++ libraries
 (and I have wrapped FORTRAN in C++ before too ... )
 Besides making it more fun to play with, I can use Python frameworks like
 [flask](https://en.wikipedia.org/wiki/Flask_(web_framework)) to provide a browser UI.
+That also opens the door for HTML, CSS, JavaScript, JSON, JQuery and Google charts. 
 
 Finally, adding nginx as a reverse proxy and TLS end point (to use
 the geolocation features of the browser) as a Docker micro-service.
 At 700MB it is a really fat micro service needing a multi stage diet soon,
-but thats why I am doing this.
+but then again, that is the type of problem I am looking for in doing this.
 
 Results are validated with [NOAA's
 solcalc](http://www.esrl.noaa.gov/gmd/grad/solcalc/) and using my
@@ -56,7 +58,18 @@ used this observation to calculate the Earth's circumference.
 
 ![Aswan 2017-11-19](https://github.com/lrmcfarland/Astronomy/blob/master/images/aswan-2017-06-21.png?raw=true)
 
+## Lillehammer
+
+![lillehammer-2017-06-21.png](https://github.com/lrmcfarland/Astronomy/blob/master/images/lillehammer-2017-06-21.png?raw=true)
+
+TODO Above this it complians about "object is below the horizon" when calculating for the midnight sun but on the winter solstice line.
+
+
 ## TODO Stonehenge Manhattenhenge
+
+## Other
+
+Under development.
 
 [Equation of Time](https://en.wikipedia.org/wiki/Equation_of_time)
 
@@ -66,12 +79,6 @@ used this observation to calculate the Earth's circumference.
 [Analemma](https://en.wikipedia.org/wiki/Analemma)
 
 ![Analemma](https://github.com/lrmcfarland/Astronomy/blob/master/images/analemma_45N.png?raw=true)
-
-
-
-
-# Moon Position
-
 
 Lunar Altitude
 
