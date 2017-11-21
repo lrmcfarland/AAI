@@ -88,5 +88,5 @@ WORKDIR ${AAI_HOME}/Astronomy/www
 
 ENTRYPOINT ["bash"]
 
-CMD [ "flask.sh", "-p", "5000", "--loghandler", "rotating", "--logfilename", "/opt/starbug.com/AAI/logs/flask/aai-flask.log", "-d", "-l", "debug" ]
+CMD [ "aai-flask.sh", "-p", "5000", "--loghandler", "rotating", "--logfilename", "/opt/starbug.com/AAI/logs/flask/aai-flask.log", "-d", "-l", "debug" ]
 
