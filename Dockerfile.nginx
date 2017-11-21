@@ -8,20 +8,43 @@
 #
 # Names must be coordinated with the gunicorn WSGI server. See also www/gunicorn.sh
 #
+# one time setup
+# persistent storage:  docker volume create aai-logs
 # create network:  docker network create nginx-proxy
 #
 # to build:      docker build -f Dockerfile.nginx -t aai-nginx .
 #
 # to run:        docker run --net nginx-proxy --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
 #
+# with log storage
+# to run:        docker run --net nginx-proxy --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/nginx --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
+#
 # to run bash:   docker run -it --entrypoint /bin/bash aai-nginx
 # to view logs:  docker logs aai-nginx-00
-#
 
 FROM nginx
 
-COPY www/conf/nginx.conf /etc/nginx/nginx.conf
+LABEL maintainer "lrm@starbug.com"
+LABEL service "AAI reverse proxy"
 
-# TODO new conf per instance? must match run --name and what is in www/aai-nginx.conf
-# TODO orchestration tool
+RUN apt-get update && apt-get -y install logrotate
+
+COPY www/conf/nginx.conf /etc/nginx/nginx.conf
 COPY www/conf/aai-nginx.conf /etc/nginx/conf.d/aai-nginx-00.conf
+COPY www/conf/aai-nginx.logrotate /etc/logrotate.d/aai-nginx
+
+# --------------------
+# ----- AAI home -----
+# --------------------
+
+ENV AAI_HOME="/opt/starbug.com/AAI" \
+    AAI_USER="starbug" \
+    AAI_GRP="starbug"
+
+RUN groupadd ${AAI_GRP} \
+    && adduser -g ${AAI_GRP} ${AAI_USER} \
+    && mkdir -p ${AAI_HOME}/logs \
+    && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
+
+
+CMD [ 'service', 'cron', 'start', '&&', 'nginx', '-g', 'daemon off;' ]
