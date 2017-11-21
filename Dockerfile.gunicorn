@@ -17,7 +17,7 @@
 # for nginx:           docker run --net nginx-proxy --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 #
 #
-# to view aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn --entrypoint /bin/bash aai-gunicorn
+# to view aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
 #
 #
 # to stop:                   docker stop aai-gunicorn-00
@@ -39,6 +39,8 @@ LABEL service "Astronomical Algorithms Implemented"
 # packages
 
 RUN yum update -y
+RUN yum -y install crontabs logrotate
+
 RUN yum install -y gcc gcc-c++ python-devel boost boost-devel make cmake git
 
 RUN yum -y install epel-release && yum clean all
@@ -58,7 +60,6 @@ ENV AAI_HOME="/opt/starbug.com/AAI" \
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/data \
     && mkdir -p ${AAI_HOME}/logs \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
