@@ -5,22 +5,21 @@
 #
 # it has c++ parts that are wrapped by python
 #
-# persistent storage:  docker volume create aai-flask-logs
+# persistent storage:  docker volume create aai-logs
 # one time setup
 #
 # to build:            docker build -f Dockerfile.flask -t aai-flask .
 #
-# to run flask:        docker run --name aai-flask-00 --mount source=aai-flask-logs,target=/opt/starbug.com/AAI/logs/flask -d -p 5000:5000 aai-flask
+# to run flask:        docker run --name aai-flask-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/flask -d -p 5000:5000 aai-flask
 #
-#
-# to view aai-flask logs:    docker run -it --mount source=aai-flask-logs,target=/opt/starbug.com/AAI/logs/flask --entrypoint /bin/bash aai-flask
+# to view aai-flask logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/flask --entrypoint /bin/bash aai-flask
 #
 # to stop:                   docker stop aai-flask-00
 # to delete container:       docker rm aai-flask-00
 # to delete image:           docker rmi aai-flask
 #
 # to show volume:            docker volume ls
-# to delete volume:          docker volume rm aai-flask-logs
+# to delete volume:          docker volume rm aai-logs
 #
 # to delete all containers:  docker rm $(docker ps -a -q)
 # to delete all images:      docker rmi $(docker images -q)
