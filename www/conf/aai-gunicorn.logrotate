@@ -1,0 +1,11 @@
+# logrotate configuration
+
+/opt/starbug.com/AAI/logs/gunicorn/gunicorn-access.log /opt/starbug.com/AAI/logs/gunicorn/gunicorn-error.log {
+    dateext
+    weekly
+    rotate 8
+    missingok
+    notifempty
+    copytruncate
+    compress
+}
