@@ -3,31 +3,33 @@
 # This will build the aai app in a container and served by gunicorn.
 # For use with nginx as a reverse proxy.
 #
-# it has c++ parts that are wrapped by python
+# one time setup
+# persistent storage:  docker volume create aai-logs
+# create network:      docker network create nginx-proxy
+#
 #
 # to build:            docker build -f Dockerfile.gunicorn -t aai-gunicorn .
 #
 #
-# to run gnuicorn:     docker run --name aai-gunicorn-00 -d -p 80:8080 aai-gunicorn
-# to daemonize:        docker run --name aai-gunicorn-00 -d -p 80:8080  --restart=always aai-gunicorn
+# to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080 aai-gunicorn
+# to daemonize:        docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080  --restart=always aai-gunicorn
 #
-# create network:      docker network create nginx-proxy
-# for nginx:           docker run --net nginx-proxy --name aai-gunicorn-00 -d -p 8080:8080 aai-gunicorn
+# for nginx:           docker run --net nginx-proxy --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 #
-#   assumes 80 outside to 8080 inside, see CMD below
 #
-# to stop:             docker stop aai-gunicorn-00
+# to view aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn --entrypoint /bin/bash aai-gunicorn
 #
-# to view logs:        docker logs aai-gunicorn-00
-# to run bash:         docker run -it --entrypoint /bin/bash aai-gunicorn
 #
-# to delete container: docker rm aai0
-# to delete image:     docker rmi aai
+# to stop:                   docker stop aai-gunicorn-00
+# to delete container:       docker rm aai-flask-00
+# to delete image:           docker rmi aai-flask
+#
+# to view docker logs:       docker logs aai-gunicorn-00
+# to run bash:               docker run -it --entrypoint /bin/bash aai-gunicorn
 #
 # to delete all containers:  docker rm $(docker ps -a -q)
 # to delete all images:      docker rmi $(docker images -q)
 # to delete dangling images: docker rmi $(docker images -q -f dangling=true)
-#
 
 FROM centos
 
@@ -94,6 +96,9 @@ ENTRYPOINT ["bash"]
 # CMD [ "pylaunch.sh", "astronomy.py" ]
 
 # gnuicorn
-CMD [ "gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--forwarded-allow-ips", "*"]
+CMD [ "gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "debug", \
+     "--access-logfile", "/opt/starbug.com/AAI/logs/gunicorn/gunicorn-access.log", \
+     "--error-logfile",  "/opt/starbug.com/AAI/logs/gunicorn/gunicorn-error.log", \
+     "--forwarded-allow-ips", "*"]
 
-# TODO limit forwarded allow ips for containers
+# TODO limit forwarded allow ips for containers to docker non-routable subnet 172.17.0.0/16 ?

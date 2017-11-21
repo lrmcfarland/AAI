@@ -3,10 +3,8 @@
 # This will build the aai app in a container and served by flask.
 # It is intended for debugging.
 #
-# it has c++ parts that are wrapped by python
-#
-# persistent storage:  docker volume create aai-logs
 # one time setup
+# persistent storage:  docker volume create aai-logs
 #
 # to build:            docker build -f Dockerfile.flask -t aai-flask .
 #
