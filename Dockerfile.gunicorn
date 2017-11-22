@@ -55,7 +55,7 @@ ENV AAI_HOME="/opt/starbug.com/AAI" \
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/logs \
+    && mkdir -p ${AAI_HOME}/logs/gunicorn \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
 
