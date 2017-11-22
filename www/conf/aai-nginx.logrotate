@@ -1,0 +1,11 @@
+# logrotate configuration
+
+/opt/starbug.com/AAI/logs/nginx/nginx-access.log /opt/starbug.com/AAI/logs/nginx/nginx-error.log {
+    dateext
+    weekly
+    rotate 8
+    missingok
+    notifempty
+    copytruncate
+    compress
+}
