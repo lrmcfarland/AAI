@@ -91,7 +91,7 @@ WORKDIR ${AAI_HOME}/Astronomy/www
 ENTRYPOINT ["bash"]
 
 # gnuicorn
-CMD [ "./bin/aai-gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "debug", \
+CMD [ "./bin/aai-gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "info", \
       "--access-logfile", "/opt/starbug.com/AAI/logs/gunicorn/gunicorn-access.log", \
       "--error-logfile",  "/opt/starbug.com/AAI/logs/gunicorn/gunicorn-error.log", \
       "--forwarded-allow-ips", "*"]

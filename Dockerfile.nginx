@@ -10,7 +10,7 @@
 #
 # one time setup
 # persistent storage:  docker volume create aai-logs
-# create network:  docker network create nginx-proxy
+# create network:      docker network create nginx-proxy
 #
 # to build:      docker build -f Dockerfile.nginx -t aai-nginx .
 #
@@ -33,18 +33,4 @@ COPY www/conf/nginx.conf /etc/nginx/nginx.conf
 COPY www/conf/aai-nginx.conf /etc/nginx/conf.d/aai-nginx-00.conf
 COPY www/conf/aai-nginx.logrotate /etc/logrotate.d/aai-nginx
 
-# --------------------
-# ----- AAI home -----
-# --------------------
-
-ENV AAI_HOME="/opt/starbug.com/AAI" \
-    AAI_USER="starbug" \
-    AAI_GRP="starbug"
-
-RUN groupadd ${AAI_GRP} \
-    && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/logs \
-    && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
-
-
-CMD [ 'service', 'cron', 'start', '&&', 'nginx', '-g', 'daemon off;' ]
+CMD service cron start && nginx -g 'daemon off;'
