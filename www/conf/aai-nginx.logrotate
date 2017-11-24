@@ -1,6 +1,6 @@
 # logrotate configuration
 
-/opt/starbug.com/AAI/logs/nginx/nginx-access.log /opt/starbug.com/AAI/logs/nginx/nginx-error.log {
+/opt/starbug.com/logs/nginx/nginx-access.log /opt/starbug.com/logs/nginx/nginx-error.log {
     dateext
     weekly
     rotate 8

@@ -1,6 +1,6 @@
 # logrotate configuration
 
-/opt/starbug.com/AAI/logs/gunicorn/gunicorn-access.log /opt/starbug.com/AAI/logs/gunicorn/gunicorn-error.log {
+/opt/starbug.com/logs/gunicorn/gunicorn-access.log /opt/starbug.com/logs/gunicorn/gunicorn-error.log {
     dateext
     weekly
     rotate 8
