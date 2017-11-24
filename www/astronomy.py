@@ -291,7 +291,7 @@ def get_sun_position_form():
                                                          is_dst),
                                         is_dst)
 
-    except (ValueError, RuntimeError) as err:
+    except (TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         flask.flash(err)
@@ -343,7 +343,7 @@ def get_sun_position_ajax():
                                                          is_dst),
                                         is_dst)
 
-    except (ValueError, RuntimeError) as err:
+    except (TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         result = {'error': str(err)}
@@ -466,7 +466,7 @@ def sun_position_chart_data():
         result['setting']  = rts['setting']
 
 
-    except (ValueError, RuntimeError, SunPosition.Error) as err:
+    except (TypeError, ValueError, RuntimeError, SunPosition.Error) as err:
 
         app.logger.error(err)
         result = {'error': str(err)}
@@ -522,7 +522,7 @@ def radec2azalt():
         result['altitude'] = utils.get_altitude(body_hz).value
 
 
-    except (ValueError, RuntimeError) as err:
+    except (TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         result = {'error': str(err)}
@@ -563,7 +563,7 @@ def azalt2radec():
         result['ra'] = utils.get_RA(body_eq).value
         result['dec'] = utils.get_declination(body_eq).value
 
-    except (ValueError, RuntimeError) as err:
+    except (TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         result = {'error': str(err)}
