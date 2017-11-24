@@ -11,13 +11,13 @@
 # to build:            docker build -f Dockerfile.gunicorn -t aai-gunicorn .
 #
 #
-# to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080 aai-gunicorn
-# to daemonize:        docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080  --restart=always aai-gunicorn
+# to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
+# to daemonize:        docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080  --restart=always aai-gunicorn
 #
-# for nginx:           docker run --net nginx-proxy --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn -d -p 8080:8080 aai-gunicorn
+# for nginx:           docker run --net nginx-proxy --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 #
 #
-# to bash aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
+# to bash aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
 # force a rotation     # logrotate -f /etc/logrotate.conf
 #
 # to stop:                   docker stop aai-gunicorn-00
@@ -49,13 +49,13 @@ RUN yum -y install python-pip && yum clean all && pip install --upgrade pip && p
 # ----- AAI home -----
 # --------------------
 
-ENV AAI_HOME="/opt/starbug.com/AAI" \
+ENV AAI_HOME="/opt/starbug.com" \
     AAI_USER="starbug" \
     AAI_GRP="starbug"
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/logs/gunicorn \
+    && mkdir -p ${AAI_HOME} \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
 
@@ -92,8 +92,8 @@ ENTRYPOINT ["bash"]
 
 # gnuicorn
 CMD [ "./bin/aai-gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "info", \
-      "--access-logfile", "/opt/starbug.com/AAI/logs/gunicorn/gunicorn-access.log", \
-      "--error-logfile",  "/opt/starbug.com/AAI/logs/gunicorn/gunicorn-error.log", \
+      "--access-logfile", "/opt/starbug.com/logs/gunicorn/gunicorn-access.log", \
+      "--error-logfile",  "/opt/starbug.com/logs/gunicorn/gunicorn-error.log", \
       "--forwarded-allow-ips", "*"]
 
 # TODO limit forwarded allow ips for containers to docker non-routable subnet 172.17.0.0/16 ?

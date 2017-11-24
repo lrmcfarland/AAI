@@ -592,7 +592,7 @@ if __name__ == "__main__":
 
     defaults = {'debug': False,
                 'host':'0.0.0.0',
-                'logfilename': '/opt/starbug.com/AAI/logs/flask',
+                'logfilename': '/opt/starbug.com/logs/flask',
                 'loghandler': 'stream',
                 'loglevel': 'warn',
                 'port': 8080,

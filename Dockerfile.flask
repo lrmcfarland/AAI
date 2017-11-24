@@ -8,9 +8,9 @@
 #
 # to build:            docker build -f Dockerfile.flask -t aai-flask .
 #
-# to run flask:        docker run --name aai-flask-00 --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/flask -d -p 5000:5000 aai-flask
+# to run flask:        docker run --name aai-flask-00 --mount source=aai-logs,target=/opt/starbug.com/logs/flask -d -p 5000:5000 aai-flask
 #
-# to view aai-flask logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/AAI/logs/flask --entrypoint /bin/bash aai-flask
+# to view aai-flask logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/flask --entrypoint /bin/bash aai-flask
 #
 # to stop:                   docker stop aai-flask-00
 # to delete container:       docker rm aai-flask-00
@@ -40,13 +40,13 @@ RUN yum -y install python-pip && yum clean all && pip install --upgrade pip && p
 # ----- AAI home -----
 # --------------------
 
-ENV AAI_HOME="/opt/starbug.com/AAI" \
+ENV AAI_HOME="/opt/starbug.com" \
     AAI_USER="starbug" \
     AAI_GRP="starbug"
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/logs/flask \
+    && mkdir -p ${AAI_HOME} \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
 
@@ -61,7 +61,7 @@ RUN git clone https://github.com/lrmcfarland/Astronomy.git
 WORKDIR ${AAI_HOME}/Astronomy/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout move-scripts2bin # TODO !!!!
+RUN git checkout move-logs # TODO !!!!
 
 RUN git submodule update --init --recursive
 
@@ -88,5 +88,5 @@ ENTRYPOINT ["bash"]
 CMD [ "./bin/aai-flask.sh", "-d", "-p", "5000", \
       "-l", "debug", \
       "--loghandler", "rotating", \
-      "--logfilename", "/opt/starbug.com/AAI/logs/flask/aai-flask.log"]
+      "--logfilename", "/opt/starbug.com/logs/flask/aai-flask.log"]
 
