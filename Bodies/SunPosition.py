@@ -66,10 +66,9 @@ import math
 
 import coords
 
-from Transforms import EclipticEquatorial
-from Transforms import EquatorialHorizon
-from Transforms import SiderealTime
-from Transforms import utils
+import Transforms.EclipticEquatorial
+import Transforms.EquatorialHorizon
+import Transforms.utils
 
 
 class Error(Exception):
@@ -125,8 +124,8 @@ def SunPosition(an_observer, a_datetime):
     ecliptic_longitude, R = SolarLongitude(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-    sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
     return sun_hz
 
@@ -147,16 +146,16 @@ def EquationOfTime(a_datetime):
 
     noon = coords.datetime()
     noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
-    gast = SiderealTime.USNO_C163.GAST(noon)
+    gast = Transforms.SiderealTime.USNO_C163.GAST(noon)
 
     ecliptic_longitude, R = SolarLongitude(noon)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, noon)
+    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, noon)
 
     eot = coords.angle()
 
-    sun_ra = utils.get_RA(sun_eq)
+    sun_ra = Transforms.utils.get_RA(sun_eq)
 
     if gast.value - sun_ra.value < 12:
         eot.value = gast.value - sun_ra.value
@@ -189,7 +188,7 @@ def SunRiseAndSet(an_observer, a_datetime):
 
     ecliptic_longitude, R = SolarLongitude(a_datetime)
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
 
     return RiseAndSet(sun_eq, an_observer, a_datetime, an_altitude=coords.angle(-0.8333))
 
@@ -230,18 +229,18 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     rising, transit and setting in local time.
     """
 
-    JD, JDo = SiderealTime.USNO_C163.JulianDate0(a_datetime)
+    JD, JDo = Transforms.SiderealTime.USNO_C163.JulianDate0(a_datetime)
 
     midnight = coords.datetime()
     midnight.fromJulianDate(JDo)
 
-    observer_latitude = utils.get_latitude(an_observer)
-    observer_longitude = utils.get_longitude(an_observer)
+    observer_latitude = Transforms.utils.get_latitude(an_observer)
+    observer_longitude = Transforms.utils.get_longitude(an_observer)
 
-    object_RA = coords.angle(utils.get_RA(an_object).value * 15) # in degrees
-    object_declination = utils.get_declination(an_object)
+    object_RA = coords.angle(Transforms.utils.get_RA(an_object).value * 15) # in degrees
+    object_declination = Transforms.utils.get_declination(an_object)
 
-    gmst = SiderealTime.USNO_C163.GMST(midnight)
+    gmst = Transforms.SiderealTime.USNO_C163.GMST(midnight)
     gmst.value *= 15 # in degrees
 
     cos_hour_angle = (math.sin(an_altitude.radians) \
@@ -331,8 +330,8 @@ if __name__ == '__main__':
     if len(args) < 3:
         parser.error('missing object and/or datetime.')
 
-    an_observer = utils.latlon2spherical(a_latitude=utils.parse_angle_arg(args[0]),
-                                         a_longitude=utils.parse_angle_arg(args[1]))
+    an_observer = Transforms.utils.latlon2spherical(a_latitude=Transforms.utils.parse_angle_arg(args[0]),
+                                                    a_longitude=Transforms.utils.parse_angle_arg(args[1]))
 
     a_datetime = coords.datetime(args[2])
 
@@ -354,8 +353,8 @@ if __name__ == '__main__':
 
             print 0.01*d,
             print current_datetime,
-            print utils.get_azimuth(sun).value,
-            print utils.get_altitude(sun).value
+            print Transforms.utils.get_azimuth(sun).value,
+            print Transforms.utils.get_altitude(sun).value
 
 
     elif options.output_mode.lower() == 'analemma':
@@ -372,7 +371,7 @@ if __name__ == '__main__':
             sun = SunPosition(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
-            print eot.value*60 + 180, utils.get_altitude(sun).value
+            print eot.value*60 + 180, Transforms.utils.get_altitude(sun).value
 
 
     elif options.output_mode.lower() == 'eot':
@@ -401,15 +400,15 @@ if __name__ == '__main__':
         print 'Ecliptic longitude:', ecliptic_longitude
         print 'Distance in AU:', R
 
-        print 'Obliquity of the ecliptic:', EclipticEquatorial.obliquity(a_datetime)
+        print 'Obliquity of the ecliptic:', Transforms.EclipticEquatorial.obliquity(a_datetime)
 
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
         print 'Sun in ecliptic coordinates:', sun_ec
 
-        sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
         print 'Sun in equatorial coordinates:', sun_eq
 
-        sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+        sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
         print 'Sun in horizon coordinates:', sun_hz
 
         sun_dec = coords.angle(90) - sun_eq.theta
@@ -418,10 +417,10 @@ if __name__ == '__main__':
         eot = EquationOfTime(a_datetime)
         print 'Equation of time (minutes):', eot.value * 60
 
-        print 'Azimuth (degrees):', utils.get_azimuth(sun_hz),
-        print ''.join(('(', str(utils.get_azimuth(sun_hz).value), ')'))
-        print 'Altitude (degrees):', utils.get_altitude(sun_hz),
-        print ''.join(('(', str(utils.get_altitude(sun_hz).value), ')'))
+        print 'Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),
+        print ''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')'))
+        print 'Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),
+        print ''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')'))
 
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)
