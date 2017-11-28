@@ -15,12 +15,11 @@ import re
 
 import coords
 
-from Transforms import EclipticEquatorial
-from Transforms import EquatorialHorizon
-from Transforms import SiderealTime
-from Transforms import utils
+import Transforms.EclipticEquatorial
+import Transforms.EquatorialHorizon
+import Transforms.utils
 
-from Bodies import SunPosition
+import Bodies.SunPosition
 
 
 # ----- module scope -----
@@ -167,12 +166,12 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     result['datetime'] = str(a_datetime)
     result['dst'] = is_dst
 
-    result['eot'] = str(SunPosition.EquationOfTime(a_datetime))
-    result['obliquity'] = str(EclipticEquatorial.obliquity(a_datetime))
+    result['eot'] = str(Bodies.SunPosition.EquationOfTime(a_datetime))
+    result['obliquity'] = str(Transforms.EclipticEquatorial.obliquity(a_datetime))
 
-    an_observer = utils.latlon2spherical(a_latitude, a_longitude)
+    an_observer = Transforms.utils.latlon2spherical(a_latitude, a_longitude)
 
-    rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
+    rising, transit, setting = Bodies.SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
     if is_dst:
 
@@ -206,23 +205,23 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     result['setting'] = str(setting)
 
 
-    ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
+    ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-    sun_hz = EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
     result['dec'] = str(coords.angle(90) - sun_eq.theta)
 
     result['R'] = R
     result['ecliptic_longitude'] = str(ecliptic_longitude)
 
-    result['azimuth'] = ''.join((str(utils.get_azimuth(sun_hz)),
-                                 ' (', str(utils.get_azimuth(sun_hz).value), ')'))
+    result['azimuth'] = ''.join((str(Transforms.utils.get_azimuth(sun_hz)),
+                                 ' (', str(Transforms.utils.get_azimuth(sun_hz).value), ')'))
 
 
-    result['altitude'] = ''.join((str(utils.get_altitude(sun_hz)),
-                                  ' (', str(utils.get_altitude(sun_hz).value), ')'))
+    result['altitude'] = ''.join((str(Transforms.utils.get_altitude(sun_hz)),
+                                  ' (', str(Transforms.utils.get_altitude(sun_hz).value), ')'))
 
 
     return result
@@ -372,8 +371,8 @@ def sun_position_chart_data():
 
         result = dict()
 
-        an_observer = utils.latlon2spherical(request_angle('latitude'),
-                                             request_angle('longitude'))
+        an_observer = Transforms.utils.latlon2spherical(request_angle('latitude'),
+                                                        request_angle('longitude'))
 
         result['observer'] = str(an_observer) # TODO format?
 
@@ -423,19 +422,19 @@ def sun_position_chart_data():
 
         for d in range(0, npts + 1):
 
-            sun_ct = SunPosition.SunPosition(an_observer, plot_time_marker)
-            sun_ve = SunPosition.SunPosition(an_observer, vernal_equinox)
-            sun_ss = SunPosition.SunPosition(an_observer, summer_solstice)
-            sun_ae = SunPosition.SunPosition(an_observer, autumnal_equinox)
-            sun_ws = SunPosition.SunPosition(an_observer, winter_solstice)
+            sun_ct = Bodies.SunPosition.SunPosition(an_observer, plot_time_marker)
+            sun_ve = Bodies.SunPosition.SunPosition(an_observer, vernal_equinox)
+            sun_ss = Bodies.SunPosition.SunPosition(an_observer, summer_solstice)
+            sun_ae = Bodies.SunPosition.SunPosition(an_observer, autumnal_equinox)
+            sun_ws = Bodies.SunPosition.SunPosition(an_observer, winter_solstice)
 
 
             altitude.append([dtime,
-                             utils.get_altitude(sun_ve).value,
-                             utils.get_altitude(sun_ss).value,
-                             utils.get_altitude(sun_ae).value,
-                             utils.get_altitude(sun_ws).value,
-                             utils.get_altitude(sun_ct).value # needs to be last for sun position marker
+                             Transforms.utils.get_altitude(sun_ve).value,
+                             Transforms.utils.get_altitude(sun_ss).value,
+                             Transforms.utils.get_altitude(sun_ae).value,
+                             Transforms.utils.get_altitude(sun_ws).value,
+                             Transforms.utils.get_altitude(sun_ct).value # needs to be last for sun position marker
                          ]
             )
 
@@ -466,7 +465,7 @@ def sun_position_chart_data():
         result['setting']  = rts['setting']
 
 
-    except (TypeError, ValueError, RuntimeError, SunPosition.Error) as err:
+    except (TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         result = {'error': str(err)}
@@ -500,8 +499,8 @@ def radec2azalt():
 
         result = dict()
 
-        an_observer = utils.latlon2spherical(request_angle('latitude'),
-                                             request_angle('longitude'))
+        an_observer = Transforms.utils.latlon2spherical(request_angle('latitude'),
+                                                        request_angle('longitude'))
 
         result['observer'] = str(an_observer)
 
@@ -514,12 +513,12 @@ def radec2azalt():
 
         result['datetime'] = str(a_datetime)
 
-        body_eq = utils.radec2spherical(request_angle('ra'), request_angle('dec'))
+        body_eq = Transforms.utils.radec2spherical(request_angle('ra'), request_angle('dec'))
 
-        body_hz = EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
+        body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
-        result['azimuth'] = utils.get_azimuth(body_hz).value
-        result['altitude'] = utils.get_altitude(body_hz).value
+        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).value
+        result['altitude'] = Transforms.utils.get_altitude(body_hz).value
 
 
     except (TypeError, ValueError, RuntimeError) as err:
@@ -541,8 +540,8 @@ def azalt2radec():
 
         result = dict()
 
-        an_observer = utils.latlon2spherical(request_angle('latitude'),
-                                             request_angle('longitude'))
+        an_observer = Transforms.utils.latlon2spherical(request_angle('latitude'),
+                                                        request_angle('longitude'))
 
         result['observer'] = str(an_observer)
 
@@ -556,12 +555,12 @@ def azalt2radec():
         result['datetime'] = str(a_datetime)
 
 
-        body_hz = utils.azalt2spherical(request_angle('azimuth'), request_angle('altitude'))
+        body_hz = Transforms.utils.azalt2spherical(request_angle('azimuth'), request_angle('altitude'))
 
-        body_eq = EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
+        body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
-        result['ra'] = utils.get_RA(body_eq).value
-        result['dec'] = utils.get_declination(body_eq).value
+        result['ra'] = Transforms.utils.get_RA(body_eq).value
+        result['dec'] = Transforms.utils.get_declination(body_eq).value
 
     except (TypeError, ValueError, RuntimeError) as err:
 

@@ -30,6 +30,7 @@ import coords
 import EclipticEquatorial
 import utils
 
+
 class EclipticEquatorialTests(unittest.TestCase):
     """Test ecliptic equatorial coordinate transformations
 

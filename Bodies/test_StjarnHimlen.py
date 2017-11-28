@@ -26,7 +26,8 @@ import unittest
 import coords
 import StjarnHimlen
 
-from Transforms import utils
+import Transforms.utils
+
 
 class StjarnHimlenTests(unittest.TestCase):
 
@@ -172,8 +173,8 @@ class StjarnHimlenTests(unittest.TestCase):
         """
 
 
-        sirius = utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
-                                       a_declination=coords.angle(-16, 42, 58.017))
+        sirius = Transforms.utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
+                                                  a_declination=coords.angle(-16, 42, 58.017))
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 

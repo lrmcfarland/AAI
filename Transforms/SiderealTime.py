@@ -2,7 +2,7 @@
 
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
-to run: ./pylaunch.sh Transforms.py
+to run: ./pylaunch.sh SiderealTime.py 2017-11-27T12:00
 
 References:
 
@@ -19,10 +19,10 @@ Validation:
 """
 
 import math
-import coords
 
-from Transforms import EclipticEquatorial # for obliquity in __main__
-from Transforms import utils
+import coords
+import EclipticEquatorial
+import utils
 
 
 class Error(Exception):
