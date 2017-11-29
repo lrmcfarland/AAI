@@ -88,14 +88,19 @@ table#observer_location {
 
     $("#set_time").click(function(e) {
 
-      {# TODO pad time with leading 0s #}
-
       var now = new Date();
 
-      var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) + "-" + now.getDate();
+      var month_str = String(parseFloat(now.getMonth()) + 1);
+      var date_str  = String(parseFloat(now.getMonth()));
+
+      var date_str = now.getFullYear() + "-" + month_str.padStart(2, "0") + "-" + date_str.padStart(2, "0");
       $("#_date").val(date_str);
 
-      var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+      var hour_str = String(now.getHours());
+      var min_str = String(now.getMinutes());
+      var sec_str = String(now.getSeconds());
+
+      var time_str = hour_str.padStart(2, "0") + ":" + min_str.padStart(2, "0") + ":" + sec_str.padStart(2, "0");
       $("#_time").val(time_str);
 
     });
