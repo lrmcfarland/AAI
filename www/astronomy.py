@@ -465,6 +465,14 @@ def sun_position_chart_data():
         result['setting']  = rts['setting']
 
 
+    except Bodies.SunPosition.Error as err:
+
+        result['sun_marker_altitude'] = str(err)
+        result['sun_marker_azimuth']  = str(err)
+        result['rising']   = str(err)
+        result['transit']  = str(err)
+        result['setting']  = str(err)
+
     except (TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
