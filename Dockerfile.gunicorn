@@ -30,7 +30,7 @@
 FROM centos
 
 LABEL maintainer "lrm@starbug.com"
-LABEL service "Astronomical Algorithms Implemented"
+LABEL service "Astronomical Algorithms Implemented gunicorn wrapper"
 
 # packages
 
