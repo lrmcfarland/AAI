@@ -10,14 +10,14 @@
 #
 # one time setup
 # persistent storage:  docker volume create aai-logs
-# create network:      docker network create nginx-proxy
+# create network:      docker network create starbugnet
 #
 # to build:            docker build -f Dockerfile.nginx -t aai-nginx .
 #
 # with log storage
-# to run:              docker run --net nginx-proxy --mount source=aai-logs,target=/opt/starbug.com/logs/nginx --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
+# to run:              docker run --net starbugnet --mount source=aai-logs,target=/opt/starbug.com/logs/nginx --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
 #
-# to run min:          docker run --net nginx-proxy --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
+# to run min:          docker run --net starbugnet --name aai-nginx-00 -v /var/run/docker.sock:/tmp/docker.sock -d -p 80:80 -p 443:443 aai-nginx
 #
 # to bash aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/nginx --user root --entrypoint /bin/bash aai-nginx
 

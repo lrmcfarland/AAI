@@ -5,18 +5,14 @@
 #
 # one time setup
 # persistent storage:  docker volume create aai-logs
-# create network:      docker network create nginx-proxy
+# create network:      docker network create starbugnet
 #
 #
 # to build:            docker build -f Dockerfile.gunicorn -t aai-gunicorn .
 #
+# for nginx:           docker run --net starbugnet --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 #
 # to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
-# to daemonize:        docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080  --restart=always aai-gunicorn
-#
-# for nginx:           docker run --net nginx-proxy --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
-#
-#
 # to bash aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
 # force a rotation     # logrotate -f /etc/logrotate.conf
 #

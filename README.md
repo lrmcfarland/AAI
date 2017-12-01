@@ -62,8 +62,6 @@ used this observation to calculate the Earth's circumference.
 
 ![lillehammer-2017-06-21.png](https://github.com/lrmcfarland/Astronomy/blob/master/images/lillehammer-2017-06-21.png?raw=true)
 
-TODO Above this it complians about "object is below the horizon" when calculating for the midnight sun but on the winter solstice line.
-
 
 ## TODO Stonehenge Manhattenhenge
 
