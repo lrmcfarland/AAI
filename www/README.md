@@ -1,12 +1,17 @@
 # SunPosition Web UI using Flask
 
-This is the initial Web UI for my astronomy tool kit.
+This is the initial Web UI for my astronomy tool kit. I use
+[Flask](http://flask.pocoo.org) to create the templates for the sun
+position calculation.
 
-I use [Flask](http://flask.pocoo.org) to create the templates for the sun position
-calculation.
+## Docker install
 
+See ../Dockerfile.flask
 
-## To Install
+## Manual Apache Install
+
+Originally this was installed manually on a system running Apache.
+It has been superseded by the Docker install, but for the record:
 
 If it isn't already installed:
 
@@ -20,7 +25,7 @@ then
 sudo pip install Flask
 ```
 
-## To Run from the command line
+### To Run from the command line
 
 ```
 $ ./pylaunch.sh SunPosition.py
@@ -32,17 +37,17 @@ $ ./pylaunch.sh SunPosition.py
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-## To Debug
+### To Debug
 
 Set app.debug = True, but remember to turn it off in production since
 it is a security issue.
 
 
-## To run in Apache
+### To run in Apache
 
 On a CentOS system, you will need these packages:
 
-### Yum Packages
+#### Yum Packages
 
 ```
 sudo yum update -y
@@ -68,7 +73,7 @@ sudo yum install git -y
 sudo pip install flask
 ```
 
-### Configure Apache
+#### Configure Apache
 
 To end of /etc/httpd/conf/httpd.conf, add these lines, with the
 location were you have checked out this repo, /var/www/Astronomy in
@@ -99,7 +104,7 @@ sudo chmod -R 775 /var/log/httpd
 
 TODO: right way to do this.
 
-### Install Astronomy
+#### Install Astronomy
 
 Get the astronomy repo from github and follow the steps below.
 
@@ -123,7 +128,7 @@ cd ../Bodies
 
 ```
 
-## Start Service
+### Start Service
 
 Use the service commands to control
 

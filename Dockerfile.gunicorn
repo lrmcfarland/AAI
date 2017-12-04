@@ -14,7 +14,6 @@
 #
 # to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 # to bash aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
-# force a rotation     # logrotate -f /etc/logrotate.conf
 #
 # to stop:                   docker stop aai-gunicorn-00
 # to delete container:       docker rm aai-flask-00
@@ -35,7 +34,6 @@ LABEL service "Astronomical Algorithms Implemented gunicorn wrapper"
 # packages
 
 RUN yum update -y
-RUN yum -y install crontabs logrotate
 RUN yum install -y gcc gcc-c++ python-devel boost boost-devel make cmake git epel-release && yum clean all
 RUN yum -y install python-pip && yum clean all && pip install --upgrade pip && pip install flask && pip install gunicorn
 
@@ -54,8 +52,6 @@ RUN groupadd ${AAI_GRP} \
     && mkdir -p ${AAI_HOME} \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
-
-COPY www/conf/aai-gunicorn.logrotate /etc/logrotate.d/aai-gunicorn
 
 USER ${AAI_USER}:${AAI_GRP}
 
