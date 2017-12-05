@@ -7,17 +7,18 @@
 # persistent storage:  docker volume create aai-logs
 # create network:      docker network create starbugnet
 #
-#
 # to build:            docker build -f Dockerfile.gunicorn -t aai-gunicorn .
 #
-# for nginx:           docker run --net starbugnet --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
+# to run:              docker run --net starbugnet --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 #
-# to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 # to bash aai-logs:    docker run -it --rm --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
 #
 # to stop:                   docker stop aai-gunicorn-00
 # to delete container:       docker rm aai-flask-00
 # to delete image:           docker rmi aai-flask
+#
+# to tag:                    docker tag aai-gunicorn lrmcfarland/aai-gunicorn
+# to push to dockerhub:      docker push lrmcfarland/aai-gunicorn
 #
 # to view docker logs:       docker logs aai-gunicorn-00
 # to run bash:               docker run -it --entrypoint /bin/bash aai-gunicorn

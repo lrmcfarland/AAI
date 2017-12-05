@@ -3,9 +3,6 @@
 #
 # starbug.com static content is loaded from http on port 80
 #
-# AAI TLS content (for browser location) is reverse proxied to the aai
-# gunicorn app.  It expects this app to be running on aai-gunicorn-00
-#
 # Names must be coordinated with the gunicorn WSGI server. See also www/gunicorn.sh
 #
 # one time setup
