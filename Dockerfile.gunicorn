@@ -13,7 +13,7 @@
 # for nginx:           docker run --net starbugnet --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
 #
 # to run gnuicorn:     docker run --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
-# to bash aai-logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
+# to bash aai-logs:    docker run -it --rm --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
 #
 # to stop:                   docker stop aai-gunicorn-00
 # to delete container:       docker rm aai-flask-00

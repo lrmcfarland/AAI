@@ -10,7 +10,7 @@
 #
 # to run flask:        docker run --name aai-flask-00 --mount source=aai-logs,target=/opt/starbug.com/logs/flask -d -p 5000:5000 aai-flask
 #
-# to view aai-flask logs:    docker run -it --mount source=aai-logs,target=/opt/starbug.com/logs/flask --entrypoint /bin/bash aai-flask
+# to view aai-flask logs:    docker run -it --rm --mount source=aai-logs,target=/opt/starbug.com/logs/flask --entrypoint /bin/bash aai-flask
 #
 # to stop:                   docker stop aai-flask-00
 # to delete container:       docker rm aai-flask-00
