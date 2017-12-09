@@ -50,7 +50,7 @@ ENV AAI_HOME="/opt/starbug.com" \
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME} \
+    && mkdir -p ${AAI_HOME}/logs/gunicorn \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
 
@@ -59,9 +59,9 @@ USER ${AAI_USER}:${AAI_GRP}
 WORKDIR ${AAI_HOME}
 
 # built with git
-RUN git clone https://github.com/lrmcfarland/Astronomy.git
+RUN git clone https://github.com/lrmcfarland/AAI.git
 
-WORKDIR ${AAI_HOME}/Astronomy/
+WORKDIR ${AAI_HOME}/AAI/
 
 # assumes the latest checked on the master branch otherwise
 # RUN git checkout  move-scripts2bin-v1 # TODO !!!
@@ -72,14 +72,14 @@ RUN git submodule update --init --recursive
 # ----- build -----
 # -----------------
 
-WORKDIR ${AAI_HOME}/Astronomy/Coordinates
+WORKDIR ${AAI_HOME}/AAI/Coordinates
 RUN ./build.sh # optional test
 
 # -----------------------
 # ----- run web app -----
 # -----------------------
 
-WORKDIR ${AAI_HOME}/Astronomy/www
+WORKDIR ${AAI_HOME}/AAI/www
 
 ENTRYPOINT ["bash"]
 
