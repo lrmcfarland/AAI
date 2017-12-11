@@ -84,6 +84,9 @@ WORKDIR ${AAI_HOME}/AAI/www
 ENTRYPOINT ["bash"]
 
 # gnuicorn
+# TODO nginx module handles log rotation because it has a working systemd
+# see https://hub.docker.com/_/centos/
+
 CMD [ "./bin/aai-gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "info", \
       "--access-logfile", "/opt/starbug.com/logs/gunicorn/gunicorn-access.log", \
       "--error-logfile",  "/opt/starbug.com/logs/gunicorn/gunicorn-error.log", \
