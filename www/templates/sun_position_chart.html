@@ -58,7 +58,7 @@
 
       $("#get_sun_position_data").click(function(e) {
 
-        $.getJSON($SCRIPT_ROOT + "/get_sun_position_chart_data",
+        $.getJSON($SCRIPT_ROOT + "/api/v1/sun_position_data",
           {
             latitude: $('input[name="latitude"]').val(),
             longitude: $('input[name="longitude"]').val(),

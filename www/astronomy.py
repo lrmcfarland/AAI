@@ -361,11 +361,27 @@ def sun_position_chart():
     return flask.render_template('sun_position_chart.html')
 
 
-@app.route("/get_sun_position_chart_data")
-def sun_position_chart_data():
-    """Get the sun position chart for the given day"""
+@app.route("/api/v1/sun_position_data")
+def sun_position_data():
+    """Get the sun position chart for the given day as JSON
 
-    app.logger.info('get_sun_positon_chart_data: %s', flask.request.args)
+    for example:
+
+    curl http://0.0.0.0:8080/api/v1/sun_position_data\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
+
+    result.datetime
+          .sun_date_label
+          .sun_marker_time
+          .sun_marker_altitude
+          .sun_marker_azimuth
+          .rising
+          .transit
+          .setting
+          .altitude_data_24h[time, current, vernal, summer, autumnal, winter]
+
+    """
+
+    app.logger.info('/api/v1/sun_positon_data: %s', flask.request.args)
 
     try:
 
@@ -494,10 +510,7 @@ def eqhz_transforms():
     return flask.render_template('eqhz_transforms.html')
 
 
-
-
-
-@app.route("/radec2azalt")
+@app.route("/api/v1/radec2azalt")
 def radec2azalt():
     """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates"""
 
@@ -537,8 +550,7 @@ def radec2azalt():
     return flask.jsonify(**result)
 
 
-
-@app.route("/azalt2radec")
+@app.route("/api/v1/azalt2radec")
 def azalt2radec():
     """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates"""
 
