@@ -5,4 +5,4 @@
 
 . ./bin/setenv.sh
 
-gunicorn astronomy:app "$@"
+gunicorn aai:app "$@"

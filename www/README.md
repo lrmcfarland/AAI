@@ -76,18 +76,18 @@ sudo pip install flask
 #### Configure Apache
 
 To end of /etc/httpd/conf/httpd.conf, add these lines, with the
-location were you have checked out this repo, /var/www/Astronomy in
+location were you have checked out this repo, /var/www/AAI in
 this case.
 
 ```
 <VirtualHost *>
     ServerName astarbug.com
 
-    WSGIDaemonProcess astronomy user=apache group=apache threads=5
-    WSGIScriptAlias / /var/www/Astronomy/www/astronomy.wsgi
+    WSGIDaemonProcess aai user=apache group=apache threads=5
+    WSGIScriptAlias / /var/www/AAI/www/aai.wsgi
 
-    <Directory /var/www/Astronomy/www>
-	WSGIProcessGroup astronomy
+    <Directory /var/www/AAI/www>
+	WSGIProcessGroup aai
 	WSGIApplicationGroup %{GLOBAL}
 	Order deny,allow
 	Allow from all
@@ -104,17 +104,17 @@ sudo chmod -R 775 /var/log/httpd
 
 TODO: right way to do this.
 
-#### Install Astronomy
+#### Install AAI
 
-Get the astronomy repo from github and follow the steps below.
+Get the aai repo from github and follow the steps below.
 
 ```
 sudo -s
 cd /var/www
 
-git clone https://github.com/lrmcfarland/Astronomy.git
+git clone https://github.com/lrmcfarland/AAI.git
 
-cd Astronomy/
+cd AAI/
 git submodule update --init --recursive
 
 cd Coordinates/

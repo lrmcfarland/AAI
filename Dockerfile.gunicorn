@@ -64,7 +64,7 @@ RUN git clone https://github.com/lrmcfarland/AAI.git
 WORKDIR ${AAI_HOME}/AAI/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout adds-api # TODO !!!
+# RUN git checkout astronomy2aai # TODO !!!
 
 RUN git submodule update --init --recursive
 
