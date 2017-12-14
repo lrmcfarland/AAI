@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-"""The Astronomy Web UI using Flask
+"""The Astronomical Algorithms Implemented in C++ and Python Web UI using Flask
 
-To run: ./pylaunch.sh astronomy.py
+To run: ./pylaunch.sh aai.py
 
-with rotating logging: ./pylaunch.sh astronomy.py -l debug --loghandler rotating --logfilename ./logs/aai-flask.log
+with rotating logging: ./pylaunch.sh aai.py -l debug --loghandler rotating --logfilename ./logs/aai-flask.log
 """
 
 import argparse

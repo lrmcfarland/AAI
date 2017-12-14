@@ -5,4 +5,4 @@
 
 . ./bin/setenv.sh
 
-python ./astronomy.py "$@"
+python ./aai.py "$@"

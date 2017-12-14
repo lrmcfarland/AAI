@@ -22,7 +22,7 @@ but I wanted to see how hard it would be to bring in more complex C++ libraries
 (and I have wrapped FORTRAN in C++ before too ... )
 Besides making it more fun to play with, I can use Python frameworks like
 [flask](https://en.wikipedia.org/wiki/Flask_(web_framework)) to provide a browser UI.
-That also opens the door for HTML, CSS, JavaScript, JSON, JQuery and Google charts. 
+That also opens the door for HTML, CSS, JavaScript, JSON, JQuery and Google charts.
 
 Finally, adding nginx as a reverse proxy and TLS end point (to use
 the geolocation features of the browser) as a Docker micro-service.
@@ -44,6 +44,65 @@ It is a work in progress.
 returns the position of the sun given the observer's location on earth
 in latitude, longitude and date-time. It is available on [aai.starbug.com](https://aai.starbug.com).
 Here are some screen shots:
+
+
+## API
+
+
+
+```
+curl https://aai.starbug.com/api/v1/sun_position_data\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
+
+{
+  "altitude_data_24h": [
+    [
+      0,
+      -53.12289141057474,
+      -29.529772137731925,
+      -52.545518554707144,
+      -76.3762556772508,
+      -75.96224706420884
+    ],
+
+...
+
+  ],
+  "datetime": "2017-12-11T14:37:54-08",
+  "observer": "<spherical><r>1</r><theta>53</theta><phi>-122</phi></spherical>",
+  "rising": "2017-12-11T07:12:13.2009-08",
+  "setting": "2017-12-11T16:52:24.806-08",
+  "sun_date_label": [
+    "2017-12-11"
+  ],
+  "sun_marker_altitude": "19:33:0.925497 (19.5502570824)",
+  "sun_marker_azimuth": "218:05:11.8683 (218.086630087)",
+  "sun_marker_time": 14.631666675209999,
+  "transit": "2017-12-11T12:02:19.0035-08"
+}
+
+
+
+curl https://aai.starbug.com/api/v1/radec2azalt?latitude=37.40012123209991\&longitude=-122.08225404051541\&date=2017-12-11\&time=21%3A42%3A05\&timezone=-8\&dst=false\&ra=0\&dec=0
+
+{
+  "altitude": 34.91958722761523,
+  "azimuth": 237.74055887676423,
+  "datetime": "2017-12-11T21:42:05-08",
+  "observer": "<spherical><r>1</r><theta>52.5999</theta><phi>-122.082</phi></spherical>"
+}
+
+
+
+
+curl https://aai.starbug.com/api/v1/azalt2radec?latitude=37.40012123209991\&longitude=-122.08225404051541\&date=2017-12-11\&time=21%3A42%3A05\&timezone=-8\&dst=false\&azimuth=237.74055887676423\&altitude=34.91958722761523
+{
+  "datetime": "2017-12-11T21:42:05-08",
+  "dec": 1.4210854715202004e-14,
+  "observer": "<spherical><r>1</r><theta>52.5999</theta><phi>-122.082</phi></spherical>",
+  "ra": 24.0
+}
+
+```
 
 ## San Franciso 2017-11-19
 
