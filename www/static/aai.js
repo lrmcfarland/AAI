@@ -1,10 +1,10 @@
-// Astronomy javascript
+// aai javascript
 
-var astronomy = astronomy || {}; // namespace TODO starbug specific?
+var aai = aai || {}; // namespace TODO starbug specific?
 
-astronomy.setLocation = function() { // TODO set location
+aai.setLocation = function() { // TODO set location
 
-    console.log("astronomy.setLocation called"); // debug?
+    console.log("aai.setLocation called"); // debug?
 
     // TODO validation: error if length not 3, args not strings
 

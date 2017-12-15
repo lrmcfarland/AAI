@@ -111,7 +111,7 @@ curl https://aai.starbug.com/api/v1/azalt2radec?latitude=37.40012123209991\&long
 ## Syene on the summer solstice
 
 This is [Syene](https://en.wikipedia.org/wiki/Aswan) at noon on the summer
-solstice when the sun is directly overhead and casts no shadow in a deep well.
+solstice when the sun is "directly overhead and casts no shadow in a deep well".
 [Eratosthenes](https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth.27s_circumference)
 used this observation to calculate the Earth's circumference.
 
