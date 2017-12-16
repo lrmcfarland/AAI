@@ -1,4 +1,4 @@
-# Astronomy
+# Astronomical Algorithms Implemented
 
 This a collection of my implementations of various algorithms I found
 on line and in books, in particular
@@ -6,7 +6,8 @@ on line and in books, in particular
 by [Jean Meeus](https://en.wikipedia.org/wiki/Jean_Meeus)
 
 I use this to collect what I learned about various programming problems into
-a coherent whole in service of an application.
+a coherent whole in service of an application, in this case calculating
+the position of the sun for an observer at a given location and date time.
 
 I started with some object oriented ideas about using C++ to build a
 [Coordinates library](https://github.com/lrmcfarland/Coordinates) to

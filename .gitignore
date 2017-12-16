@@ -7,7 +7,7 @@
 
 # build output
 *.[oa]
-www/pyenv
+pyenv
 
 # dylib
 *.dylib
