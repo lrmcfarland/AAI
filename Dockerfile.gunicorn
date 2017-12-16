@@ -88,8 +88,8 @@ ENTRYPOINT ["bash"]
 # see https://hub.docker.com/_/centos/
 
 CMD [ "./bin/aai-gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "info", \
-      "--access-logfile", "/opt/starbug.com/logs/gunicorn/gunicorn-access.log", \
-      "--error-logfile",  "/opt/starbug.com/logs/gunicorn/gunicorn-error.log", \
+      "--access-logfile", "/opt/starbug.com/logs/gunicorn/aai-gunicorn-access.log", \
+      "--error-logfile",  "/opt/starbug.com/logs/gunicorn/aai-gunicorn-error.log", \
       "--forwarded-allow-ips", "*"]
 
 # TODO limit forwarded allow ips for containers to docker non-routable subnet 172.17.0.0/16 ?
