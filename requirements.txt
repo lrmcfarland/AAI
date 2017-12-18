@@ -1,0 +1,3 @@
+# aai gunicorn pip requirements
+flask
+gunicorn

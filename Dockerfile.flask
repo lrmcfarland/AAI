@@ -32,9 +32,9 @@ LABEL service "Astronomical Algorithms Implemented with flask"
 # packages
 
 RUN yum update -y
-RUN yum install -y gcc gcc-c++ python-devel boost boost-devel make cmake git epel-release && yum clean all
-
-RUN yum -y install python-pip && yum clean all && pip install --upgrade pip && pip install flask
+RUN yum install -y gcc gcc-c++ boost boost-devel make cmake git epel-release && yum clean all
+RUN yum install -y python-devel python-pip && yum clean all # line belown not happy if this is in line above
+RUN pip install --upgrade pip && pip install flask
 
 # --------------------
 # ----- AAI home -----
