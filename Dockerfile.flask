@@ -61,13 +61,13 @@ RUN git clone https://github.com/lrmcfarland/AAI.git
 WORKDIR ${AAI_HOME}/AAI/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout astronomy.js2aai # TODO !!!!
+# RUN git checkout remove-dup-scripts # TODO !!!!
 
 RUN git submodule update --init --recursive
 
 
-# TODO assumes submodule update has been run locally, but has other problems
-# COPY . ${AAI_HOME}/AAI
+# config not checked in
+COPY www/conf/aai-flask.cfg ${AAI_HOME}/AAI/www/conf
 
 
 # -----------------

@@ -8,6 +8,8 @@ position calculation.
 
 ## Setup pyenv
 
+one time setup
+
 ```
 lrm@lrmz-iMac AAI (master)]$ pwd
 /Users/lrm/src/starbug/AAI
@@ -71,6 +73,20 @@ wheel        0.30.0
 
 
 ```
+
+## config
+
+Setup conf/aai-flask.cfg with secret
+
+```
+$ more www/conf/aai-flask.cfg
+# base line aai flask config
+
+SECRET_KEY = 'secret'
+
+```
+
+
 
 ## Run pylanuch.sh
 

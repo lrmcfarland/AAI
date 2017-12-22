@@ -1,4 +1,4 @@
-{# google chart example #}
+{# AAI sun position chart #}
 
 {% extends "base.html" %}
 
@@ -8,50 +8,11 @@
 
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
-
     {# ----------------- #}
     {# ----- ready ----- #}
     {# ----------------- #}
 
     $(document).ready(function() {
-
-
-      {# ----- set date ----- #}
-
-      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
-
-
-      {# ----- set location ----- #}
-
-      $("#set_location").click(function(e) {
-        {# aai.js uses document.getElementById #}
-        aai.setLocation("_latitude", "_longitude", "_timezone", e);
-      });
-
-
-      {# ----- set time ----- #}
-
-      $("#set_time").click(function(e) {
-
-        {# TODO pad time with leading 0s #}
-
-        var now = new Date();
-
-        var date_str = now.getFullYear() + "-" + (parseFloat(now.getMonth()) + 1) +
-                       "-" + now.getDate();
-        $("#_date").val(date_str);
-
-        var time_str = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-        $("#_time").val(time_str);
-      });
-
-
-      {# ----- set timezone from longitude ----- #}
-
-      $("#_longitude").change(function() {
-        var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
-        $("#_timezone").val(timezone);
-      });
 
 
       {# ----- get data ----- #}
