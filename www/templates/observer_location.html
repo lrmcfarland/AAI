@@ -77,14 +77,19 @@ table#observer_location {
 
   $(function() {
 
+    {# ----- set date ----- #}
+
     $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
 
+    {# ----- set location ----- #}
 
     $("#set_location").click(function(e) {
       {# aai.js uses document.getElementById #}
       aai.setLocation("_latitude", "_longitude", "_timezone", e);
     });
 
+
+    {# ----- set time ----- #}
 
     $("#set_time").click(function(e) {
 
@@ -105,6 +110,7 @@ table#observer_location {
 
     });
 
+    {# ----- set timezone from longitude ----- #}
 
     $("#_longitude").change(function() {
       var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
@@ -114,14 +120,14 @@ table#observer_location {
 
     $("#show_help").click(function(e) {
 
-        var help_message = [
-            "Degrees, and optional minutes and seconds are accepted as a ",
-            "time format with : between each element, e.g. 37:47:30 instead ",
-            "of 37\u00b0 47\u2032 30\u2033 for San Francisco's latitude. ",
-            "The timezone, in hours, is estimated from the longitude, but ",
-            "should be adjusted as needed."].join("");
+	var help_message = [
+	    "Degrees, and optional minutes and seconds are accepted as a ",
+	    "time format with : between each element, e.g. 37:47:30 instead ",
+	    "of 37\u00b0 47\u2032 30\u2033 for San Francisco's latitude. ",
+	    "The timezone, in hours, is estimated from the longitude, but ",
+	    "should be adjusted as needed."].join("");
 
-        alert(help_message);
+	alert(help_message);
 
     });
 
@@ -141,13 +147,13 @@ table#observer_location {
     <tr>
 
       <td>
-        <button type="button" id="set_location">Current Location</button>
+	<button type="button" id="set_location">Current Location</button>
       </td>
 
       <th>Latitude</th>
 
       <td>
-        <input type="text" id="_latitude" name="latitude">
+	<input type="text" id="_latitude" name="latitude">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -162,7 +168,7 @@ table#observer_location {
       <th>Longitude</th>
 
       <td>
-        <input type="text" id="_longitude" name="longitude">
+	<input type="text" id="_longitude" name="longitude">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -175,7 +181,7 @@ table#observer_location {
       <th>Date</th>
 
       <td>
-        <input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
+	<input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
     </tr>
@@ -183,7 +189,7 @@ table#observer_location {
     <tr>
 
       <td>
-        <button type="button" id="set_time">Current Time</button>
+	<button type="button" id="set_time">Current Time</button>
       </td>
 
       <th>Local Time</th>
@@ -196,7 +202,7 @@ table#observer_location {
 
       <th>Time Zone</th>
       <td>
-        <input type="text" id="_timezone" name="timezone" value="0">
+	<input type="text" id="_timezone" name="timezone" value="0">
       </td>
       <td>hr</td>
 
@@ -205,13 +211,13 @@ table#observer_location {
     <tr>
 
       <td>
-        <button type="button" id="show_help">Help</button>
+	<button type="button" id="show_help">Help</button>
       </td>
 
       <th>Daylight Savings</th>
 
       <td>
-        <input type="checkbox" id="_dst" name="dst">
+	<input type="checkbox" id="_dst" name="dst">
       </td>
     </tr>
 
