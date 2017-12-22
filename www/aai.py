@@ -233,7 +233,7 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
 
 app = flask.Flask(__name__) # must be before decorators
 
-app.secret_key = 'seti2001' # TODO more random
+app.config.from_pyfile('conf/aai-flask.cfg')
 
 
 @app.route("/")
