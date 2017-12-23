@@ -71,6 +71,7 @@ RUN git submodule update --init --recursive
 
 
 # config not checked in
+# TODO copy to /tmp and have aai verify it is not checked into git
 COPY www/conf/aai-flask.cfg ${AAI_HOME}/AAI/www/conf
 
 
