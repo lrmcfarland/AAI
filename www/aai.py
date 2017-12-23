@@ -41,6 +41,11 @@ dms_re = re.compile(r'(?P<degrees>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
 # ----- utilities -----
 # ---------------------
 
+
+class Error(Exception):
+    pass
+
+
 def request_float(a_float_str):
     """Gets the float of string from the request args
 
@@ -648,8 +653,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-
-
     # ----- set up logging -----
 
     if args.loghandler == 'stream':
@@ -669,6 +672,10 @@ if __name__ == "__main__":
     log_handler.setFormatter(
         logging.Formatter(
             '[%(asctime)s %(levelname)s %(filename)s %(lineno)s] %(message)s'))
+
+
+    if app.config['SECRET_KEY'] == 'changeme': # TODO meh
+        raise Error('change flask secret key in www/conf/aai-flask.cfg from default')
 
     app.logger.addHandler(log_handler)
     app.logger.setLevel(loglevels[args.loglevel])
