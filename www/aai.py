@@ -2,7 +2,7 @@
 
 """The Astronomical Algorithms Implemented in C++ and Python Web UI using Flask
 
-To run: ./pylaunch.sh aai.py
+To run: ./bin/pylaunch.sh aai.py
 
 with rotating logging: ./pylaunch.sh aai.py -l debug --loghandler rotating --logfilename ./logs/aai-flask.log
 """
@@ -11,142 +11,15 @@ import argparse
 import flask
 import logging
 import logging.handlers
-import re
 
 import coords
+import aai_flask_utils
 
 import Transforms.EclipticEquatorial
 import Transforms.EquatorialHorizon
 import Transforms.utils
 
 import Bodies.SunPosition
-
-
-# ----- module scope -----
-
-dms_re = re.compile(r'(?P<degrees>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
-                      '((:(?P<minutes>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?)'
-                       '(:(?P<seconds>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?')
-
-# TODO re.VERBOSE
-# TODO stricter formatting 12:3x4:45 passes
-
-# works for 10, 1:23, 12:23:45
-
-# TODO limit range to 24 hrs., 60 minutes and seconds. missing lower parts
-# TODO utf-8 degrees
-
-
-# ---------------------
-# ----- utilities -----
-# ---------------------
-
-
-class Error(Exception):
-    pass
-
-
-def request_float(a_float_str):
-    """Gets the float of string from the request args
-
-    Args:
-        a_float_str (str): float as string
-
-    Returns: the float
-    Raises: ValueError if not found
-    """
-
-    a_float = flask.request.args.get(a_float_str, type=float)
-
-    app.logger.debug('request float: %s: %s', a_float_str, a_float)
-
-    if a_float is None:
-        raise ValueError('{a_float_str} is not a float: {a_value}'.format(
-            a_float_str=a_float_str, a_value=flask.request.args.get(a_float_str)))
-
-    return a_float
-
-
-def safe_get_float(a_match, a_key):
-    """Safe get float
-
-    Args:
-        a_match (re.match result dictonary): regex with named groups
-        a_float_key (str): value to get
-
-    Returns 0 if not found
-    Raises error if not float-able
-    """
-
-    a_val = a_match.groupdict()[a_key]
-
-    if a_val is None:
-        return 0
-    else:
-        return float(a_val)
-
-
-def request_angle(an_angle_key):
-    """Gets the degree minute second values from the request args
-
-    Arg:
-        an_angle_key (str): one of deg, deg:min, deg:min:sec
-
-    Returns: coords.angle
-    Raises: value exception on format error
-    """
-
-    an_angle_value = flask.request.args.get(an_angle_key)
-
-    app.logger.debug('request angle: %s: %s', an_angle_key, an_angle_value)
-
-    found_dms = dms_re.match(an_angle_value)
-
-    if not found_dms:
-        raise ValueError(
-            'unsupported format for {an_angle_key}: {an_angle_value}'.format(**locals()))
-
-    degrees = safe_get_float(found_dms, 'degrees')
-    minutes = safe_get_float(found_dms, 'minutes')
-    seconds = safe_get_float(found_dms, 'seconds')
-
-    return coords.angle(degrees, minutes, seconds)
-
-
-def request_datetime(a_date_key, a_time_key, a_timezone, is_dst):
-    """Gets the degree minute second values from the request args
-
-    Arg:
-        a_date_key (str): yyyy-mm-dd
-        a_time_key (str): hr:min:sec
-        a_timezone (float): -12 to 12
-        is_dst (bool): daylight savings time
-
-    Returns: coords.datetime
-    Raises: value exception on format error
-    """
-
-    # TODO regex validation
-
-    ymd = flask.request.args.get(a_date_key).split('-') # ASSUMES: yyyy-mm-dd format
-
-    hms = flask.request.args.get(a_time_key).split(':') # ASSUMES: hh:mm:ss.ss
-    while len(hms) < 3:
-        hms.append('0')
-
-    a_datetime = coords.datetime(int(ymd[0]),
-                                 int(ymd[1]),
-                                 int(ymd[2]),
-                                 int(hms[0]),
-                                 int(hms[1]),
-                                 float(hms[2]),
-                                 a_timezone)
-    if is_dst:
-        a_datetime -= 1.0/24
-
-    app.logger.debug('datetime: %s', a_datetime)
-
-    return a_datetime
 
 
 def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
@@ -392,17 +265,18 @@ def sun_position_data():
 
         result = dict()
 
-        an_observer = Transforms.utils.latlon2spherical(request_angle('latitude'),
-                                                        request_angle('longitude'))
+        an_observer = Transforms.utils.latlon2spherical(aai_flask_utils.request_angle('latitude', flask.request),
+                                                        aai_flask_utils.request_angle('longitude', flask.request))
 
-        result['observer'] = str(an_observer) # TODO format?
+        result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-        a_datetime = request_datetime('date',
-                                      'time',
-                                      request_float('timezone'),
-                                      is_dst)
+        a_datetime = aai_flask_utils.request_datetime('date',
+                                                      'time',
+                                                      aai_flask_utils.request_float('timezone', flask.request),
+                                                      is_dst,
+                                                      flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -471,12 +345,13 @@ def sun_position_data():
         result['altitude_data_24h'] = altitude # list
 
         # get rise, transit, set time
-        rts = calculate_sun_position(request_angle('latitude'),
-                                     request_angle('longitude'),
-                                     request_datetime('date',
-                                                      'time',
-                                                      request_float('timezone'),
-                                                      is_dst),
+        rts = calculate_sun_position(aai_flask_utils.request_angle('latitude', flask.request),
+                                     aai_flask_utils.request_angle('longitude', flask.request),
+                                     aai_flask_utils.request_datetime('date',
+                                                                      'time',
+                                                                      aai_flask_utils.request_float('timezone', flask.request),
+                                                                      is_dst,
+                                                                      flask.request),
                                      is_dst)
 
         result['sun_marker_altitude'] = rts['altitude']
@@ -494,7 +369,7 @@ def sun_position_data():
         result['transit']  = str(err)
         result['setting']  = str(err)
 
-    except (TypeError, ValueError, RuntimeError) as err:
+    except (aai_flask_utils.Error, TypeError, ValueError, RuntimeError) as err:
 
         app.logger.error(err)
         result = {'error': str(err)}
@@ -525,21 +400,23 @@ def radec2azalt():
 
         result = dict()
 
-        an_observer = Transforms.utils.latlon2spherical(request_angle('latitude'),
-                                                        request_angle('longitude'))
+        an_observer = Transforms.utils.latlon2spherical(aai_flask_utils.request_angle('latitude', flask.request),
+                                                        aai_flask_utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-        a_datetime = request_datetime('date',
-                                      'time',
-                                      request_float('timezone'),
-                                      is_dst)
+        a_datetime = aai_flask_utils.request_datetime('date',
+                                                      'time',
+                                                      aai_flask_utils.request_float('timezone', flask.request),
+                                                      is_dst,
+                                                      flask.request)
 
         result['datetime'] = str(a_datetime)
 
-        body_eq = Transforms.utils.radec2spherical(request_angle('ra'), request_angle('dec'))
+        body_eq = Transforms.utils.radec2spherical(aai_flask_utils.request_angle('ra', flask.request),
+                                                   aai_flask_utils.request_angle('dec', flask.request))
 
         body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
@@ -565,22 +442,24 @@ def azalt2radec():
 
         result = dict()
 
-        an_observer = Transforms.utils.latlon2spherical(request_angle('latitude'),
-                                                        request_angle('longitude'))
+        an_observer = Transforms.utils.latlon2spherical(aai_flask_utils.request_angle('latitude', flask.request),
+                                                        aai_flask_utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-        a_datetime = request_datetime('date',
-                                      'time',
-                                      request_float('timezone'),
-                                      is_dst)
+        a_datetime = aai_flask_utils.request_datetime('date',
+                                                      'time',
+                                                      aai_flask_utils.request_float('timezone', flask.request),
+                                                      is_dst,
+                                                      flask.request)
 
         result['datetime'] = str(a_datetime)
 
 
-        body_hz = Transforms.utils.azalt2spherical(request_angle('azimuth'), request_angle('altitude'))
+        body_hz = Transforms.utils.azalt2spherical(aai_flask_utils.request_angle('azimuth', flask.request),
+                                                   aai_flask_utils.request_angle('altitude', flask.request))
 
         body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
