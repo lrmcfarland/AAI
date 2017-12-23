@@ -76,16 +76,20 @@ wheel        0.30.0
 
 ## config
 
-Setup conf/aai-flask.cfg with secret
+use git diff to keep track
+
+
+### flask secret
+
+change secret in conf/aai-flask.cfg
 
 ```
 $ more www/conf/aai-flask.cfg
 # base line aai flask config
 
-SECRET_KEY = 'secret'
+SECRET_KEY = 'changeme'
 
 ```
-
 
 
 ## Run pylanuch.sh

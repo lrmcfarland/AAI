@@ -26,18 +26,20 @@ Besides making it more fun to play with, I can use Python frameworks like
 That also opens the door for HTML, CSS, JavaScript, JSON, JQuery and Google charts.
 
 Finally, adding nginx as a reverse proxy and TLS end point (to use
-the geolocation features of the browser) as a Docker micro-service.
+the geolocation features of the browser) as a
+[Docker micro-service](https://github.com/lrmcfarland/starbug.com/blob/master/Dockerfile.nginx.letsencrypt).
 At 700MB it is a really fat micro service needing a multi stage diet soon,
 but then again, that is the type of problem I am looking for in doing this.
 
 Results are validated with [NOAA's
 solcalc](http://www.esrl.noaa.gov/gmd/grad/solcalc/) and using my
-[Davis Mark 15
-sextant](http://www.landfallnavigation.com/-nd026.html?cmp=froogle&kw=-nd026&utm_source=-nd026&utm_medium=shopping%2Bengine&utm_campaign=froogle)
+[Davis Mark 15 sextant](http://www.landfallnavigation.com/-nd026.html?cmp=froogle&kw=-nd026&utm_source=-nd026&utm_medium=shopping%2Bengine&utm_campaign=froogle)
 with a swimming pool as an artificial horizon.
 Details are recorded in the [unit tests](https://github.com/lrmcfarland/Astronomy/blob/master/Bodies/test_SunPosition.py).
 
 It is a work in progress.
+
+-lrm 2017dec22
 
 # SunPosition
 
@@ -141,3 +143,11 @@ Under development.
 Lunar Altitude
 
 ![Lunar Altitude](https://github.com/lrmcfarland/Astronomy/blob/master/images/lunar_altitude_20150429.png?raw=true)
+
+
+# TODO
+
+This builds using git to recursively checkout the Coordinates (and googletest) sub-modules so it needs to be
+checked (preferably on a branch and that branch in the Dockerfile).
+It would be easier of it COPYed the local changes, but I had some problems with git ignoring all the
+build artifacts.

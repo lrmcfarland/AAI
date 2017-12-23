@@ -2,9 +2,6 @@
 
 *.gignore
 
-# configuration secrets
-www/conf/aai-flask.cfg
-
 # emacs backups
 *~
 
