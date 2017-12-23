@@ -127,110 +127,6 @@ def accuracy():
 
     return flask.render_template('accuracy.html')
 
-# ------------------------------
-# ----- sun position forms -----
-# ------------------------------
-
-@app.route("/sun_position_form_in")
-def sun_position_form_in():
-    """A form for submitting an observer's location in space and time"""
-
-    return flask.render_template('sun_position_form_in.html')
-
-
-@app.route("/get_sun_position_form")
-def get_sun_position_form():
-    """Get the sun position for the form example.
-
-    This uses a html form to provide the input with the name to connect the
-
-        <input type=text name=of_latitude>
-
-    via flask
-
-        val = flask.request.values.get('latitude')
-
-    And returns a page of results:
-
-        flask.render_template('sun_position.html', a_latitude = my_latitude, et. al)
-
-    """
-
-    try:
-
-        is_dst = True if flask.request.args.get('dst') == 'on' else False
-
-        result = calculate_sun_position(request_angle('latitude'),
-                                        request_angle('longitude'),
-                                        request_datetime('date',
-                                                         'time',
-                                                         request_float('timezone'),
-                                                         is_dst),
-                                        is_dst)
-
-    except (TypeError, ValueError, RuntimeError) as err:
-
-        app.logger.error(err)
-        flask.flash(err)
-        return flask.render_template('flashes.html')
-
-    return flask.render_template('sun_position_form_out.html', **result)
-
-
-# -----------------------------
-# ----- sun position ajax -----
-# -----------------------------
-
-@app.route("/sun_position_ajax")
-def sun_position_ajax():
-    """Use AJAX to send observer's location to the server"""
-
-    flask.session['foo'] = 'bar' # how to set a session variable. TODO rm
-
-    return flask.render_template('sun_position_ajax.html')
-
-
-@app.route("/get_sun_position_ajax")
-def get_sun_position_ajax():
-    """Get sun position
-
-    This was written to handle a JQuery AJAX call to connect a button
-    click event to send a get request with parameters for:
-
-    latitude, longitude, date, time timezone, dst
-
-    The server does calculation and return the sun position data as a
-    JSON object.
-
-    If there is an exception, this returns an error key with the
-    message as the value in the same JSON object. The caller is
-    expected to handle it as they see fit.
-
-    """
-
-    try:
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        result = calculate_sun_position(request_angle('latitude'),
-                                        request_angle('longitude'),
-                                        request_datetime('date',
-                                                         'time',
-                                                         request_float('timezone'),
-                                                         is_dst),
-                                        is_dst)
-
-    except (TypeError, ValueError, RuntimeError) as err:
-
-        app.logger.error(err)
-        result = {'error': str(err)}
-
-    return flask.jsonify(**result)
-
-# ---------------------
-# ----- sun chart -----
-# ---------------------
-
 
 @app.route("/sun_position_chart")
 def sun_position_chart():
@@ -238,6 +134,16 @@ def sun_position_chart():
 
     return flask.render_template('sun_position_chart.html')
 
+
+@app.route("/eqhz_transforms")
+def eqhz_transforms():
+    """Transform equatorial to horizontal coordinates at observer's location in space and time"""
+
+    return flask.render_template('eqhz_transforms.html')
+
+# ---------------
+# ----- API -----
+# ---------------
 
 @app.route("/api/v1/sun_position_data")
 def sun_position_data():
@@ -377,17 +283,9 @@ def sun_position_data():
     return flask.jsonify(**result)
 
 
-
 # ----------------------------
 # ----- eq hz transforms -----
 # ----------------------------
-
-
-@app.route("/eqhz_transforms")
-def eqhz_transforms():
-    """Transform equatorial to horizontal coordinates at observer's location in space and time"""
-
-    return flask.render_template('eqhz_transforms.html')
 
 
 @app.route("/api/v1/radec2azalt")
@@ -558,8 +456,6 @@ if __name__ == "__main__":
 
     app.logger.addHandler(log_handler)
     app.logger.setLevel(loglevels[args.loglevel])
-
-
 
     # -------------------
     # ----- run app -----
