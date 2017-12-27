@@ -22,6 +22,10 @@ import Transforms.utils
 import Bodies.SunPosition
 
 
+def Error(Exception):
+    pass
+
+
 def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
