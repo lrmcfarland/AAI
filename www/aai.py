@@ -22,7 +22,7 @@ import Transforms.utils
 import Bodies.SunPosition
 
 
-def Error(Exception):
+class Error(Exception):
     pass
 
 
