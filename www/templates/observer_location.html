@@ -96,7 +96,7 @@ table#observer_location {
       var now = new Date();
 
       var month_str = String(parseFloat(now.getMonth()) + 1);
-      var date_str  = String(parseFloat(now.getMonth()));
+      var date_str  = String(parseFloat(now.getDate()));
 
       var date_str = now.getFullYear() + "-" + month_str.padStart(2, "0") + "-" + date_str.padStart(2, "0");
       $("#_date").val(date_str);
