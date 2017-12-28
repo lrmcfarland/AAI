@@ -14,7 +14,6 @@
 
     $(document).ready(function() {
 
-
       {# ----- get data ----- #}
 
       $("#get_sun_position_data").click(function(e) {
@@ -53,11 +52,11 @@
 
             };
 
-          });
+          }); {# end getJSON #}
 
         return false;
 
-      });
+      }); {# end get_sun_position_data click #}
 
 
       {# ----- draw chart ----- #}
@@ -298,12 +297,11 @@ button#get_sun_position_data {
 
   The plot shows the
   sun's <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
-  (as the angle above the horizon) changing over a day starting at
-  local midnight.  The point where the altitude crosses the zero line
+  (as the angle above the horizon) over the selected day starting at
+  local midnight. The points where the altitude crosses the zero line
   indicates sun rise and sun set (not adjusted for atmospheric
-  refraction).  The distance between them is the length of the day.
-  The peak is local noon adjusted, for daylight savings time.  The
-  solstice lines indicate the maximum and minimum range of the sun
+  refraction). The distance between them is the length of the day.
+  The solstice lines indicate the maximum and minimum range of the sun
   position through out the year. The equinox lines show the middle of
   the cycle.
 
@@ -452,8 +450,8 @@ button#get_sun_position_data {
     <a href="https://en.wikipedia.org/wiki/Tropic_of_Capricorn">Tropic of Capricorn</a>
     -23:26 (south)
     the equinox lines pass directly overhead.
-    On hearing about a well in the Egyptian city of Syene had no shadow
-    at noon on the solstice,
+    On hearing about a well in the Egyptian city of Syene "had no shadow
+    at noon on the solstice",
     <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth.27s_circumference">Eratosthenes</a>
     realized that Syene must be on the Tropic of Cancer and used that information
     to calculate the earth's circumference back in third century B.C.
