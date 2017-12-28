@@ -96,29 +96,29 @@ SECRET_KEY = 'changeme'
 
 ```
 
-(pyenv) [lrm@lrmz-iMac www (master)]$ ./bin/pylaunch.sh aai.py --help
+(pyenv) [lrm@lrmz-iMac www (master)]$ ./bin/pylaunch.sh aai.py -h
 # COORDS_ROOT not set. Using ..
-# coords.so: ../Coordinates/Python/Boost/build/lib.macosx-10.13-intel-2.7/coords.so
+# coords.so: ../Coordinates/Python/Boost/build/lib.macosx-10.12-intel-2.7/coords.so
 # DYLD_LIBRARY_PATH :../Coordinates/libCoords
-# PYTHONPATH :../Coordinates/Python/Boost/build/lib.macosx-10.13-intel-2.7:..
+# PYTHONPATH :../Coordinates/Python/Boost/build/lib.macosx-10.12-intel-2.7:..
 
 usage: aai.py [-h] [-d] [--host host] [--logfilename logfilename]
-	      [--loghandler HANDLER] [-l LEVEL] [-p PORT]
+              [--loghandler HANDLER] [-l LEVEL] [-p PORT]
 
-vArmour simple flask server
+Astronomical Algorithms Implemented flask server
 
 optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           flask debug (default: False)
   --host host           host IP to serve (default: 0.0.0.0)
   --logfilename logfilename
-			name of log file (default:
-			/opt/starbug.com/logs/flask)
+                        name of log file (default:
+                        /opt/starbug.com/logs/flask)
   --loghandler HANDLER  logging handler choice: rotating, stream (default:
-			stream)
+                        stream)
   -l LEVEL, --loglevel LEVEL
-			logging level choice: debug, info, warn, error
-			(default: warn)
+                        logging level choice: debug, info, warn, error
+                        (default: warn)
   -p PORT, --port PORT  port (default: 8080)
 
 ```
