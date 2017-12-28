@@ -403,7 +403,7 @@ if __name__ == "__main__":
                 'port': 8080,
     }
 
-    parser = argparse.ArgumentParser(description='vArmour simple flask server')
+    parser = argparse.ArgumentParser(description='Astronomical Algorithms Implemented flask server')
 
     parser.add_argument('-d', '--debug', action='store_true',
                         dest='debug', default=defaults['debug'],
