@@ -14,8 +14,8 @@
 # to bash aai-logs:    docker run -it --rm --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
 #
 # to stop:                   docker stop aai-gunicorn-00
-# to delete container:       docker rm aai-flask-00
-# to delete image:           docker rmi aai-flask
+# to delete container:       docker rm aai-gunicorn-00
+# to delete image:           docker rmi aai-gunicorn
 #
 # to tag:                    docker tag aai-gunicorn lrmcfarland/aai-gunicorn
 # to push to dockerhub:      docker push lrmcfarland/aai-gunicorn
@@ -53,7 +53,6 @@ RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
     && mkdir -p ${AAI_HOME}/logs/gunicorn \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
-
 
 USER ${AAI_USER}:${AAI_GRP}
 
