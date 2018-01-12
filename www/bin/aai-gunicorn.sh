@@ -5,4 +5,4 @@
 
 . ./bin/setenv.sh
 
-gunicorn aai:app "$@"
+gunicorn gaai:app "$@"
