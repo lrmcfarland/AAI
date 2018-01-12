@@ -61,7 +61,7 @@ RUN git clone https://github.com/lrmcfarland/AAI.git
 WORKDIR ${AAI_HOME}/AAI/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout remove-dup-scripts # TODO !!!!
+RUN git checkout factory-aai # TODO !!!!
 
 RUN git submodule update --init --recursive
 
@@ -85,8 +85,4 @@ WORKDIR ${AAI_HOME}/AAI/www
 
 ENTRYPOINT ["bash"]
 
-CMD [ "./bin/aai-flask.sh", "-d", "-p", "5000", \
-      "-l", "debug", \
-      "--loghandler", "rotating", \
-      "--logfilename", "/opt/starbug.com/logs/flask/aai-flask.log"]
-
+CMD [ "./bin/aai-flask.sh", "-d", "-p", "5000"]
