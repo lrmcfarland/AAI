@@ -1,8 +1,4 @@
-/* style sheet for astronomy apps
-
-originally from the Flask tutorial
-
-*/
+/* style sheet for astronomy apps */
 
 body            { font-family: sans-serif;
 		  background: #eee;
@@ -10,10 +6,7 @@ body            { font-family: sans-serif;
 		  padding: 2px;
 		}
 
-a, h1, h2       { color: #377ba8; }
-h1, h2          { font-family: 'Georgia', serif; margin: 0; }
-h1              { border-bottom: 2px solid #eee; }
-h2              { font-size: 1.2em; }
+h1, h2          { color: #1098fb; font-family: 'Georgia', serif; margin: 0; }
 
 pre.code        {
 		  background-color: #eeeeee;
@@ -44,3 +37,7 @@ pre.code        {
 		  border: 1px solid #aacbe2; }
 .error          { background: #f0d6d6; padding: 0.5em; }
 
+a:link    {color:blue}
+a:visited {color:darkblue}
+a:active  {color:coral}
+a:hover   {color:coral}
