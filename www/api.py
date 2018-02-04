@@ -68,11 +68,7 @@ def sun_position_data():
 
         result['datetime'] = str(a_datetime)
 
-        plot_time_marker = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
-        plot_time_marker.timezone = a_datetime.timezone
-        plot_time_marker += a_datetime.timezone * 1.0/24 # to center plot at local noon
-
-        result['sun_marker_time'] = 24.0 * (a_datetime - plot_time_marker) # distance on x-axis to plot sun marker
+        result['sun_marker_time'] = a_datetime.hour + a_datetime.minute/60.0 # distance on x-axis to plot sun marker
 
         vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
         vernal_equinox.timezone = a_datetime.timezone
@@ -90,9 +86,9 @@ def sun_position_data():
         winter_solstice.timezone = a_datetime.timezone
         winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        result['sun_date_label'] = '{year}-{month}-{day}'.format(year=plot_time_marker.year,
-                                                                 month=plot_time_marker.month,
-                                                                 day=plot_time_marker.day),
+        result['sun_date_label'] = '{year}-{month}-{day}'.format(year=a_datetime.year,
+                                                                 month=a_datetime.month,
+                                                                 day=a_datetime.day),
         npts = 24*4
 
         if is_dst:
@@ -103,9 +99,13 @@ def sun_position_data():
 
         altitude = list()
 
+        local_midnight = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
+        local_midnight.timezone = a_datetime.timezone
+        local_midnight += a_datetime.timezone * 1.0/24 # to center plot at local noon
+
         for d in range(0, npts + 1):
 
-            sun_ct = Bodies.SunPosition.SunPosition(an_observer, plot_time_marker)
+            sun_ct = Bodies.SunPosition.SunPosition(an_observer, local_midnight)
             sun_ve = Bodies.SunPosition.SunPosition(an_observer, vernal_equinox)
             sun_ss = Bodies.SunPosition.SunPosition(an_observer, summer_solstice)
             sun_ae = Bodies.SunPosition.SunPosition(an_observer, autumnal_equinox)
@@ -124,7 +124,7 @@ def sun_position_data():
 
             dtime += 1.0/npts*24
 
-            plot_time_marker += 1.0/npts
+            local_midnight += 1.0/npts
             vernal_equinox += 1.0/npts
             summer_solstice += 1.0/npts
             autumnal_equinox += 1.0/npts

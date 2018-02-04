@@ -47,6 +47,44 @@ class AAITests(unittest.TestCase):
 
         self.assertEqual(u'218:05:11.8683 (218.086630087)', position_data[u'sun_marker_azimuth'])
 
+        self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
+
+
+    def test_sun_position_2018_01_03(self):
+        """sun position data for 2018 jan 03"""
+        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2018-01-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        position_data = json.loads(response.data)
+
+        self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
+
+
+    def test_sun_position_2018_02_03(self):
+        """sun position data for 2018 feb 03
+
+        this had a problem with the sun marker time calculation that caused it to be > 24 hrs
+        """
+        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2018-02-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        position_data = json.loads(response.data)
+
+        self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
+
+
+    def test_sun_position_2018_03_03(self):
+        """sun position data for 2018 mar 03"""
+        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2018-03-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        position_data = json.loads(response.data)
+
+        self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
+
 
     def test_radec2azalt_2018_01_11(self):
         """radec2azalt data for 2018 jan 11"""
