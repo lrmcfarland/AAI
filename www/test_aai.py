@@ -41,6 +41,67 @@ class AAITests(unittest.TestCase):
     # ----------------------
 
 
+    # ----- latitude2decimal -----
+
+    def test_latitude2decimal_dms1(self):
+        """Test latitude2decimal degrees:minutes:seconds"""
+
+        response = self.app.get('/api/v1/latitude2decimal?latitude=37:30:30')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual(37.5083333333, float(jresp['latitude']))
+
+
+    def test_latitude2decimal_d1(self):
+        """Test latitude2decimal degrees:minutes:seconds"""
+
+        response = self.app.get('/api/v1/latitude2decimal?latitude=45')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual(45.0, float(jresp['latitude']))
+
+
+    def test_latitude2decimal_dm1(self):
+        """Test latitude2decimal degrees:minutes:seconds"""
+
+        response = self.app.get('/api/v1/latitude2decimal?latitude=-45:30')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual(-45.5, float(jresp['latitude']))
+
+
+    def test_latitude2decimal_err1(self):
+        """Test latitude2decimal unsupported format"""
+
+        response = self.app.get('/api/v1/latitude2decimal?latitude=we36asdf')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        print jresp
+
+        self.assertEqual(1, len(jresp['errors']))
+        self.assertEqual(u'unsupported format for latitude: we36asdf', jresp['errors'])
+
+
+
+    # ----- radec2azalt -----
+
+
     def test_radec2azalt_2018_01_11(self):
         """radec2azalt data for 2018 jan 11"""
         response = self.app.get('/api/v1/radec2azalt?latitude=37&longitude=-122&date=2018-01-11&time=10%3A14%3A56&timezone=-8&dst=false&ra=0&dec=0')
@@ -54,6 +115,8 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(-6.159799566504844, xform_data[u'altitude'])
         self.assertAlmostEqual(85.3351397270823, xform_data[u'azimuth'])
 
+
+    # ----- azalt2radec -----
 
     def test_azalt2radec_2018_01_11(self):
         """azalt2radec data for 2018 jan 11"""

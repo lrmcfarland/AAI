@@ -38,8 +38,8 @@ api = flask.Blueprint('api', __name__, url_prefix='/api/v1')
 # ----------------------
 
 
-@api.route("/colons2decimal")
-def colons2decimal():
+@api.route("/latitude2decimal")
+def latitude2decimal():
 
     """Converts a starbug format of deg[:min[:sec]] to decimal degrees
 
@@ -48,8 +48,12 @@ def colons2decimal():
     result.errors = list()
 
     """
-
     result = {'errors': list()}
+    try:
+        latitude = utils.request_angle('latitude', flask.request)
+        result['latitude'] = str(latitude.getValue())
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
 
     return flask.jsonify(**result)
 
@@ -87,7 +91,6 @@ def azalt2radec():
         result['dec'] = Transforms.utils.get_declination(body_eq).value
 
     except (TypeError, ValueError, RuntimeError) as err:
-
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
