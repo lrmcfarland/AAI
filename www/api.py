@@ -3,9 +3,9 @@
 
 """AAI API
 
-    sun_position_data
+    daily_solar_altitude
 
-    curl http://0.0.0.0:8080/api/v1/sun_position_data\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
+    curl http://0.0.0.0:8080/api/v1/daily_solar_altitude\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
 
 
     radec2azalt
@@ -33,8 +33,8 @@ import Transforms.utils
 api = flask.Blueprint('api', __name__, url_prefix='/api/v1')
 
 
-@api.route("/sun_position_data")
-def sun_position_data():
+@api.route("/daily_solar_altitude")
+def daily_solar_altitude():
     """Get the sun position chart for the given day as JSON
 
     result.datetime
@@ -133,14 +133,14 @@ def sun_position_data():
         result['altitude_data_24h'] = altitude # list
 
         # get rise, transit, set time
-        rts = calculate_sun_position(utils.request_angle('latitude', flask.request),
-                                     utils.request_angle('longitude', flask.request),
-                                     utils.request_datetime('date',
-                                                            'time',
-                                                            utils.request_float('timezone', flask.request),
-                                                            is_dst,
-                                                            flask.request),
-                                     is_dst)
+        rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
+                                       utils.request_angle('longitude', flask.request),
+                                       utils.request_datetime('date',
+                                                              'time',
+                                                              utils.request_float('timezone', flask.request),
+                                                              is_dst,
+                                                              flask.request),
+                                       is_dst)
 
         result['sun_marker_altitude'] = rts['altitude']
         result['sun_marker_azimuth']  = rts['azimuth']
@@ -163,7 +163,7 @@ def sun_position_data():
     return flask.jsonify(**result)
 
 
-def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
+def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
     Args:

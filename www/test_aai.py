@@ -37,9 +37,9 @@ class AAITests(unittest.TestCase):
         self.assertIn(b'<h1>Astronomical Algorithms Implemented</h1>', response.data)
 
 
-    def test_sun_position_2017_12_11(self):
+    def test_daily_solar_altitude_2017_12_11(self):
         """sun position data for 2017 dec 11"""
-        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2017-12-11&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2017-12-11&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
@@ -50,9 +50,9 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
 
-    def test_sun_position_2018_01_03(self):
+    def test_daily_solar_altitude_2018_01_03(self):
         """sun position data for 2018 jan 03"""
-        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2018-01-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2018-01-03&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
@@ -61,12 +61,12 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
 
-    def test_sun_position_2018_02_03(self):
+    def test_daily_solar_altitude_2018_02_03(self):
         """sun position data for 2018 feb 03
 
         this had a problem with the sun marker time calculation that caused it to be > 24 hrs
         """
-        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2018-02-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2018-02-03&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
@@ -75,9 +75,9 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
 
-    def test_sun_position_2018_03_03(self):
+    def test_daily_solar_altitude_2018_03_03(self):
         """sun position data for 2018 mar 03"""
-        response = self.app.get('/api/v1/sun_position_data?latitude=37&longitude=-122&date=2018-03-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2018-03-03&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
