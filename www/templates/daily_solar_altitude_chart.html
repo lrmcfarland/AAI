@@ -30,7 +30,7 @@
           },
           function(sun_position) {
 
-            if ("error" in sun_position) {
+            if (sun_position.errors.length > 0) {
 
                $("#rising").text("TBD");
                $("#transit").text("TBD");
@@ -38,7 +38,7 @@
                $("#azimuth").text("TBD");
                $("#altitude").text("TBD");
 
-              alert("Error: " + sun_position.error);
+              alert("Errors: " + sun_position.errors.join(", "));
 
             } else {
 
