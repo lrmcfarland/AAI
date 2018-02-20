@@ -92,11 +92,110 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
 
-        print jresp
-
         self.assertEqual(1, len(jresp['errors']))
-        self.assertEqual(u'unsupported format for latitude: we36asdf', jresp['errors'])
+        self.assertEqual(u'unsupported format for latitude: we36asdf', jresp['errors'][0])
 
+
+
+    # ----- standardize -----
+
+    def test_standardize_n1(self):
+        """Test standardize normal one"""
+
+        response = self.app.get('/api/v1/standardize?latitude=37:30:45&longitude=-122:45:30&date=2018-01-11&time=10%3A14%3A56&timezone=-8&dst=false&ra=6:30:30&dec=10:30:45&az=12:15:30&alt=-6:15')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        self.assertEqual('2018-01-11T09:14:56-08', jresp['iso8601'])
+        self.assertAlmostEqual(-6.25, float(jresp['alt']))
+        self.assertAlmostEqual(12.2583333333, float(jresp['az']))
+        self.assertAlmostEqual(10.5125, float(jresp['dec']))
+        self.assertAlmostEqual(37.5125, float(jresp['latitude']))
+        self.assertAlmostEqual(-122.758333333, float(jresp['longitude']))
+        self.assertAlmostEqual(6.50833333333, float(jresp['ra']))
+
+
+    def test_standardize_n2(self):
+        """Test standardize normal with dst"""
+
+        response = self.app.get('/api/v1/standardize?latitude=37:30&longitude=-122:45:30.1&date=2018-08-21&time=13%3A45&timezone=-8&dst=false&ra=6:30&dec=10&az=12:15:30&alt=6:15')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        self.assertEqual(u'2018-08-21T12:45:00-08', jresp['iso8601'])
+        self.assertAlmostEqual(6.25, float(jresp['alt']))
+        self.assertAlmostEqual(12.2583333333, float(jresp['az']))
+        self.assertAlmostEqual(10, float(jresp['dec']))
+        self.assertAlmostEqual(37.5, float(jresp['latitude']))
+        self.assertAlmostEqual(-122.758361111, float(jresp['longitude']))
+        self.assertAlmostEqual(6.5, float(jresp['ra']))
+
+
+    def test_standardize_err1(self):
+        """Test standardize error incomplete date time key set"""
+
+        response = self.app.get('/api/v1/standardize?latitude=37:30:45&longitude=-122:45:30&date=2018-01-11&time=10%3A14%3A56')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        self.assertEqual(1, len(jresp['warnings']))
+        self.assertEqual(u'Incomplete datetime key set', jresp['warnings'][0])
+
+
+    def test_standardize_err2(self):
+        """Test standardize unsupported data type"""
+
+        response = self.app.get('/api/v1/standardize?latitude=37:30:45&longitude=-122:45:30&date=2018-01-11&time=10%3A14%3A56&timezone=-8&dst=false&ra=6:30:30&dec=10:30:45&az=12:15:30&alt=-6:15&foo=bar&baz=10')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        # TODO order from sorted dict ok?
+        self.assertEqual(2, len(jresp['warnings']))
+        self.assertEqual(u'Unsupported standard type baz', jresp['warnings'][0])
+        self.assertEqual(u'Unsupported standard type foo', jresp['warnings'][1])
+
+        self.assertEqual('2018-01-11T09:14:56-08', jresp['iso8601'])
+        self.assertAlmostEqual(-6.25, float(jresp['alt']))
+        self.assertAlmostEqual(12.2583333333, float(jresp['az']))
+        self.assertAlmostEqual(10.5125, float(jresp['dec']))
+        self.assertAlmostEqual(37.5125, float(jresp['latitude']))
+        self.assertAlmostEqual(-122.758333333, float(jresp['longitude']))
+        self.assertAlmostEqual(6.50833333333, float(jresp['ra']))
+
+
+    def test_standardize_err3(self):
+        """Test standardize multiple format errors"""
+
+        response = self.app.get('/api/v1/standardize?latitude=37&longitude=-122:45&date=2018-07-11&time=10%3A30&timezone=-8&dst=false&ra=-6:15&dec=***10:30:45&az=str12:15:30&alt=asdf-6:15')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        # TODO order from sorted dict ok?
+        self.assertEqual(3, len(jresp['errors']))
+        self.assertEqual(u'unsupported format for alt: asdf-6:15', jresp['errors'][0])
+        self.assertEqual(u'unsupported format for az: str12:15:30', jresp['errors'][1])
+        self.assertEqual(u'unsupported format for dec: ***10:30:45', jresp['errors'][2])
+
+        self.assertEqual(u'2018-07-11T09:30:00-08', jresp['iso8601'])
+
+        self.assertAlmostEqual(37, float(jresp['latitude']))
+        self.assertAlmostEqual(-122.75, float(jresp['longitude']))
+        self.assertAlmostEqual(-6.25, float(jresp['ra']))
 
 
     # ----- radec2azalt -----

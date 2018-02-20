@@ -44,9 +44,8 @@ def latitude2decimal():
     """Converts a starbug format of deg[:min[:sec]] to decimal degrees
 
     Returns: JSON
-    result.degrees
-    result.errors = list()
-
+        result.degrees
+        result.errors = list()
     """
     result = {'errors': list()}
     try:
@@ -54,6 +53,71 @@ def latitude2decimal():
         result['latitude'] = str(latitude.getValue())
     except (utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+
+
+
+@api.route("/standardize")
+def standardize():
+
+    """Converts parameters from starbug format strings to standard format
+
+    for example: deg[:min[:sec]] to decimal degrees
+
+    warns if it is not an expected paramter
+    error if the format is wrong
+
+    Returns: JSON
+
+        result.alt et. al
+        ...
+
+        result.errors = list()
+        result.warnings = list()
+    """
+
+    result = {'errors': list(), 'warnings': list()}
+
+    # datetime stuff
+
+    if 'time' in flask.request.args and \
+       'date' in flask.request.args and \
+       'timezone' in flask.request.args and \
+       'dst' in flask.request.args:
+
+        try:
+            std_val = utils.request_datetime('date', 'time', float(flask.request.args['timezone']), flask.request.args['dst'], flask.request)
+            result['iso8601'] = str(std_val)
+
+        except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+            result['errors'].append(str(err))
+
+    else:
+        result['warnings'].append('Incomplete datetime key set')
+
+
+    # non-datetime stuff
+    for key, val in sorted(flask.request.args.items()):
+
+        try:
+
+            if key in ('latitude', 'longitude', 'alt', 'az', 'dec', 'ra'):
+
+                std_val = utils.request_angle(key, flask.request)
+                result[key] = str(std_val.getValue())
+
+            elif key in ('time', 'date', 'timezone', 'dst'):
+                pass
+
+            else:
+                result['warnings'].append('Unsupported standard type {}'.format(key))
+
+        except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+            result['errors'].append(str(err))
+            continue
 
     return flask.jsonify(**result)
 
