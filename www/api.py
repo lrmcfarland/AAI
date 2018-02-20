@@ -3,14 +3,14 @@
 
 """AAI API
 
-    sun_position_data
-
-    curl http://0.0.0.0:8080/api/v1/sun_position_data\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
-
+    azalt2radec
 
     radec2azalt
 
-    azalt2radec
+    daily_solar_altitude
+
+    curl http://0.0.0.0:8080/api/v1/daily_solar_altitude\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
+
 
 
 TODO more details
@@ -27,14 +27,183 @@ import Transforms.EclipticEquatorial
 import Transforms.EquatorialHorizon
 import Transforms.utils
 
-
-
+# -------------------
+# ----- globals -----
+# -------------------
 
 api = flask.Blueprint('api', __name__, url_prefix='/api/v1')
 
+# ----------------------
+# ----- transforms -----
+# ----------------------
 
-@api.route("/sun_position_data")
-def sun_position_data():
+
+@api.route("/latitude2decimal")
+def latitude2decimal():
+
+    """Converts a starbug format of deg[:min[:sec]] to decimal degrees
+
+    Returns: JSON
+        result.degrees
+        result.errors = list()
+    """
+    result = {'errors': list()}
+    try:
+        latitude = utils.request_angle('latitude', flask.request)
+        result['latitude'] = str(latitude.getValue())
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+
+
+
+@api.route("/standardize")
+def standardize():
+
+    """Converts parameters from starbug format strings to standard format
+
+    for example: deg[:min[:sec]] to decimal degrees
+
+    warns if it is not an expected paramter
+    error if the format is wrong
+
+    Returns: JSON
+
+        result.alt et. al
+        ...
+
+        result.errors = list()
+        result.warnings = list()
+    """
+
+    result = {'errors': list(), 'warnings': list()}
+
+    # datetime stuff
+
+    if 'time' in flask.request.args and \
+       'date' in flask.request.args and \
+       'timezone' in flask.request.args and \
+       'dst' in flask.request.args:
+
+        try:
+            std_val = utils.request_datetime('date', 'time', float(flask.request.args['timezone']), flask.request.args['dst'], flask.request)
+            result['iso8601'] = str(std_val)
+
+        except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+            result['errors'].append(str(err))
+
+    else:
+        result['warnings'].append('Incomplete datetime key set')
+
+
+    # non-datetime stuff
+    for key, val in sorted(flask.request.args.items()):
+
+        try:
+
+            if key in ('latitude', 'longitude', 'alt', 'az', 'dec', 'ra'):
+
+                std_val = utils.request_angle(key, flask.request)
+                result[key] = str(std_val.getValue())
+
+            elif key in ('time', 'date', 'timezone', 'dst'):
+                pass
+
+            else:
+                result['warnings'].append('Unsupported standard type {}'.format(key))
+
+        except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+            result['errors'].append(str(err))
+            continue
+
+    return flask.jsonify(**result)
+
+
+@api.route("/azalt2radec")
+def azalt2radec():
+    """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates"""
+
+    result = {'errors': list()}
+
+    try:
+
+        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                        utils.request_angle('longitude', flask.request))
+
+        result['observer'] = str(an_observer)
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
+
+        a_datetime = utils.request_datetime('date',
+                                            'time',
+                                            utils.request_float('timezone', flask.request),
+                                            is_dst,
+                                            flask.request)
+
+        result['datetime'] = str(a_datetime)
+
+
+        body_hz = Transforms.utils.azalt2spherical(utils.request_angle('azimuth', flask.request),
+                                                   utils.request_angle('altitude', flask.request))
+
+        body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
+
+        result['ra'] = Transforms.utils.get_RA(body_eq).value
+        result['dec'] = Transforms.utils.get_declination(body_eq).value
+
+    except (TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+@api.route("/radec2azalt")
+def radec2azalt():
+    """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates"""
+
+    result = {'errors': list()}
+
+    try:
+        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                        utils.request_angle('longitude', flask.request))
+
+        result['observer'] = str(an_observer)
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
+
+        a_datetime = utils.request_datetime('date',
+                                            'time',
+                                            utils.request_float('timezone', flask.request),
+                                            is_dst,
+                                            flask.request)
+
+        result['datetime'] = str(a_datetime)
+
+        body_eq = Transforms.utils.radec2spherical(utils.request_angle('ra', flask.request),
+                                                   utils.request_angle('dec', flask.request))
+
+        body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
+
+        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).value
+        result['altitude'] = Transforms.utils.get_altitude(body_hz).value
+
+
+    except (TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+
+# --------------------------------
+# ----- daily solar altitude -----
+# --------------------------------
+
+@api.route("/daily_solar_altitude")
+def daily_solar_altitude():
     """Get the sun position chart for the given day as JSON
 
     result.datetime
@@ -49,9 +218,9 @@ def sun_position_data():
 
     """
 
-    try:
+    result = {'errors': list()}
 
-        result = dict()
+    try:
 
         an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
                                                         utils.request_angle('longitude', flask.request))
@@ -132,15 +301,14 @@ def sun_position_data():
 
         result['altitude_data_24h'] = altitude # list
 
-        # get rise, transit, set time
-        rts = calculate_sun_position(utils.request_angle('latitude', flask.request),
-                                     utils.request_angle('longitude', flask.request),
-                                     utils.request_datetime('date',
-                                                            'time',
-                                                            utils.request_float('timezone', flask.request),
-                                                            is_dst,
-                                                            flask.request),
-                                     is_dst)
+        rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
+                                       utils.request_angle('longitude', flask.request),
+                                       utils.request_datetime('date',
+                                                              'time',
+                                                              utils.request_float('timezone', flask.request),
+                                                              is_dst,
+                                                              flask.request),
+                                       is_dst)
 
         result['sun_marker_altitude'] = rts['altitude']
         result['sun_marker_azimuth']  = rts['azimuth']
@@ -158,12 +326,12 @@ def sun_position_data():
         result['setting']  = str(err)
 
     except (utils.Error, TypeError, ValueError, RuntimeError) as err:
-        result = {'error': str(err)}
+        result['errors'].append(str(err))
 
     return flask.jsonify(**result)
 
 
-def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
+def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     """Calculate the sun position.
 
     Args:
@@ -241,89 +409,5 @@ def calculate_sun_position(a_latitude, a_longitude, a_datetime, is_dst):
 
 
     return result
-
-
-
-# ----------------------------
-# ----- eq hz transforms -----
-# ----------------------------
-
-
-@api.route("/radec2azalt")
-def radec2azalt():
-    """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates"""
-
-    try:
-
-        result = dict()
-
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
-
-        result['observer'] = str(an_observer)
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        a_datetime = utils.request_datetime('date',
-                                            'time',
-                                            utils.request_float('timezone', flask.request),
-                                            is_dst,
-                                            flask.request)
-
-        result['datetime'] = str(a_datetime)
-
-        body_eq = Transforms.utils.radec2spherical(utils.request_angle('ra', flask.request),
-                                                   utils.request_angle('dec', flask.request))
-
-        body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
-
-        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).value
-        result['altitude'] = Transforms.utils.get_altitude(body_hz).value
-
-
-    except (TypeError, ValueError, RuntimeError) as err:
-        result = {'error': str(err)}
-
-    return flask.jsonify(**result)
-
-
-@api.route("/azalt2radec")
-def azalt2radec():
-    """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates"""
-
-    try:
-
-        result = dict()
-
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
-
-        result['observer'] = str(an_observer)
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        a_datetime = utils.request_datetime('date',
-                                            'time',
-                                            utils.request_float('timezone', flask.request),
-                                            is_dst,
-                                            flask.request)
-
-        result['datetime'] = str(a_datetime)
-
-
-        body_hz = Transforms.utils.azalt2spherical(utils.request_angle('azimuth', flask.request),
-                                                   utils.request_angle('altitude', flask.request))
-
-        body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
-
-        result['ra'] = Transforms.utils.get_RA(body_eq).value
-        result['dec'] = Transforms.utils.get_declination(body_eq).value
-
-    except (TypeError, ValueError, RuntimeError) as err:
-
-        result = {'error': str(err)}
-
-    return flask.jsonify(**result)
-
 
 

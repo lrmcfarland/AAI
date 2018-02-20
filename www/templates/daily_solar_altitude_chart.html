@@ -1,4 +1,4 @@
-{# AAI sun position chart #}
+{# AAI daily solar altitude chart #}
 
 {% extends "base.html" %}
 
@@ -16,9 +16,9 @@
 
       {# ----- get data ----- #}
 
-      $("#get_sun_position_data").click(function(e) {
+      $("#get_daily_solar_altitude").click(function(e) {
 
-        $.getJSON($SCRIPT_ROOT + "/api/v1/sun_position_data",
+        $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
           {
             latitude: $('input[name="latitude"]').val(),
             longitude: $('input[name="longitude"]').val(),
@@ -30,7 +30,7 @@
           },
           function(sun_position) {
 
-            if ("error" in sun_position) {
+            if (sun_position.errors.length > 0) {
 
                $("#rising").text("TBD");
                $("#transit").text("TBD");
@@ -38,7 +38,7 @@
                $("#azimuth").text("TBD");
                $("#altitude").text("TBD");
 
-              alert("Error: " + sun_position.error);
+              alert("Errors: " + sun_position.errors.join(", "));
 
             } else {
 
@@ -56,7 +56,7 @@
 
         return false;
 
-      }); {# end get_sun_position_data click #}
+      }); {# end get_daily_solar_altitude click #}
 
 
       {# ----- draw chart ----- #}
@@ -265,7 +265,7 @@ table#sun_chart_legend {
 }
 
 
-button#get_sun_position_data {
+button#get_daily_solar_altitude {
 
     text-align: center;
 
@@ -289,7 +289,7 @@ button#get_sun_position_data {
 
 
 
-<h1>Sun Position</h1>
+<h1>Daily Solar Altitude</h1>
 
 <br>
 
@@ -313,9 +313,9 @@ button#get_sun_position_data {
 
 <br>
 
-<button id="get_sun_position_data">get sun position</button>
+<button id="get_daily_solar_altitude">get solar altitude data</button>
 
-<h2>Sun's Position</h2>
+<h2>Daily Solar Altitude</h2>
 
 
 <table>
@@ -457,7 +457,7 @@ button#get_sun_position_data {
     to calculate the earth's circumference back in third century B.C.
 
   <p>
-    <a href="https://github.com/lrmcfarland/AAI/blob/master/www/templates/sun_position_chart.html">
+    <a href="https://github.com/lrmcfarland/AAI/blob/master/www/templates/daily_solar_altitude_chart.html">
       The source for this page
     </a> is an example of plotting a days worth of sun position data with
     <a href="https://developers.google.com/chart/">google charts</a>.

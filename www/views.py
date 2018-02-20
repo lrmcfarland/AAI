@@ -32,11 +32,11 @@ def accuracy():
     return flask.render_template('accuracy.html')
 
 
-@home_page.route("/sun_position_chart")
-def sun_position_chart():
+@home_page.route("/daily_solar_altitude_chart")
+def daily_solar_altitude_chart():
     """Plot the sun position for the observer's location in space and time"""
 
-    return flask.render_template('sun_position_chart.html')
+    return flask.render_template('daily_solar_altitude_chart.html')
 
 
 @home_page.route("/eqhz_transforms")
