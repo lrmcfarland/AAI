@@ -36,22 +36,6 @@ class SunPositionsTests(unittest.TestCase):
                                                         a_longitude=coords.angle(-122, 4, 56))
 
 
-    def test_stick_shadow_2015_03_21(self):
-        """Test matches sun angle measured from a stick's shadow
-
-        Stick not straight, shadow not level.
-
-        Note time zone.
-        """
-
-        a_datetime = coords.datetime('2015-03-21T12:57:00-08')
-
-        sun = SunPosition.SunPosition(self.mlc404, a_datetime)
-
-        self.assertAlmostEqual(196.74093494548637, Transforms.utils.get_azimuth(sun).value, self.places)
-        self.assertAlmostEqual(51.50253975117711, Transforms.utils.get_altitude(sun).value, self.places)
-
-
     def test_sextant_2015_03_27(self):
         """Test against sextant measurement
 
@@ -144,6 +128,7 @@ class EquationOfTimeTests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 12
+
 
     def test_2015_01_01T12_00(self):
         """Test Equation of time 2015-01-01T12:00:00
@@ -241,7 +226,13 @@ class RiseAndSetTests(unittest.TestCase):
 
 
     def test_Meeus_15a(self):
-        """Tests with Meeus 15.a data"""
+        """Tests with Meeus 15.a data
+
+        TODO this is also showing datetime rounding error, setting a
+        day later, with out the hack described in
+        SunPosition.RiseAndSet
+
+        """
 
         a_datetime = coords.datetime('1988-03-20T00:00:00')
 
@@ -255,7 +246,7 @@ class RiseAndSetTests(unittest.TestCase):
 
         self.assertEqual('1988-03-20T12:26:9.28415', str(rising))
         self.assertEqual('1988-03-20T19:40:17.533', str(transit))
-        self.assertEqual('1988-03-21T02:54:25.782', str(setting))
+        self.assertEqual('1988-03-20T02:54:25.782', str(setting))
 
 
     def test_polaris_1(self):
@@ -292,6 +283,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         self.places = 12
 
+        self.mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                        a_longitude=coords.angle(-122, 4, 56))
+
 
     def test_timezone_p1(self):
         """Tests timezone +1"""
@@ -324,7 +318,13 @@ class SunRiseAndSetTests(unittest.TestCase):
 
 
     def test_timezone_p6(self):
-        """Tests timezone +6"""
+        """Tests timezone +6
+
+        TODO this is also showing datetime rounding error, rising a
+        day later, with out the hack described in
+        SunPosition.RiseAndSet
+
+        """
 
         an_observer = Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
                                                         a_longitude = coords.angle(90))
@@ -333,9 +333,7 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('2015-05-23T04:26:42.9486+06', str(rising))  # NOAA 04:25
-        # TODO a day too early
-
+        self.assertEqual('2015-05-22T04:26:42.9486+06', str(rising))  # NOAA 04:25
         self.assertEqual('2015-05-22T11:59:37.1856+06', str(transit)) # NOAA 11:56:38
         self.assertEqual('2015-05-22T19:32:31.4226+06', str(setting)) # NOAA 19:29
 
@@ -353,6 +351,80 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T04:25:11.9585-06', str(rising))  # NOAA 04:24
         self.assertEqual('2015-05-22T11:57:36.6885-06', str(transit)) # NOAA 11:56:40
         self.assertEqual('2015-05-22T19:30:1.41858-06', str(setting)) # NOAA 19:30
+
+
+    def test_wrong_date_2018jan31(self):
+        """Tests wrong date
+
+        algorithm was getting the wrong date after 2018jan31
+
+        TODO: Problem with joining Mesus algorithm with datetime and timezones?
+        """
+
+        a_datetime = coords.datetime('2018-01-31T12:55:00-08')
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-01-31T07:13:26.5023-08', str(rising))
+        self.assertEqual('2018-01-31T12:22:31.1063-08', str(transit))
+        self.assertEqual('2018-01-31T17:31:35.7103-08', str(setting))
+
+
+    def test_wrong_date_2018feb01(self):
+        """Tests wrong date
+
+        algorithm was getting the wrong date in feb switching (off by
+        one in transit or rising/setting as the days increased but
+        back to correct in march. same in 2017
+
+        TODO: Problem with my joining Mesus algorithm with my full datetime and timezones instead
+        """
+
+        a_datetime = coords.datetime('2018-02-01T12:55:00-08')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-02-01T07:12:37.4165-08', str(rising))
+        self.assertEqual('2018-02-01T12:22:39.6759-08', str(transit))
+        self.assertEqual('2018-02-01T17:32:41.9353-08', str(setting)) # was 2018-01-31
+
+
+    def test_wrong_rising_2018feb28(self):
+        """Tests wrong rising
+
+        algorithm was getting the wrong date in feb switching (off by
+        one in transit or rising/setting as the days increased but
+        back to correct in march. same in 2017
+
+
+        TODO: Problem with my joining Mesus algorithm with my full datetime and timezones instead
+        """
+
+        a_datetime = coords.datetime('2018-02-28T10:55:00-08')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-02-28T06:41:52.695-08', str(rising))
+        self.assertEqual('2018-02-28T12:21:24.1057-08', str(transit))
+        self.assertEqual('2018-02-28T18:00:55.5163-08', str(setting))
+
+
+    def test_2018mar01(self):
+        """Tests wrong date
+
+        algorithm was getting the wrong date in feb switching (off by
+        one in transit or rising/setting as the days increased but
+        back to correct in march. same in december 2017
+
+        TODO: Problem with my joining Mesus algorithm with my full datetime and timezones instead
+        """
+
+        a_datetime = coords.datetime('2018-03-01T10:00:00-08')
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-03-01T06:40:24.7133-08', str(rising))
+        self.assertEqual('2018-03-01T12:21:4.26997-08', str(transit))
+        self.assertEqual('2018-03-01T18:01:43.8267-08', str(setting))
 
 
 
