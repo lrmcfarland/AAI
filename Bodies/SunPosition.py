@@ -198,6 +198,11 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     from Meeus, ch. 15
 
+    # TODO problem with rounding to the wrong date some times of the
+    year see test_SunPosition.py for examples. This error moves from
+    rising to transit to setting starting 2018-02-01 among other
+    times. Is back to being correct by 2016-06-01.
+
     # TODO more than just sun position, return local time, altitude
     # configurable to astronomical, nautical, civil, star, sun, moon
 
@@ -227,6 +232,7 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     Returns (coords.datetime, coords.datetime, coords.datetime) of
     rising, transit and setting in local time.
+
     """
 
     JD, JDo = Transforms.SiderealTime.USNO_C163.JulianDate0(a_datetime)
@@ -287,7 +293,19 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     setting += m2.value
     setting += a_datetime.timezone/24
 
-    return rising, transit, setting
+    # TODO hack to fix datetime rounding error
+
+    fixed_rising = coords.datetime(midnight.year, midnight.month, midnight.day,
+                                   rising.hour, rising.minute, rising.second, rising.timezone)
+
+    fixed_transit = coords.datetime(midnight.year, midnight.month, midnight.day,
+                                    transit.hour, transit.minute, transit.second, transit.timezone)
+
+    fixed_setting = coords.datetime(midnight.year, midnight.month, midnight.day,
+                                    setting.hour, setting.minute, setting.second, setting.timezone)
+
+
+    return fixed_rising, fixed_transit, fixed_setting
 
 
 # ================
