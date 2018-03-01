@@ -92,6 +92,7 @@ def standardize():
 
         try:
 
+            # TODO have datetime do more of this? support hhmm not hh.hh (decmial timezones)
             tz_match = tz_re.match(flask.request.args['timezone'])
 
             if tz_match is None:
@@ -141,7 +142,8 @@ def standardize():
                 std_val = utils.request_angle(key, flask.request)
                 result[key] = str(std_val.getValue())
 
-                # TODO if azalt: az or alt convert to ra dec
+                # TODO if flask.request.args['azalt'] == 'true' and key == 'az':
+                # TODO if azalt: az or alt convert to ra dec needs complete observer set
 
 
             elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
