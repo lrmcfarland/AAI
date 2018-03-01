@@ -128,22 +128,27 @@ def standardize():
     else:
         result['warnings'].append('Incomplete datetime key set')
 
-
     # non-datetime stuff
     for key, val in sorted(flask.request.args.items()):
 
         try:
 
-            if key in ('latitude', 'longitude', 'alt', 'az', 'dec', 'ra'):
+            if key in ('alt', 'az', 'dec', 'latitude', 'longitude', 'ra'):
+
+                if val == '':
+                    continue
 
                 std_val = utils.request_angle(key, flask.request)
                 result[key] = str(std_val.getValue())
 
-            elif key in ('time', 'date', 'timezone', 'dst'):
+                # TODO if azalt: az or alt convert to ra dec
+
+
+            elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
                 pass
 
             else:
-                result['warnings'].append('Unsupported standard type {}'.format(key))
+                result['warnings'].append('Unsupported standard type {}: {}'.format(key, val))
 
         except (utils.Error, TypeError, ValueError, RuntimeError) as err:
             result['errors'].append(str(err))
