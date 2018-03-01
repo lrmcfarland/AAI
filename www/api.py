@@ -34,10 +34,6 @@ import Transforms.utils
 
 api = flask.Blueprint('api', __name__, url_prefix='/api/v1')
 
-
-tz_re = re.compile(r'(?P<sign>[+-]){0,1}(?P<hrs>\d\d)(:){0,1}(?P<mins>\d\d){0,1}')
-
-
 # ----------------------
 # ----- transforms -----
 # ----------------------
@@ -67,10 +63,14 @@ def standardize():
 
     """Converts parameters from starbug format strings to standard format
 
-    for example: deg[:min[:sec]] to decimal degrees
+    for example: deg[:min[:sec]] string into a float of degrees
+
+    intended for use with a database
 
     warns if it is not an expected paramter
     error if the format is wrong
+
+    TODO hardcoded keys
 
     Returns: JSON
 
@@ -79,50 +79,23 @@ def standardize():
 
         result.errors = list()
         result.warnings = list()
+
     """
 
     result = {'errors': list(), 'warnings': list()}
 
     # datetime stuff
 
+    std_datetime = None
+
     if 'time' in flask.request.args and \
        'date' in flask.request.args and \
        'timezone' in flask.request.args and \
        'dst' in flask.request.args:
 
-        std_datetime = None
-
         try:
 
-            # TODO have datetime do more of this? support hhmm not hh.hh (decmial timezones)
-            tz_match = tz_re.match(flask.request.args['timezone'])
-
-            if tz_match is None:
-                utils.Error('unsupported timezone format {}'.format(flask.request.args['timezone']))
-
-            tz_elements = tz_match.groupdict()
-
-            time_zone = float(tz_elements['hrs'])
-
-            if tz_elements['mins'] is not None:
-                tzmins = float(tz_elements['mins'])/60.0
-                if tzmins > 1:
-                    utils.Error('time zone minutes exceeded {}'.format(flask.request.args['timezone']))
-                else:
-                    time_zone += tzmins
-
-            if time_zone > 12:
-                utils.Error('time zone range exceeded {}'.format(flask.request.args['timezone']))
-
-            if tz_elements['sign'] == '-':
-                time_zone *= -1
-
-            if flask.request.args['dst'] == 'true':
-                dst = True
-            else:
-                dst = False
-
-            std_datetime = utils.request_datetime('date', 'time', time_zone, dst, flask.request)
+            std_datetime = utils.request_datetime('date', 'time', 'timezone', 'dst', flask.request)
             result['iso8601'] = str(std_datetime)
 
         except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
@@ -132,30 +105,36 @@ def standardize():
         result['warnings'].append('Incomplete datetime key set')
 
 
-    # az alt
-    if std_datetime is not None and flask.request.args['azalt'] == 'true' and \
-       'az' in flask.request.args and 'alt' in flask.request.args:
+    # az alt TODO change to something about convert from azalt
+    if 'azalt' in flask.request.args:
 
-        try:
-            an_observer = Transforms.utils.latlon2spherical(flask.request.args['latitude'],
-                                                            flask.request.args['longitude'])
+        if std_datetime is not None and \
+           flask.request.args['azalt'] == 'true' and \
+           'az' in flask.request.args and \
+           'alt' in flask.request.args:
 
-            body_hz = Transforms.utils.azalt2spherical(flask.request.args['az'],
-                                                       flask.request.args['alt'])
+            try:
+                an_observer = Transforms.utils.latlon2spherical(
+                    utils.request_angle('latitude', flask.request),
+                    utils.request_angle('longitude', flask.request))
 
-            body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
+                body_hz = Transforms.utils.azalt2spherical(utils.request_angle('az', flask.request),
+                                                           utils.request_angle('alt', flask.request))
 
-            results['ra'] = Transforms.utils.get_RA(body_eq).value
-            results['dec'] = Transforms.utils.get_declination(body_eq).value
+                body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
 
-        except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
-            result['errors'].append(str(err))
+                result['ra'] = Transforms.utils.get_RA(body_eq).value
+                result['dec'] = Transforms.utils.get_declination(body_eq).value
 
-    else:
-        result['warnings'].append('Incomplete az alt key set')
+            except (utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
+                result['errors'].append(str(err))
+
+        else:
+            result['errors'].append('Incomplete az alt key set')
 
 
     # non-datetime stuff
+    # TODO ra dec overwritten if azalt is true ok?
     for key, val in sorted(flask.request.args.items()):
 
         try:
@@ -167,7 +146,6 @@ def standardize():
 
                 std_val = utils.request_angle(key, flask.request)
                 result[key] = str(std_val.getValue())
-
 
             elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
                 pass
@@ -195,13 +173,7 @@ def azalt2radec():
 
         result['observer'] = str(an_observer)
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        a_datetime = utils.request_datetime('date',
-                                            'time',
-                                            utils.request_float('timezone', flask.request),
-                                            is_dst,
-                                            flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -234,11 +206,7 @@ def radec2azalt():
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
 
-        a_datetime = utils.request_datetime('date',
-                                            'time',
-                                            utils.request_float('timezone', flask.request),
-                                            is_dst,
-                                            flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -287,13 +255,7 @@ def daily_solar_altitude():
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        a_datetime = utils.request_datetime('date',
-                                            'time',
-                                            utils.request_float('timezone', flask.request),
-                                            is_dst,
-                                            flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -319,6 +281,8 @@ def daily_solar_altitude():
                                                                  month=a_datetime.month,
                                                                  day=a_datetime.day),
         npts = 24*4
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
 
         if is_dst:
             dtime = 1
@@ -365,8 +329,8 @@ def daily_solar_altitude():
                                        utils.request_angle('longitude', flask.request),
                                        utils.request_datetime('date',
                                                               'time',
-                                                              utils.request_float('timezone', flask.request),
-                                                              is_dst,
+                                                              'timezone',
+                                                              'dst',
                                                               flask.request),
                                        is_dst)
 

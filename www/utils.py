@@ -4,25 +4,42 @@ TODO: This is identical to what is used in mongodb. make into a common
 libary but too small for now.
 """
 
+import flask
 import re
+
 import coords
+
+# ===================
+# ===== globals =====
+# ===================
 
 dms_re = re.compile(r'(?P<degrees>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?)'
                       '((:(?P<minutes>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?)'
                        '(:(?P<seconds>[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?))?')
 
-# TODO re.VERBOSE
-# TODO stricter formatting 12:3x4:45 passes
 
-# works for 10, 1:23, 12:23:45
+# year-month-day
+ymd_re = re.compile(r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})')
 
-# TODO limit range to 24 hrs., 60 minutes and seconds. missing lower parts
-# TODO utf-8 degrees
+# hour:minute:seconds
+hms_re = re.compile(r'(?P<hour>\d{1,2}):(?P<minute>\d{1,2})(:(?P<seconds>\d{0,2}\.*\d+)){0,1}')
+
+# time zone +hhmm
+tz_re = re.compile(r'(?P<sign>[+-]){0,1}(?P<hrs>\d{1,2})(:){0,1}(?P<mins>\d\d){0,1}')
+
+
+# ===================
+# ===== classes =====
+# ===================
 
 
 class Error(Exception):
     pass
 
+
+# =====================
+# ===== functions =====
+# =====================
 
 def request_float(a_float_str, a_flask_request):
     """Gets the float of string from the request args
@@ -87,38 +104,72 @@ def request_angle(an_angle_key, a_flask_request):
     return coords.angle(degrees, minutes, seconds)
 
 
-def request_datetime(a_date_key, a_time_key, a_timezone, is_dst, a_flask_request):
+def request_datetime(a_date_key, a_time_key, a_timezone_key, a_dst_key, a_flask_request):
     """Gets the degree minute second values from the request args
 
     Arg:
-        a_date_key (str): yyyy-mm-dd
-        a_time_key (str): hr:min:sec
-        a_timezone (float): -12 to 12
-        is_dst (bool): daylight savings time
+        a_date_key (str): date key
+        a_time_key (str): time key
+        a_timezone_key (str): timezone key
+        a_dst_key (str): daylight savings time key
         a_flask_request (werkzeug.local.LocalProxy): reference to the flask request object
 
     Returns: coords.datetime
     Raises: Error if not found
     """
 
-    # TODO regex validation
+    ymd_match = ymd_re.match(a_flask_request.args[a_date_key])
 
-    ymd = a_flask_request.args.get(a_date_key).split('-') # ASSUMES: yyyy-mm-dd format
+    if ymd_match is None:
+        raise Error('unsupported date format {}'.format(flask.request.args[a_date_key]))
 
-    hms = a_flask_request.args.get(a_time_key).split(':') # ASSUMES: hh:mm:ss.ss
-    while len(hms) < 3:
-        hms.append('0')
+    ymd = ymd_match.groupdict()
 
-    a_datetime = coords.datetime(int(ymd[0]),
-                                 int(ymd[1]),
-                                 int(ymd[2]),
-                                 int(hms[0]),
-                                 int(hms[1]),
-                                 float(hms[2]),
-                                 a_timezone)
-    if is_dst:
-        a_datetime -= 1.0/24
+    year = int(ymd['year'])
+    month = int(ymd['month'])
+    day = int(ymd['day'])
+
+    hms_match = hms_re.match(a_flask_request.args[a_time_key])
+
+    if hms_match is None:
+        raise Error('unsupported date format {}'.format(flask.request.args[a_date_key]))
+
+    hms = hms_match.groupdict()
+
+    hour = int(hms['hour'])
+    minute = int(hms['minute'])
+
+    if hms['seconds'] is not None:
+        seconds = float(hms['seconds'])
+    else:
+        seconds = 0
+
+    tz_match = tz_re.match(flask.request.args[a_timezone_key])
+
+    if tz_match is None:
+        raise Error('unsupported timezone format {}'.format(flask.request.args[a_timezone_key]))
+
+    tz_elements = tz_match.groupdict()
+
+    timezone = float(tz_elements['hrs'])
+
+    if tz_elements['mins'] is not None:
+        tzmins = float(tz_elements['mins'])/60.0
+        if tzmins > 1:
+            raise Error('time zone minutes exceeded {}'.format(flask.request.args[a_timezone_key]))
+        else:
+            timezone += tzmins
+
+    if timezone > 12:
+        raise Error('time zone range exceeded {}'.format(flask.request.args[a_timezone_key]))
+
+    if tz_elements['sign'] == '-':
+        timezone *= -1
+
+    # handle daylight savings time
+    if flask.request.args[a_dst_key] == 'true':
+        hour -= 1
+
+    a_datetime = coords.datetime(year, month, day, hour, minute, seconds, timezone)
 
     return a_datetime
-
-
