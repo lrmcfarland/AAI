@@ -90,6 +90,8 @@ def standardize():
        'timezone' in flask.request.args and \
        'dst' in flask.request.args:
 
+        std_datetime = None
+
         try:
 
             # TODO have datetime do more of this? support hhmm not hh.hh (decmial timezones)
@@ -120,14 +122,38 @@ def standardize():
             else:
                 dst = False
 
-            std_val = utils.request_datetime('date', 'time', time_zone, dst, flask.request)
-            result['iso8601'] = str(std_val)
+            std_datetime = utils.request_datetime('date', 'time', time_zone, dst, flask.request)
+            result['iso8601'] = str(std_datetime)
 
         except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
             result['errors'].append(str(err))
 
     else:
         result['warnings'].append('Incomplete datetime key set')
+
+
+    # az alt
+    if std_datetime is not None and flask.request.args['azalt'] == 'true' and \
+       'az' in flask.request.args and 'alt' in flask.request.args:
+
+        try:
+            an_observer = Transforms.utils.latlon2spherical(flask.request.args['latitude'],
+                                                            flask.request.args['longitude'])
+
+            body_hz = Transforms.utils.azalt2spherical(flask.request.args['az'],
+                                                       flask.request.args['alt'])
+
+            body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
+
+            results['ra'] = Transforms.utils.get_RA(body_eq).value
+            results['dec'] = Transforms.utils.get_declination(body_eq).value
+
+        except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
+            result['errors'].append(str(err))
+
+    else:
+        result['warnings'].append('Incomplete az alt key set')
+
 
     # non-datetime stuff
     for key, val in sorted(flask.request.args.items()):
@@ -141,9 +167,6 @@ def standardize():
 
                 std_val = utils.request_angle(key, flask.request)
                 result[key] = str(std_val.getValue())
-
-                # TODO if flask.request.args['azalt'] == 'true' and key == 'az':
-                # TODO if azalt: az or alt convert to ra dec needs complete observer set
 
 
             elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
