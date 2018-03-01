@@ -20,6 +20,7 @@ TODO more details
 import flask
 
 import coords
+import re
 import utils
 
 import Bodies.SunPosition
@@ -32,6 +33,10 @@ import Transforms.utils
 # -------------------
 
 api = flask.Blueprint('api', __name__, url_prefix='/api/v1')
+
+
+tz_re = re.compile(r'(?P<sign>[+-]){0,1}(?P<hrs>\d\d)(:){0,1}(?P<mins>\d\d){0,1}')
+
 
 # ----------------------
 # ----- transforms -----
@@ -89,10 +94,35 @@ def standardize():
        'dst' in flask.request.args:
 
         try:
-            std_val = utils.request_datetime('date', 'time', float(flask.request.args['timezone']), flask.request.args['dst'], flask.request)
+
+            tz_match = tz_re.match(flask.request.args['timezone'])
+
+            if tz_match is None:
+                utils.Error('unsupported timezone format {}'.format(flask.request.args['timezone']))
+
+            tz_elements = tz_match.groupdict()
+
+            time_zone = float(tz_elements['hrs'])
+
+            if tz_elements['mins'] is not None:
+                tzmins = float(tz_elements['mins'])/60.0
+                if tzmins > 1:
+                    utils.Error('time zone minutes exceeded {}'.format(flask.request.args['timezone']))
+                else:
+                    time_zone += tzmins
+
+            if time_zone > 12:
+                utils.Error('time zone range exceeded {}'.format(flask.request.args['timezone']))
+
+            if tz_elements['sign'] == '-':
+                time_zone *= -1
+
+            std_val = utils.request_datetime('date', 'time',
+                                             time_zone,
+                                             flask.request.args['dst'], flask.request)
             result['iso8601'] = str(std_val)
 
-        except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
             result['errors'].append(str(err))
 
     else:
@@ -409,5 +439,3 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 
 
     return result
-
-
