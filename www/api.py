@@ -62,9 +62,6 @@ def latitude2decimal():
     return flask.jsonify(**result)
 
 
-
-
-
 @api.route("/standardize")
 def standardize():
 
@@ -117,9 +114,12 @@ def standardize():
             if tz_elements['sign'] == '-':
                 time_zone *= -1
 
-            std_val = utils.request_datetime('date', 'time',
-                                             time_zone,
-                                             flask.request.args['dst'], flask.request)
+            if flask.request.args['dst'] == 'true':
+                dst = True
+            else:
+                dst = False
+
+            std_val = utils.request_datetime('date', 'time', time_zone, dst, flask.request)
             result['iso8601'] = str(std_val)
 
         except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
