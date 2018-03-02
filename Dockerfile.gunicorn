@@ -64,7 +64,7 @@ RUN git clone https://github.com/lrmcfarland/AAI.git
 WORKDIR ${AAI_HOME}/AAI/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout remove-dup-scripts # TODO !!!!
+# RUN git checkout correct-timezone-v5 # TODO !!!! do not merge uncommented
 
 RUN git submodule update --init --recursive
 
