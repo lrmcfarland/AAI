@@ -84,8 +84,7 @@ def standardize():
 
     result = {'errors': list(), 'warnings': list()}
 
-    # datetime stuff
-
+    # ----- datetime stuff -----
     std_datetime = None
 
     if 'time' in flask.request.args and \
@@ -104,14 +103,14 @@ def standardize():
     else:
         result['warnings'].append('Incomplete datetime key set')
 
-
-    # az alt TODO change to something about convert from azalt
-    if 'azalt' in flask.request.args:
+    # ----- azalt stuff -----
+    if 'azalt' in flask.request.args and flask.request.args['azalt'] == 'true':
 
         if std_datetime is not None and \
-           flask.request.args['azalt'] == 'true' and \
            'az' in flask.request.args and \
-           'alt' in flask.request.args:
+           'alt' in flask.request.args and \
+           'latitude' in flask.request.args and \
+           'longitude' in flask.request.args:
 
             try:
                 an_observer = Transforms.utils.latlon2spherical(
