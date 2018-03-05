@@ -110,13 +110,13 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
 
-        self.assertEqual('2018-01-11T10:14:56.123-08', jresp['iso8601'])
-        self.assertAlmostEqual(-6.25, float(jresp['alt']))
-        self.assertAlmostEqual(12.2583333333, float(jresp['az']))
-        self.assertAlmostEqual(10.5125, float(jresp['dec']))
-        self.assertAlmostEqual(37.5125, float(jresp['latitude']))
-        self.assertAlmostEqual(-122.758333333, float(jresp['longitude']))
-        self.assertAlmostEqual(6.50833333333, float(jresp['ra']))
+        self.assertEqual('2018-01-11T10:14:56.123-08', jresp['params']['iso8601'])
+        self.assertAlmostEqual(-6.25, float(jresp['params']['alt']))
+        self.assertAlmostEqual(12.2583333333, float(jresp['params']['az']))
+        self.assertAlmostEqual(10.5125, float(jresp['params']['dec']))
+        self.assertAlmostEqual(37.5125, float(jresp['params']['latitude']))
+        self.assertAlmostEqual(-122.758333333, float(jresp['params']['longitude']))
+        self.assertAlmostEqual(6.50833333333, float(jresp['params']['ra']))
 
 
     def test_standardize_n2(self):
@@ -129,13 +129,13 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
 
-        self.assertEqual(u'2018-08-21T12:45:00-08', jresp['iso8601'])
-        self.assertAlmostEqual(6.25, float(jresp['alt']))
-        self.assertAlmostEqual(12.2583333333, float(jresp['az']))
-        self.assertAlmostEqual(10, float(jresp['dec']))
-        self.assertAlmostEqual(37.5, float(jresp['latitude']))
-        self.assertAlmostEqual(-122.758361111, float(jresp['longitude']))
-        self.assertAlmostEqual(6.5, float(jresp['ra']))
+        self.assertEqual(u'2018-08-21T12:45:00-08', jresp['params']['iso8601'])
+        self.assertAlmostEqual(6.25, float(jresp['params']['alt']))
+        self.assertAlmostEqual(12.2583333333, float(jresp['params']['az']))
+        self.assertAlmostEqual(10, float(jresp['params']['dec']))
+        self.assertAlmostEqual(37.5, float(jresp['params']['latitude']))
+        self.assertAlmostEqual(-122.758361111, float(jresp['params']['longitude']))
+        self.assertAlmostEqual(6.5, float(jresp['params']['ra']))
 
 
     def test_standardize_err1(self):
@@ -167,13 +167,13 @@ class AAITests(unittest.TestCase):
         self.assertEqual(u'Unsupported standard type baz: 10', jresp['warnings'][0])
         self.assertEqual(u'Unsupported standard type foo: bar', jresp['warnings'][1])
 
-        self.assertEqual('2018-01-11T10:14:56-08', jresp['iso8601'])
-        self.assertAlmostEqual(-6.25, float(jresp['alt']))
-        self.assertAlmostEqual(12.2583333333, float(jresp['az']))
-        self.assertAlmostEqual(10.5125, float(jresp['dec']))
-        self.assertAlmostEqual(37.5125, float(jresp['latitude']))
-        self.assertAlmostEqual(-122.758333333, float(jresp['longitude']))
-        self.assertAlmostEqual(6.50833333333, float(jresp['ra']))
+        self.assertEqual('2018-01-11T10:14:56-08', jresp['params']['iso8601'])
+        self.assertAlmostEqual(-6.25, float(jresp['params']['alt']))
+        self.assertAlmostEqual(12.2583333333, float(jresp['params']['az']))
+        self.assertAlmostEqual(10.5125, float(jresp['params']['dec']))
+        self.assertAlmostEqual(37.5125, float(jresp['params']['latitude']))
+        self.assertAlmostEqual(-122.758333333, float(jresp['params']['longitude']))
+        self.assertAlmostEqual(6.50833333333, float(jresp['params']['ra']))
 
 
     def test_standardize_err3(self):
@@ -192,11 +192,11 @@ class AAITests(unittest.TestCase):
         self.assertEqual(u'unsupported format for az: str12:15:30', jresp['errors'][1])
         self.assertEqual(u'unsupported format for dec: ***10:30:45', jresp['errors'][2])
 
-        self.assertEqual(u'2018-07-11T09:30:00-08', jresp['iso8601'])
+        self.assertEqual(u'2018-07-11T09:30:00-08', jresp['params']['iso8601'])
 
-        self.assertAlmostEqual(37, float(jresp['latitude']))
-        self.assertAlmostEqual(-122.75, float(jresp['longitude']))
-        self.assertAlmostEqual(-6.25, float(jresp['ra']))
+        self.assertAlmostEqual(37, float(jresp['params']['latitude']))
+        self.assertAlmostEqual(-122.75, float(jresp['params']['longitude']))
+        self.assertAlmostEqual(-6.25, float(jresp['params']['ra']))
 
 
     # ----- radec2azalt -----

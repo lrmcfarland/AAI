@@ -82,10 +82,9 @@ def standardize():
 
     """
 
-    result = {'errors': list(), 'warnings': list()}
+    result = {'params': dict(), 'errors': list(), 'warnings': list()}
 
-    # datetime stuff
-
+    # ----- datetime stuff -----
     std_datetime = None
 
     if 'time' in flask.request.args and \
@@ -96,7 +95,7 @@ def standardize():
         try:
 
             std_datetime = utils.request_datetime('date', 'time', 'timezone', 'dst', flask.request)
-            result['iso8601'] = str(std_datetime)
+            result['params']['iso8601'] = str(std_datetime)
 
         except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
             result['errors'].append(str(err))
@@ -104,14 +103,14 @@ def standardize():
     else:
         result['warnings'].append('Incomplete datetime key set')
 
-
-    # az alt TODO change to something about convert from azalt
-    if 'azalt' in flask.request.args:
+    # ----- azalt stuff -----
+    if 'azalt' in flask.request.args and flask.request.args['azalt'] == 'true':
 
         if std_datetime is not None and \
-           flask.request.args['azalt'] == 'true' and \
            'az' in flask.request.args and \
-           'alt' in flask.request.args:
+           'alt' in flask.request.args and \
+           'latitude' in flask.request.args and \
+           'longitude' in flask.request.args:
 
             try:
                 an_observer = Transforms.utils.latlon2spherical(
@@ -123,8 +122,8 @@ def standardize():
 
                 body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
 
-                result['ra'] = Transforms.utils.get_RA(body_eq).value
-                result['dec'] = Transforms.utils.get_declination(body_eq).value
+                result['params']['ra'] = Transforms.utils.get_RA(body_eq).value
+                result['params']['dec'] = Transforms.utils.get_declination(body_eq).value
 
             except (utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
                 result['errors'].append(str(err))
@@ -145,7 +144,7 @@ def standardize():
                     continue
 
                 std_val = utils.request_angle(key, flask.request)
-                result[key] = str(std_val.getValue())
+                result['params'][key] = str(std_val.getValue())
 
             elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
                 pass
