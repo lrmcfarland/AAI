@@ -111,7 +111,7 @@ def request_datetime(a_date_key, a_time_key, a_timezone_key, a_dst_key, a_flask_
         a_date_key (str): date key
         a_time_key (str): time key
         a_timezone_key (str): timezone key
-        a_dst_key (str): daylight savings time key
+        a_dst_key (str): daylight saving time key
         a_flask_request (werkzeug.local.LocalProxy): reference to the flask request object
 
     Returns: coords.datetime
@@ -166,7 +166,7 @@ def request_datetime(a_date_key, a_time_key, a_timezone_key, a_dst_key, a_flask_
     if tz_elements['sign'] == '-':
         timezone *= -1
 
-    # handle daylight savings time
+    # handle daylight saving time
     if flask.request.args[a_dst_key] == 'true':
         hour -= 1
 

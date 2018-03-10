@@ -361,7 +361,7 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
         a_latitude (coords.angle): observer's latitude
         a_longitude (coords.angle): observer's longitude
         a_datetime (coords.datetime): observer's time
-        a_dst (bool): daylight savings time
+        a_dst (bool): daylight saving time
 
 
     return results dictionary
