@@ -253,6 +253,8 @@ def daily_solar_altitude():
                                                         utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
+        result['latitude'] = utils.request_angle('latitude', flask.request).value
+        result['longitude'] = utils.request_angle('longitude', flask.request).value
 
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 

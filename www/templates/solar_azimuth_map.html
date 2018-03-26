@@ -1,0 +1,310 @@
+{# AAI solar azimuth map #}
+
+{% extends "base.html" %}
+
+{% block title %}Solar Azinuth Map{% endblock %}
+
+{% block content %}
+
+<style>
+
+.page {
+    width: 60em;
+}
+
+.aaimap {
+    width: 800px;
+    height: 300px;
+}
+
+table#sun_chart_legend {
+    width: 10em;
+}
+
+#_vernal_equinox_txt {
+    color: green;
+}
+
+#_summer_solstice_txt {
+    color: red;
+}
+
+#_autumnal_equinox_txt {
+    color: orange;
+}
+
+#_winter_solstice_txt {
+    color: cyan;
+}
+
+
+button#get_solar_azimuth_map {
+
+    text-align: center;
+
+    font-size: 100%;
+    font-weight: bold;
+
+    margin: 0 auto;
+    display: block;
+
+    width: 100px;
+    height: 100px;
+
+    border-radius: 50%;
+
+    color:red;
+    background: #ffD700;
+}
+
+
+</style>
+
+
+
+<h1>Solar Azimuth Map</h1>
+
+<br>
+
+<div class="twocolumn">
+
+This shows the sun rise and set lines for the location at the current time, equinoxes and solstices in case you want to build your own Stonehenge.
+
+</div>
+
+<br>
+
+{% include "observer_location.html" %}
+
+<br>
+
+<button id="get_solar_azimuth_map">get solar azimuth map</button>
+
+<h2>Solar Azimuth Map</h2>
+
+
+<table>
+
+  <tr>
+
+    <td>
+      <div id="sunRiseSetMap" class="aaimap"></div>
+    </td>
+
+    <td>
+
+      <table id="sun_chart_legend">
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
+	  </td>
+
+	  <td id="_vernal_equinox_txt">
+	    Vernal Equinox
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
+	  </td>
+
+	  <td id="_summer_solstice_txt">
+	    Summer Solstice
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
+	  </td>
+
+	  <td id="_autumnal_equinox_txt">
+	    Autumnal Equinox
+	  </td>
+
+	</tr>
+
+	<tr>
+
+	  <td>
+	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
+	  </td>
+
+	  <td id="_winter_solstice_txt">
+	    Winter Solstice
+	  </td>
+
+	</tr>
+
+
+      </table>
+
+    </td>
+
+  </tr>
+
+  <tr>
+    <td colspan="2">
+
+      <table id="results_table" align="center">
+
+	<tr>
+	  <th>Azimuth</th>
+	  <td id="azimuth">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Altitude</th>
+	  <td id="altitude">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Rising</th>
+	  <td id="rising">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+
+	<tr>
+	  <th>Transit</th>
+	  <td id="transit">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+	<tr>
+	  <th>Setting</th>
+	  <td id="setting">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+      </table>
+
+    </td>
+  </tr>
+
+
+</table>
+
+<hr>
+<br>
+
+<div class="twocolumn">
+  <p>
+    <a href="https://github.com/lrmcfarland/AAI/blob/master/www/templates/solar_azimuth_map_chart.html">
+      The source for this page
+    </a> is an example of plotting the rising and setting azimuths on a
+    <a href="https://developers.google.com/chart/">google map</a>.
+  </p>
+
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+
+  <script type="text/javascript">
+
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    {# -------------------- #}
+    {# ----- init map ----- #}
+    {# -------------------- #}
+
+    var sazmap;
+
+    function initMap() {
+
+      {# TODO init from user location? or fixed? #}
+
+      var mapProp = {
+	center:new google.maps.LatLng(37.4, -122.082),
+	zoom: 15,
+      };
+
+      sazmap = new google.maps.Map(document.getElementById("sunRiseSetMap"), mapProp);
+
+    }; {# end initMap() #}
+
+
+    {# ----------------- #}
+    {# ----- ready ----- #}
+    {# ----------------- #}
+
+    $(document).ready(function() {
+
+      {# ----- get data ----- #}
+
+      $("#get_solar_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
+	  {
+	    latitude: $('input[name="latitude"]').val(),
+	    longitude: $('input[name="longitude"]').val(),
+	    date: $('input[name="date"]').val(),
+	    time: $('input[name="time"]').val(),
+	    timezone: $('input[name="timezone"]').val(),
+	    dst: $("#_dst").is(':checked') {# jQuery selector #}
+
+	  },
+	  function(sun_position) {
+
+	    if (sun_position.errors.length > 0) {
+
+	       $("#rising").text("TBD");
+	       $("#transit").text("TBD");
+	       $("#setting").text("TBD");
+	       $("#azimuth").text("TBD");
+	       $("#altitude").text("TBD");
+
+	      alert("Errors: " + sun_position.errors.join(", "));
+
+	    } else {
+
+
+
+               sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+
+
+
+
+	       $("#rising").text(sun_position.rising);
+	       $("#transit").text(sun_position.transit);
+	       $("#setting").text(sun_position.setting);
+	       $("#azimuth").text(sun_position.sun_marker_azimuth);
+	       $("#altitude").text(sun_position.sun_marker_altitude);
+
+	    };
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_solar_azimuth_map click #}
+
+
+
+    }); {# end ready method #}
+
+
+
+
+  </script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key={{config['GOOGLEMAPS_KEY']}}&callback=initMap" async defer></script>
+
+
+
+
+{% endblock %}

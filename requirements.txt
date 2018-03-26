@@ -1,3 +1,6 @@
-# aai gunicorn pip requirements
+# aai python packages
+#
+# $ pip install -r requirements.txt
+
 flask
 gunicorn
