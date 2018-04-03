@@ -434,3 +434,33 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 
 
     return result
+
+
+# solar azimuth
+
+
+@api.route("/sun_rise_set_azimuths")
+def sun_rise_set_azimuths():
+    """Get the sun rise and set azimuths"""
+
+    result = {'errors': list()}
+
+    try:
+
+        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                        utils.request_angle('longitude', flask.request))
+
+        result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
+        result['latitude'] = utils.request_angle('latitude', flask.request).value
+        result['longitude'] = utils.request_angle('longitude', flask.request).value
+
+        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+
+        result['datetime'] = str(a_datetime)
+
+
+
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
