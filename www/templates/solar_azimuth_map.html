@@ -13,28 +13,8 @@
 }
 
 .aaimap {
-    width: 800px;
-    height: 300px;
-}
-
-table#sun_chart_legend {
-    width: 10em;
-}
-
-#_vernal_equinox_txt {
-    color: green;
-}
-
-#_summer_solstice_txt {
-    color: red;
-}
-
-#_autumnal_equinox_txt {
-    color: orange;
-}
-
-#_winter_solstice_txt {
-    color: cyan;
+    width: 900px;
+    height: 600px;
 }
 
 
@@ -68,7 +48,9 @@ button#get_solar_azimuth_map {
 
 <div class="twocolumn">
 
-This shows the sun rise and set lines for the location at the current time, equinoxes and solstices in case you want to build your own Stonehenge.
+  This shows the sun rise and set lines for the location at the given
+  time. The green marker is pointing to the sun rise, the red to sun
+  set. They can be dragged with out changing their bearing.
 
 </div>
 
@@ -83,63 +65,37 @@ This shows the sun rise and set lines for the location at the current time, equi
 <h2>Solar Azimuth Map</h2>
 
 
-<table>
+<table align="center">
 
   <tr>
 
+    <div id="sunRiseSetMap" class="aaimap"></div>
+
+  </tr>
+
+  <tr>
     <td>
-      <div id="sunRiseSetMap" class="aaimap"></div>
-    </td>
 
-    <td>
 
-      <table id="sun_chart_legend">
+      <table id="results_table" align="center">
 
 	<tr>
+	  <th>Rising</th>
+	  <td id="rising_azimuth">TBD</td>
+	  <td>azimuth in degrees</td>
 
-	  <td>
-	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
-	  </td>
-
-	  <td id="_vernal_equinox_txt">
-	    Vernal Equinox
-	  </td>
+	  <td id="rising_time">TBD</td>
+	  <td>ISO8601</td>
 
 	</tr>
 
 	<tr>
+	  <th>Setting</th>
+	  <td id="setting_azimuth">TBD</td>
+	  <td>azimuth in degrees</td>
 
-	  <td>
-	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
-	  </td>
-
-	  <td id="_summer_solstice_txt">
-	    Summer Solstice
-	  </td>
-
-	</tr>
-
-	<tr>
-
-	  <td>
-	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
-	  </td>
-
-	  <td id="_autumnal_equinox_txt">
-	    Autumnal Equinox
-	  </td>
-
-	</tr>
-
-	<tr>
-
-	  <td>
-	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
-	  </td>
-
-	  <td id="_winter_solstice_txt">
-	    Winter Solstice
-	  </td>
+	  <td id="setting_time">TBD</td>
+	  <td>ISO8601</td>
 
 	</tr>
 
@@ -147,24 +103,32 @@ This shows the sun rise and set lines for the location at the current time, equi
       </table>
 
     </td>
-
   </tr>
-
 
 </table>
 
-<hr>
-<br>
 
-<div class="twocolumn">
-  <p>
-    <a href="https://github.com/lrmcfarland/AAI/blob/master/www/templates/solar_azimuth_map.html">
-      The source for this page
-    </a> is an example of plotting the rising and setting azimuths on a
-    <a href="https://developers.google.com/chart/">google map</a>.
-  </p>
+    <div class="twocolumn">
 
-</div>
+      <p>
+      The most interesting example
+      is <a href="https://en.wikipedia.org/wiki/Stonehenge">Stonehenge</a>
+      (lat: 51:10:43.84, longitude: -1:49:34.28). Setting the date to
+      the summer solstice (June 21) and assuming prehistoric Britons
+      were not using daylight saving time, this gives a sunrise
+      azimuth of 49:54 which is in good agreement with what I found
+      on <a href="http://www.sacred-texts.com/neu/eng/sac/sac15.htm">this
+      site</a> and lines up with what we see in the satellite image
+      with google maps (left). Conversely the winter solstice
+      (December 21) is the reverse of this.
+
+      </p>
+
+      <img src="static/images/stonehenge_summer_solstice.jpg">
+
+
+    </div>
+
 
 
 {% endblock %}
@@ -181,6 +145,8 @@ This shows the sun rise and set lines for the location at the current time, equi
     {# -------------------- #}
 
     var sazmap;
+    var rising_azimuth_marker;
+    var setting_azimuth_marker;
 
     function initMap() {
 
@@ -221,13 +187,58 @@ This shows the sun rise and set lines for the location at the current time, equi
 
 	    if (sun_position.errors.length > 0) {
 
+	       $("#rising_azimuth").text("TBD");
+	       $("#rising_time").text("TBD");
+
+	       $("#setting_azimuth").text("TBD");
+	       $("#setting_time").text("TBD");
+
 	      alert("Errors: " + sun_position.errors.join(", "));
 
 	    } else {
 
+	       $("#rising_azimuth").text(sun_position.rising_azimuth_str);
+	       $("#rising_time").text(sun_position.rising_time_str);
 
+	       $("#setting_azimuth").text(sun_position.setting_azimuth_str);
+	       $("#setting_time").text(sun_position.setting_time_str);
 
-               sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+	       sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+
+	       if (rising_azimuth_marker != null) {
+		 rising_azimuth_marker.setMap(null);
+	       }
+
+	       rising_azimuth_marker = new google.maps.Marker({
+		 position: {lat: sun_position.latitude, lng: sun_position.longitude + 0.001},
+		   icon: {
+		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+		     scale: 10,
+		     rotation: sun_position.rising_azimuth,
+		     strokeColor: '#0F0',
+		     flat: true,
+		   },
+		 draggable: true,
+		 map: sazmap,
+	       });
+
+	       if (setting_azimuth_marker != null) {
+		 setting_azimuth_marker.setMap(null);
+	       }
+
+	       setting_azimuth_marker = new google.maps.Marker({
+		 position: {lat: sun_position.latitude, lng: sun_position.longitude - 0.001},
+		   icon: {
+		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+		     scale: 10,
+		     rotation: sun_position.setting_azimuth,
+		     strokeColor: '#F00',
+		     flat: true
+		   },
+		 draggable: true,
+		 map: sazmap,
+	       });
+
 
 
 	    };

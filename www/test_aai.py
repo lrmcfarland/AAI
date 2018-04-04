@@ -246,6 +246,7 @@ class AAITests(unittest.TestCase):
         position_data = json.loads(response.data)
 
         self.assertEqual(u'218:05:11.8683 (218.086630087)', position_data[u'sun_marker_azimuth'])
+        self.assertEqual(u'19:33:0.925497 (19.5502570824)', position_data[u'sun_marker_altitude'])
 
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
