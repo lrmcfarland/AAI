@@ -253,6 +253,8 @@ def daily_solar_altitude():
                                                         utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
+        result['latitude'] = utils.request_angle('latitude', flask.request).value
+        result['longitude'] = utils.request_angle('longitude', flask.request).value
 
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
@@ -333,11 +335,13 @@ def daily_solar_altitude():
                                                               flask.request),
                                        is_dst)
 
-        result['sun_marker_altitude'] = rts['altitude']
-        result['sun_marker_azimuth']  = rts['azimuth']
-        result['rising']   = rts['rising']
-        result['transit']  = rts['transit']
-        result['setting']  = rts['setting']
+
+        result['sun_marker_altitude'] = ''.join((str(rts['altitude']), ' (', str(rts['altitude'].value), ')'))
+        result['sun_marker_azimuth']  = ''.join((str(rts['azimuth']), ' (', str(rts['azimuth'].value), ')'))
+
+        result['rising']   = str(rts['rising'])  # JSON-able
+        result['transit']  = str(rts['transit']) # JSON-able
+        result['setting']  = str(rts['setting']) # JSON-able
 
 
     except Bodies.SunPosition.Error as err:
@@ -368,13 +372,13 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     """
 
     result = dict()
-    result['latitude'] = str(a_latitude)
-    result['longitude'] = str(a_longitude)
-    result['datetime'] = str(a_datetime)
+    result['latitude'] = a_latitude
+    result['longitude'] = a_longitude
+    result['datetime'] = a_datetime
     result['dst'] = is_dst
 
-    result['eot'] = str(Bodies.SunPosition.EquationOfTime(a_datetime))
-    result['obliquity'] = str(Transforms.EclipticEquatorial.obliquity(a_datetime))
+    result['eot'] = Bodies.SunPosition.EquationOfTime(a_datetime)
+    result['obliquity'] = Transforms.EclipticEquatorial.obliquity(a_datetime)
 
     an_observer = Transforms.utils.latlon2spherical(a_latitude, a_longitude)
 
@@ -407,9 +411,30 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
                                   setting.timezone)
 
 
-    result['rising'] = str(rising)
-    result['transit'] = str(transit)
-    result['setting'] = str(setting)
+    result['rising'] = rising
+    result['transit'] = transit
+    result['setting'] = setting
+
+
+    sun_azalt = get_sun_azalt(an_observer, a_datetime)
+
+    result['azimuth'] = sun_azalt['azimuth']
+    result['altitude'] = sun_azalt['altitude']
+
+    return result
+
+
+# solar azimuth
+
+
+def get_sun_azalt(an_observer, a_datetime):
+    """Calculate the azimuth and altitude of the sun for an observer at a_datetime
+
+    Args:
+        an_observer (coords.spherical): an observer locatioin
+        a_datetime (coords.datetime): time of obsevation
+    """
+    result = dict()
 
 
     ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
@@ -423,12 +448,59 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     result['R'] = R
     result['ecliptic_longitude'] = str(ecliptic_longitude)
 
-    result['azimuth'] = ''.join((str(Transforms.utils.get_azimuth(sun_hz)),
-                                 ' (', str(Transforms.utils.get_azimuth(sun_hz).value), ')'))
-
-
-    result['altitude'] = ''.join((str(Transforms.utils.get_altitude(sun_hz)),
-                                  ' (', str(Transforms.utils.get_altitude(sun_hz).value), ')'))
-
+    result['azimuth'] = Transforms.utils.get_azimuth(sun_hz)
+    result['altitude'] = Transforms.utils.get_altitude(sun_hz)
 
     return result
+
+
+@api.route("/sun_rise_set_azimuths")
+def sun_rise_set_azimuths():
+    """Get the sun rise and set azimuths"""
+
+    result = {'errors': list()}
+
+    try:
+
+        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                        utils.request_angle('longitude', flask.request))
+
+        result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
+        result['latitude'] = utils.request_angle('latitude', flask.request).value
+        result['longitude'] = utils.request_angle('longitude', flask.request).value
+
+        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+
+        result['datetime'] = str(a_datetime)
+
+        is_dst = True if flask.request.args.get('dst') == 'true' else False
+
+
+        rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
+                                       utils.request_angle('longitude', flask.request),
+                                       utils.request_datetime('date',
+                                                              'time',
+                                                              'timezone',
+                                                              'dst',
+                                                              flask.request),
+                                       is_dst)
+
+
+        rising_azalt = get_sun_azalt(an_observer, rts['rising'])
+        setting_azalt = get_sun_azalt(an_observer, rts['setting'])
+
+        result['rising_azimuth'] = rising_azalt['azimuth'].value
+        result['setting_azimuth'] = setting_azalt['azimuth'].value
+
+        # string version for JSON
+        result['rising_azimuth_str'] = str(rising_azalt['azimuth'])
+        result['rising_time_str'] = str(rts['rising'])
+
+        result['setting_azimuth_str'] = str(setting_azalt['azimuth'])
+        result['setting_time_str'] = str(rts['setting'])
+
+
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)

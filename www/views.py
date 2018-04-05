@@ -34,15 +34,23 @@ def accuracy():
 
 @home_page.route("/daily_solar_altitude_chart")
 def daily_solar_altitude_chart():
-    """Plot the sun position for the observer's location in space and time"""
+    """Plot the sun's altitude for the observer's location"""
 
     return flask.render_template('daily_solar_altitude_chart.html')
 
 
 @home_page.route("/eqhz_transforms")
 def eqhz_transforms():
-    """Transform equatorial to horizontal coordinates at observer's location in space and time"""
+    """Transform equatorial to horizontal coordinates at observer's location"""
 
     return flask.render_template('eqhz_transforms.html')
 
+
+@home_page.route("/solar_azimuth_map")
+def solar_azimuth_map():
+    """Plot the sun's azimuth for the observer's location"""
+
+
+
+    return flask.render_template('solar_azimuth_map.html')
 
