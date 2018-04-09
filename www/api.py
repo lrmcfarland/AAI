@@ -262,19 +262,19 @@ def daily_solar_altitude():
 
         result['sun_marker_time'] = a_datetime.hour + a_datetime.minute/60.0 # distance on x-axis to plot sun marker
 
-        vernal_equinox = coords.datetime(a_datetime.year, 3, 20) # TODO not every year
+        vernal_equinox = coords.datetime(a_datetime.year, 3, 20)
         vernal_equinox.timezone = a_datetime.timezone
         vernal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        summer_solstice = coords.datetime(a_datetime.year, 6, 20) # TODO not every year
+        summer_solstice = coords.datetime(a_datetime.year, 6, 20)
         summer_solstice.timezone = a_datetime.timezone
         summer_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        autumnal_equinox = coords.datetime(a_datetime.year, 9, 22) # TODO not every year
+        autumnal_equinox = coords.datetime(a_datetime.year, 9, 22)
         autumnal_equinox.timezone = a_datetime.timezone
         autumnal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        winter_solstice = coords.datetime(a_datetime.year, 12, 21) # TODO not every year
+        winter_solstice = coords.datetime(a_datetime.year, 12, 21)
         winter_solstice.timezone = a_datetime.timezone
         winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
@@ -486,15 +486,26 @@ def sun_rise_set_azimuths():
                                        is_dst)
 
 
+        current_azalt = get_sun_azalt(an_observer, a_datetime)
         rising_azalt = get_sun_azalt(an_observer, rts['rising'])
+        transit_azalt = get_sun_azalt(an_observer, rts['transit'])
         setting_azalt = get_sun_azalt(an_observer, rts['setting'])
 
+        result['current_azimuth'] = current_azalt['azimuth'].value
         result['rising_azimuth'] = rising_azalt['azimuth'].value
+        result['transit_azimuth'] = transit_azalt['azimuth'].value
         result['setting_azimuth'] = setting_azalt['azimuth'].value
 
         # string version for JSON
+
+        result['current_azimuth_str'] = str(current_azalt['azimuth'])
+        result['current_time_str'] = str(a_datetime)
+
         result['rising_azimuth_str'] = str(rising_azalt['azimuth'])
         result['rising_time_str'] = str(rts['rising'])
+
+        result['transit_azimuth_str'] = str(transit_azalt['azimuth'])
+        result['transit_time_str'] = str(rts['transit'])
 
         result['setting_azimuth_str'] = str(setting_azalt['azimuth'])
         result['setting_time_str'] = str(rts['setting'])
