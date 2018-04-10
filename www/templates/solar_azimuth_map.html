@@ -47,10 +47,10 @@ button#get_solar_azimuth_map {
 <br>
 
 <div class="twocolumn">
-
   This shows the sun rise and set lines for the location at the given
-  time. The green marker is pointing to the sun rise, the red to sun
-  set. They can be dragged with out changing their bearing.
+  time. The green marker is pointing to the sun rise, the blue to the
+  current position and the red to sun set. They can be dragged with
+  out changing their bearing.
 
 </div>
 
@@ -80,11 +80,31 @@ button#get_solar_azimuth_map {
       <table id="results_table" align="center">
 
 	<tr>
+	  <th>Current</th>
+	  <td id="current_azimuth">TBD</td>
+	  <td>azimuth in degrees</td>
+
+	  <td id="current_time">TBD</td>
+	  <td>ISO8601</td>
+
+	</tr>
+
+	<tr>
 	  <th>Rising</th>
 	  <td id="rising_azimuth">TBD</td>
 	  <td>azimuth in degrees</td>
 
 	  <td id="rising_time">TBD</td>
+	  <td>ISO8601</td>
+
+	</tr>
+
+	<tr>
+	  <th>Transit</th>
+	  <td id="transit_azimuth">TBD</td>
+	  <td>azimuth in degrees</td>
+
+	  <td id="transit_time">TBD</td>
 	  <td>ISO8601</td>
 
 	</tr>
@@ -111,7 +131,7 @@ button#get_solar_azimuth_map {
     <div class="twocolumn">
 
       <p>
-      The most interesting example
+      An interesting example
       is <a href="https://en.wikipedia.org/wiki/Stonehenge">Stonehenge</a>
       (lat: 51:10:43.84, longitude: -1:49:34.28). Setting the date to
       the summer solstice (June 21) and assuming prehistoric Britons
@@ -119,7 +139,7 @@ button#get_solar_azimuth_map {
       azimuth of 49:54 which is in good agreement with what I found
       on <a href="http://www.sacred-texts.com/neu/eng/sac/sac15.htm">this
       site</a> and lines up with what we see in the satellite image
-      with google maps (left). Conversely, sun set on the winter solstice
+      with google maps. Conversely, sun set on the winter solstice
       (December 21) is the reverse of this.
 
       </p>
@@ -145,6 +165,7 @@ button#get_solar_azimuth_map {
     {# -------------------- #}
 
     var sazmap;
+    var current_azimuth_marker;
     var rising_azimuth_marker;
     var setting_azimuth_marker;
 
@@ -187,8 +208,14 @@ button#get_solar_azimuth_map {
 
 	    if (sun_position.errors.length > 0) {
 
+	       $("#current_azimuth").text("TBD");
+	       $("#current_time").text("TBD");
+
 	       $("#rising_azimuth").text("TBD");
 	       $("#rising_time").text("TBD");
+
+	       $("#transit_azimuth").text("TBD");
+	       $("#transit_time").text("TBD");
 
 	       $("#setting_azimuth").text("TBD");
 	       $("#setting_time").text("TBD");
@@ -197,20 +224,43 @@ button#get_solar_azimuth_map {
 
 	    } else {
 
+	       $("#current_azimuth").text(sun_position.current_azimuth_str);
+	       $("#current_time").text(sun_position.current_time_str);
+
 	       $("#rising_azimuth").text(sun_position.rising_azimuth_str);
 	       $("#rising_time").text(sun_position.rising_time_str);
+
+	       $("#transit_azimuth").text(sun_position.transit_azimuth_str);
+	       $("#transit_time").text(sun_position.transit_time_str);
 
 	       $("#setting_azimuth").text(sun_position.setting_azimuth_str);
 	       $("#setting_time").text(sun_position.setting_time_str);
 
 	       sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
 
+	       if (current_azimuth_marker != null) {
+		 current_azimuth_marker.setMap(null);
+	       }
+
+	       current_azimuth_marker = new google.maps.Marker({
+		 position: {lat: sun_position.latitude - 0.005, lng: sun_position.longitude},
+		   icon: {
+		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+		     scale: 10,
+		     rotation: sun_position.current_azimuth,
+		     strokeColor: '#00F',
+		     flat: true,
+		   },
+		 draggable: true,
+		 map: sazmap,
+	       });
+
 	       if (rising_azimuth_marker != null) {
 		 rising_azimuth_marker.setMap(null);
 	       }
 
 	       rising_azimuth_marker = new google.maps.Marker({
-		 position: {lat: sun_position.latitude, lng: sun_position.longitude + 0.001},
+		 position: {lat: sun_position.latitude, lng: sun_position.longitude + 0.005},
 		   icon: {
 		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
 		     scale: 10,
@@ -227,7 +277,7 @@ button#get_solar_azimuth_map {
 	       }
 
 	       setting_azimuth_marker = new google.maps.Marker({
-		 position: {lat: sun_position.latitude, lng: sun_position.longitude - 0.001},
+		 position: {lat: sun_position.latitude, lng: sun_position.longitude - 0.005},
 		   icon: {
 		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
 		     scale: 10,
