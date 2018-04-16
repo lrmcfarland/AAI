@@ -3,15 +3,17 @@
 # This will build the aai app in a container and served by gunicorn.
 # For use with nginx as a reverse proxy.
 #
+# Assmues: starbug.com container rotates all logs and log name is unique. See CMD below.
+#
 # one time setup
-# persistent storage:  docker volume create aai-logs
+# persistent storage:  docker volume create starbuglogs
 # create network:      docker network create starbugnet
 #
 # to build:            docker build -f Dockerfile.gunicorn -t aai-gunicorn .
 #
-# to run:              docker run --net starbugnet --name aai-gunicorn-00 --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn -d -p 8080:8080 aai-gunicorn
+# to run:              docker run --net starbugnet --name aai-gunicorn-00 --mount source=starbuglogs,target=/opt/starbug.com/logs -d -p 8080:8080 aai-gunicorn
 #
-# to bash aai-logs:    docker run -it --rm --mount source=aai-logs,target=/opt/starbug.com/logs/gunicorn --user root --entrypoint /bin/bash aai-gunicorn
+# to bash starbuglogs:    docker run -it --rm --mount source=starbuglogs,target=/opt/starbug.com/logs --user root --entrypoint /bin/bash aai-gunicorn
 #
 # to stop:                   docker stop aai-gunicorn-00
 # to delete container:       docker rm aai-gunicorn-00
@@ -51,7 +53,7 @@ ENV AAI_HOME="/opt/starbug.com" \
 
 RUN groupadd ${AAI_GRP} \
     && adduser -g ${AAI_GRP} ${AAI_USER} \
-    && mkdir -p ${AAI_HOME}/logs/gunicorn \
+    && mkdir -p ${AAI_HOME}/logs \
     && chown -R ${AAI_USER}:${AAI_GRP} ${AAI_HOME}
 
 USER ${AAI_USER}:${AAI_GRP}
@@ -90,6 +92,6 @@ WORKDIR ${AAI_HOME}/AAI/www
 ENTRYPOINT ["bash"]
 
 CMD [ "./bin/aai-gunicorn.sh", "-b", "0.0.0.0:8080", "-w", "4", "--capture-output", "--log-level", "info", \
-      "--access-logfile", "/opt/starbug.com/logs/gunicorn/aai-gunicorn-access.log", \
-      "--error-logfile",  "/opt/starbug.com/logs/gunicorn/aai-gunicorn-error.log", \
+      "--access-logfile", "/opt/starbug.com/logs/aai-access.log", \
+      "--error-logfile",  "/opt/starbug.com/logs/aai-error.log", \
       "--forwarded-allow-ips", "*"]
