@@ -35,6 +35,8 @@ class SunPositionsTests(unittest.TestCase):
         self.mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
                                                         a_longitude=coords.angle(-122, 4, 56))
 
+        return
+
 
     def test_sextant_2015_03_27(self):
         """Test against sextant measurement
@@ -66,6 +68,8 @@ class SunPositionsTests(unittest.TestCase):
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10').value/2)
         self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=1)
 
+        return
+
 
     def test_sextant_2015_04_20(self):
         """Test against sextant measurement
@@ -94,6 +98,8 @@ class SunPositionsTests(unittest.TestCase):
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32').value/2)
         self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=1)
 
+        return
+
 
     def test_sextant_2015_05_01(self):
         """Test against sextant measurement
@@ -120,6 +126,8 @@ class SunPositionsTests(unittest.TestCase):
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46').value/2)
         self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=2)
 
+        return
+
 
 class EquationOfTimeTests(unittest.TestCase):
     """Test Equatoin of Time calculations"""
@@ -128,6 +136,8 @@ class EquationOfTimeTests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 12
+
+        return
 
 
     def test_2015_01_01T12_00(self):
@@ -141,6 +151,8 @@ class EquationOfTimeTests(unittest.TestCase):
 
         # NOAA says -3.59 minutes
         self.assertAlmostEqual(-3.901196866415546, eot.value*60, self.places)
+
+        return
 
 
     def test_2015_02_11T12_00(self):
@@ -157,6 +169,8 @@ class EquationOfTimeTests(unittest.TestCase):
         # NOAA says -14.24 minutes
         self.assertAlmostEqual(-14.212711856485711, eot.value*60, self.places)
 
+        return
+
 
     def test_2015_03_20T12_00(self):
         """Test Equation of time 2015-03-20T12:00:00
@@ -169,6 +183,8 @@ class EquationOfTimeTests(unittest.TestCase):
 
         # NOAA says -7.44 minutes
         self.assertAlmostEqual(-7.563513810377245, eot.value*60, self.places)
+
+        return
 
 
     def test_2015_05_14T12_00(self):
@@ -185,6 +201,8 @@ class EquationOfTimeTests(unittest.TestCase):
         # NOAA says 3.65 minutes
         self.assertAlmostEqual(3.6588472510257475, eot.value*60, self.places)
 
+        return
+
 
     def test_2015_07_26T12_00(self):
         """Test Equation of time 2015-07-26T12:00:00
@@ -199,6 +217,8 @@ class EquationOfTimeTests(unittest.TestCase):
 
         # NOAA says -6.54 minutes
         self.assertAlmostEqual(-6.5354183954768175, eot.value*60, self.places)
+
+        return
 
 
     def test_2015_11_03T12_00(self):
@@ -215,6 +235,8 @@ class EquationOfTimeTests(unittest.TestCase):
         # NOAA says 16.48 minutes
         self.assertAlmostEqual(16.43786410739647, eot.value*60, self.places)
 
+        return
+
 
 class RiseAndSetTests(unittest.TestCase):
     """Test rise and set calculations"""
@@ -223,6 +245,8 @@ class RiseAndSetTests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 12
+
+        return
 
 
     def test_Meeus_15a(self):
@@ -248,6 +272,8 @@ class RiseAndSetTests(unittest.TestCase):
         self.assertEqual('1988-03-20T19:40:17.533', str(transit))
         self.assertEqual('1988-03-20T02:54:25.782', str(setting))
 
+        return
+
 
     def test_polaris_1(self):
         """Tests circumpolar exception to high"""
@@ -260,6 +286,8 @@ class RiseAndSetTests(unittest.TestCase):
         a_datetime = coords.datetime('2015-05-25T00:00:00-07')
 
         self.assertRaises(SunPosition.Error, SunPosition.RiseAndSet, polaris, mlc404, a_datetime, coords.angle(-0.5667))
+
+        return
 
 
     def test_polaris_2(self):
@@ -274,6 +302,8 @@ class RiseAndSetTests(unittest.TestCase):
 
         self.assertRaises(SunPosition.Error, SunPosition.RiseAndSet, antipolaris, mlc404, a_datetime, coords.angle(-0.5667))
 
+        return
+
 
 class SunRiseAndSetTests(unittest.TestCase):
     """Test sunrise and set calculations"""
@@ -285,6 +315,10 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         self.mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
                                                         a_longitude=coords.angle(-122, 4, 56))
+
+        self.antimlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                            a_longitude=coords.angle(122, 4, 56))
+        return
 
 
     def test_timezone_p1(self):
@@ -301,6 +335,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T11:58:46.9625+01', str(transit)) # NOAA 11:56:39
         self.assertEqual('2015-05-22T19:31:28.9499+01', str(setting)) # NOAA 19:30
 
+        return
+
 
     def test_timezone_n1(self):
         """Tests timezone -1"""
@@ -315,6 +351,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T04:25:49.8102-01', str(rising))  # NOAA 04:24
         self.assertEqual('2015-05-22T11:58:26.8797-01', str(transit)) # NOAA 11:56:39
         self.assertEqual('2015-05-22T19:31:3.94921-01', str(setting)) # NOAA 19:30
+
+        return
 
 
     def test_timezone_p6(self):
@@ -337,6 +375,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T11:59:37.1856+06', str(transit)) # NOAA 11:56:38
         self.assertEqual('2015-05-22T19:32:31.4226+06', str(setting)) # NOAA 19:29
 
+        return
+
 
     def test_timezone_n6(self):
         """Tests timezone -6"""
@@ -351,6 +391,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2015-05-22T04:25:11.9585-06', str(rising))  # NOAA 04:24
         self.assertEqual('2015-05-22T11:57:36.6885-06', str(transit)) # NOAA 11:56:40
         self.assertEqual('2015-05-22T19:30:1.41858-06', str(setting)) # NOAA 19:30
+
+        return
 
 
     def test_wrong_date_2018jan31(self):
@@ -367,6 +409,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2018-01-31T07:13:26.5023-08', str(rising))
         self.assertEqual('2018-01-31T12:22:31.1063-08', str(transit))
         self.assertEqual('2018-01-31T17:31:35.7103-08', str(setting))
+
+        return
 
 
     def test_wrong_date_2018feb01(self):
@@ -386,6 +430,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2018-02-01T07:12:37.4165-08', str(rising))
         self.assertEqual('2018-02-01T12:22:39.6759-08', str(transit))
         self.assertEqual('2018-02-01T17:32:41.9353-08', str(setting)) # was 2018-01-31
+
+        return
 
 
     def test_wrong_rising_2018feb28(self):
@@ -407,6 +453,8 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2018-02-28T12:21:24.1057-08', str(transit))
         self.assertEqual('2018-02-28T18:00:55.5163-08', str(setting))
 
+        return
+
 
     def test_2018mar01(self):
         """Tests wrong date
@@ -425,6 +473,109 @@ class SunRiseAndSetTests(unittest.TestCase):
         self.assertEqual('2018-03-01T06:40:24.7133-08', str(rising))
         self.assertEqual('2018-03-01T12:21:4.26997-08', str(transit))
         self.assertEqual('2018-03-01T18:01:43.8267-08', str(setting))
+
+        return
+
+
+
+
+
+    def test_mlc_2018apr18_7am(self):
+        """Tests wrong date with timezone before
+
+        This is one of four tests bracketing the problem of getting
+        the wrong date depending on the timezone: -122 latitude (-8
+        timezone) but before 8 am getting the previous day.
+
+        """
+
+        a_datetime = coords.datetime('2018-04-18T07:00:00-08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-04-18T05:33:58.6014-08', str(rising))
+        self.assertEqual('2018-04-18T12:11:35.1228-08', str(transit))
+        self.assertEqual('2018-04-18T18:49:11.6441-08', str(setting))
+
+        return
+
+
+    def test_mlc_2018apr18_9am(self):
+        """Tests wrong date with timezone after
+
+        This is one of four tests bracketing the problem of getting
+        the wrong date depending on the timezone: -122 latitude (-8
+        timezone) but after 8 am getting the correct day.
+
+        """
+
+        a_datetime = coords.datetime('2018-04-18T09:00:00-08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-04-18T05:30:14.9913-08', str(rising)) # TODO should be same as test_2018apr18_7am?
+        self.assertEqual('2018-04-18T12:07:57.1532-08', str(transit))
+        self.assertEqual('2018-04-18T18:45:39.3151-08', str(setting))
+
+        return
+
+
+    def test_antimlc_2018apr18_5pm(self):
+        """Tests wrong date with timezone before
+
+        This is one of four tests bracketing the problem of getting
+        the wrong date depending on the timezone: +122 latitude (+8
+        timezone) but after 4 pm getting the wrong day.
+
+        """
+
+        a_datetime = coords.datetime('2018-04-18T17:00:00+08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.antimlc404, a_datetime)
+
+        self.assertEqual('2018-04-18T05:12:14.7203+08', str(rising))
+        self.assertEqual('2018-04-18T11:51:4.37649+08', str(transit))
+        self.assertEqual('2018-04-18T18:29:54.0326+08', str(setting))
+
+        return
+
+
+    def test_antimlc_2018apr18_3pm(self):
+        """Tests wrong date with timezone before
+
+        This is one of four tests bracketing the problem of getting
+        the wrong date depending on the timezone: +122 latitude (+8
+        timezone) but before 4 pm getting the correct day.
+
+        """
+
+        a_datetime = coords.datetime('2018-04-18T15:00:00+08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.antimlc404, a_datetime)
+
+        self.assertEqual('2018-04-18T05:15:58.2673+08', str(rising))
+        self.assertEqual('2018-04-18T11:54:42.3127+08', str(transit))
+        self.assertEqual('2018-04-18T18:33:26.3581+08', str(setting))
+
+        return
+
+
+
+
+    def test_mlc_2018oct18_3pm(self):
+        """Test for positive m0? not here
+
+        """
+
+        a_datetime = coords.datetime('2018-10-18T15:00:00+08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.antimlc404, a_datetime)
+
+        self.assertEqual('2018-10-18T06:06:47.3352+08', str(rising))
+        self.assertEqual('2018-10-18T11:40:31.1913+08', str(transit))
+        self.assertEqual('2018-10-18T17:14:15.0475+08', str(setting))
+
+        return
 
 
 
