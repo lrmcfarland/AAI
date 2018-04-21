@@ -198,18 +198,15 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     from Meeus, ch. 15
 
-    # TODO problem with rounding to the wrong date some times of the
-    year see test_SunPosition.py for examples. This error moves from
-    rising to transit to setting starting 2018-02-01 among other
-    times. Is back to being correct by 2016-06-01.
+    WARNING: I found adding the m0, m1 and m2 could mess with my timezone
+    adjustments by up to 2 days, hence the adjustments.
 
-    # TODO more than just sun position, return local time, altitude
-    # configurable to astronomical, nautical, civil, star, sun, moon
+    TODO try not normalizing m0, m1 or m2
 
-    # TODO error check for timezone and observer location?
+    TODO more than just sun position, return local time, altitude
+    configurable to astronomical, nautical, civil, star, sun, moon
 
-    # TODO more steps on p. 103?
-    # TODO set timezone on rising, transit, setting value
+    TODO error check for timezone and observer location?
 
     Args:
 
@@ -262,50 +259,134 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     hour_angle = coords.angle()
     hour_angle.radians = math.acos(cos_hour_angle)
 
+    # -------------------
+    # ----- transit -----
+    # -------------------
+
     # longitude sign convention is IAU, opposite Meeus p. 93
     m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
     m0.normalize(0, 1)
 
-    transit = coords.datetime(midnight.year, midnight.month, midnight.day,
-                              0, 0, 0, a_datetime.timezone)
-    transit += m0.value
-    transit += a_datetime.timezone/24
+    transit_utc = coords.datetime()
+    transit_utc.fromJulianDate(JDo + m0.value)
 
+
+    if not a_datetime.timezone:
+        transit_loc = transit_utc
+
+    else:
+
+        transit_loc = coords.datetime(midnight.year, midnight.month, midnight.day,
+                                      transit_utc.hour, transit_utc.minute, transit_utc.second,
+                                      a_datetime.timezone)
+
+        transit_loc += a_datetime.timezone/24
+
+        # can be two days off! and infinite failure for 2018-02-28 +=1
+        # TODO bug in last day in feb += 1?
+
+
+        if transit_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
+            transit_loc -= 2 # test case TODO
+
+        elif transit_loc.toJulianDate() - a_datetime.toJulianDate() > 0.5:
+            transit_loc -= 1 # test case 2018-04-18T17:00:00+08
+
+        elif transit_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
+            transit_loc += 2 # test case TODO
+
+        elif transit_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
+            transit_loc += 1 # test case 2018-04-18T07:00:00-08
+
+        elif math.fabs(transit_loc.toJulianDate() - a_datetime.toJulianDate()) < 0.5:
+            pass
+
+        else:
+            raise Error('transit: unsupported timezone mod case {}'.format(a_datetime))
+
+    # ------------------
+    # ----- rising -----
+    # ------------------
 
     m1 = coords.angle(m0.value - hour_angle.value/360)
     m1.normalize(0, 1)
 
-    rising = coords.datetime(midnight.year, midnight.month, midnight.day,
-                             0, 0, 0, a_datetime.timezone)
-    rising += m1.value
-    rising += a_datetime.timezone/24.0
+    rising_utc = coords.datetime()
+    rising_utc.fromJulianDate(JDo + m1.value)
 
-    # TODO a day too early on test_timezone_p6
+    if not a_datetime.timezone:
+        rising_loc = rising_utc
 
+    else:
+
+        rising_loc = coords.datetime(midnight.year, midnight.month, midnight.day,
+                                     rising_utc.hour, rising_utc.minute, rising_utc.second,
+                                     a_datetime.timezone)
+
+        rising_loc += a_datetime.timezone/24
+
+        if rising_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
+            rising_loc -= 2 # test case 2018-04-18T17:00:00+08
+
+        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() > 0.5:
+            rising_loc -= 1 # test case 2015-05-22T12:00:00+06, 2018-10-18T15:00:00+08,
+
+        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
+            rising_loc += 2 # test case TODO
+
+        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
+            rising_loc += 1 # test case 2018-04-18T07:00:00-08
+
+        elif math.fabs(rising_loc.toJulianDate() - a_datetime.toJulianDate()) < 0.5:
+            pass
+
+        else:
+            raise Error('rising: unsupported timezone mod case {}'.format(a_datetime))
+
+    # -------------------
+    # ----- setting -----
+    # -------------------
 
     m2 = coords.angle(m0.value + hour_angle.value/360)
-    # TODO m2.normalize(0, 1) ?
-    # TODO a day to late in december if normalizing
+    m2.normalize(0, 1)
 
+    setting_utc = coords.datetime()
+    setting_utc.fromJulianDate(JDo + m2.value)
 
-    setting = coords.datetime(midnight.year, midnight.month, midnight.day,
-                              0, 0, 0, a_datetime.timezone)
-    setting += m2.value
-    setting += a_datetime.timezone/24
+    if not a_datetime.timezone:
+        setting_loc = setting_utc
 
-    # TODO hack to fix datetime rounding error
+    else:
 
-    fixed_rising = coords.datetime(midnight.year, midnight.month, midnight.day,
-                                   rising.hour, rising.minute, rising.second, rising.timezone)
+        setting_loc = coords.datetime(midnight.year, midnight.month, midnight.day,
+                                      setting_utc.hour, setting_utc.minute, setting_utc.second,
+                                      a_datetime.timezone)
 
-    fixed_transit = coords.datetime(midnight.year, midnight.month, midnight.day,
-                                    transit.hour, transit.minute, transit.second, transit.timezone)
+        setting_loc += a_datetime.timezone/24
 
-    fixed_setting = coords.datetime(midnight.year, midnight.month, midnight.day,
-                                    setting.hour, setting.minute, setting.second, setting.timezone)
+        if setting_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
+            setting_loc -= 2 # test case TODO
 
+        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() > 0.5:
+            setting_loc -= 1 # test case 2018-04-18T17:00:00+08
 
-    return fixed_rising, fixed_transit, fixed_setting
+        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
+            setting_loc += 2 # test case 2018-04-18T07:00:00-08
+
+        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
+            setting_loc += 1 # test case 2018-01-31T12:55:00-08,
+                             # 2018-02-01T12:55:00-08,
+                             # 2018-04-18T09:00:00-08,
+                             # 2015-05-22T12:00:00-06,
+                             # 2018-03-01T10:00:00-08
+
+        elif math.fabs(setting_loc.toJulianDate() - a_datetime.toJulianDate()) < 0.5:
+            pass
+
+        else:
+            raise Error('setting: unsupported timezone mod case {}'.format(a_datetime))
+
+    return rising_loc, transit_loc, setting_loc
 
 
 # ================
