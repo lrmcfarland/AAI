@@ -459,7 +459,7 @@ class SunRiseAndSetTests(unittest.TestCase):
 
 
 
-    def test_mlc_2018apr18_7am(self):
+    def test_mlc_2018apr18_0700(self):
         """Tests wrong day observer timezone less than current hour
 
         This is one of four tests bracketing the problem of getting
@@ -481,7 +481,7 @@ class SunRiseAndSetTests(unittest.TestCase):
         return
 
 
-    def test_mlc_2018apr18_9am(self):
+    def test_mlc_2018apr18_0900(self):
         """Tests wrong day observer timezone greater than current hour
 
         This is one of four tests bracketing the problem of getting
@@ -501,7 +501,7 @@ class SunRiseAndSetTests(unittest.TestCase):
         return
 
 
-    def test_antimlc_2018apr18_5pm(self):
+    def test_antimlc_2018apr18_1700(self):
         """Tests wrong day observer timezone greater than current hour
 
         This is one of four tests bracketing the problem of getting
@@ -523,7 +523,7 @@ class SunRiseAndSetTests(unittest.TestCase):
         return
 
 
-    def test_antimlc_2018apr18_3pm(self):
+    def test_antimlc_2018apr18_1500(self):
         """Tests wrong day observer timezone less than current hour
 
         This is one of four tests bracketing the problem of getting
@@ -545,7 +545,7 @@ class SunRiseAndSetTests(unittest.TestCase):
 
 
 
-    def test_antimlc_2018oct18_3pm(self):
+    def test_antimlc_2018oct18_1500(self):
         """Test for in the fall"""
 
         a_datetime = coords.datetime('2018-10-18T15:00:00+08') # no DST
@@ -560,8 +560,8 @@ class SunRiseAndSetTests(unittest.TestCase):
 
 
 
-    def test_mlc_2018aug31_10am(self):
-        """Test for in august"""
+    def test_mlc_2018aug31_1000(self):
+        """Test for mlc 2018aug31 1000"""
 
         a_datetime = coords.datetime('2018-08-31T10:00:00-08') # no DST
 
@@ -573,6 +573,68 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         return
 
+
+    def test_mlc_2018apr20_0600(self):
+        """Test for mlc 2018apr20
+
+        Rising off by a day in old algorithm
+        This works for current time 7 am and onward.
+        """
+
+        a_datetime = coords.datetime('2018-04-20T06:00:00-08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-04-20T05:31:11.1024-08', str(rising))
+        self.assertEqual('2018-04-20T12:10:59.516-08', str(transit))
+        self.assertEqual('2018-04-20T18:50:47.9295-08', str(setting)) # day to early
+
+        return
+
+
+    def test_mlc_2018apr20_1800(self):
+        """Test for mlc 2018apr20 1800
+
+        Rising off by a day in old algorithm
+        """
+
+        a_datetime = coords.datetime('2018-04-20T18:00:00-08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-04-20T05:28:33.0581-08', str(rising)) # day too late
+        self.assertEqual('2018-04-20T12:08:54.917-08', str(transit))
+        self.assertEqual('2018-04-20T18:49:16.776-08', str(setting))
+
+        return
+
+
+    def test_mlc_2018apr22_0600(self):
+        """Test for setting off by a day in the old algorithm"""
+
+        a_datetime = coords.datetime('2018-04-22T06:00:00-08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-04-22T05:28:33.2722-08', str(rising))
+        self.assertEqual('2018-04-22T12:10:34.8754-08', str(transit))
+        self.assertEqual('2018-04-22T18:52:36.4785-08', str(setting)) # day too early
+
+        return
+
+
+    def test_mlc_2018apr22_2000(self):
+        """Test for setting off by a day in the old algorithm"""
+
+        a_datetime = coords.datetime('2018-04-22T20:00:00-08') # no DST
+
+        rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
+
+        self.assertEqual('2018-04-22T05:26:9.31046-08', str(rising)) # day too late
+        self.assertEqual('2018-04-22T12:08:49.4541-08', str(transit))
+        self.assertEqual('2018-04-22T18:51:29.5978-08', str(setting))
+
+        return
 
 
 
