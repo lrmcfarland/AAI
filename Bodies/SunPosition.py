@@ -325,6 +325,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
         rising_loc += a_datetime.timezone/24
 
+        # TODO de-hack this
+        
         if rising_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
             rising_loc -= 2 # test case 2018-04-18T17:00:00+08
 
@@ -334,14 +336,19 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
         elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
             rising_loc += 2 # test case TODO
 
-        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
+        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -1.0:
             rising_loc += 1 # test case 2018-04-18T07:00:00-08
 
-        elif math.fabs(rising_loc.toJulianDate() - a_datetime.toJulianDate()) < 0.5:
+        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
+            pass
+
+        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < 0.5:
             pass
 
         else:
             raise Error('rising: unsupported timezone mod case {}'.format(a_datetime))
+
+
 
     # -------------------
     # ----- setting -----
@@ -364,6 +371,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
         setting_loc += a_datetime.timezone/24
 
+        # TODO de-hack this
+
         if setting_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
             setting_loc -= 2 # test case TODO
 
@@ -373,6 +382,9 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
         elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
             setting_loc += 2 # test case 2018-04-18T07:00:00-08
 
+        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -1.25: # TODO meh?!?
+            setting_loc += 2 # test case
+
         elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
             setting_loc += 1 # test case 2018-01-31T12:55:00-08,
                              # 2018-02-01T12:55:00-08,
@@ -380,7 +392,7 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
                              # 2015-05-22T12:00:00-06,
                              # 2018-03-01T10:00:00-08
 
-        elif math.fabs(setting_loc.toJulianDate() - a_datetime.toJulianDate()) < 0.5:
+        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < 0.5:
             pass
 
         else:
