@@ -37,7 +37,7 @@ LABEL service "Astronomical Algorithms Implemented gunicorn wrapper"
 # packages
 
 RUN yum update -y
-RUN yum install -y gcc gcc-c++ boost boost-devel make cmake git epel-release && yum clean all
+RUN yum install -y gcc gcc-c++ boost boost-devel make cmake git epel-release
 RUN yum install -y python-devel python-pip && yum clean all # pip line belown not happy if this is in line above
 
 COPY requirements.txt /tmp
