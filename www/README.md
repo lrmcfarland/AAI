@@ -6,7 +6,64 @@ position calculation.
 
 # From the command line
 
-## Setup pyenv
+## Setup [pyenv](https://github.com/pyenv/pyenv)
+
+### On OS X with brew
+
+```
+    brew install pyenv-virtualenv
+
+```
+
+### env
+
+Run these commands in your shell but move to .bashrc to make permanent.
+
+```
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+
+```
+
+Create python 2.7 or 3.7 envs
+
+```
+
+    pyenv install 2.7.15
+    pyenv install 3.7.0
+
+    pyenv virtualenv 2.7.15 sb-py2
+    pyenv virtualenv 3.7.0 sb-py3
+
+
+    $ pyenv virtualenvs
+    2.7.15/envs/sb-py2 (created from /Users/lrm/.pyenv/versions/2.7.15)
+    3.7.0/envs/sb-py3 (created from /Users/lrm/.pyenv/versions/3.7.0)
+    sb-py2 (created from /Users/lrm/.pyenv/versions/2.7.15)
+    sb-py3 (created from /Users/lrm/.pyenv/versions/3.7.0)
+
+
+    pyenv activate sb-py2
+
+
+```
+
+Add the required libraries from AAI/requirements.txt
+
+```
+
+
+(sb-py2) lrmz-iMac:AAI lrm$ pip install -r requirements.txt
+Collecting requirements.txt
+
+
+```
+
+
+
+## Superseded: setup virtualenv
+
+Here pyenv is local not the application described above.
 
 one time setup
 
@@ -103,7 +160,7 @@ SECRET_KEY = 'changeme'
 # PYTHONPATH :../Coordinates/Python/Boost/build/lib.macosx-10.12-intel-2.7:..
 
 usage: aai.py [-h] [-d] [--host host] [--logfilename logfilename]
-              [--loghandler HANDLER] [-l LEVEL] [-p PORT]
+	      [--loghandler HANDLER] [-l LEVEL] [-p PORT]
 
 Astronomical Algorithms Implemented flask server
 
@@ -112,13 +169,13 @@ optional arguments:
   -d, --debug           flask debug (default: False)
   --host host           host IP to serve (default: 0.0.0.0)
   --logfilename logfilename
-                        name of log file (default:
-                        /opt/starbug.com/logs/flask)
+			name of log file (default:
+			/opt/starbug.com/logs/flask)
   --loghandler HANDLER  logging handler choice: rotating, stream (default:
-                        stream)
+			stream)
   -l LEVEL, --loglevel LEVEL
-                        logging level choice: debug, info, warn, error
-                        (default: warn)
+			logging level choice: debug, info, warn, error
+			(default: warn)
   -p PORT, --port PORT  port (default: 8080)
 
 ```
