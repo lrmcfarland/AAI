@@ -169,18 +169,68 @@ button#get_solar_azimuth_map {
     var rising_azimuth_marker;
     var setting_azimuth_marker;
 
-    function initMap() {
+    function initSolarMap() {
 
       {# TODO init from user location? or fixed? #}
 
       var mapProp = {
-	center:new google.maps.LatLng(37.4, -122.082),
+	center:new google.maps.LatLng(51.4764838, -0.0051793),
 	zoom: 15,
       };
 
       sazmap = new google.maps.Map(document.getElementById("sunRiseSetMap"), mapProp);
 
-    }; {# end initMap() #}
+    }; {# end initSolarMap() #}
+
+
+    function drawSolarMarker(azimuth_marker, sun_position, lat_off, lon_off, marker_rotation, marker_color) {
+
+	if (azimuth_marker != null) {
+	    azimuth_marker.setMap(null);
+	}
+
+	azimuth_marker = new google.maps.Marker({
+	    position: {lat: sun_position.latitude + lat_off, lng: sun_position.longitude + lon_off},
+	    icon: {
+		path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+		scale: 10,
+		rotation: marker_rotation,
+		strokeColor: marker_color,
+		flat: true,
+	    },
+	    draggable: true,
+	    map: sazmap,
+	});
+
+	return azimuth_marker;
+
+    }; {# end drawSolarMarker() #}
+
+
+    function drawSolarMap(sun_position) {
+
+	$("#current_azimuth").text(sun_position.current_azimuth_str);
+	$("#current_time").text(sun_position.current_time_str);
+
+	$("#rising_azimuth").text(sun_position.rising_azimuth_str);
+	$("#rising_time").text(sun_position.rising_time_str);
+
+	$("#transit_azimuth").text(sun_position.transit_azimuth_str);
+	$("#transit_time").text(sun_position.transit_time_str);
+
+	$("#setting_azimuth").text(sun_position.setting_azimuth_str);
+	$("#setting_time").text(sun_position.setting_time_str);
+
+	sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+
+	current_azimuth_marker = drawSolarMarker(current_azimuth_marker, sun_position, -0.005, 0,  sun_position.current_azimuth, '#ffD700');
+	rising_azimuth_marker = drawSolarMarker(rising_azimuth_marker,   sun_position,  0,  0.005, sun_position.rising_azimuth,  '#0F0');
+	setting_azimuth_marker = drawSolarMarker(setting_azimuth_marker, sun_position,  0, -0.005, sun_position.setting_azimuth, '#F00');
+
+    };
+
+
+
 
 
     {# ----------------- #}
@@ -224,72 +274,7 @@ button#get_solar_azimuth_map {
 
 	    } else {
 
-	       $("#current_azimuth").text(sun_position.current_azimuth_str);
-	       $("#current_time").text(sun_position.current_time_str);
-
-	       $("#rising_azimuth").text(sun_position.rising_azimuth_str);
-	       $("#rising_time").text(sun_position.rising_time_str);
-
-	       $("#transit_azimuth").text(sun_position.transit_azimuth_str);
-	       $("#transit_time").text(sun_position.transit_time_str);
-
-	       $("#setting_azimuth").text(sun_position.setting_azimuth_str);
-	       $("#setting_time").text(sun_position.setting_time_str);
-
-	       sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
-
-	       if (current_azimuth_marker != null) {
-		 current_azimuth_marker.setMap(null);
-	       }
-
-	       current_azimuth_marker = new google.maps.Marker({
-		 position: {lat: sun_position.latitude - 0.005, lng: sun_position.longitude},
-		   icon: {
-		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-		     scale: 10,
-		     rotation: sun_position.current_azimuth,
-		     strokeColor: '#00F',
-		     flat: true,
-		   },
-		 draggable: true,
-		 map: sazmap,
-	       });
-
-	       if (rising_azimuth_marker != null) {
-		 rising_azimuth_marker.setMap(null);
-	       }
-
-	       rising_azimuth_marker = new google.maps.Marker({
-		 position: {lat: sun_position.latitude, lng: sun_position.longitude + 0.005},
-		   icon: {
-		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-		     scale: 10,
-		     rotation: sun_position.rising_azimuth,
-		     strokeColor: '#0F0',
-		     flat: true,
-		   },
-		 draggable: true,
-		 map: sazmap,
-	       });
-
-	       if (setting_azimuth_marker != null) {
-		 setting_azimuth_marker.setMap(null);
-	       }
-
-	       setting_azimuth_marker = new google.maps.Marker({
-		 position: {lat: sun_position.latitude, lng: sun_position.longitude - 0.005},
-		   icon: {
-		     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-		     scale: 10,
-		     rotation: sun_position.setting_azimuth,
-		     strokeColor: '#F00',
-		     flat: true
-		   },
-		 draggable: true,
-		 map: sazmap,
-	       });
-
-
+		drawSolarMap(sun_position);
 
 	    };
 
@@ -308,7 +293,7 @@ button#get_solar_azimuth_map {
 
   </script>
 
-  <script src="https://maps.googleapis.com/maps/api/js?key={{config['GOOGLEMAPS_KEY']}}&callback=initMap" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={{config['GOOGLEMAPS_KEY']}}&callback=initSolarMap" async defer></script>
 
 
 
