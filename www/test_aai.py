@@ -5,7 +5,9 @@
 
 This needs location of the coords python wrappers set in pylaunch.sh
 
-to run: ./bin/pylaunch.sh test_aai.py -v
+to run:
+
+    ./bin/pylaunch.sh test_aai.py -v
 
 
 Reference:
@@ -28,6 +30,8 @@ class AAITests(unittest.TestCase):
         self.app = aai_instance.test_client()
         self.app.testing = True
 
+        return
+
 
     def test_home_page(self):
         """Test home page"""
@@ -36,56 +40,63 @@ class AAITests(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertIn(b'<h1>Astronomical Algorithms Implemented</h1>', response.data)
 
+        return
+
     # ----------------------
     # ----- transforms -----
     # ----------------------
 
 
-    # ----- latitude2decimal -----
+    # ----- dms2dec -----
 
-    def test_latitude2decimal_dms1(self):
-        """Test latitude2decimal degrees:minutes:seconds"""
+    def test_dms2dec_dms1(self):
+        """Test dms2dec degrees:minutes:seconds"""
 
-        response = self.app.get('/api/v1/latitude2decimal?latitude=37:30:30')
-
-        self.assertEqual('200 OK', response.status)
-        self.assertEqual(200, response.status_code)
-
-        jresp = json.loads(response.data)
-        self.assertEqual(0, len(jresp['errors']))
-        self.assertAlmostEqual(37.5083333333, float(jresp['latitude']))
-
-
-    def test_latitude2decimal_d1(self):
-        """Test latitude2decimal degrees:minutes:seconds"""
-
-        response = self.app.get('/api/v1/latitude2decimal?latitude=45')
+        response = self.app.get('/api/v1/dms2dec?dms=37:30:30')
 
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
         jresp = json.loads(response.data)
         self.assertEqual(0, len(jresp['errors']))
-        self.assertAlmostEqual(45.0, float(jresp['latitude']))
+        self.assertAlmostEqual(37.5083333333, float(jresp['dec']))
+
+        return
 
 
-    def test_latitude2decimal_dm1(self):
-        """Test latitude2decimal degrees:minutes:seconds"""
+    def test_dms2dec_d1(self):
+        """Test dms2dec degrees:minutes:seconds"""
 
-        response = self.app.get('/api/v1/latitude2decimal?latitude=-45:30')
+        response = self.app.get('/api/v1/dms2dec?dms=45')
 
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
         jresp = json.loads(response.data)
         self.assertEqual(0, len(jresp['errors']))
-        self.assertAlmostEqual(-45.5, float(jresp['latitude']))
+        self.assertAlmostEqual(45.0, float(jresp['dec']))
+
+        return
 
 
-    def test_latitude2decimal_err1(self):
-        """Test latitude2decimal unsupported format"""
+    def test_dms2dec_dm1(self):
+        """Test dms2dec degrees:minutes:seconds"""
 
-        response = self.app.get('/api/v1/latitude2decimal?latitude=we36asdf')
+        response = self.app.get('/api/v1/dms2dec?dms=-45:30')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual(-45.5, float(jresp['dec']))
+
+        return
+
+    def test_dms2dec_err1(self):
+        """Test dms2dec unsupported format"""
+
+        response = self.app.get('/api/v1/dms2dec?dms=we36asdf')
 
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
@@ -93,7 +104,74 @@ class AAITests(unittest.TestCase):
         jresp = json.loads(response.data)
 
         self.assertEqual(1, len(jresp['errors']))
-        self.assertEqual(u'unsupported format for latitude: we36asdf', jresp['errors'][0])
+        self.assertEqual(u'unsupported format for dms: we36asdf', jresp['errors'][0])
+
+        return
+
+
+
+    # ----- dec2dms -----
+
+    def test_dec2dms_dms1(self):
+        """Test dec2dms degrees:minutes:seconds"""
+
+        response = self.app.get('/api/v1/dec2dms?dec=37:30:30')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual('37:30:30', jresp['dms'])
+
+        return
+
+
+    def test_dec2dms_d1(self):
+        """Test dec2dms degrees:minutes:seconds"""
+
+        response = self.app.get('/api/v1/dec2dms?dec=45')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual('45:00:00', jresp['dms'])
+
+        return
+
+
+    def test_dec2dms_dm1(self):
+        """Test dec2dms degrees:minutes:seconds"""
+
+        response = self.app.get('/api/v1/dec2dms?dec=-45:30')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+        self.assertEqual(0, len(jresp['errors']))
+        self.assertAlmostEqual('-45:30:00', jresp['dms'])
+
+        return
+
+
+    def test_dec2dms_err1(self):
+        """Test dec2dms unsupported format"""
+
+        response = self.app.get('/api/v1/dec2dms?dec=we36asdf')
+
+        self.assertEqual('200 OK', response.status)
+        self.assertEqual(200, response.status_code)
+
+        jresp = json.loads(response.data)
+
+        self.assertEqual(1, len(jresp['errors']))
+        self.assertEqual(u'unsupported format for dec: we36asdf', jresp['errors'][0])
+
+
+        return
 
 
     # -----------------------
@@ -118,6 +196,8 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(-122.758333333, float(jresp['params']['longitude']))
         self.assertAlmostEqual(6.50833333333, float(jresp['params']['ra']))
 
+        return
+
 
     def test_standardize_n2(self):
         """Test standardize normal with dst"""
@@ -137,6 +217,8 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(-122.758361111, float(jresp['params']['longitude']))
         self.assertAlmostEqual(6.5, float(jresp['params']['ra']))
 
+        return
+
 
     def test_standardize_err1(self):
         """Test standardize error incomplete date time key set"""
@@ -150,6 +232,8 @@ class AAITests(unittest.TestCase):
 
         self.assertEqual(1, len(jresp['warnings']))
         self.assertEqual(u'Incomplete datetime key set', jresp['warnings'][0])
+
+        return
 
 
     def test_standardize_err2(self):
@@ -175,6 +259,8 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(-122.758333333, float(jresp['params']['longitude']))
         self.assertAlmostEqual(6.50833333333, float(jresp['params']['ra']))
 
+        return
+
 
     def test_standardize_err3(self):
         """Test standardize multiple format errors"""
@@ -198,6 +284,7 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(-122.75, float(jresp['params']['longitude']))
         self.assertAlmostEqual(-6.25, float(jresp['params']['ra']))
 
+        return
 
     # ----- radec2azalt -----
 
@@ -215,6 +302,7 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(-6.159799566504844, xform_data[u'altitude'])
         self.assertAlmostEqual(85.3351397270823, xform_data[u'azimuth'])
 
+        return
 
     # ----- azalt2radec -----
 
@@ -231,6 +319,7 @@ class AAITests(unittest.TestCase):
         self.assertAlmostEqual(0, xform_data[u'ra'])
         self.assertAlmostEqual(0, xform_data[u'dec'])
 
+        return
 
 
     # --------------------------------
@@ -250,6 +339,8 @@ class AAITests(unittest.TestCase):
 
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
+        return
+
 
     def test_daily_solar_altitude_404mlc_2018_01_03(self):
         """sun daily solar altitude for 2018 jan 03"""
@@ -260,6 +351,8 @@ class AAITests(unittest.TestCase):
         position_data = json.loads(response.data)
 
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
+
+        return
 
 
     def test_daily_solar_altitude_404mlc_2018_02_03(self):
@@ -275,6 +368,8 @@ class AAITests(unittest.TestCase):
 
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
+        return
+
 
     def test_daily_solar_altitude_404mlc_2018_03_03(self):
         """sun daily solar altitude for 2018 mar 03"""
@@ -285,6 +380,8 @@ class AAITests(unittest.TestCase):
         position_data = json.loads(response.data)
 
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
+
+        return
 
 
     def test_daily_solar_altitude_below_horizon(self):
@@ -298,6 +395,7 @@ class AAITests(unittest.TestCase):
 
         self.assertEqual(u'object is below the horizon from this observation point', position_data[u'sun_marker_azimuth'])
 
+        return
 
 
     def test_daily_solar_altitude_bad_longitude(self):
@@ -312,6 +410,8 @@ class AAITests(unittest.TestCase):
         self.assertEqual(1, len(position_data['errors']))
         self.assertEqual(u'unsupported format for latitude: badlongitude', position_data[u'errors'][0])
 
+        return
+
 
     def test_daily_solar_altitude_incomplete_parameters(self):
         """test error object below horizon"""
@@ -325,6 +425,7 @@ class AAITests(unittest.TestCase):
         self.assertEqual(1, len(position_data['errors']))
         self.assertEqual(u'expected string or buffer', position_data[u'errors'][0])
 
+        return
 
 
 if __name__ == '__main__':

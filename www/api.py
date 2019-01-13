@@ -39,10 +39,10 @@ api = flask.Blueprint('api', __name__, url_prefix='/api/v1')
 # ----------------------
 
 
-@api.route("/latitude2decimal")
-def latitude2decimal():
+@api.route("/dms2dec")
+def dms2dec():
 
-    """Converts a starbug format of deg[:min[:sec]] to decimal degrees
+    """Converts a string of deg[:min[:sec]] to decimal degrees
 
     Returns: JSON
         result.degrees
@@ -50,8 +50,27 @@ def latitude2decimal():
     """
     result = {'errors': list()}
     try:
-        latitude = utils.request_angle('latitude', flask.request)
-        result['latitude'] = str(latitude.getValue())
+        dms = utils.request_angle('dms', flask.request)
+        result['dec'] = str(dms.getValue())
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+@api.route("/dec2dms")
+def dec2dms():
+
+    """Converts decimal degrees into a string of deg[:min[:sec]]
+
+    Returns: JSON
+        result.degrees
+        result.errors = list()
+    """
+    result = {'errors': list()}
+    try:
+        dec = utils.request_angle('dec', flask.request)
+        result['dms'] = str(dec)
     except (utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
@@ -185,7 +204,7 @@ def azalt2radec():
         result['ra'] = Transforms.utils.get_RA(body_eq).value
         result['dec'] = Transforms.utils.get_declination(body_eq).value
 
-    except (TypeError, ValueError, RuntimeError) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -218,7 +237,7 @@ def radec2azalt():
         result['altitude'] = Transforms.utils.get_altitude(body_hz).value
 
 
-    except (TypeError, ValueError, RuntimeError) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)

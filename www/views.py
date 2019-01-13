@@ -25,11 +25,11 @@ def home():
     return flask.render_template('home.html')
 
 
-@home_page.route("/accuracy")
-def accuracy():
-    """Accuracy page"""
+@home_page.route("/solar_azimuth_map")
+def solar_azimuth_map():
+    """Plot the sun's azimuth for the observer's location"""
 
-    return flask.render_template('accuracy.html')
+    return flask.render_template('solar_azimuth_map.html')
 
 
 @home_page.route("/daily_solar_altitude_chart")
@@ -46,11 +46,17 @@ def eqhz_transforms():
     return flask.render_template('eqhz_transforms.html')
 
 
-@home_page.route("/solar_azimuth_map")
-def solar_azimuth_map():
-    """Plot the sun's azimuth for the observer's location"""
+@home_page.route("/dms_transforms")
+def dms_transforms():
+    """Transform deg:min:sec to decimal degrees"""
+
+    return flask.render_template('dms_transforms.html')
 
 
+@home_page.route("/accuracy")
+def accuracy():
+    """Accuracy page"""
 
-    return flask.render_template('solar_azimuth_map.html')
+    return flask.render_template('accuracy.html')
+
 

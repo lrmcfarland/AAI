@@ -1,0 +1,148 @@
+{# flask ajax example #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+<style>
+
+
+table#coordinates_table {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+
+}
+
+</style>
+
+<script type="text/javascript">
+
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+
+  $(document).ready(function() {
+
+
+    $("#dms2dec").click(function(e) {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/dms2dec",
+      {
+	dms: $('input[name="dms"]').val(),
+      },
+
+      function(data) {
+
+	if ("error" in data) {
+
+	  alert("Error: " + data.error);
+
+	  $("#_dec").val("TBD");
+
+	} else {
+
+	  $("#_dec").val(data.dec);
+
+	};
+
+      });
+
+      return false;
+
+    }); {# end dms2dec click #}
+
+
+
+    $("#dec2dms").click(function(e) {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/dec2dms",
+      {
+	dec: $('input[name="dec"]').val(),
+      },
+
+      function(data) {
+
+	if ("error" in data) {
+
+	  alert("Error: " + data.error);
+
+	  $("#_dms").val("TBD");
+
+	} else {
+
+	  $("#_dms").val(data.dms);
+
+	};
+
+      });
+
+      return false;
+
+    }); {# end dec2dms click #}
+
+
+
+  }); {# end ready method #}
+
+</script>
+
+{% endblock %}
+
+{% block title %} Deg:Min:Sec to Decimal degree Transforms {% endblock %}
+
+{% block content %}
+
+<h1>Degree to Decimal transforms</h1>
+
+<br>
+
+<div>
+
+  This page transforms coordinates between
+
+  degree/hour:minute:second notation to the decimal equivalent.
+
+
+</div>
+
+<br>
+
+<div class="resultbox">
+
+  <table id="coordinates_table">
+
+
+    <tr>
+      <td></td>
+      <td> <button id="dms2dec">deg:min:sec to decimal degrees</button> </td>
+      <td></td>
+    </tr>
+
+    <tr>
+
+      <th align="center">Deg:Min:Sec</th>
+      <td></td>
+      <th align="center">Decimal Degrees</th>
+
+    </tr>
+    <tr>
+
+      <td align="center"><input type="text" name="dms" id="_dms" value="0"></td>
+      <td></td>
+      <td align="center"><input type="text" name="dec" id="_dec" value="0"></td>
+
+    </tr>
+
+    <tr>
+      <td></td>
+      <td> <button id="dec2dms">decimal degrees to deg:min:sec</button> </td>
+      <td></td>
+    </tr>
+
+
+  </table>
+
+</div>
+
+
+{% endblock %}
