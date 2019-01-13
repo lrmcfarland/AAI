@@ -13,7 +13,7 @@
 }
 
 .aaimap {
-    width: 900px;
+    width: 950px;
     height: 600px;
 }
 
@@ -47,10 +47,46 @@ button#get_solar_azimuth_map {
 <br>
 
 <div class="twocolumn">
-  This shows the sun rise and set lines for the location at the given
-  time. The green marker is pointing to the sun rise, the blue to the
-  current position and the red to sun set. They can be dragged with
-  out changing their bearing.
+
+    This page will take an observer location and time and plot the sun
+    rise (green), current position (yellow) and sun set (red) as markers
+    on a google map. The most obvious test case is
+    <a href="https://en.wikipedia.org/wiki/Stonehenge">Stonehenge</a>.
+
+    <button id="get_stonehenge_summer_azimuth_map">Stonehenge on the
+      summer solstice</button> shows the sun rise marker pointing towards
+    the heal stone.
+
+    <button id="get_stonehenge_winter_azimuth_map">Stonehenge on the
+      winter solstice</button> shows the sun set marker pointing away from
+    the heal stone.
+
+    (The markers can be dragged without changing their bearing.)
+
+    This gives a sunrise azimuth of 49:22 which is in good agreement
+    with what I found
+    on this <a href="http://www.sacred-texts.com/neu/eng/sac/sac15.htm">
+      astronomical archaeology site</a>
+
+
+  <p>
+    Manhattanhenge (as noted by the <a href="https://www.nytimes.com/2018/05/28/science/manhattanhenge-dates-time-locations.html?rref=collection%2Fsectioncollection%2Fscience&action=click&contentCollection=science&region=rank&module=package&version=highlights&contentPlacement=2&pgtype=sectionfront">
+      New York Times</a> and <a href="https://www.bbc.com/news/world-us-canada-44313124">BBC</a>)
+
+    is another example, but since the streets are
+    not alligned with the solstice sunrise, there are four alignments (and four half alignments)
+
+    <ul>
+      <li> <button id="get_manhattenhenge_summer1_azimuth_map">summer sunset  one: 2018-05-30</button> </li>
+      <li> <button id="get_manhattenhenge_summer2_azimuth_map">summer sunset  two: 2018-07-12</button> </li>
+      <li> <button id="get_manhattenhenge_winter1_azimuth_map">winter sunrise one: 2018-12-05</button> </li>
+      <li> <button id="get_manhattenhenge_winter2_azimuth_map">winter sunrise one: 2018-01-08</button> </li>
+    </ul>
+
+
+
+  </p>
+
 
 </div>
 
@@ -80,42 +116,41 @@ button#get_solar_azimuth_map {
       <table id="results_table" align="center">
 
 	<tr>
+	  <th></th>
+	  <th>azimuth</th>
+	  <th>time</th>
+	</tr>
+
+	<tr>
+	  <th></th>
+	  <th>degrees from North</th>
+	  <th>ISO8601</th>
+	</tr>
+
+	
+	<tr>
 	  <th>Current</th>
 	  <td id="current_azimuth">TBD</td>
-	  <td>azimuth in degrees</td>
-
 	  <td id="current_time">TBD</td>
-	  <td>ISO8601</td>
 
 	</tr>
 
 	<tr>
 	  <th>Rising</th>
 	  <td id="rising_azimuth">TBD</td>
-	  <td>azimuth in degrees</td>
-
 	  <td id="rising_time">TBD</td>
-	  <td>ISO8601</td>
-
 	</tr>
 
 	<tr>
 	  <th>Transit</th>
 	  <td id="transit_azimuth">TBD</td>
-	  <td>azimuth in degrees</td>
-
 	  <td id="transit_time">TBD</td>
-	  <td>ISO8601</td>
-
 	</tr>
 
 	<tr>
 	  <th>Setting</th>
 	  <td id="setting_azimuth">TBD</td>
-	  <td>azimuth in degrees</td>
-
 	  <td id="setting_time">TBD</td>
-	  <td>ISO8601</td>
 
 	</tr>
 
@@ -127,27 +162,6 @@ button#get_solar_azimuth_map {
 
 </table>
 
-
-    <div class="twocolumn">
-
-      <p>
-      An interesting example
-      is <a href="https://en.wikipedia.org/wiki/Stonehenge">Stonehenge</a>
-      (latitude: 51:10:43.84, longitude: -1:49:34.28). Setting the date to
-      the summer solstice (June 21) and assuming prehistoric Britons
-      were not using daylight saving time, this gives a sunrise
-      azimuth of 49:54 which is in good agreement with what I found
-      on <a href="http://www.sacred-texts.com/neu/eng/sac/sac15.htm">this
-      site</a> and lines up with what we see in the satellite image
-      with google maps. Conversely, sun set on the winter solstice
-      (December 21) is the reverse of this.
-
-      </p>
-
-      <img src="static/images/stonehenge_summer_solstice.jpg">
-
-
-    </div>
 
 
 
@@ -170,8 +184,6 @@ button#get_solar_azimuth_map {
     var setting_azimuth_marker;
 
     function initSolarMap() {
-
-      {# TODO init from user location? or fixed? #}
 
       var mapProp = {
 	center:new google.maps.LatLng(51.4764838, -0.0051793),
@@ -209,28 +221,77 @@ button#get_solar_azimuth_map {
 
     function drawSolarMap(sun_position) {
 
-	$("#current_azimuth").text(sun_position.current_azimuth_str);
-	$("#current_time").text(sun_position.current_time_str);
+	if (sun_position.errors.length > 0) {
 
-	$("#rising_azimuth").text(sun_position.rising_azimuth_str);
-	$("#rising_time").text(sun_position.rising_time_str);
+	    $("#current_azimuth").text("TBD");
+	    $("#current_time").text("TBD");
 
-	$("#transit_azimuth").text(sun_position.transit_azimuth_str);
-	$("#transit_time").text(sun_position.transit_time_str);
+	    $("#rising_azimuth").text("TBD");
+	    $("#rising_time").text("TBD");
 
-	$("#setting_azimuth").text(sun_position.setting_azimuth_str);
-	$("#setting_time").text(sun_position.setting_time_str);
+	    $("#transit_azimuth").text("TBD");
+	    $("#transit_time").text("TBD");
 
-	sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+	    $("#setting_azimuth").text("TBD");
+	    $("#setting_time").text("TBD");
 
-	current_azimuth_marker = drawSolarMarker(current_azimuth_marker, sun_position, -0.005, 0,  sun_position.current_azimuth, '#ffD700');
-	rising_azimuth_marker = drawSolarMarker(rising_azimuth_marker,   sun_position,  0,  0.005, sun_position.rising_azimuth,  '#0F0');
-	setting_azimuth_marker = drawSolarMarker(setting_azimuth_marker, sun_position,  0, -0.005, sun_position.setting_azimuth, '#F00');
+	    alert("Errors: " + sun_position.errors.join(", "));
+
+	} else {
+
+
+	    $("#current_azimuth").text(sun_position.current_azimuth_str);
+	    $("#current_time").text(sun_position.current_time_str);
+
+	    $("#rising_azimuth").text(sun_position.rising_azimuth_str);
+	    $("#rising_time").text(sun_position.rising_time_str);
+
+	    $("#transit_azimuth").text(sun_position.transit_azimuth_str);
+	    $("#transit_time").text(sun_position.transit_time_str);
+
+	    $("#setting_azimuth").text(sun_position.setting_azimuth_str);
+	    $("#setting_time").text(sun_position.setting_time_str);
+
+
+	    $('input[name="latitude"]').val(sun_position.latitude);
+	    $('input[name="longitude"]').val(sun_position.longitude);
+
+
+	    {# TODO meh! use regex #}
+	    var a_datetime = sun_position.datetime.split('T');
+	    var a_timeandzone = [a_datetime[1], 0];
+	    var a_sign = '';
+
+	    if (/-/.test(a_datetime[1])) {
+
+		a_timeandzone = a_datetime[1].split('-');
+		a_sign = '-';
+
+	    } else if (/\+/.test(a_datetime[1])) {
+
+		a_timeandzone = a_datetime[1].split('+');
+		a_sign = '+';
+
+	    } else {
+		{# pass #}
+	    }
+
+	    $('input[name="date"]').val(a_datetime[0]);
+
+	    $('input[name="time"]').val(a_timeandzone[0]);
+	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
+
+
+
+	    sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+
+	    current_azimuth_marker = drawSolarMarker(current_azimuth_marker, sun_position, -0.005, 0,  sun_position.current_azimuth, '#ffD700');
+	    rising_azimuth_marker = drawSolarMarker(rising_azimuth_marker,   sun_position,  0,  0.005, sun_position.rising_azimuth,  '#0F0');
+	    setting_azimuth_marker = drawSolarMarker(setting_azimuth_marker, sun_position,  0, -0.005, sun_position.setting_azimuth, '#F00');
+
+	};
 
     };
-
-
-
 
 
     {# ----------------- #}
@@ -256,33 +317,170 @@ button#get_solar_azimuth_map {
 	  },
 	  function(sun_position) {
 
-	    if (sun_position.errors.length > 0) {
-
-	       $("#current_azimuth").text("TBD");
-	       $("#current_time").text("TBD");
-
-	       $("#rising_azimuth").text("TBD");
-	       $("#rising_time").text("TBD");
-
-	       $("#transit_azimuth").text("TBD");
-	       $("#transit_time").text("TBD");
-
-	       $("#setting_azimuth").text("TBD");
-	       $("#setting_time").text("TBD");
-
-	      alert("Errors: " + sun_position.errors.join(", "));
-
-	    } else {
-
-		drawSolarMap(sun_position);
-
-	    };
+	      drawSolarMap(sun_position);
 
 	  }); {# end getJSON #}
 
 	return false;
 
       }); {# end get_solar_azimuth_map click #}
+
+
+
+
+      $("#get_stonehenge_summer_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+	  {
+	      latitude: '51:10:55',
+	      longitude: '-1:49:34.28',
+	      date: '2018-06-21',
+	      time: '03:52',
+	      timezone: '0',
+	      dst: 'false'
+
+	  },
+	  function(sun_position) {
+
+	      drawSolarMap(sun_position);
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_stonehenge_summer_azimuth_map click #}
+
+
+
+      $("#get_stonehenge_winter_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+	  {
+	      latitude: '51:10:55',
+	      longitude: '-1:49:34.28',
+	      date: '2018-12-21',
+	      time: '16:02',
+	      timezone: '0',
+	      dst: 'false'
+
+	  },
+	  function(sun_position) {
+
+	      drawSolarMap(sun_position);
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_stonehenge_summer_azimuth_map click #}
+
+
+
+
+
+      $("#get_manhattenhenge_summer1_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+	  {
+	      latitude: '40.759',
+	      longitude: '-73.99',
+	      date: '2018-05-30',
+	      time: '19:22',
+	      timezone: '-5',
+	      dst: 'false'
+
+	  },
+	  function(sun_position) {
+
+	      drawSolarMap(sun_position);
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_manhattenhenge_summer1_azimuth_map click #}
+
+
+
+      $("#get_manhattenhenge_summer2_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+	  {
+	      latitude: '40.759',
+	      longitude: '-73.99',
+	      date: '2018-07-12',
+	      time: '19:30',
+	      timezone: '-5',
+	      dst: 'false'
+
+	  },
+	  function(sun_position) {
+
+	      drawSolarMap(sun_position);
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_manhattenhenge_summer2_azimuth_map click #}
+
+
+
+      $("#get_manhattenhenge_winter1_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+	  {
+	      latitude: '40.759',
+	      longitude: '-73.99',
+	      date: '2018-12-05',
+	      time: '07:07',
+	      timezone: '-5',
+	      dst: 'false'
+
+	  },
+	  function(sun_position) {
+
+	      drawSolarMap(sun_position);
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_manhattenhenge_winter1_azimuth_map click #}
+
+
+
+
+
+      $("#get_manhattenhenge_winter2_azimuth_map").click(function(e) {
+
+
+	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+	  {
+	      latitude: '40.759',
+	      longitude: '-73.99',
+	      date: '2018-01-08',
+	      time: '07:20',
+	      timezone: '-5',
+	      dst: 'false'
+
+	  },
+	  function(sun_position) {
+
+	      drawSolarMap(sun_position);
+
+	  }); {# end getJSON #}
+
+	return false;
+
+      }); {# end get_manhattenhenge_winter2_azimuth_map click #}
+
+
 
 
 
