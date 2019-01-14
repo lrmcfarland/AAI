@@ -6,6 +6,7 @@
 
 
 <h1>Astronomical Algorithms Implemented</h1>
+<h2>in C++, Python and JavaScript.</h2>
 
 <br>
 
@@ -20,13 +21,24 @@ This is my implementation of various astronomical algorithms, mostly
 Algorithms by Jean Meeus</a>, with parts found around the home and
 across the internet.
 
-This web page pulls together examples of the techniques I have learned
-for how to combine C++, Python and JavaScript. It also puts the
-AAI server in a docker container as a micro-service (a really fat
-micro-service in need of a multi stage build soon)
-with <a href="http://www.nginx.com">Nginx</a> running as a reverse proxy.
+It pulls together examples of design patterns I have
+learned for how to combine C++, Python and JavaScript.
 
-It is also created using those techniques.
+Access to the implementation here is through a flask server in a docker
+container as a micro-service (a really fat micro-service in need of a
+multi stage build soon).
+
+The server provides
+an <a href="https://github.com/lrmcfarland/AAI/blob/master/www/api.py">AAI
+API</a> to support various operations like transforming an
+observer's <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">horizontal
+coordinate system</a>
+to <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">an
+  equatorial</a> one.
+
+This is used to support this web page as well as data operations
+for the <a href="https://db.starbug.com/">starbug database</a>
+like standardizing input data.
 
 <p>
 My purpose is to provide a complete, non-trivial example that is
@@ -43,12 +55,9 @@ C++ coordinates library</a>, is caught on the server in the Python
 wrapper, sent as a HTTP response to the client and displayed as a
 JavaScript alert.
 <p>
-I developed this on OS X.
 
-My public server is on Linux in AWS.
-
-The code is built “by hand” with Emacs from open source projects and
-is, of course, itself open source and available on GitHub
+The code is built mostly "by hand" with Emacs from open source
+projects and is, of course, itself open source and available on GitHub
 <a href="https://github.com/lrmcfarland/Astronomy">
 here</a>.
 
@@ -60,7 +69,7 @@ If you find them, please feel free to let me know.
 
 <p>
 
-<a href="http://www.starbug.com">-lrm</a>, <i>2017 Nov 15</i>
+<a href="http://www.starbug.com">-lrm</a>, <i>2019 Jan 14</i>
 
 </div>
 
@@ -76,25 +85,12 @@ If you find them, please feel free to let me know.
 
   <tr>
 
-    <th>
-      Pattern
-    </th>
-
-    <th>
-      Notes
-    </th>
-
-  </tr>
-
-
-  <tr>
-
     <td>
       <a href="{{ url_for('home_blueprint.solar_azimuth_map') }}">Solar Azimuth Map</a>
     </td>
 
     <td>
-      This is an example using google maps.
+      Plots the azimuth of the sun, current, rise and set, at the observer's location.
     </td>
 
   </tr>
@@ -107,7 +103,7 @@ If you find them, please feel free to let me know.
     </td>
 
     <td>
-      This is an example using google charts.
+      Plots the altitude of the sun at the observer's location over the day.
     </td>
 
   </tr>
@@ -132,7 +128,7 @@ If you find them, please feel free to let me know.
     </td>
 
     <td>
-      Transforms between deg:min:sec and decimal degrees
+      Transforms between deg:min:sec and decimal degrees notation.
     </td>
 
   </tr>
