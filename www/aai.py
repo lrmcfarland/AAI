@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 
-"""The Astronomical Algorithms Implemented in C++ and Python Web UI using Flask
+"""The Astronomical Algorithms Implemented in C++ and Python
 
-To run: ./bin/pylaunch.sh aai.py
+To run:
+
+    ./bin/pylaunch.sh aai.py -c config/aai-flask-testing-config.py
+
+The testing config is a "GET /static/aai.js HTTP/1.1" 304 -
+The GOOGLEMAPS_KEY is "changeme"
 
 """
 
 import argparse
 import flask
 import logging
-import logging.handlers
-
+import os
 
 import api
 import views
-
 
 
 # =====================
@@ -22,26 +25,36 @@ import views
 # =====================
 
 
-
-def factory(conf_flnm):
+def factory(a_config_flnm=None):
     """Creates a observations ui flask
-
-    Blueprints makes this much clearer
 
     Args:
         conf_flnm (str): configuration filename
 
-    Returns a reference to the flask app
+    Returns a reference to the AAI app
     """
 
+    config_key = 'AAI_FLASK_CONFIG'
+
+    if a_config_flnm is not None:
+        config_flnm = a_config_flnm
+
+    elif os.getenv(config_key) is not None:
+        config_flnm = os.environ[config_key]
+
+    else:
+        config_flnm = 'config/aai-flask-testing-config.py'
+        logging.warning('Using AAI flask test configuration.')
+
+
     aai_app = flask.Flask(__name__)
-    aai_app.config.from_pyfile(conf_flnm)
+
+    aai_app.config.from_pyfile(config_flnm)
 
     aai_app.register_blueprint(views.home_page)
     aai_app.register_blueprint(api.api)
 
     return aai_app
-
 
 
 # ================
@@ -50,27 +63,11 @@ def factory(conf_flnm):
 
 if __name__ == "__main__":
 
-    defaults = {'config': 'conf/aai-flask.cfg',
-                'debug': False,
-                'host':'0.0.0.0',
-                'port': 8080}
+    parser = argparse.ArgumentParser(description='Astronomical Algorithms Implemented')
 
-    parser = argparse.ArgumentParser(description='Astronomical Algorithms Implemented flask server')
-
-    parser.add_argument('-f', '--config', type=str, dest='config', default=defaults['config'],
+    parser.add_argument('-c', '--config', type=str, dest='config', default=None,
                         metavar='config',
-                        help='name of config file (default: %(default)s)')
-
-    parser.add_argument('-d', '--debug', action='store_true',
-                        dest='debug', default=defaults['debug'],
-                        help='flask debug (default: %(default)s)')
-
-    parser.add_argument('--host', type=str, dest='host', default=defaults['host'],
-                        metavar='host',
-                        help='host IP to serve (default: %(default)s)')
-
-    parser.add_argument('-p', '--port', type=int, dest='port', default=defaults['port'],
-                        help='port (default: %(default)s)')
+                        help='The name of the flask config pyfile.')
 
     args = parser.parse_args()
 
@@ -80,4 +77,4 @@ if __name__ == "__main__":
 
     app = factory(args.config)
 
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    app.run()

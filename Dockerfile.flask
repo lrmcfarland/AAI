@@ -4,20 +4,25 @@
 # It is intended for debugging.
 #
 # one time setup
-# persistent storage:  docker volume create aai-logs
+# persistent storage:  docker volume create starbuglogs
 #
-# to build:            docker build -f Dockerfile.flask -t aai-flask .
+# to build:            docker build -f Dockerfile.flask -t aai_flask .
 #
-# to run flask:        docker run --name aai-flask-00 --mount source=aai-logs,target=/opt/starbug.com/logs/flask -d -p 5000:5000 aai-flask
+# WARNING: -p ports must match config file
 #
-# to view aai-flask logs:    docker run -it --rm --mount source=aai-logs,target=/opt/starbug.com/logs/flask --entrypoint /bin/bash aai-flask
+# to run default flask:      docker run --name aai_flask_00 --mount source=starbuglogs,target=/opt/starbug.com/logs -d -p 8080:8080 aai_flask
 #
-# to stop:                   docker stop aai-flask-00
-# to delete container:       docker rm aai-flask-00
-# to delete image:           docker rmi aai-flask
+# to run deploy flask:       docker run --name aai_flask_00 --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='config/aai-flask-deployment-config.py' -p 8080:8080 aai_flask
+#
+#
+# to view aai_flask logs:    docker run -it --rm --mount source=starbuglogs,target=/opt/starbug.com/logs --entrypoint /bin/bash aai_flask
+#
+# to stop:                   docker stop aai_flask_00
+# to delete container:       docker rm aai_flask_00
+# to delete image:           docker rmi aai_flask
 #
 # to show volume:            docker volume ls
-# to delete volume:          docker volume rm aai-logs
+# to delete volume:          docker volume rm starbuglogs
 #
 # to delete all containers:  docker rm $(docker ps -a -q)
 # to delete all images:      docker rmi $(docker images -q)
@@ -61,14 +66,9 @@ RUN git clone https://github.com/lrmcfarland/AAI.git
 WORKDIR ${AAI_HOME}/AAI/
 
 # assumes the latest checked on the master branch otherwise
-# RUN git checkout factory-aai # TODO !!!!
+RUN git checkout flask-config-v3 # TODO needs to be checked in for git recursive checkout
 
 RUN git submodule update --init --recursive
-
-
-# config not checked in
-COPY www/conf/aai-flask.cfg ${AAI_HOME}/AAI/www/conf
-
 
 # -----------------
 # ----- build -----
@@ -81,8 +81,14 @@ RUN ./build.sh test
 # ----- run web app -----
 # -----------------------
 
+# default with out real google maps key.
+# use the envar AAI_FLASK_CONFIG to set the real version at run time.
+# TODO persistant store?
+COPY www/config/aai-flask-testing-config.py ${AAI_HOME}/AAI/www/config
+COPY www/config/aai-flask-deployment-config.py ${AAI_HOME}/AAI/www/config
+
 WORKDIR ${AAI_HOME}/AAI/www
 
 ENTRYPOINT ["bash"]
 
-CMD [ "./bin/aai-flask.sh", "-d", "-p", "5000"]
+CMD [ "./bin/aai-flask.sh" ]

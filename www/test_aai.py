@@ -21,7 +21,7 @@ import unittest
 
 import aai
 
-aai_instance = aai.factory('conf/aai-flask.cfg') # TODO something
+aai_instance = aai.factory('config/aai-flask-testing-config.py')
 
 
 class AAITests(unittest.TestCase):

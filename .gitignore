@@ -2,6 +2,9 @@
 
 *.gignore
 
+# working config
+www/config/aai-flask-deployment-config.py
+
 # emacs backups
 *~
 
