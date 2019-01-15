@@ -3,7 +3,33 @@
 # This sets up the shell environment for gunicorn to find the wrapped coords library.
 #
 
-# http://mywiki.wooledge.org/BashFAQ/035#getopts
+# I tried a bunch of things to pass both the gunicorn and flask config files:
+
+# gunicorn -c $gunicorn_config_file 'aai:factory(${flask_config_file})'
+# factory(${flask_config_file}) $ SyntaxError: invalid syntax
+
+# gunicorn -c $gunicorn_config_file 'aai:factory(\${flask_config_file})'
+# factory(${flask_config_file}) $ SyntaxError: invalid syntax
+
+# gunicorn -c $gunicorn_config_file "aai:factory(${flask_config_file})"
+# Failed to find application object 'factory(config/aai-flask-testing-config.py)' in 'aai'
+
+# gunicorn -c $gunicorn_config_file 'aai:factory("${flask_config_file}")'
+# IOError: [Errno 2] Unable to load configuration file (No such file or directory): '/opt/starbug.com/AAI/www/${flask_config_file}'
+
+# gunicorn -c $gunicorn_config_file aai:factory("${flask_config_file}")
+# /bin/aai-gunicorn.sh: line 143: syntax error near unexpected token `('
+
+# gunicorn -c $gunicorn_config_file aai:factory\("${flask_config_file}"\)
+# Failed to find application object 'factory(config/aai-flask-testing-config.py)' in 'aai'
+
+# I decided to use an environment variable for AAI flask config for now.
+
+# ----------------------
+# ----- parse args -----
+# ----------------------
+
+# cli args from http://mywiki.wooledge.org/BashFAQ/035#getopts
 
 show_help() {
 cat << EOF
@@ -83,23 +109,27 @@ done
 
 
 if [ -z "$flask_config_file" ]; then
-    die 'ERROR: a flask config file is required'
+    echo '# AAI warning: no flask config file provided.'
+    echo '# AAI_FLASK_CONFIG:' $AAI_FLASK_CONFIG
 else
-    echo '# flask config file' $flask_config_file
+    echo '# AAI gunicorn wrapper ignoring flask config file:' $flask_config_file
 fi
 
 
 if [ -z "$gunicorn_config_file" ]; then
-    die 'ERROR: a gunicorn config file is required'
+    die 'AAI ERROR: a gunicorn config file is required'
 else
-    echo '# gunicorn config file' $gunicorn_config_file
+    echo '# AAI gunicorn config file:' $gunicorn_config_file
 fi
+
+echo '#' # linefeed
 
 # ===========================
 # ===== run application =====
 # ===========================
 
-
 . ./bin/setenv.sh
 
-gunicorn -c $gunicorn_config_file 'gaai:app(config=$flask_config_file)'
+echo "# Starting gunicorn"
+
+gunicorn -c $gunicorn_config_file "aai:factory()"
