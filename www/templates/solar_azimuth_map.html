@@ -71,10 +71,10 @@ button#get_solar_azimuth_map {
     not alligned with the solstice sunrise, there are four alignments (and four half alignments)
 
     <ul>
-      <li> <button id="get_manhattenhenge_summer1_azimuth_map">vernal sunset: 2018-05-30</button> </li>
-      <li> <button id="get_manhattenhenge_summer2_azimuth_map">summer sunset: 2018-07-12</button> </li>
-      <li> <button id="get_manhattenhenge_winter1_azimuth_map">autumnal sunrise: 2018-12-05</button> </li>
-      <li> <button id="get_manhattenhenge_winter2_azimuth_map">winter sunrise: 2018-01-08</button> </li>
+      <li> <button id="get_manhattenhenge_summer1_azimuth_map">vernal sunset: 2018-05-30</button></li>
+      <li> <button id="get_manhattenhenge_summer2_azimuth_map">summer sunset: 2018-07-12</button></li>
+      <li> <button id="get_manhattenhenge_winter1_azimuth_map">autumnal sunrise: 2018-12-05</button></li>
+      <li> <button id="get_manhattenhenge_winter2_azimuth_map">winter sunrise: 2018-01-08</button></li>
     </ul>
 
 
@@ -121,7 +121,7 @@ button#get_solar_azimuth_map {
 	  <th>ISO8601</th>
 	</tr>
 
-	
+
 	<tr>
 	  <th>Current</th>
 	  <td id="current_azimuth">TBD</td>
@@ -294,188 +294,183 @@ button#get_solar_azimuth_map {
 
     $(document).ready(function() {
 
-      {# ----- get data ----- #}
+	{# ----- get data ----- #}
 
-      $("#get_solar_azimuth_map").click(function(e) {
+	$("#get_solar_azimuth_map").click(function(e) {
 
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	    latitude: $('input[name="latitude"]').val(),
-	    longitude: $('input[name="longitude"]').val(),
-	    date: $('input[name="date"]').val(),
-	    time: $('input[name="time"]').val(),
-	    timezone: $('input[name="timezone"]').val(),
-	    dst: $("#_dst").is(':checked') {# jQuery selector #}
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val(),
+			  dst: $("#_dst").is(':checked') {# jQuery selector #}
 
-	  },
-	  function(sun_position) {
+		      },
+		      function(sun_position) {
 
-	      drawSolarMap(sun_position);
+			  drawSolarMap(sun_position);
 
-	  }); {# end getJSON #}
+		      }); {# end getJSON #}
 
-	return false;
+	    return false;
 
-      }); {# end get_solar_azimuth_map click #}
+	}); {# end get_solar_azimuth_map click #}
 
 
 
 
-      $("#get_stonehenge_summer_azimuth_map").click(function(e) {
+	$("#get_stonehenge_summer_azimuth_map").click(function(e) {
 
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	      latitude: '51:10:55',
-	      longitude: '-1:49:34.28',
-	      date: '2018-06-21',
-	      time: '03:52:18',
-	      timezone: '0',
-	      dst: 'false'
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: '51:10:55',
+			  longitude: '-1:49:34.28',
+			  date: '2018-06-21',
+			  time: '03:52:18',
+			  timezone: '0',
+			  dst: 'false'
 
-	  },
-	  function(sun_position) {
+		      },
+		      function(sun_position) {
 
-	      drawSolarMap(sun_position);
+			  drawSolarMap(sun_position);
 
-	  }); {# end getJSON #}
+		      }); {# end getJSON #}
 
-	return false;
+	    return false;
 
-      }); {# end get_stonehenge_summer_azimuth_map click #}
+	}); {# end get_stonehenge_summer_azimuth_map click #}
 
 
 
-      $("#get_stonehenge_winter_azimuth_map").click(function(e) {
+	$("#get_stonehenge_winter_azimuth_map").click(function(e) {
 
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	      latitude: '51:10:55',
-	      longitude: '-1:49:34.28',
-	      date: '2018-12-21',
-	      time: '16:02',
-	      timezone: '0',
-	      dst: 'false'
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: '51:10:55',
+			  longitude: '-1:49:34.28',
+			  date: '2018-12-21',
+			  time: '16:02',
+			  timezone: '0',
+			  dst: 'false'
 
-	  },
-	  function(sun_position) {
+		      },
+		      function(sun_position) {
 
-	      drawSolarMap(sun_position);
+			  drawSolarMap(sun_position);
 
-	  }); {# end getJSON #}
+		      }); {# end getJSON #}
 
-	return false;
+	    return false;
 
-      }); {# end get_stonehenge_summer_azimuth_map click #}
+	}); {# end get_stonehenge_summer_azimuth_map click #}
 
 
 
 
 
-      $("#get_manhattenhenge_summer1_azimuth_map").click(function(e) {
+	$("#get_manhattenhenge_summer1_azimuth_map").click(function(e) {
 
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	      latitude: '40.759',
-	      longitude: '-73.99',
-	      date: '2018-05-30',
-	      time: '19:22',
-	      timezone: '-5',
-	      dst: 'false'
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: '40.759',
+			  longitude: '-73.99',
+			  date: '2018-05-30',
+			  time: '19:22',
+			  timezone: '-5',
+			  dst: 'false'
 
-	  },
-	  function(sun_position) {
+		      },
+		      function(sun_position) {
 
-	      drawSolarMap(sun_position);
+			  drawSolarMap(sun_position);
 
-	  }); {# end getJSON #}
+		      }); {# end getJSON #}
 
-	return false;
+	    return false;
 
-      }); {# end get_manhattenhenge_summer1_azimuth_map click #}
+	}); {# end get_manhattenhenge_summer1_azimuth_map click #}
 
 
 
-      $("#get_manhattenhenge_summer2_azimuth_map").click(function(e) {
+	$("#get_manhattenhenge_summer2_azimuth_map").click(function(e) {
 
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	      latitude: '40.759',
-	      longitude: '-73.99',
-	      date: '2018-07-12',
-	      time: '19:30',
-	      timezone: '-5',
-	      dst: 'false'
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: '40.759',
+			  longitude: '-73.99',
+			  date: '2018-07-12',
+			  time: '19:30',
+			  timezone: '-5',
+			  dst: 'false'
 
-	  },
-	  function(sun_position) {
+		      },
+		      function(sun_position) {
 
-	      drawSolarMap(sun_position);
+			  drawSolarMap(sun_position);
 
-	  }); {# end getJSON #}
+		      }); {# end getJSON #}
 
-	return false;
+	    return false;
 
-      }); {# end get_manhattenhenge_summer2_azimuth_map click #}
+	}); {# end get_manhattenhenge_summer2_azimuth_map click #}
 
 
 
-      $("#get_manhattenhenge_winter1_azimuth_map").click(function(e) {
+	$("#get_manhattenhenge_winter1_azimuth_map").click(function(e) {
 
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	      latitude: '40.759',
-	      longitude: '-73.99',
-	      date: '2018-12-05',
-	      time: '07:07',
-	      timezone: '-5',
-	      dst: 'false'
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: '40.759',
+			  longitude: '-73.99',
+			  date: '2018-12-05',
+			  time: '07:07',
+			  timezone: '-5',
+			  dst: 'false'
 
-	  },
-	  function(sun_position) {
+		      },
+		      function(sun_position) {
 
-	      drawSolarMap(sun_position);
+			  drawSolarMap(sun_position);
 
-	  }); {# end getJSON #}
+		      }); {# end getJSON #}
 
-	return false;
+	    return false;
 
-      }); {# end get_manhattenhenge_winter1_azimuth_map click #}
+	}); {# end get_manhattenhenge_winter1_azimuth_map click #}
 
 
 
+	$("#get_manhattenhenge_winter2_azimuth_map").click(function(e) {
 
 
-      $("#get_manhattenhenge_winter2_azimuth_map").click(function(e) {
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
+		      {
+			  latitude: '40.759',
+			  longitude: '-73.99',
+			  date: '2018-01-08',
+			  time: '07:20',
+			  timezone: '-5',
+			  dst: 'false'
 
+		      },
+		      function(sun_position) {
 
-	$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-	  {
-	      latitude: '40.759',
-	      longitude: '-73.99',
-	      date: '2018-01-08',
-	      time: '07:20',
-	      timezone: '-5',
-	      dst: 'false'
+			  drawSolarMap(sun_position);
 
-	  },
-	  function(sun_position) {
+		      }); {# end getJSON #}
 
-	      drawSolarMap(sun_position);
+	    return false;
 
-	  }); {# end getJSON #}
-
-	return false;
-
-      }); {# end get_manhattenhenge_winter2_azimuth_map click #}
-
-
-
+	}); {# end get_manhattenhenge_winter2_azimuth_map click #}
 
 
     }); {# end ready method #}

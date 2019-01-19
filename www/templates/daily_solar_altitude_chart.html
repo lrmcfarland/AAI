@@ -8,218 +8,326 @@
 
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
+    {# -------------------- #}
+    {# ----- init map ----- #}
+    {# -------------------- #}
+
+
+    {# ----- draw chart ----- #}
+
+
+    google.charts.load('current', {'packages':['corechart']});
+
+    function updateSunChart(sun_position_data) {
+
+	if (sun_position_data.errors.length > 0) {
+
+	    $("#rising").text("TBD");
+	    $("#transit").text("TBD");
+	    $("#setting").text("TBD");
+	    $("#azimuth").text("TBD");
+	    $("#altitude").text("TBD");
+
+	    alert("Errors: " + sun_position_data.errors.join(", "));
+
+	} else {
+
+	    $("#rising").text(sun_position_data.rising);
+	    $("#transit").text(sun_position_data.transit);
+	    $("#setting").text(sun_position_data.setting);
+	    $("#azimuth").text(sun_position_data.sun_marker_azimuth);
+	    $("#altitude").text(sun_position_data.sun_marker_altitude);
+
+
+	    $('input[name="latitude"]').val(sun_position_data.latitude);
+	    $('input[name="longitude"]').val(sun_position_data.longitude);
+
+
+	    {# TODO meh! use regex #}
+	    var a_datetime = sun_position_data.datetime.split('T');
+	    var a_timeandzone = [a_datetime[1], 0];
+	    var a_sign = '';
+
+	    if (/-/.test(a_datetime[1])) {
+
+		a_timeandzone = a_datetime[1].split('-');
+		a_sign = '-';
+
+	    } else if (/\+/.test(a_datetime[1])) {
+
+		a_timeandzone = a_datetime[1].split('+');
+		a_sign = '+';
+
+	    } else {
+		{# pass #}
+	    }
+
+	    $('input[name="date"]').val(a_datetime[0]);
+
+	    $('input[name="time"]').val(a_timeandzone[0]);
+	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
+
+
+	    drawSunChart(sun_position_data);
+	};
+
+    }; {# end updateSunChart(sun_position_data) #}
+
+
+    function drawSunChart(sun_position_data) {
+
+	{# ----- formatting for google chart ----- #}
+	var sun_plot_data = [['time',
+			      'Vernal Equinox',
+			      'Summer Solstice',
+			      'Autumnal Equinox',
+			      'Winter Solstice',
+			      sun_position_data.sun_date_label,
+			      {'type': 'string', 'role': 'style'}]];
+
+	{# ----- special format for sun marker ----- #}
+
+	for (var i = 0; i < sun_position_data.altitude_data_24h.length - 1; i++) {
+
+	    var plot_record = sun_position_data.altitude_data_24h[i];
+	    var next_plot_record = sun_position_data.altitude_data_24h[i+1];
+
+	    if (sun_position_data.sun_marker_time == plot_record[0]) {
+
+		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+	    } else if (sun_position_data.sun_marker_time > plot_record[0] &&
+		       sun_position_data.sun_marker_time < next_plot_record[0]) {
+
+		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+	    } else if (i == sun_position_data.altitude_data_24h.length - 1 &&
+		       sun_position_data.sun_marker_time == next_plot_record[0]) {
+
+		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+	    } else if (sun_position_data.sun_marker_time > next_plot_record[0]) {
+
+		plot_record.push(null);
+
+	    } else {
+
+		plot_record.push(null);
+
+	    }
+
+
+	    sun_plot_data.push(plot_record);
+
+	}
+
+	var altitudeVtime_chart = new google.visualization.LineChart(
+	    document.getElementById('altitudeVtime'));
+
+	var altitude_table = google.visualization.arrayToDataTable(sun_plot_data);
+	var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour");
+
+	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+
+	{# ----- make toggles active ----- #}
+
+	$("#_vernal_equinox_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+	$("#_summer_solstice_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+	$("#_autumnal_equinox_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+	$("#_winter_solstice_cb").change(function() {
+	  var altitude_view = getSunChartView(altitude_table);
+	  altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+	});
+
+
+    }; {# end drawSunChart(sun_position_data) #}
+
+
+    function getSunChartView (data_table, chart_title, hAxis_title) {
+
+	var view_data = {};
+
+	var current_color = "blue";
+	var vernal_color = "green";
+	var summer_color = "red";
+	var autumnal_color = "orange";
+	var winter_color = "cyan";
+
+
+	var options = {
+
+	    legend: "none",
+
+	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
+
+	    title: chart_title,
+
+	    hAxis: { title: hAxis_title},
+	    vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
+
+	    series: {
+		0: { lineDashStyle: [] }
+	    },
+
+	    colors: [current_color],
+
+	    pointSize: 1,
+	    dataOpacity: 0.7
+
+	};
+
+
+	var data = new google.visualization.DataView(data_table);
+
+	var hides = [];
+	var line_count = 0; {# assumes order ve, ss, ae, ws, current time #}
+
+	if ($("#_vernal_equinox_cb").is(':checked')) {
+	    options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
+	} else {
+	    hides.push(1);
+	};
+
+
+	if ($("#_summer_solstice_cb").is(':checked')) {
+	    options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
+	} else {
+	    hides.push(2);
+	};
+
+
+	if ($("#_autumnal_equinox_cb").is(':checked')) {
+	    options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
+	} else {
+	    hides.push(3);
+	};
+
+
+	if ($("#_winter_solstice_cb").is(':checked')) {
+	    options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
+	} else {
+	    hides.push(4);
+	};
+
+	data.hideColumns(hides);
+
+	view_data['data'] = data;
+	view_data['options'] = options;
+
+	return view_data;
+
+    };
+
+
     {# ----------------- #}
     {# ----- ready ----- #}
     {# ----------------- #}
 
     $(document).ready(function() {
 
-      {# ----- get data ----- #}
+	{# ----- get data ----- #}
 
-      $("#get_daily_solar_altitude").click(function(e) {
+	$("#get_daily_solar_altitude").click(function(e) {
 
-        $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
-          {
-            latitude: $('input[name="latitude"]').val(),
-            longitude: $('input[name="longitude"]').val(),
-            date: $('input[name="date"]').val(),
-            time: $('input[name="time"]').val(),
-            timezone: $('input[name="timezone"]').val(),
-            dst: $("#_dst").is(':checked') {# jQuery selector #}
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
+		      {
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val(),
+			  dst: $("#_dst").is(':checked') {# jQuery selector #}
 
-          },
-          function(sun_position) {
+		      },
+		      function(sun_position) {
 
-            if (sun_position.errors.length > 0) {
+			  updateSunChart(sun_position);
 
-               $("#rising").text("TBD");
-               $("#transit").text("TBD");
-               $("#setting").text("TBD");
-               $("#azimuth").text("TBD");
-               $("#altitude").text("TBD");
+		      }); {# end getJSON #}
 
-              alert("Errors: " + sun_position.errors.join(", "));
+	    return false;
 
-            } else {
+	}); {# end get_daily_solar_altitude click #}
 
-               $("#rising").text(sun_position.rising);
-               $("#transit").text(sun_position.transit);
-               $("#setting").text(sun_position.setting);
-               $("#azimuth").text(sun_position.sun_marker_azimuth);
-               $("#altitude").text(sun_position.sun_marker_altitude);
 
-               drawChart(sun_position);
 
-            };
+	$("#get_midnight_sun").click(function(e) {
 
-          }); {# end getJSON #}
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
+		      {
+			  latitude: '66:33',
+			  longitude: '0:0:0',
+			  date: '2018-06-21',
+			  time: '12:00:00',
+			  timezone: '0',
+			  dst: 'false'
+		      },
+		      function(sun_position) {
 
-        return false;
+			  updateSunChart(sun_position);
 
-      }); {# end get_daily_solar_altitude click #}
+		      }); {# end getJSON #}
 
+	    return false;
 
-      {# ----- draw chart ----- #}
+	}); {# end get_midnight_sun click #}
 
 
-      google.charts.load('current', {'packages':['corechart']});
+	$("#get_darkness_at_noon").click(function(e) {
 
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
+		      {
+			  latitude: '66:33',
+			  longitude: '0:0:0',
+			  date: '2018-12-21',
+			  time: '12:00:00',
+			  timezone: '0',
+			  dst: 'false'
+		      },
+		      function(sun_position) {
 
-      function drawChart(sun_position_data) {
+			  updateSunChart(sun_position);
 
-        {# ----- formatting for google chart ----- #}
-        var sun_plot_data = [['time',
-                              'Vernal Equinox',
-                              'Summer Solstice',
-                              'Autumnal Equinox',
-                              'Winter Solstice',
-                              sun_position_data.sun_date_label,
-                              {'type': 'string', 'role': 'style'}]];
+		      }); {# end getJSON #}
 
-        {# ----- special format for sun marker ----- #}
+	    return false;
 
-        for (var i = 0; i < sun_position_data.altitude_data_24h.length - 1; i++) {
+	}); {# end get_darkness_at_noon click #}
 
-            var plot_record = sun_position_data.altitude_data_24h[i];
-            var next_plot_record = sun_position_data.altitude_data_24h[i+1];
 
-            if (sun_position_data.sun_marker_time == plot_record[0]) {
+	$("#get_no_shadow_at_noon").click(function(e) {
 
-                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
+		      {
+			  latitude: '23:05',
+			  longitude: '32:54',
+			  date: '2018-06-21',
+			  time: '12:00:00',
+			  timezone: '2',
+			  dst: 'false'
+		      },
+		      function(sun_position) {
 
-            } else if (sun_position_data.sun_marker_time > plot_record[0] &&
-                       sun_position_data.sun_marker_time < next_plot_record[0]) {
+			  updateSunChart(sun_position);
 
-                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+		      }); {# end getJSON #}
 
-            } else if (i == sun_position_data.altitude_data_24h.length - 1 &&
-                       sun_position_data.sun_marker_time == next_plot_record[0]) {
+	    return false;
 
-                plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+	}); {# end get_no_shadow_at_noon click #}
 
-            } else if (sun_position_data.sun_marker_time > next_plot_record[0]) {
-
-                plot_record.push(null);
-
-            } else {
-
-                plot_record.push(null);
-
-            }
-
-
-            sun_plot_data.push(plot_record);
-
-        }
-
-        var altitudeVtime_chart = new google.visualization.LineChart(
-            document.getElementById('altitudeVtime'));
-
-        var altitude_table = google.visualization.arrayToDataTable(sun_plot_data);
-        var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour");
-
-        altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-
-        {# ----- make toggles active ----- #}
-
-        $("#_vernal_equinox_cb").change(function() {
-          var altitude_view = getSunChartView(altitude_table);
-          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-        });
-
-        $("#_summer_solstice_cb").change(function() {
-          var altitude_view = getSunChartView(altitude_table);
-          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-        });
-
-        $("#_autumnal_equinox_cb").change(function() {
-          var altitude_view = getSunChartView(altitude_table);
-          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-        });
-
-        $("#_winter_solstice_cb").change(function() {
-          var altitude_view = getSunChartView(altitude_table);
-          altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-        });
-
-
-      }; {# end drawChart(sun_position_data) #}
-
-
-      function getSunChartView (data_table, chart_title, hAxis_title) {
-
-        var view_data = {};
-
-        var current_color = "blue";
-        var vernal_color = "green";
-        var summer_color = "red";
-        var autumnal_color = "orange";
-        var winter_color = "cyan";
-
-
-        var options = {
-
-            legend: "none",
-
-            chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
-
-            title: chart_title,
-
-            hAxis: { title: hAxis_title},
-            vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
-
-            series: {
-                0: { lineDashStyle: [] }
-            },
-
-            colors: [current_color],
-
-            pointSize: 1,
-            dataOpacity: 0.7
-
-        };
-
-
-        var data = new google.visualization.DataView(data_table);
-
-        var hides = [];
-        var line_count = 0; {# assumes order ve, ss, ae, ws, current time #}
-
-        if ($("#_vernal_equinox_cb").is(':checked')) {
-            options.series[line_count++] = { color: vernal_color, lineDashStyle: [4, 2] };
-        } else {
-            hides.push(1);
-        };
-
-
-        if ($("#_summer_solstice_cb").is(':checked')) {
-            options.series[line_count++] = { color: summer_color, lineDashStyle: [8, 4] };
-        } else {
-            hides.push(2);
-        };
-
-
-        if ($("#_autumnal_equinox_cb").is(':checked')) {
-            options.series[line_count++] = { color: autumnal_color, lineDashStyle: [16, 4] };
-        } else {
-            hides.push(3);
-        };
-
-
-        if ($("#_winter_solstice_cb").is(':checked')) {
-            options.series[line_count++] = { color: winter_color, lineDashStyle: [32, 4] };
-        } else {
-            hides.push(4);
-        };
-
-        data.hideColumns(hides);
-
-        view_data['data'] = data;
-        view_data['options'] = options;
-
-        return view_data;
-
-      };
 
 
     }); {# end ready method #}
@@ -295,15 +403,32 @@ button#get_daily_solar_altitude {
 
 <div class="twocolumn">
 
-  The plot shows the
-  sun's <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
-  (as the angle above the horizon) over the selected day starting at
-  local midnight. The points where the altitude crosses the zero line
-  indicates sun rise and sun set (not adjusted for atmospheric
-  refraction). The distance between them is the length of the day.
-  The solstice lines indicate the maximum and minimum range of the sun
-  position through out the year. The equinox lines show the middle of
-  the cycle.
+    This shows the
+    sun's <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
+    over the current day starting at local midnight. The points where
+    the altitude crosses the zero line indicates sun rise and sun set
+    (not adjusted for atmospheric refraction). The distance between
+    them is the length of the day.  The solstice lines indicate the
+    maximum and minimum range of the sun position through out the
+    year.
+
+    <p>
+
+    The earth's <a href="https://en.wikipedia.org/wiki/Axial_tilt">axial tilt</a>
+    is 23&deg;-ish so a <a href="https://en.wikipedia.org/wiki/Midnight_sun">midnight
+      sun</a> happens at an extreme latitude, e.g. near the
+    <a href="https://en.wikipedia.org/wiki/Polar_circle">polar
+      circle</a>, for example
+    <button id="get_midnight_sun">on the summer solstice at 66&deg;N</button>
+    Conversly, it is darkness at noon at
+    <button id="get_darkness_at_noon">on the winter solstice at 66&deg;N</button>.
+
+    The well that "had no shadow at noon on the solstice"
+    <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth.27s_circumference">
+      Eratosthenes uses to calculate the earth's circumference
+    </a>.
+    <button id="get_no_shadow_at_noon">is 23&deg;N and on the summer solstice</button>.
+
 
 </div>
 
@@ -330,53 +455,53 @@ button#get_daily_solar_altitude {
 
       <table id="sun_chart_legend">
 
-        <tr>
+	<tr>
 
-          <td>
-            <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
-          </td>
+	  <td>
+	    <input type="checkbox" id="_vernal_equinox_cb" name="vernal_equinox_cb">
+	  </td>
 
-          <td id="_vernal_equinox_txt">
-            Vernal Equinox
-          </td>
+	  <td id="_vernal_equinox_txt">
+	    Vernal Equinox
+	  </td>
 
-        </tr>
+	</tr>
 
-        <tr>
+	<tr>
 
-          <td>
-            <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
-          </td>
+	  <td>
+	    <input type="checkbox" id="_summer_solstice_cb" name="summer_solstice_cb" checked>
+	  </td>
 
-          <td id="_summer_solstice_txt">
-            Summer Solstice
-          </td>
+	  <td id="_summer_solstice_txt">
+	    Summer Solstice
+	  </td>
 
-        </tr>
+	</tr>
 
-        <tr>
+	<tr>
 
-          <td>
-            <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
-          </td>
+	  <td>
+	    <input type="checkbox" id="_autumnal_equinox_cb" name="autumnal_equinox_cb">
+	  </td>
 
-          <td id="_autumnal_equinox_txt">
-            Autumnal Equinox
-          </td>
+	  <td id="_autumnal_equinox_txt">
+	    Autumnal Equinox
+	  </td>
 
-        </tr>
+	</tr>
 
-        <tr>
+	<tr>
 
-          <td>
-            <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
-          </td>
+	  <td>
+	    <input type="checkbox" id="_winter_solstice_cb" name="winter_solstice_cb" checked>
+	  </td>
 
-          <td id="_winter_solstice_txt">
-            Winter Solstice
-          </td>
+	  <td id="_winter_solstice_txt">
+	    Winter Solstice
+	  </td>
 
-        </tr>
+	</tr>
 
 
       </table>
@@ -390,36 +515,36 @@ button#get_daily_solar_altitude {
 
       <table id="results_table" align="center">
 
-        <tr>
-          <th>Azimuth</th>
-          <td id="azimuth">TBD</td>
-          <td>deg:min:sec (deg)</td>
-        </tr>
+	<tr>
+	  <th>Azimuth</th>
+	  <td id="azimuth">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
 
-        <tr>
-          <th>Altitude</th>
-          <td id="altitude">TBD</td>
-          <td>deg:min:sec (deg)</td>
-        </tr>
+	<tr>
+	  <th>Altitude</th>
+	  <td id="altitude">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
 
-        <tr>
-          <th>Rising</th>
-          <td id="rising">TBD</td>
-          <td>ISO8601</td>
-        </tr>
+	<tr>
+	  <th>Rising</th>
+	  <td id="rising">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
 
 
-        <tr>
-          <th>Transit</th>
-          <td id="transit">TBD</td>
-          <td>ISO8601</td>
-        </tr>
+	<tr>
+	  <th>Transit</th>
+	  <td id="transit">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
 
-        <tr>
-          <th>Setting</th>
-          <td id="setting">TBD</td>
-          <td>ISO8601</td>
-        </tr>
+	<tr>
+	  <th>Setting</th>
+	  <td id="setting">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
 
       </table>
 
@@ -429,43 +554,6 @@ button#get_daily_solar_altitude {
 </table>
 
 <hr>
-<br>
-
-<div class="twocolumn">
-
-  <p>
-    To see
-    the <a href="https://en.wikipedia.org/wiki/Midnight_sun">midnight
-      sun</a> enter an extreme latitude near a
-    <a href="https://en.wikipedia.org/wiki/Polar_circle">polar
-      circle</a> around 66:33:46.2 north or south.
-
-    Closer to the equator with in either the
-    <a href="https://en.wikipedia.org/wiki/Tropic_of_Cancer">Tropic of Cancer</a>
-    23:26 (north)
-    or
-    <a href="https://en.wikipedia.org/wiki/Tropic_of_Capricorn">Tropic
-    of Capricorn</a> -23:26 (south) the equinox lines pass directly
-    overhead.
-
-    <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth.27s_circumference">Eratosthenes</a>
-    heard the Egyptian city of Syene "had no shadow at noon on the
-    solstice" and knowing the angle of the sun in Alexandria on that
-    day and the distance to Syene, calculated the earth's
-    circumference back in third century B.C.
-  </p>
-
-  <p>
-    <a href="https://github.com/lrmcfarland/AAI/blob/master/www/templates/daily_solar_altitude_chart.html">
-      The source for this page
-    </a> is an example of plotting a days worth of sun position data with
-    <a href="https://developers.google.com/chart/">google charts</a>.
-    Data views are used to control the display on the client with the legend,
-    i.e. the equinox and solstice lines.
-  </p>
-
-</div>
-
 
 
 {% endblock %}
