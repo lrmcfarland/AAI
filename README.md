@@ -36,11 +36,10 @@ API](https://github.com/lrmcfarland/AAI/blob/master/www/api.py).
 I found this to be a very flexible development environment.
 - I can run the [flask microframework](http://flask.pocoo.org/) from my OS X command line with the python debugger.
 - add that to a [docker container](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.flask) running CentOS
-- with a [gunicorn](https://gunicorn.org/) server [docker container](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.gunicorn)
-- so it can support aai.starbug.com a service for an [nginx reverse
-proxy](https://github.com/lrmcfarland/starbug.com) with transport
-layer security
-[TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security) end
+- with a [gunicorn](https://gunicorn.org/) server in a [docker container](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.gunicorn)
+- so it can support the aai.starbug.com service for an [Nginx reverse
+proxy](https://github.com/lrmcfarland/starbug.com) running as a
+[transport layer security](https://en.wikipedia.org/wiki/Transport_Layer_Security) end
 point.
 
 This last step allows the user's browser to send its location information to
@@ -79,39 +78,40 @@ finished working through the issues with getting git to ignoring all
 the right build artifacts.
 
 
-## flask
+## AAI flask
 
 ```
 docker build -f Dockerfile.flask -t aai_flask .
 ```
 
 
-## gunicorn
-
+## AAI gunicorn
 
 ```
 docker build -f Dockerfile.gunicorn -t aai_gunicorn .
 ```
 
 
+## starbuglogs
 
-## create persistent storage for logs
-
-
+Create shared persistent storage for the logs,
+if this does not already exist.
 
 ```
 docker volume create starbuglogs
 ```
 
 
+## starbugnet
 
-## create starbugnet for use with nginx
+Create starbugnet for use with nginx,
+if this does not already exist.
 
+This is used by starbug.com to connect aai.starbug.com and db.starbug.com
 
 ```
 docker network create starbugnet
 ```
-
 
 
 # Configure
@@ -157,7 +157,7 @@ and supports the usual [gunicorn config settings](http://docs.gunicorn.org/en/st
 
 ## flask
 
-Warning: -p ports must match what is in the flask configuration file.
+Warning: -p ports argument must match what is in the [flask configuration file](https://github.com/lrmcfarland/AAI/blob/master/www/config/aai-flask-testing-config.py).
 
 ### default (testing) configuration
 
@@ -171,7 +171,8 @@ Set the AAI_FLASK_CONFIG environment variable to the location of the
 config file in the container.
 See
 [Dockerfile.flask](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.flask)
-for how to COPY it there.
+for an example of COPY in the docker file, but the file can be
+put there by any method, sftp, scp et al.
 
 
 ```
@@ -181,7 +182,12 @@ docker run --name aai_flask_00 -e AAI_FLASK_CONFIG='config/aai-flask-deployment-
 
 ## gunicorn
 
-Warning: -p ports must match what is in the flask configuration file.
+Warning: -p ports argument must match what is in the flask [flask
+configuration
+file](https://github.com/lrmcfarland/AAI/blob/master/www/config/aai-flask-testing-config.py).
+For use with nginx, the container name match what is in the [nginx ca
+config
+file](https://github.com/lrmcfarland/starbug.com/blob/master/conf/starbug.nginx.ca.conf#L82).
 
 
 ### default (testing) configuration
@@ -197,9 +203,9 @@ docker run --net starbugnet --name aai_gunicorn_00 --mount source=starbuglogs,ta
 Set the AAI_FLASK_CONFIG environment variable to the location of the
 config file in the container.
 See
-[Dockerfile.gunicorn](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.flask)
-for how to COPY it there.
-
+[Dockerfile.flask](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.flask)
+for an example of COPY in the docker file, but the file can be
+put there by any method, sftp, scp et al.
 
 ```
 docker run --net starbugnet --name aai_gunicorn_00 --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='config/aai-flask-deployment-config.py' -p 8080:8080 aai_gunicorn

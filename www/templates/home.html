@@ -6,9 +6,102 @@
 
 
 <h1>Astronomical Algorithms Implemented</h1>
-<h2>in C++, Python and JavaScript.</h2>
+<h2>in C++, Python</h2>
+<h3>and JavaScript,</h3>
+<h4>and bash,</h4>
+<h5>and html, css,</h5>
+<h6>and Werkzeug, Jinja 2</h6>
+<h6>...</h6>
 
 <br>
+
+<div id="examples">
+
+<h2>Contents</h2>
+
+<br>
+
+<table>
+
+  <tr>
+    Plot
+  </tr>
+
+  <tr>
+    <td></td>
+
+    <td>
+      <a href="{{ url_for('home_blueprint.solar_azimuth_map') }}">Solar Azimuth Map</a>
+    </td>
+
+    <td>
+      Maps the azimuth of the sun at the observer's location.
+    </td>
+
+  </tr>
+
+
+  <tr>
+
+    <td></td>
+
+    <td>
+      <a href="{{ url_for('home_blueprint.daily_solar_altitude_chart') }}">Daily Solar Altitude</a>
+    </td>
+
+    <td>
+      Charts the altitude of the sun at the observer's location over a day.
+    </td>
+
+  </tr>
+
+
+  <tr>
+
+    <td>Transform</td>
+
+  </tr>
+
+  <tr>
+
+    <td></td>
+
+    <td>
+      <a href="{{ url_for('home_blueprint.eqhz_transforms') }}">Equatorial - Horizontal</a>
+    </td>
+
+    <td>
+      equatorial and horizontal coordinate systems.
+    </td>
+
+  </tr>
+
+  <tr>
+
+    <td></td>
+
+    <td>
+      <a href="{{ url_for('home_blueprint.dms_transforms') }}">DMS - decimal</a>
+    </td>
+
+    <td>
+      deg:min:sec and decimal degrees notation.
+    </td>
+
+  </tr>
+
+  <tr>
+    <td>
+      <a href="{{ url_for('home_blueprint.accuracy') }}">On Accuracy</a>
+    </td>
+
+  </tr>
+
+</table>
+
+</div>
+
+<hr>
 
 <h2>Introduction</h2>
 
@@ -74,75 +167,5 @@ If you find them, please feel free to let me know.
 </div>
 
 <hr>
-
-<div id="examples">
-
-<h2>Contents</h2>
-
-<br>
-
-<table>
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('home_blueprint.solar_azimuth_map') }}">Solar Azimuth Map</a>
-    </td>
-
-    <td>
-      Plots the azimuth of the sun, current, rise and set, at the observer's location.
-    </td>
-
-  </tr>
-
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('home_blueprint.daily_solar_altitude_chart') }}">Daily Solar Altitude</a>
-    </td>
-
-    <td>
-      Plots the altitude of the sun at the observer's location over the day.
-    </td>
-
-  </tr>
-
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('home_blueprint.eqhz_transforms') }}">Equatorial - Horizontal transforms</a>
-    </td>
-
-    <td>
-      Transforms between the equatorial and horizontal coordinate systems.
-    </td>
-
-  </tr>
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('home_blueprint.dms_transforms') }}">DMS - decimal transforms</a>
-    </td>
-
-    <td>
-      Transforms between deg:min:sec and decimal degrees notation.
-    </td>
-
-  </tr>
-
-  <tr>
-
-    <td>
-      <a href="{{ url_for('home_blueprint.accuracy') }}">On Accuracy</a>
-    </td>
-
-  </tr>
-
-</table>
-
-</div>
 
 {% endblock %}

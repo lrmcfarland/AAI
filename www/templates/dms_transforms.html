@@ -14,6 +14,26 @@ table#coordinates_table {
 
 }
 
+div.rot90 {
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari 3-8 */
+  transform: rotate(90deg);
+}
+
+div.rot180 {
+  -ms-transform: rotate(180deg); /* IE 9 */
+  -webkit-transform: rotate(180deg); /* Safari 3-8 */
+  transform: rotate(180deg);
+}
+
+div.rot270 {
+  -ms-transform: rotate(270deg); /* IE 9 */
+  -webkit-transform: rotate(270deg); /* Safari 3-8 */
+  transform: rotate(270deg);
+}
+
+
+
 </style>
 
 <script type="text/javascript">
@@ -92,16 +112,16 @@ table#coordinates_table {
 
 {% block content %}
 
-<h1>Degree to Decimal transforms</h1>
+<h1>Deg:Min:Sec (DMS) to Decimal transforms</h1>
 
 <br>
 
 <div>
 
-  This page transforms coordinates between
-
-  degree/hour:minute:second notation to the decimal equivalent.
-
+  <p>
+    This page transforms coordinates between
+    degree/hour:minute:second notation to the decimal equivalent.
+  </p>
 
 </div>
 
@@ -113,9 +133,19 @@ table#coordinates_table {
 
 
     <tr>
-      <td></td>
-      <td> <button id="dms2dec">deg:min:sec to decimal degrees</button> </td>
-      <td></td>
+
+      <td align="center">
+	<div class="rot180"><i style="font-size:24px" class="fa">&#x2B90;</i>
+	</div>
+      </td>
+
+      <td> <button id="dms2dec">dms to dec</button> </td>
+
+      <td align="center">
+	<div class="rot270"><i style="font-size:24px" class="fa">&#x2B90;</i>
+	</div>
+      </td>
+
     </tr>
 
     <tr>
@@ -125,6 +155,7 @@ table#coordinates_table {
       <th align="center">Decimal Degrees</th>
 
     </tr>
+
     <tr>
 
       <td align="center"><input type="text" name="dms" id="_dms" value="0"></td>
@@ -134,9 +165,21 @@ table#coordinates_table {
     </tr>
 
     <tr>
-      <td></td>
-      <td> <button id="dec2dms">decimal degrees to deg:min:sec</button> </td>
-      <td></td>
+
+      <td align="center">
+	<div class="rot90"><i style="font-size:24px" class="fa">&#x2B90;</i>
+	</div>
+      </td>
+
+
+      <td> <button id="dec2dms">dec to dms</button> </td>
+
+      <td align="center">
+	<div><i style="font-size:24px" class="fa">&#x2B90;</i>
+	</div>
+      </td>
+
+
     </tr>
 
 
