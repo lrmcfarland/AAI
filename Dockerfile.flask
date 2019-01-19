@@ -65,8 +65,9 @@ RUN git clone https://github.com/lrmcfarland/AAI.git
 
 WORKDIR ${AAI_HOME}/AAI/
 
-# assumes the latest checked on the master branch otherwise
-RUN git checkout flask-config-v3 # TODO needs to be checked in for git recursive checkout
+# WARNING: set the branch here if not using master, but don't forget
+# to comment it out before merging back.
+# RUN git checkout flask-config-v3
 
 RUN git submodule update --init --recursive
 
