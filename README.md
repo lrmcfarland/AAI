@@ -368,12 +368,7 @@ Provide a deployment file or comment out this line.
 
 ## IOError: [Errno 13] Permission denied: '/opt/starbug.com/logs/aai-error.log'
 
-Flask runs as starbug and gunicorn as root, so they may step
-on each others log file.
 Chown or delete the file as needed.
-
-TODO why?
-
 
 
 # Under development.

@@ -15,7 +15,7 @@
 # to run deploy flask:       docker run --name aai_flask_00 --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='config/aai-flask-deployment-config.py' -p 8080:8080 aai_flask
 #
 #
-# to view aai_flask logs:    docker run -it --rm --mount source=starbuglogs,target=/opt/starbug.com/logs --entrypoint /bin/bash aai_flask
+# to view aai_flask logs:    docker run -it aai_flask_00 bash
 #
 # to stop:                   docker stop aai_flask_00
 # to delete container:       docker rm aai_flask_00

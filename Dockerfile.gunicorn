@@ -18,7 +18,7 @@
 # to run deploy flask:      docker run --net starbugnet --name aai_gunicorn_00 --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='config/aai-flask-deployment-config.py' -p 8080:8080 aai_gunicorn
 #
 #
-# to bash starbuglogs:       docker run -it --rm --mount source=starbuglogs,target=/opt/starbug.com/logs --user root --entrypoint /bin/bash aai_gunicorn
+# to bash starbuglogs:       docker exec -it aai_gunicorn_00 bash
 #
 # to stop:                   docker stop aai_gunicorn_00
 # to delete container:       docker rm aai_gunicorn_00
