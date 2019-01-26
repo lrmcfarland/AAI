@@ -283,5 +283,4 @@ if __name__ == '__main__':
         result = toHorizon(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
         print 'Azimuth:', utils.get_azimuth(result),
-        print '(', utils.get_azimuth(result, is_relative2south=True), ' south)',
         print ', Altitude:', utils.get_altitude(result)

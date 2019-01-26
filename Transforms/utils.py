@@ -50,7 +50,7 @@ def JulianCentury(a_datetime):
 
     Args:
 
-    a_datetime: local date and time of the observation.
+        a_datetime: local date and time of the observation in coords.datetime
 
     Returns a double equal to the Julian century.
     """
@@ -63,25 +63,28 @@ def get_altitude(a_point):
     Converts spherical coordinate theta (angle to +z axis) to
     altitude (angle to the horizon).
 
+    Args:
+        a_point: coords.spherical
+
     Returns coords.angle, the angle to the longitude.
     """
 
     return a_point.theta.complement()
 
 
-def get_azimuth(a_point, is_relative2south=False):
+def get_azimuth(a_point):
     """Spherical to azimuth
 
     Converts spherical coordinate phi (angle to +x axis of
     projection in xy plane) to longitude (angle to the prime meridian).
 
+    Args:
+        a_point: coords.spherical
+
     Returns coords.angle, the angle to the azimuth.
     """
 
-    if is_relative2south:
-        return coords.angle(a_point.phi.value - 180)
-    else:
-        return a_point.phi
+    return a_point.phi
 
 
 def get_latitude(a_point):
@@ -89,6 +92,9 @@ def get_latitude(a_point):
 
     Converts spherical coordinate theta (angle to +z axis) to
     latitude (angle to the equator).
+
+    Args:
+        a_point: coords.spherical
 
     Returns coords.angle, the angle to the latitude.
     """
@@ -102,6 +108,9 @@ def get_longitude(a_point):
     Converts spherical coordinate phi (angle to +x axis of
     projection in xy plane) to longitude (angle to the prime meridian).
 
+    Args:
+        a_point: coords.spherical
+
     Returns coords.angle, the angle to the longitude.
     """
 
@@ -113,6 +122,9 @@ def get_RA(a_point):
 
     Converts spherical coordinate phi (angle to +x axis of
     projection in xy plane) to right ascension (/= 15).
+
+    Args:
+        a_point: coords.spherical
 
     Returns an angle with a value equal to the Right Ascension.
     """
@@ -135,12 +147,14 @@ def get_declination(a_point):
 def azalt2spherical(an_azimuth, an_altitude, a_radius=1):
     """Converts a given altitude and azimuth into spherical coordinates
 
-    Azimuth (coords.angle): is measured from the anti-meridian (north,
-    positive east following IAU standard) and is converted into
-    degrees and assigned to phi.
+    Args:
 
-    Altitude (coords.angle): is measured from the horizon is converted
-    to theta measured from the north pole.
+        Azimuth (coords.angle): is measured from the anti-meridian
+    (north, positive east following IAU standard) and is converted
+    into degrees and assigned to phi.
+
+        Altitude (coords.angle): is measured from the horizon is
+    converted to theta measured from the north pole.
 
     Returns coords.spherical.
     """
@@ -151,14 +165,16 @@ def azalt2spherical(an_azimuth, an_altitude, a_radius=1):
 def latlon2spherical(a_latitude, a_longitude, a_radius=1):
     """Converts a given latitude and longitude into spherical coordinates
 
-    latitude (coords.angle): is measured in degrees from the equator
-    and is converted to theta measured from the axis of the north pole.
+    Args:
 
-    longitude (coords.angle): is measured in degrees from the prime
-    merdian.
+        latitude (coords.angle): is measured in degrees from the
+    equator and is converted to theta measured from the axis of the
+    north pole.
+
+        longitude (coords.angle): is measured in degrees from the
+    prime merdian.
 
     Returns coords.spherical.
-
     """
 
     return coords.spherical(a_radius, a_latitude.complement(),
@@ -168,11 +184,14 @@ def latlon2spherical(a_latitude, a_longitude, a_radius=1):
 def radec2spherical(a_right_ascension, a_declination, a_radius=1):
     """Converts a given right ascension and declination into spherical coordinates
 
-    Right ascension (coords.angle): is measured in hours from the vernal
-    equinox and converted into degrees.
+    Args:
 
-    Declination (coords.angle): is measured in degrees from the ecliptic
-    and is converted to theta measured from the axis of the north pole.
+        Right ascension (coords.angle): is measured in hours from the
+    vernal equinox and converted into degrees.
+
+        Declination (coords.angle): is measured in degrees from the
+    ecliptic and is converted to theta measured from the axis of the
+    north pole.
 
     Returns coords.spherical.
     """
