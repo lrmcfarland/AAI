@@ -11,9 +11,9 @@
 #
 # WARNING: -p ports must match config file
 #
-# to run default flask:      docker run --name aai_flask_00 --mount source=starbugconfig,target=/opt/starbug.com/www/config --mount source=starbuglogs,target=/opt/starbug.com/logs -d -p 8080:8080 aai_flask
+# to run default flask:      docker run --name aai_flask_00 --mount source=starbugconfig,target=/opt/starbug.com/config --mount source=starbuglogs,target=/opt/starbug.com/logs -d -p 8080:8080 aai_flask
 #
-# to run deploy flask:       docker run --name aai_flask_00 --mount source=starbugconfig,target=/opt/starbug.com/www/config --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='/opt/starbug.com/config/aai-flask-deployment-config.py' -p 8080:8080 aai_flask
+# to run deploy flask:       docker run --name aai_flask_00 --mount source=starbugconfig,target=/opt/starbug.com/config --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='/opt/starbug.com/config/aai-flask-deployment-config.py' -p 8080:8080 aai_flask
 #
 #
 # to view aai_flask logs:    docker run -it aai_flask_00 bash

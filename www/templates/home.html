@@ -113,11 +113,17 @@ This is my implementation of various astronomical algorithms, mostly
 Algorithms by Jean Meeus</a>, with parts found around the home and
 across the internet.
 
-It pulls together examples of design patterns I have
+For example, I use the geolocation capability of a web browser to
+provide the observer's location to calculate the azimuth and altitude
+of the sun at the current time.
+
+To do this, I pulled together examples of design patterns I have
 learned for how to combine C++, Python and JavaScript.
 
+<p>
+
 Access to the implementation here is through a
-<a href="http://flask.pocoo.org/">flask server</a> in a
+<a href="http://flask.pocoo.org/">flask server</a> running in a
 <a href="https://www.docker.com/">docker container</a>
 as a micro-service.
 
@@ -134,35 +140,8 @@ for the <a href="https://db.starbug.com/">starbug database</a>
 like standardizing input data.
 
 <p>
-My purpose is to provide a complete, non-trivial example that is
-complex enough to challenge the approach but easy to verify, in this
-case by looking out a window.
 
-The goal is to provide a good reference and demonstrate a
-robust product with good error handling across the platform.
-
-For example, the exception thrown by June 31
-originates in my
-<a href="https://github.com/lrmcfarland/Coordinates">
-C++ coordinates library</a>, is caught on the server in the Python
-wrapper, sent as a HTTP response to the client and displayed as a
-JavaScript alert.
-<p>
-
-The code is built mostly "by hand" with Emacs from open source
-projects and is, of course, itself open source and available on GitHub
-<a href="https://github.com/lrmcfarland/Astronomy">
-here</a>.
-
-I use test driven development to find and remove errors.
-
-The mistakes that are left in here are all mine.
-
-If you find them, please feel free to let me know.
-
-<p>
-
-<a href="http://www.starbug.com">-lrm</a>, <i>2019 Jan 14</i>
+<a href="http://www.starbug.com">-lrm</a>, <i>2019 Feb 16</i>
 
 </div>
 
