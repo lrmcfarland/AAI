@@ -5,14 +5,14 @@
 echo '============='
 echo 'APC'
 echo '============='
-python test_APCBodies.py "$@"
+PYTHONPATH=../.. python test_APCBodies.py "$@"
 
 echo '============='
 echo 'Stjarn Himlen'
 echo '============='
-python test_StjarnHimlen.py "$@"
+PYTHONPATH=../.. python test_StjarnHimlen.py "$@"
 
 echo '============'
 echo 'Sun Position'
 echo '============'
-python test_SunPosition.py "$@"
+PYTHONPATH=../.. python test_SunPosition.py "$@"

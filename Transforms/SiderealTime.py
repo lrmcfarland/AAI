@@ -1,8 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Transforms coordinates, Ecliptic, Equatorial and Horizontal
 
-to run: ./pylaunch.sh SiderealTime.py 2017-11-27T12:00
+To Run
+
+$ PYTHONPATH=../.. ./test_SiderealTime.py 
 
 References:
 
@@ -18,11 +21,13 @@ Validation:
     http://aa.usno.navy.mil/data/docs/siderealtime.php
 """
 
+from __future__ import absolute_import  # for python 2 and 3
+
 import math
 
-import coords
-import EclipticEquatorial
-import utils
+import starbug.coords as coords
+import AAI.Transforms.EclipticEquatorial
+import AAI.Transforms.utils
 
 
 class Error(Exception):
@@ -285,19 +290,19 @@ if __name__ == '__main__':
 
     # ----- results -----
 
-    print a_datetime
-    print an_observer
+    print(a_datetime)
+    print(an_observer)
 
-    print 'Julian Date', a_datetime.toJulianDate()
+    print('Julian Date', a_datetime.toJulianDate())
 
-    eps_jpl = EclipticEquatorial.obliquity(a_datetime)
-    print 'obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.value), ')'))
+    eps_jpl = AAI.Transforms.EclipticEquatorial.obliquity(a_datetime)
+    print('obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.value), ')')))
 
     eps_usno = USNO_C163.obliquity(a_datetime)
-    print 'obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.value), ')'))
+    print('obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.value), ')')))
 
 
-    print 'GMST', USNO_C163.GMST(a_datetime)
-    print 'GAST', USNO_C163.GAST(a_datetime)
-    print 'LSTM', USNO_C163.LSTM(an_observer, a_datetime)
-    print 'LSTA', USNO_C163.LSTA(an_observer, a_datetime)
+    print('GMST', USNO_C163.GMST(a_datetime))
+    print('GAST', USNO_C163.GAST(a_datetime))
+    print('LSTM', USNO_C163.LSTM(an_observer, a_datetime))
+    print('LSTA', USNO_C163.LSTA(an_observer, a_datetime))

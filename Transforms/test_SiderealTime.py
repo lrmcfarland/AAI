@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """Unit tests for Right Ascension, declination, Ecliptic and Equatorial transforms
 
 to run:  ./pylaunch.sh test_SiderealTime.py
@@ -27,7 +30,7 @@ import math
 import time
 import unittest
 
-import coords
+import starbug.coords as coords
 import SiderealTime
 
 class USNO_C163_Tests(unittest.TestCase):
@@ -59,10 +62,6 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
 
-        print '\nDatetime:', a_datetime
-        print 'GMST', a_gmst
-        print 'GAST', a_gast # TODO rm
-
 
     @unittest.skip('hacking')
     def test_LST(self):
@@ -72,11 +71,6 @@ class USNO_C163_Tests(unittest.TestCase):
 
         a_gmst = self.xforms.GMST(a_datetime)
         a_lsta = self.xforms.LSTA(a_datetime, an_observer)
-
-        print '\nDatetime:', a_datetime
-        print 'observer:', an_observer
-        print 'GMST', a_gmst
-        print 'LSTA', a_lsta, a_lsta.value
 
 
     def test_JDo_0(self):

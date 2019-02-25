@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """ Transforms from Astronomy on the Personal Computer (APC)
     by Montenbruck and Pfleger
@@ -6,8 +7,10 @@
     TODO: not all of my implementations of this are working. Check unittests.
 """
 
+from __future__ import absolute_import  # for python 2 and 3
+
 import math
-import coords
+import starbug.coords as coords
 
 
 horizon_axis = coords.rotator(coords.Cartesian.Uy)

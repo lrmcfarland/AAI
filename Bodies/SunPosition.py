@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Calculates the position of the sun for the given datetime.
 
@@ -7,68 +8,20 @@ Uses algorithms from:
     http://en.wikipedia.org/wiki/Position_of_the_Sun
     http://aa.usno.navy.mil/faq/docs/GAST.php
 
-to validate:
-    http://www.esrl.noaa.gov/gmd/grad/solcalc/
 
-to run:
-
-$ ./pylaunch.sh SunPosition.py -v -- 37:24 -122:04:57 2015-03-21T12:57:00-08
-
-Note: use -- to end options and allow for negative coordinates.
-
-to plot:
-
-Altitude:
-
-$ ./pylaunch.sh SunPosition.py -- 37:24 0 2015-03-21T00:00:00 > altitude_2015.03.20.txt
-
-Note: Series starts at midnight and 0 longitude to center noon w/o time zone.
-
-$ r
-
-> spring <- read.table("./a_place.spring.txt")
-> summer <- read.table("./a_place.summer.txt")
-> fall <- read.table("./a_place.fall.txt")
-> winter <- read.table("./a_place.winter.txt")
-> plot(spring$V1, spring$V4, type="l", xlab="time of day", ylab="altitude in degrees", ylim=c(-100, 100), col="light green")
-> lines(summer$V1, summer$V4, type="l", col="pink")
-> lines(fall$V1, fall$V4, type="l", col="orange")
-> lines(winter$V1, winter$V4, type="l", col="light blue")
-> legend("topright", c("vernal equinox", "summer solstice", "autumnal equinox", "winter solstice"), lwd=c(1,1), col=c("light green", "red", "orange", "light blue"))
-> title("Solar altitude")
-
-
-
-Analemma:
-
-$ ./pylaunch.sh SunPosition.py -o analemma -- 45 0 2015-01-01T12:00:00 > analemma.txt
-
-Note: Series starts at noon and 0 longitude to center noon w/o time zone.
-
-> analemma <- read.table("analemma.txt")
-> plot(analemma$V1, analemma$V2, type="l", xlab="Azimuth in degrees", ylab="Altitude in degrees", col="red")
-> title("Analemma at 37N, 2015")
-> grid()
-
-
-
-EoT:
-
-> eot <- read.table("eot.txt")
-> plot(eot$V1, eot$V3, type="l", xlab="day of year", ylab="minutes", col="green")
-> title("Equation of time 2015")
-> grid()
 
 
 """
 
+from __future__ import absolute_import  # for python 2 and 3
+
 import math
 
-import coords
+import starbug.coords as coords
 
-import Transforms.EclipticEquatorial
-import Transforms.EquatorialHorizon
-import Transforms.utils
+import AAI.Transforms.EclipticEquatorial
+import AAI.Transforms.EquatorialHorizon
+import AAI.Transforms.utils
 
 
 class Error(Exception):
@@ -124,8 +77,8 @@ def SunPosition(an_observer, a_datetime):
     ecliptic_longitude, R = SolarLongitude(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-    sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+    sun_eq = AAI.Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = AAI.Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
     return sun_hz
 
@@ -146,16 +99,16 @@ def EquationOfTime(a_datetime):
 
     noon = coords.datetime()
     noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
-    gast = Transforms.SiderealTime.USNO_C163.GAST(noon)
+    gast = AAI.Transforms.SiderealTime.USNO_C163.GAST(noon)
 
     ecliptic_longitude, R = SolarLongitude(noon)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, noon)
+    sun_eq = AAI.Transforms.EclipticEquatorial.toEquatorial(sun_ec, noon)
 
     eot = coords.angle()
 
-    sun_ra = Transforms.utils.get_RA(sun_eq)
+    sun_ra = AAI.Transforms.utils.get_RA(sun_eq)
 
     if gast.value - sun_ra.value < 12:
         eot.value = gast.value - sun_ra.value
@@ -188,7 +141,7 @@ def SunRiseAndSet(an_observer, a_datetime):
 
     ecliptic_longitude, R = SolarLongitude(a_datetime)
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_eq = AAI.Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
 
     return RiseAndSet(sun_eq, an_observer, a_datetime, an_altitude=coords.angle(-0.8333))
 
@@ -232,18 +185,18 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     """
 
-    JD, JDo = Transforms.SiderealTime.USNO_C163.JulianDate0(a_datetime)
+    JD, JDo = AAI.Transforms.SiderealTime.USNO_C163.JulianDate0(a_datetime)
 
     midnight = coords.datetime()
     midnight.fromJulianDate(JDo)
 
-    observer_latitude = Transforms.utils.get_latitude(an_observer)
-    observer_longitude = Transforms.utils.get_longitude(an_observer)
+    observer_latitude = AAI.Transforms.utils.get_latitude(an_observer)
+    observer_longitude = AAI.Transforms.utils.get_longitude(an_observer)
 
-    object_RA = coords.angle(Transforms.utils.get_RA(an_object).value * 15) # in degrees
-    object_declination = Transforms.utils.get_declination(an_object)
+    object_RA = coords.angle(AAI.Transforms.utils.get_RA(an_object).value * 15) # in degrees
+    object_declination = AAI.Transforms.utils.get_declination(an_object)
 
-    gmst = Transforms.SiderealTime.USNO_C163.GMST(midnight)
+    gmst = AAI.Transforms.SiderealTime.USNO_C163.GMST(midnight)
     gmst.value *= 15 # in degrees
 
     cos_hour_angle = (math.sin(an_altitude.radians) \
@@ -441,8 +394,8 @@ if __name__ == '__main__':
     if len(args) < 3:
         parser.error('missing object and/or datetime.')
 
-    an_observer = Transforms.utils.latlon2spherical(a_latitude=Transforms.utils.parse_angle_arg(args[0]),
-                                                    a_longitude=Transforms.utils.parse_angle_arg(args[1]))
+    an_observer = AAI.Transforms.utils.latlon2spherical(a_latitude=AAI.Transforms.utils.parse_angle_arg(args[0]),
+                                                        a_longitude=AAI.Transforms.utils.parse_angle_arg(args[1]))
 
     a_datetime = coords.datetime(args[2])
 
@@ -462,10 +415,10 @@ if __name__ == '__main__':
 
             sun = SunPosition(an_observer, current_datetime)
 
-            print 0.01*d,
-            print current_datetime,
-            print Transforms.utils.get_azimuth(sun).value,
-            print Transforms.utils.get_altitude(sun).value
+            print(0.01*d,)
+            print(current_datetime,)
+            print(AAI.Transforms.utils.get_azimuth(sun).value,)
+            print(AAI.Transforms.utils.get_altitude(sun).value)
 
 
     elif options.output_mode.lower() == 'analemma':
@@ -482,7 +435,7 @@ if __name__ == '__main__':
             sun = SunPosition(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
-            print eot.value*60 + 180, Transforms.utils.get_altitude(sun).value
+            print(eot.value*60 + 180, AAI.Transforms.utils.get_altitude(sun).value)
 
 
     elif options.output_mode.lower() == 'eot':
@@ -497,45 +450,45 @@ if __name__ == '__main__':
             current_date += 1
             eot = EquationOfTime(current_date)
 
-            print d, current_date, eot.value * 60
+            print(d, current_date, eot.value * 60)
 
 
     else:
 
         # azimuth, altitude
 
-        print 'A datetime: ', a_datetime, ''.join(('(', str(a_datetime.toJulianDate()), ')'))
-        print 'An observer:', an_observer
+        print('A datetime: ', a_datetime, ''.join(('(', str(a_datetime.toJulianDate()), ')')))
+        print('An observer:', an_observer)
 
         ecliptic_longitude, R = SolarLongitude(a_datetime)
-        print 'Ecliptic longitude:', ecliptic_longitude
-        print 'Distance in AU:', R
+        print('Ecliptic longitude:', ecliptic_longitude)
+        print('Distance in AU:', R)
 
-        print 'Obliquity of the ecliptic:', Transforms.EclipticEquatorial.obliquity(a_datetime)
+        print('Obliquity of the ecliptic:', AAI.Transforms.EclipticEquatorial.obliquity(a_datetime))
 
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        print 'Sun in ecliptic coordinates:', sun_ec
+        print('Sun in ecliptic coordinates:', sun_ec)
 
-        sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        print 'Sun in equatorial coordinates:', sun_eq
+        sun_eq = AAI.Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+        print('Sun in equatorial coordinates:', sun_eq)
 
-        sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-        print 'Sun in horizon coordinates:', sun_hz
+        sun_hz = AAI.Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+        print('Sun in horizon coordinates:', sun_hz)
 
         sun_dec = coords.angle(90) - sun_eq.theta
-        print 'Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.value), ')'))
+        print('Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.value), ')')))
 
         eot = EquationOfTime(a_datetime)
-        print 'Equation of time (minutes):', eot.value * 60
+        print('Equation of time (minutes):', eot.value * 60)
 
-        print 'Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')'))
-        print 'Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')'))
+        print('Azimuth (degrees):', AAI.Transforms.utils.get_azimuth(sun_hz),)
+        print(''.join(('(', str(AAI.Transforms.utils.get_azimuth(sun_hz).value), ')')))
+        print('Altitude (degrees):', AAI.Transforms.utils.get_altitude(sun_hz),)
+        print(''.join(('(', str(AAI.Transforms.utils.get_altitude(sun_hz).value), ')')))
 
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)
 
-        print 'Rising :', rising
-        print 'Transit:', transit
-        print 'Setting:', setting
+        print('Rising :', rising)
+        print('Transit:', transit)
+        print('Setting:', setting)

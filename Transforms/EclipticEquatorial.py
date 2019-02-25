@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """Transforms coordinates to/from Ecliptic, Equatorial
 
@@ -27,10 +28,12 @@ Validation:
 
 """
 
-import math
-import coords
+from __future__ import absolute_import  # for python 2 and 3
 
-import utils
+import math
+import starbug.coords as coords
+
+import AAI.Transforms.utils
 
 
 class Error(Exception):
@@ -54,9 +57,9 @@ def obliquity(a_datetime):
 
     a_datetime (coords.datetime): The time of the observation.
     """
-    T = utils.JulianCentury(a_datetime)
+    T = AAI.Transforms.utils.JulianCentury(a_datetime)
     eps = 0
-    for i in xrange(len(obe)):
+    for i in range(len(obe)):
         eps += obe[i].value * math.pow(T, i)
     return coords.angle(eps)
 
@@ -156,8 +159,8 @@ if __name__ == '__main__':
     if len(args) < 3:
         parser.error('missing object and/or datetime.')
 
-    an_object = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg(args[0]),
-                                      a_declination=utils.parse_angle_arg(args[1]))
+    an_object = AAI.Transforms.utils.radec2spherical(a_right_ascension=AAI.Transforms.utils.parse_angle_arg(args[0]),
+                                                     a_declination=AAI.Transforms.utils.parse_angle_arg(args[1]))
 
     a_datetime = coords.datetime(args[2])
 
@@ -169,8 +172,9 @@ if __name__ == '__main__':
 
     if options.toEcliptic is True:
         result = toEcliptic(an_object, a_datetime)
-        print 'Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', utils.get_longitude(result)
+        print('Ecliptic Latitude:', AAI.Transforms.utils.get_latitude(result),
+              ', Longitude:', AAI.Transforms.utils.get_longitude(result))
 
     else:
         result = toEquatorial(an_object, a_datetime)
-        print 'RA:', utils.get_RA(result), ', Dec:', utils.get_declination(result)
+        print('RA:', AAI.Transforms.utils.get_RA(result), ', Dec:', AAI.Transforms.utils.get_declination(result))

@@ -1,32 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """Unit tests for Stjarn Himlen transforms
 
-to run:  ./pylaunch.sh test_StjarnHimlen.py
-verbose: ./pylaunch.sh test_StjarnHimlen.py -v
-filter:  ./pylaunch.sh test_StjarnHimlen.py StjarnHimlenTests.test_GMST
+To Run
 
-debug:   ./pylaunch.sh -m pdb test_StjarnHimlen.py
 
-next until import module:
 
-(Pdb) n
-> /Users/lrm/src/Astronomy/Transforms/test_StjarnHimlen.py(28)<module>()
--> import StjarnHimlen
-(Pdb) n
-> /Users/lrm/src/Astronomy/Transforms/test_StjarnHimlen.py(30)<module>()
--> class StjarnHimlenTests(unittest.TestCase):
-(Pdb) b StjarnHimlen.StjarnHimlen.SolarLongitude
-Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/StjarnHimlen.py:31
 
 """
+
+from __future__ import absolute_import  # for python 2 and 3
 
 import math
 import time
 import unittest
 
-import coords
-import StjarnHimlen
+import starbug.coords as coords
+import AAI.Bodies.StjarnHimlen
 
-import Transforms.utils
+import AAI.Transforms.utils
 
 
 class StjarnHimlenTests(unittest.TestCase):
@@ -62,17 +55,13 @@ class StjarnHimlenTests(unittest.TestCase):
 
         """
         a_datetime = coords.datetime('2015-01-01T00:00:00')
-        a_gmst = StjarnHimlen.GMST(a_datetime)
-
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'gmst', a_gmst # TODO rm
-
+        a_gmst = AAI.Bodies.StjarnHimlen.GMST(a_datetime)
 
 
     def test_SolarLongitude_J2000(self):
         """Tests solar longitude calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        a_solar_longitude = StjarnHimlen.SolarLongitude(j2000)
+        a_solar_longitude = AAI.Bodies.StjarnHimlen.SolarLongitude(j2000)
 
         self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
 
@@ -80,7 +69,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_SolarRADec_J2000(self):
         """Tests solar RA and Dec calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        RA, Dec = StjarnHimlen.SolarRADec(j2000)
+        RA, Dec = AAI.Bodies.StjarnHimlen.SolarRADec(j2000)
 
         self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
         self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
@@ -89,7 +78,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST0_J2000(self):
         """Tests GMST0 calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst0 = StjarnHimlen.GMST0(j2000)
+        gmst0 = AAI.Bodies.StjarnHimlen.GMST0(j2000)
 
         self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
 
@@ -97,7 +86,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST_J2000(self):
         """Tests GMST calculation for J2000"""
         j2000 = coords.datetime('2000-01-01T00:00:00')
-        gmst = StjarnHimlen.GMST(j2000)
+        gmst = AAI.Bodies.StjarnHimlen.GMST(j2000)
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
@@ -106,9 +95,9 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST_J2000_plus_day(self):
         """Test GMST J2000 plus a day"""
         a_datetime_0 = coords.datetime('2000-01-01T12:00:00')
-        a_gmst_0 = StjarnHimlen.GMST(a_datetime_0)
+        a_gmst_0 = AAI.Bodies.StjarnHimlen.GMST(a_datetime_0)
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
-        a_gmst_1 = StjarnHimlen.GMST(a_datetime_1)
+        a_gmst_1 = AAI.Bodies.StjarnHimlen.GMST(a_datetime_1)
 
         # returns '00:04:4.61177'
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
@@ -117,7 +106,7 @@ class StjarnHimlenTests(unittest.TestCase):
     def test_GMST_StA(self):
         """Tests GMST calculation for St. Andrews example"""
         a_datetime = coords.datetime('2000-01-01T00:00:00')
-        gmst = StjarnHimlen.GMST(a_datetime)
+        gmst = AAI.Bodies.StjarnHimlen.GMST(a_datetime)
 
         self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
 
@@ -137,8 +126,8 @@ class StjarnHimlenTests(unittest.TestCase):
             for j in xrange(1, 13):
                 for k in xrange(1, 28):
                     a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
-                    a_solar_longitude = StjarnHimlen.SolarLongitude(a_datetime)
-                    print a_datetime, a_solar_longitude
+                    a_solar_longitude = AAI.Bodies.StjarnHimlen.SolarLongitude(a_datetime)
+                    print(a_datetime, a_solar_longitude)
 
 
 
@@ -181,9 +170,9 @@ class StjarnHimlenTests(unittest.TestCase):
         a_datetime = coords.datetime('2014-12-31T20:41:00') # obs 1
         # a_datetime = coords.datetime('2015-01-06T21:39:00') # obs 2
 
-        sirius_hz = StjarnHimlen.toHorizon(sirius, an_observer, a_datetime)
+        sirius_hz = AAI.Bodies.StjarnHimlen.toHorizon(sirius, an_observer, a_datetime)
 
-        print 'sirius', sirius_hz
+        print('sirius', sirius_hz)
 
         # TODO validate something
 

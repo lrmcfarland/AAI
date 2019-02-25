@@ -1,27 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """Unit tests for Right Ascension, declination, Ecliptic and Equatorial transforms
 
-to run:  ./pylaunch.sh test_APCTransforms.py
-verbose: ./pylaunch.sh test_APCTransforms.py -v
-filter:  ./pylaunch.sh test_APCTransforms.py -v test_GMST
-debug:   ./pylaunch.sh -m pdb test_APCTransforms.py
+To Run:
 
-next until import module:
+$ PYTHONPATH=../.. ./test_APCTransforms.py
+s........ssss
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
 
-(Pdb) n
-> /Users/lrm/src/Astronomy/Transforms/test_APCTransforms.py(25)<module>()
--> import APCTransforms
-(Pdb) b APCTransforms.APCTransforms.GMST
-Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/APCTransforms.py:17
-
-
+OK (skipped=5)
 """
 
 import math
 import time
 import unittest
 
-import coords
 import APCTransforms
+import starbug.coords as coords
 import utils
 
 
@@ -40,9 +37,6 @@ class APCTransformTests(unittest.TestCase):
         """Hacking Test of GMST"""
         a_datetime = coords.datetime('2015-06-01T00:00:00')
         a_gmst = APCTransforms.GMST(a_datetime)
-
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'GMST', a_gmst # TODO rm
 
 
     def test_GMST_J2000(self):
@@ -157,7 +151,7 @@ class APCTransformTests(unittest.TestCase):
         sirius = utils.radec2spherical(a_right_ascension=coords.angle(6, 45, 8.9173),
                                        a_declination=coords.angle(-16, 42, 58.017))
 
-        print '\nsirius', sirius
+        print('\nsirius', sirius)
 
         an_observer = coords.spherical(1, coords.latitude(37, 24), coords.angle(-122, 4, 57))
 
@@ -165,7 +159,7 @@ class APCTransformTests(unittest.TestCase):
 
         sirius_hz = APCTransforms.toHorizon(sirius, an_observer, a_datetime)
 
-        print 'sirius hz', sirius_hz
+        print('sirius hz', sirius_hz)
 
         # TODO close, but still several minutes difference from USNO results
 
@@ -174,8 +168,8 @@ class APCTransformTests(unittest.TestCase):
 
         sirius_eq = APCTransforms.toEquatorial(sirius_hz, an_observer, a_datetime)
 
-        print 'sirius eq', sirius_eq # TODO not inverting correctly,
-                                     # ~10 degrees difference in theta and phi
+        print('sirius eq', sirius_eq) # TODO not inverting correctly,
+                                      # ~10 degrees difference in theta and phi
 
         # TODO validate something
 

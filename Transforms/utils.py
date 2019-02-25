@@ -7,7 +7,7 @@
 import math
 import re
 
-import coords
+import starbug.coords as coords
 
 
 class Error(Exception):

@@ -1,31 +1,15 @@
-"""Test transform utilities
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-to run:  ./pylaunch.sh test_utils.py
-verbose: ./pylaunch.sh test_utils.py -v
-filter:  ./pylaunch.sh test_utils.py UtilsTests.test_get_latitude_npole
-debug:   ./pylaunch.sh -m pdb test_utils.py
+"""Test transform utilities"""
 
-(Pdb) n
-> /Users/lrm/src/Astronomy/Transforms/test_utils.py(12)<module>()
--> import math
-
-repeat until
-
-(Pdb)
-> /Users/lrm/src/Astronomy/Transforms/test_utils.py(17)<module>()
--> import utils
-(Pdb) b utils.get_latitude
-Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/utils.py:14
-(Pdb) c
-..> /Users/lrm/src/Astronomy/Transforms/utils.py(23)get_latitude()
--> if not isinstance(a_point, coords.spherical):
-"""
+from __future__ import absolute_import  # for python 2 and 3
 
 import math
 import time
 import unittest
 
-import coords
+import starbug.coords as coords
 import utils
 
 class UtilsTests(unittest.TestCase):

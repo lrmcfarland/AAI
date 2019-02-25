@@ -1,27 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """Unit tests for Sun Position calculations
 
-to run:  ./pylaunch.sh test_SunPosition.py
-verbose: ./pylaunch.sh test_SunPosition.py -v
-filter:  ./pylaunch.sh test_SunPosition.py -v RiseAndSetTests.test_Meeus_15a
-debug:   ./pylaunch.sh -m pdb test_SunPosition.py
+To Run
 
-next until import module:
+$ PYTHONPATH=../.. ./test_SunPosition.py
 
-(Pdb) n
-> /Users/lrm/src/Astronomy/Transforms/test_SunPosition.py(25)<module>()
--> import SunPosition
-(Pdb) b SunPosition.SunPosition.EquationOfTime
-Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/SunPosition.py:17
+
 """
+
+from __future__ import absolute_import  # for python 2 and 3
 
 import math
 import time
 import unittest
 
-import coords
+import starbug.coords as coords
 import SunPosition
 
-import Transforms.utils
+import AAI.Transforms.utils
 
 
 class SunPositionsTests(unittest.TestCase):
@@ -32,8 +30,8 @@ class SunPositionsTests(unittest.TestCase):
 
         self.places = 12
 
-        self.mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
-                                                        a_longitude=coords.angle(-122, 4, 56))
+        self.mlc404 = AAI.Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                            a_longitude=coords.angle(-122, 4, 56))
 
         return
 
@@ -63,10 +61,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(243.07115892922118, Transforms.utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(243.07115892922118, AAI.Transforms.utils.get_azimuth(sun).value, self.places)
 
-        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10').value/2)
-        self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=1)
+        sextant_alt = coords.angle(AAI.Transforms.utils.parse_angle_arg('70:10').value/2)
+        self.assertAlmostEqual(sextant_alt.value, AAI.Transforms.utils.get_altitude(sun).value, delta=1)
 
         return
 
@@ -93,10 +91,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(267.90829781482097, Transforms.utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(267.90829781482097, AAI.Transforms.utils.get_azimuth(sun).value, self.places)
 
-        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32').value/2)
-        self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=1)
+        sextant_alt = coords.angle(AAI.Transforms.utils.parse_angle_arg('44:32').value/2)
+        self.assertAlmostEqual(sextant_alt.value, AAI.Transforms.utils.get_altitude(sun).value, delta=1)
 
         return
 
@@ -121,10 +119,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.SunPosition(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(95.95981144985676, Transforms.utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(95.95981144985676, AAI.Transforms.utils.get_azimuth(sun).value, self.places)
 
-        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46').value/2)
-        self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=2)
+        sextant_alt = coords.angle(AAI.Transforms.utils.parse_angle_arg('66:46').value/2)
+        self.assertAlmostEqual(sextant_alt.value, AAI.Transforms.utils.get_altitude(sun).value, delta=2)
 
         return
 
@@ -163,7 +161,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 02, 11, 12)
+        a_datetime = coords.datetime(2015, 2, 11, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -14.24 minutes
@@ -178,7 +176,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 03, 20, 12)
+        a_datetime = coords.datetime(2015, 3, 20, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -7.44 minutes
@@ -195,7 +193,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 05, 14, 12)
+        a_datetime = coords.datetime(2015, 5, 14, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says 3.65 minutes
@@ -212,7 +210,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 07, 26, 12)
+        a_datetime = coords.datetime(2015, 7, 26, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -6.54 minutes
@@ -229,7 +227,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 11, 03, 12)
+        a_datetime = coords.datetime(2015, 11, 3, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says 16.48 minutes
@@ -260,10 +258,10 @@ class RiseAndSetTests(unittest.TestCase):
 
         a_datetime = coords.datetime('1988-03-20T00:00:00')
 
-        boston = Transforms.utils.latlon2spherical(a_latitude = coords.angle(42.3333),
-                                                   a_longitude = coords.angle(-71.0833))
+        boston = AAI.Transforms.utils.latlon2spherical(a_latitude = coords.angle(42.3333),
+                                                       a_longitude = coords.angle(-71.0833))
 
-        venus = Transforms.utils.radec2spherical(coords.angle(41.73129/15), coords.angle(18.44092))
+        venus = AAI.Transforms.utils.radec2spherical(coords.angle(41.73129/15), coords.angle(18.44092))
 
 
         rising, transit, setting = SunPosition.RiseAndSet(venus, boston, a_datetime, coords.angle(-0.5667))
@@ -278,10 +276,10 @@ class RiseAndSetTests(unittest.TestCase):
     def test_polaris_1(self):
         """Tests circumpolar exception to high"""
 
-        polaris = Transforms.utils.radec2spherical(coords.angle(2, 31, 49.09), coords.angle(89, 15, 50.8))
+        polaris = AAI.Transforms.utils.radec2spherical(coords.angle(2, 31, 49.09), coords.angle(89, 15, 50.8))
 
-        mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
-                                                   a_longitude=coords.angle(-122, 4, 56))
+        mlc404 = AAI.Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                       a_longitude=coords.angle(-122, 4, 56))
 
         a_datetime = coords.datetime('2015-05-25T00:00:00-07')
 
@@ -293,10 +291,10 @@ class RiseAndSetTests(unittest.TestCase):
     def test_polaris_2(self):
         """Tests circumpolar exception to low"""
 
-        antipolaris = Transforms.utils.radec2spherical(coords.angle(2, 31, 49.09), coords.angle(-89, 15, 50.8))
+        antipolaris = AAI.Transforms.utils.radec2spherical(coords.angle(2, 31, 49.09), coords.angle(-89, 15, 50.8))
 
-        mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
-                                                   a_longitude=coords.angle(-122, 4, 56))
+        mlc404 = AAI.Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                       a_longitude=coords.angle(-122, 4, 56))
 
         a_datetime = coords.datetime('2015-05-25T00:00:00-07')
 
@@ -313,19 +311,19 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         self.places = 12
 
-        self.mlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
-                                                        a_longitude=coords.angle(-122, 4, 56))
+        self.mlc404 = AAI.Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                            a_longitude=coords.angle(-122, 4, 56))
 
-        self.antimlc404 = Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
-                                                            a_longitude=coords.angle(122, 4, 56))
+        self.antimlc404 = AAI.Transforms.utils.latlon2spherical(a_latitude=coords.angle(37, 24),
+                                                                a_longitude=coords.angle(122, 4, 56))
         return
 
 
     def test_timezone_p1(self):
         """Tests timezone +1"""
 
-        an_observer = Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
-                                                        a_longitude = coords.angle(15))
+        an_observer = AAI.Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
+                                                            a_longitude = coords.angle(15))
 
         a_datetime = coords.datetime('2015-05-22T12:00:00+01')
 
@@ -341,8 +339,8 @@ class SunRiseAndSetTests(unittest.TestCase):
     def test_timezone_n1(self):
         """Tests timezone -1"""
 
-        an_observer = Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
-                                                        a_longitude = coords.angle(-15))
+        an_observer = AAI.Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
+                                                            a_longitude = coords.angle(-15))
 
         a_datetime = coords.datetime('2015-05-22T12:00:00-01')
 
@@ -364,8 +362,8 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         """
 
-        an_observer = Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
-                                                        a_longitude = coords.angle(90))
+        an_observer = AAI.Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
+                                                            a_longitude = coords.angle(90))
 
         a_datetime = coords.datetime('2015-05-22T12:00:00+06')
 
@@ -381,8 +379,8 @@ class SunRiseAndSetTests(unittest.TestCase):
     def test_timezone_n6(self):
         """Tests timezone -6"""
 
-        an_observer = Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
-                                                        a_longitude = coords.angle(-90))
+        an_observer = AAI.Transforms.utils.latlon2spherical(a_latitude = coords.angle(45),
+                                                            a_longitude = coords.angle(-90))
 
         a_datetime = coords.datetime('2015-05-22T12:00:00-06')
 

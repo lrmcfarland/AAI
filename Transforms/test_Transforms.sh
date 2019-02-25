@@ -5,24 +5,24 @@
 echo '==='
 echo 'APC'
 echo '==='
-python test_APCTransforms.py "$@"
+PYTHONPATH=../.. python test_APCTransforms.py "$@"
 
 echo '==================='
 echo 'Ecliptic Equatorial'
 echo '==================='
-python test_EclipticEquatorial.py "$@"
+PYTHONPATH=../.. python test_EclipticEquatorial.py "$@"
 
 echo '=================='
 echo 'Equatorial Horizon'
 echo '=================='
-python test_EquatorialHorizon.py "$@"
+PYTHONPATH=../.. python test_EquatorialHorizon.py "$@"
 
 echo '============'
 echo 'SiderealTime'
 echo '============'
-python test_SiderealTime.py "$@"
+PYTHONPATH=../.. python test_SiderealTime.py "$@"
 
 echo '====='
 echo 'Utils'
 echo '====='
-python test_utils.py "$@"
+PYTHONPATH=../.. python test_utils.py "$@"

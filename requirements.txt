@@ -4,3 +4,4 @@
 
 flask
 gunicorn
+starbug.coords
