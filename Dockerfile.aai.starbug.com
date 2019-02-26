@@ -43,7 +43,11 @@ LABEL maintainer "lrm@starbug.com"
 LABEL service "Astronomical Algorithms Implemented gunicorn wrapper"
 
 
-RUN yum install -y zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel git
+
+RUN yum install -y epel-release gcc gcc-c++ git make
+RUN yum install -y python-devel python-pip
+
+
 
 # --------------------
 # ----- AAI home -----
@@ -69,9 +73,8 @@ WORKDIR ${AAI_HOME}
 
 COPY . ${AAI_HOME}/AAI/www/
 
-WORKDIR ${AAI_HOME}/AAI/www
 
-RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+RUN git clone https://github.com/pyenv/pyenv.git ${AAI_HOME}/.pyenv
 
 RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 RUN echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
@@ -79,20 +82,24 @@ RUN echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)
 
 
 
+ENV PYENV_ROOT ${AAI_HOME}/.pyenv
 
-ENV PYENV_ROOT $HOME/.pyenv
-
-ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
+ENV PATH ${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}
 
 
 
 RUN pyenv install 3.7.0
 
-RUN pyenv global 3.7.0
+# RUN pyenv global 3.7.0
 
-RUN pyenv rehash
+# RUN pyenv rehash
 
-ENV eval "$(pyenv init -)"
+# ENV eval "$(pyenv init -)"
+
+
+
+WORKDIR ${AAI_HOME}/AAI/www
+
 
 # RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
 
