@@ -124,12 +124,11 @@ docker volume create starbugconfig
 ```
 
 To edit the config, you will need to start the contaier with the default config then
-edit it from a shell with the valid keys
+edit it from an interactive shell with the valid keys
 
 ```
-    $ docker run --net starbugnet --name aai_gunicorn_00 --mount source=starbugconfig,target=/opt/starbug.com/config --mount source=starbuglogs,target=/opt/starbug.com/logs -d -p 8080:8080 aai_gunicorn
+    $ docker run -it --net starbugnet --name aai.starbug.com_00 --mount source=starbugconfig,target=/opt/starbug.com/config --mount source=starbuglogs,target=/opt/starbug.com/logs -p 8080:8080 aai.starbug.com
 
-    $ docker exec -it aai_gunicorn_00 bash
 
 ```
 
@@ -151,13 +150,13 @@ Restart the container with the new config passed in as an environment variable,
 with the -e option
 
 ```
-    $ docker stop aai_gunicorn_00
+    $ docker stop aai.starbug.com_00
 
 
-    $ docker rm aai_gunicorn_00
+    $ docker rm aai.starbug.com_00
 
 
-    $ docker run --net starbugnet --name aai_gunicorn_00 --mount source=starbugconfig,target=/opt/starbug.com/config --mount source=starbuglogs,target=/opt/starbug.com/logs -d -e AAI_FLASK_CONFIG='/opt/starbug.com/config/aai-flask-deployment-config.py' -p 8080:8080 aai_gunicorn
+    $ docker run -d --net starbugnet --name aai.starbug.com_00 --mount source=starbugconfig,target=/opt/starbug.com/config --mount source=starbuglogs,target=/opt/starbug.com/logs -e AAI_FLASK_CONFIG='/opt/starbug.com/config/aai-flask-deployment-config.py' -p 8080:8080 aai.starbug.com
 
 ```
 
@@ -205,10 +204,10 @@ Warning: -p ports argument must match what is in the [flask configuration file](
 ### default (testing) configuration
 
 ```
-docker run --name aai_flask_00 \
+docker run -d --name aai_flask_00 \
            --mount source=starbugconfig,target=/opt/starbug.com/www/config \
 	   --mount source=starbuglogs,target=/opt/starbug.com/logs \
-	   -d -p 8080:8080 aai_flask
+	   -p 8080:8080 aai_flask
 
 ```
 
@@ -223,11 +222,11 @@ put there by any method, sftp, scp et al.
 
 
 ```
-docker run --name aai_flask_00 \
+docker run -d --name aai_flask_00 \
            --mount source=starbugconfig,target=/opt/starbug.com/www/config \
            --mount source=starbuglogs,target=/opt/starbug.com/logs \
 	   -e AAI_FLASK_CONFIG='/opt/starbug.com/config/aai-flask-deployment-config.py' \
-	   -d -p 8080:8080 aai_flask
+	   -p 8080:8080 aai_flask
 ```
 
 
@@ -245,11 +244,11 @@ file](https://github.com/lrmcfarland/starbug.com/blob/master/conf/starbug.nginx.
 
 
 ```
-docker run --name aai_gunicorn_00 \
+docker run -d --name aai.starbug.com_00 \
            --net starbugnet \
 	   --mount source=starbugconfig,target=/opt/starbug.com/config \
            --mount source=starbuglogs,target=/opt/starbug.com/logs \
-	   -d -p 8080:8080 aai_gunicorn
+	   -p 8080:8080 aai.starbug.com
 ```
 
 
@@ -263,12 +262,12 @@ for an example of COPY in the docker file, but the file can be
 put there by any method, sftp, scp et al.
 
 ```
-docker run --net starbugnet \
-           --name aai_gunicorn_00 \
+docker run -d --net starbugnet \
+           --name aai.starbug.com_00 \
 	   --mount source=starbugconfig,target=/opt/starbug.com/config \
 	   --mount source=starbuglogs,target=/opt/starbug.com/logs \
 	   -e AAI_FLASK_CONFIG='/opt/starbug.com/config/aai-flask-deployment-config.py' \
-	   -d -p 8080:8080 aai_gunicorn
+	   -p 8080:8080 aai.starbug.com
 ```
 
 
@@ -365,7 +364,7 @@ At this time I haven't configured logging to persistent storage like AAI gunicor
 
 ## AAI gunicorn
 
-In addition to the docker logs, aai_gunicorn log files are available
+In addition to the docker logs, aai.starbug.com log files are available
 persistent storage.  The gunicorn files are written to the location
 given in the gunicorn config file
 [AAI/www/config/aai-gunicron-config.py](https://github.com/lrmcfarland/AAI/blob/master/www/config/aai-gunicorn-config.py).
@@ -373,7 +372,7 @@ given in the gunicorn config file
 Use docker exec bash to access the logs in the running container
 
 ```
-$ docker exec -it aai_gunicorn_00 bash
+$ docker exec -it aai.starbug.com_00 bash
 
 [starbug@c0d26b279a07 www]$ tail /opt/starbug.com/logs/aai-error.log
 [2019-01-17 06:17:45 +0000] [10] [INFO] Starting gunicorn 19.9.0
@@ -393,7 +392,7 @@ WARNING:root:Using AAI flask test configuration.
 or one that just runs the shell
 
 ```
-$ docker run -it --rm --mount source=starbuglogs,target=/opt/starbug.com/logs --user root --entrypoint /bin/bash aai_gunicorn
+$ docker run -it --rm --mount source=starbuglogs,target=/opt/starbug.com/logs --user root --entrypoint /bin/bash aai.starbug.com
 
 ```
 
