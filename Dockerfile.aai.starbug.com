@@ -43,8 +43,8 @@ LABEL maintainer "lrm@starbug.com"
 LABEL service "Astronomical Algorithms Implemented gunicorn wrapper"
 
 
-
-RUN yum install -y epel-release gcc gcc-c++ git make
+RUN yum install -y zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel
+RUN yum install -y gcc gcc-c++ boost boost-devel make cmake git epel-release
 RUN yum install -y python-devel python-pip
 
 
@@ -90,18 +90,20 @@ ENV PATH ${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}
 
 RUN pyenv install 3.7.0
 
-# RUN pyenv global 3.7.0
+RUN pyenv global 3.7.0
 
-# RUN pyenv rehash
+RUN pyenv rehash
 
-# ENV eval "$(pyenv init -)"
+ENV eval "$(pyenv init -)"
 
 
 
 WORKDIR ${AAI_HOME}/AAI/www
 
 
-# RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
+RUN pip install --upgrade pip
+
+# RUN pip install -r requirements.txt
 
 
 ENTRYPOINT ["bash"]
