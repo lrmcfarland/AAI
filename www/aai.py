@@ -1,13 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """The Astronomical Algorithms Implemented in C++ and Python
 
 To run:
 
-    ./bin/pylaunch.sh aai.py -c config/aai-flask-testing-config.py
-
-The testing config is a "GET /static/aai.js HTTP/1.1" 304 -
-The GOOGLEMAPS_KEY is "changeme"
+    PYTHONPATH=../.. python aai.py -c config/aai-flask-testing-config.py
 
 """
 

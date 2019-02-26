@@ -71,9 +71,6 @@ done
 # ===== run application =====
 # ===========================
 
-# This sets up the shell environment for flask to find the wrapped coords library.
-. ./bin/setenv.sh
-
 
 if [ -z "$flask_config_file" ]; then
     echo 'AAI warning: no flask config file provided.'

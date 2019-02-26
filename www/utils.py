@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Utils for parsing strings into AAI data formats from a flask request object
 
 TODO: This is identical to what is used in mongodb. make into a common
@@ -7,7 +9,7 @@ libary but too small for now.
 import flask
 import re
 
-import coords
+import starbug.coords as coords
 
 # ===================
 # ===== globals =====

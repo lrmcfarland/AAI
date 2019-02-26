@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """AAI API
@@ -19,14 +18,14 @@ TODO more details
 
 import flask
 
-import coords
+import starbug.coords as coords
 import re
 import utils
 
-import Bodies.SunPosition
-import Transforms.EclipticEquatorial
-import Transforms.EquatorialHorizon
-import Transforms.utils
+import AAI.Bodies.SunPosition
+import AAI.Transforms.EclipticEquatorial
+import AAI.Transforms.EquatorialHorizon
+import AAI.Transforms.utils
 
 # -------------------
 # ----- globals -----
@@ -132,17 +131,17 @@ def standardize():
            'longitude' in flask.request.args:
 
             try:
-                an_observer = Transforms.utils.latlon2spherical(
+                an_observer = AAI.Transforms.utils.latlon2spherical(
                     utils.request_angle('latitude', flask.request),
                     utils.request_angle('longitude', flask.request))
 
-                body_hz = Transforms.utils.azalt2spherical(utils.request_angle('az', flask.request),
-                                                           utils.request_angle('alt', flask.request))
+                body_hz = AAI.Transforms.utils.azalt2spherical(utils.request_angle('az', flask.request),
+                                                               utils.request_angle('alt', flask.request))
 
-                body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
+                body_eq = AAI.Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
 
-                result['params']['ra'] = Transforms.utils.get_RA(body_eq).value
-                result['params']['dec'] = Transforms.utils.get_declination(body_eq).value
+                result['params']['ra'] = AAI.Transforms.utils.get_RA(body_eq).value
+                result['params']['dec'] = AAI.Transforms.utils.get_declination(body_eq).value
 
             except (utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
                 result['errors'].append(str(err))
@@ -186,8 +185,8 @@ def azalt2radec():
 
     try:
 
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
+        an_observer = AAI.Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                            utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer)
 
@@ -196,13 +195,13 @@ def azalt2radec():
         result['datetime'] = str(a_datetime)
 
 
-        body_hz = Transforms.utils.azalt2spherical(utils.request_angle('azimuth', flask.request),
-                                                   utils.request_angle('altitude', flask.request))
+        body_hz = AAI.Transforms.utils.azalt2spherical(utils.request_angle('azimuth', flask.request),
+                                                       utils.request_angle('altitude', flask.request))
 
-        body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
+        body_eq = AAI.Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
-        result['ra'] = Transforms.utils.get_RA(body_eq).value
-        result['dec'] = Transforms.utils.get_declination(body_eq).value
+        result['ra'] = AAI.Transforms.utils.get_RA(body_eq).value
+        result['dec'] = AAI.Transforms.utils.get_declination(body_eq).value
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -217,8 +216,8 @@ def radec2azalt():
     result = {'errors': list()}
 
     try:
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
+        an_observer = AAI.Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                            utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer)
 
@@ -228,13 +227,13 @@ def radec2azalt():
 
         result['datetime'] = str(a_datetime)
 
-        body_eq = Transforms.utils.radec2spherical(utils.request_angle('ra', flask.request),
-                                                   utils.request_angle('dec', flask.request))
+        body_eq = AAI.Transforms.utils.radec2spherical(utils.request_angle('ra', flask.request),
+                                                       utils.request_angle('dec', flask.request))
 
-        body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
+        body_hz = AAI.Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
-        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).value
-        result['altitude'] = Transforms.utils.get_altitude(body_hz).value
+        result['azimuth'] = AAI.Transforms.utils.get_azimuth(body_hz).value
+        result['altitude'] = AAI.Transforms.utils.get_altitude(body_hz).value
 
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
@@ -268,8 +267,8 @@ def daily_solar_altitude():
 
     try:
 
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
+        an_observer = AAI.Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                            utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
         result['latitude'] = utils.request_angle('latitude', flask.request).value
@@ -318,19 +317,19 @@ def daily_solar_altitude():
 
         for d in range(0, npts + 1):
 
-            sun_ct = Bodies.SunPosition.SunPosition(an_observer, local_midnight)
-            sun_ve = Bodies.SunPosition.SunPosition(an_observer, vernal_equinox)
-            sun_ss = Bodies.SunPosition.SunPosition(an_observer, summer_solstice)
-            sun_ae = Bodies.SunPosition.SunPosition(an_observer, autumnal_equinox)
-            sun_ws = Bodies.SunPosition.SunPosition(an_observer, winter_solstice)
+            sun_ct = AAI.Bodies.SunPosition.SunPosition(an_observer, local_midnight)
+            sun_ve = AAI.Bodies.SunPosition.SunPosition(an_observer, vernal_equinox)
+            sun_ss = AAI.Bodies.SunPosition.SunPosition(an_observer, summer_solstice)
+            sun_ae = AAI.Bodies.SunPosition.SunPosition(an_observer, autumnal_equinox)
+            sun_ws = AAI.Bodies.SunPosition.SunPosition(an_observer, winter_solstice)
 
 
             altitude.append([dtime,
-                             Transforms.utils.get_altitude(sun_ve).value,
-                             Transforms.utils.get_altitude(sun_ss).value,
-                             Transforms.utils.get_altitude(sun_ae).value,
-                             Transforms.utils.get_altitude(sun_ws).value,
-                             Transforms.utils.get_altitude(sun_ct).value # needs to be last for sun position marker
+                             AAI.Transforms.utils.get_altitude(sun_ve).value,
+                             AAI.Transforms.utils.get_altitude(sun_ss).value,
+                             AAI.Transforms.utils.get_altitude(sun_ae).value,
+                             AAI.Transforms.utils.get_altitude(sun_ws).value,
+                             AAI.Transforms.utils.get_altitude(sun_ct).value # needs to be last for sun position marker
                          ]
             )
 
@@ -363,7 +362,7 @@ def daily_solar_altitude():
         result['setting']  = str(rts['setting']) # JSON-able
 
 
-    except Bodies.SunPosition.Error as err:
+    except AAI.Bodies.SunPosition.Error as err:
 
         result['sun_marker_altitude'] = str(err)
         result['sun_marker_azimuth']  = str(err)
@@ -396,12 +395,12 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     result['datetime'] = a_datetime
     result['dst'] = is_dst
 
-    result['eot'] = Bodies.SunPosition.EquationOfTime(a_datetime)
-    result['obliquity'] = Transforms.EclipticEquatorial.obliquity(a_datetime)
+    result['eot'] = AAI.Bodies.SunPosition.EquationOfTime(a_datetime)
+    result['obliquity'] = AAI.Transforms.EclipticEquatorial.obliquity(a_datetime)
 
-    an_observer = Transforms.utils.latlon2spherical(a_latitude, a_longitude)
+    an_observer = AAI.Transforms.utils.latlon2spherical(a_latitude, a_longitude)
 
-    rising, transit, setting = Bodies.SunPosition.SunRiseAndSet(an_observer, a_datetime)
+    rising, transit, setting = AAI.Bodies.SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
     if is_dst:
 
@@ -456,19 +455,19 @@ def get_sun_azalt(an_observer, a_datetime):
     result = dict()
 
 
-    ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
+    ecliptic_longitude, R = AAI.Bodies.SunPosition.SolarLongitude(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-    sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
+    sun_eq = AAI.Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+    sun_hz = AAI.Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
     result['dec'] = str(coords.angle(90) - sun_eq.theta)
 
     result['R'] = R
     result['ecliptic_longitude'] = str(ecliptic_longitude)
 
-    result['azimuth'] = Transforms.utils.get_azimuth(sun_hz)
-    result['altitude'] = Transforms.utils.get_altitude(sun_hz)
+    result['azimuth'] = AAI.Transforms.utils.get_azimuth(sun_hz)
+    result['altitude'] = AAI.Transforms.utils.get_altitude(sun_hz)
 
     return result
 
@@ -481,8 +480,8 @@ def sun_rise_set_azimuths():
 
     try:
 
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
+        an_observer = AAI.Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
+                                                            utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
         result['latitude'] = utils.request_angle('latitude', flask.request).value

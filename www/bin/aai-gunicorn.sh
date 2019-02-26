@@ -128,7 +128,6 @@ echo '#' # linefeed
 # ===== run application =====
 # ===========================
 
-. ./bin/setenv.sh
 
 echo "# Starting gunicorn"
 
