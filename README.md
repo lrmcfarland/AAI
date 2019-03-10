@@ -65,17 +65,12 @@ There are also build instructions in the header of the [docker
 files](https://github.com/lrmcfarland/AAI/blob/master/Dockerfile.gunicorn).
 
 
-This build is a little unusual in that it uses git sub-modules to
-recursively checkout the Coordinates (and googletest) libraries it
-needs.
-So if you don't set the branch name in the docker file, it checks
-out master by default.  This can cause confusion if you have not
-committed your changes to the branch and are wondering why they
-haven't shown up in your container.
-
-TODO It would be easier of it COPY-ed the local changes, but I haven't
-finished working through the issues with getting git to ignoring all
-the right build artifacts.
+I am using regex in c++: the boost version for gcc versions < 4.9 and
+std::regex for clang++ and gcc 4.9. I haven't got this sorted in PyPI
+yet, so this build is a little unusual in that it uses git sub-modules
+to recursively checkout the Coordinates (and googletest) libraries it
+needs. When CentOSs start shiping with gcc 4.9 I expect this to simplify
+by using the PyPI [coords module](https://pypi.org/project/starbug.coords/).
 
 
 ## AAI flask
