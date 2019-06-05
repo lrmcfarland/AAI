@@ -3,7 +3,7 @@
 # This will build the aai app in a container and served by gunicorn.
 # For use with nginx as a reverse proxy.
 #
-# with docker compose
+# with docker compose after building image (below)
 #
 # docker-compose -f aai-compose.yaml up -d
 # docker-compose -f aai-compose.yaml down
