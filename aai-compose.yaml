@@ -1,0 +1,37 @@
+# deploys the aai image
+#
+# sets name: aai.starbug.com_00
+#      network: starbugnet
+#      ports: 8080:8080
+#      volumes: starbugconfig, starbuglogs
+#
+# docker-compose -f aai-compose.yaml up -d
+# docker-compose -f aai-compose.yaml ps
+# docker-compose -f aai-compose.yaml down
+
+version: '3'
+
+services:
+  aai:
+    image: aai.starbug.com
+    container_name: aai.starbug.com_00
+#   environment:
+#     AAI_FLASK_CONFIG: /opt/starbug.com/config/aai-flask-deployment-config.py
+    restart: always
+    networks:
+      - starbugnet
+    ports:
+      - "8080:8080"
+    volumes:
+      - starbugconfig:/opt/starbug.com/config
+      - starbuglogs:/opt/starbug.com/logs
+
+networks:
+  starbugnet:
+
+# persistent storage
+volumes:
+  starbugconfig:
+    external: true
+  starbuglogs:
+    external: true

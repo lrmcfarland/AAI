@@ -3,6 +3,13 @@
 # This will build the aai app in a container and served by gunicorn.
 # For use with nginx as a reverse proxy.
 #
+# with docker compose
+#
+# docker-compose -f aai-compose.yaml up -d
+# docker-compose -f aai-compose.yaml down
+#
+# with just docker
+#
 # Assmues: starbug.com container rotates all logs and log name is unique. See CMD below.
 #
 # one time setup

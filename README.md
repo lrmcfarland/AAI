@@ -75,6 +75,8 @@ by using the PyPI [coords module](https://pypi.org/project/starbug.coords/).
 
 ## AAI flask
 
+Flask only test version.
+
 ```
 docker build -f Dockerfile.flask -t aai_flask .
 ```
@@ -82,11 +84,38 @@ docker build -f Dockerfile.flask -t aai_flask .
 
 ## AAI gunicorn
 
+Adds gunicorn
+
 ```
 docker build -f Dockerfile.gunicorn -t aai_gunicorn .
 ```
 
-## starbugnet
+## AAI starbug.com docker image
+
+Creates aai.starbug.com image for deployment
+
+```
+docker build -f Dockerfile.aai.starbug.com -t aai.starbug.com .
+```
+
+TODO currently this checks out the starbug.com Coordinates library and
+builds it in the container. Future versions should pull this from pypi.
+Linux with gcc 4.9 or higher (for std-regex) is required for linking.
+
+
+
+## deploy with docker-compose
+
+Use docker-compose to create the name, network and volumes used.
+
+You will still need to load the keys into starbugconfig described below.
+
+
+## deploy with docker cli
+
+To create a deployment with just docker
+
+### starbugnet
 
 Create starbugnet for use with nginx,
 if this does not already exist.
@@ -97,7 +126,7 @@ This is used by starbug.com to connect aai.starbug.com and db.starbug.com
 docker network create starbugnet
 ```
 
-## starbuglogs
+### starbuglogs
 
 Create shared persistent storage for the logs,
 if this does not already exist.
@@ -106,10 +135,7 @@ if this does not already exist.
 docker volume create starbuglogs
 ```
 
-
-# Configure
-
-## starbugconfig
+### Configure
 
 Create shared persistent storage for the configuation files,
 if this does not already exist.
