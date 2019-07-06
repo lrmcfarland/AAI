@@ -75,18 +75,78 @@ by using the PyPI [coords module](https://pypi.org/project/starbug.coords/).
 
 ## AAI flask
 
+To build the a flask only version for development and testing
+
 ```
 docker build -f Dockerfile.flask -t aai_flask .
 ```
 
+Flask configuration is read at run time from the file in the
+AAI_FLASK_CONFIG environment variable.
+This should be set to a file in the starbugconfig persistent storage, e.g. /opt/starbug.com/config.
+If this is not set it defaults
+to
+[config/aai-flask-testing-config.py](https://github.com/lrmcfarland/AAI/blob/master/www/config/aai-flask-testing-config.py)
+see
+[aai.py](https://github.com/lrmcfarland/AAI/blob/master/www/aai.py)
+
+This sets the google maps key and debug status.
+
 
 ## AAI gunicorn
+
+Adds a [gunicorn](https://gunicorn.org/) wrapper for deployment.
 
 ```
 docker build -f Dockerfile.gunicorn -t aai_gunicorn .
 ```
 
-## starbugnet
+Gunicorn configuration is read at build time from [](https://github.com/lrmcfarland/AAI/blob/master/www/config/aai-gunicorn-config.py)
+
+This has information about which ports are being used and where the log files are written that needs to be coordinated with docker.
+
+TODO read at run time from persistent storage.
+
+
+## AAI starbug.com docker image
+
+Creates aai.starbug.com image for deployment
+
+```
+docker build -f Dockerfile.aai.starbug.com -t aai.starbug.com .
+``
+
+TODO currently this checks out the starbug.com Coordinates library and
+builds it in the container. Future versions should pull this from pypi.
+Linux with gcc 4.9 or higher (for std-regex) is required for linking.
+
+
+
+
+# Deploy
+
+
+## Deploy with docker-compose
+
+Use docker-compose to create the name, network and volumes used.
+
+You will still need to load the keys into starbugconfig described below.
+
+```
+docker-compose -f aai-compose.yaml up -d
+
+docker-compose -f aai-compose.yaml ps
+
+docker-compose -f aai-compose.yaml down
+
+```
+
+
+## Deploy with docker cli
+
+To create a deployment with just docker
+
+### starbugnet
 
 Create starbugnet for use with nginx,
 if this does not already exist.
@@ -97,7 +157,7 @@ This is used by starbug.com to connect aai.starbug.com and db.starbug.com
 docker network create starbugnet
 ```
 
-## starbuglogs
+### starbuglogs
 
 Create shared persistent storage for the logs,
 if this does not already exist.
@@ -106,10 +166,7 @@ if this does not already exist.
 docker volume create starbuglogs
 ```
 
-
-# Configure
-
-## starbugconfig
+### Configure
 
 Create shared persistent storage for the configuation files,
 if this does not already exist.

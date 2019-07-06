@@ -29,7 +29,7 @@ def factory(a_config_flnm=None):
     """Creates a observations ui flask
 
     Args:
-        conf_flnm (str): configuration filename
+        a_config_flnm (str): configuration filename
 
     Returns a reference to the AAI app
     """
@@ -44,7 +44,7 @@ def factory(a_config_flnm=None):
 
     else:
         config_flnm = 'config/aai-flask-testing-config.py'
-        logging.warning('Using AAI flask test configuration.')
+        logging.warning('Using AAI flask test configuration %s.', config_flnm)
 
 
     aai_app = flask.Flask(__name__)
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-c', '--config', type=str, dest='config', default=None,
                         metavar='config',
-                        help='The name of the flask config pyfile.')
+                        help='The name of the flask config file.')
 
     args = parser.parse_args()
 
