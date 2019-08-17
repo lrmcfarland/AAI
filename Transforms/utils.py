@@ -48,6 +48,8 @@ def parse_angle_arg(an_arg):
 def JulianCentury(a_datetime):
     """Calculates the Julian century relative to J2000 of the given date
 
+    Meeus eq. 22.1, p. 143
+
     Args:
 
         a_datetime: local date and time of the observation in coords.datetime
