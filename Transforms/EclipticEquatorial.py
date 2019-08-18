@@ -96,14 +96,14 @@ def toEcliptic(an_object, a_datetime):
 
     Args:
 
-    an_object (coords.spherical): the RA and Dec or ecliptic longitude
-    and latitude as a spherical coordinate where theta is the
-    complement of latitude and longitude is measured positive east in
-    degrees.
+    an_object (coords.spherical): the RA and Dec as a spherical
+    coordinate where theta is the complement of latitude and longitude
+    is measured positive east in degrees.
 
     a_datetime (coords.datetime): The time of the observation.
 
     Returns: coords.spherical in the transformed coordinates.
+
     """
     return _xform(an_object, a_datetime, -1.0)
 
@@ -113,16 +113,96 @@ def toEquatorial(an_object, a_datetime):
 
     Args:
 
-    an_object (coords.spherical): the RA and Dec or ecliptic longitude
-    and latitude as a spherical coordinate where theta is the
-    complement of latitude and longitude is measured positive east in
-    degrees.
+    an_object (coords.spherical): the ecliptic longitude and latitude
+    as a spherical coordinate where theta is the complement of
+    latitude and longitude is measured positive east in degrees.
 
     a_datetime (coords.datetime): The time of the observation.
 
     Returns: coords.spherical in the transformed coordinates.
+
     """
     return _xform(an_object, a_datetime, 1.0)
+
+
+
+class Meeus(object):
+    """Wrapper for Meeus' implementations
+
+    This works better with his non-IAU conventions.
+
+    See Astronomical Algorithms 2ed. Chapter 13 Transformation of Coordinates
+
+    """
+
+    @staticmethod
+    def toEcliptic(an_object, a_datetime):
+        """Transform equatorial into ecliptical coordinates
+
+        Args:
+
+        an_object (coords.spherical): the RA and Dec as a spherical
+        coordinate where theta is the complement of latitude and
+        longitude is measured positive east in degrees.
+
+        a_datetime (coords.datetime): The time of the observation.
+
+        Returns: the object in spherical coordinates based on the ecliptic.
+
+        """
+
+        if not isinstance(an_object, coords.spherical):
+            raise Error('object must be in spherical coordinates')
+
+        eps = obliquity(a_datetime) # see above
+
+        a_RA = utils.get_RA(an_object)
+        a_RA.value *= 15 # convert to degrees Meeus p. 91
+
+        a_dec = utils.get_declination(an_object)
+
+        # Meeus eqn. 13.1
+        eLong = coords.angle()
+        eLong.radians = math.atan2(math.sin(a_RA.radians)*math.cos(eps.radians) + math.tan(a_dec.radians)*math.sin(eps.radians), math.cos(a_RA.radians))
+
+        # Meeus eqn. 13.2
+        eLat = coords.angle()
+        eLat.radians = math.sin(a_dec.radians)*math.cos(eps.radians) - math.cos(a_dec.radians)*math.sin(eps.radians)*math.sin(a_RA.radians)
+
+        return utils.latlon2spherical(eLat, eLong)
+
+
+    @staticmethod
+    def toEquatorial(an_object, a_datetime):
+        """Transform ecliptical into equatorial coordinates
+
+        Args:
+
+        an_object (coords.spherical): the ecliptic longitude and
+        latitude as a spherical coordinate where theta is the
+        complement of latitude and longitude is measured positive east
+        in degrees.
+
+        a_datetime (coords.datetime): The time of the observation.
+
+        Returns: the object in spherical coordinates based on the ecliptic.
+
+        """
+
+        if not isinstance(an_object, coords.spherical):
+            raise Error('object must be in spherical coordinates')
+
+        eps = obliquity(a_datetime) # see above
+
+
+
+
+
+        return 'TODO'
+
+
+
+
 
 
 # ================

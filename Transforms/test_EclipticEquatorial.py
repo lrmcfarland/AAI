@@ -42,6 +42,8 @@ class EclipticEquatorialTests(unittest.TestCase):
 
         self.places = 5 # precision limited by LAMBDA-tools reporting
 
+        return
+
 
     def test_first_point_of_Aries(self):
         """Test J2000 first point of Aries"""
@@ -56,6 +58,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object_eq = EclipticEquatorial.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(0, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(0, utils.get_longitude(an_object_eq).value, self.places)
+
+        return
 
 
     def test_North_Pole(self):
@@ -72,6 +76,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         self.assertAlmostEqual(66.56071, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(-90, utils.get_longitude(an_object_eq).value, self.places)
 
+        return
+
 
     def test_lat_0_long_15(self):
         """Test J2000 Latitude 0, Longitude 15"""
@@ -86,6 +92,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object_eq = EclipticEquatorial.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(5.90920, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(13.81162, utils.get_longitude(an_object_eq).value, self.places)
+
+        return
 
 
     def test_lat_0_long_345(self):
@@ -102,6 +110,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         self.assertAlmostEqual(-5.90920, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(-13.811618068210034, utils.get_longitude(an_object_eq).value, self.places)
 
+        return
+
 
     def test_lat_45_long_100(self):
         """Test J2000 Latitude 45, Longitude 100"""
@@ -116,6 +126,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object_eq = EclipticEquatorial.toEquatorial(an_object, j2000)
         self.assertAlmostEqual(67.78257, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(108.94923, utils.get_longitude(an_object_eq).value, self.places)
+
+        return
 
 
     def test_lat_n30_long_n30(self):
@@ -132,6 +144,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         self.assertAlmostEqual(-39.12273, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(-14.81672658697858, utils.get_longitude(an_object_eq).value, self.places)
 
+        return
+
 
     def test_lat_n60_long_200(self):
         """Test J2015 Latitude -60, Longitude 200"""
@@ -146,6 +160,8 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object_eq = EclipticEquatorial.toEquatorial(an_object, j2015)
         self.assertAlmostEqual(-59.60899, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(158.23870, utils.get_longitude(an_object_eq).value, self.places)
+
+        return
 
 
     def test_lat_20_long_n10(self):
@@ -162,7 +178,7 @@ class EclipticEquatorialTests(unittest.TestCase):
         self.assertAlmostEqual(14.41240, utils.get_latitude(an_object_eq).value, self.places)
         self.assertAlmostEqual(-17.159651455501656, utils.get_longitude(an_object_eq).value, self.places)
 
-
+        return
 
 
     def test_meeus_13a(self):
@@ -180,6 +196,51 @@ class EclipticEquatorialTests(unittest.TestCase):
 
         # Meeus: 113.215630
         self.assertAlmostEqual(113.21571932194666, utils.get_longitude(pollux_ec).value, self.places)
+
+
+        return
+
+
+
+class MeeusEclipticEquatorialTests(unittest.TestCase):
+    """Test ecliptic equatorial coordinate transformations"""
+
+    def setUp(self):
+        """Set up test parameters."""
+
+        self.places = 8
+
+        return
+
+
+    def test_meeus_13a(self):
+
+        """Test Meeus example 13a
+
+        I use a different formula (see EclipticEquatorial.py) for and
+        get a different value for the obliquity of the ecliptic on
+        this date. Meeus has 23.4392911 vs. 23.4373411286. If I
+        hardcode this I get 6.669018753709949 for the declination and
+        113.215629227584 for RA.
+
+        """
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        pollux = utils.radec2spherical(coords.latitude(7, 45, 18.946), coords.angle(28, 01, 34.26))
+
+        pollux_ec = EclipticEquatorial.Meeus.toEcliptic(pollux, a_datetime)
+
+        # Meeus: 6.684170
+        self.assertAlmostEqual(6.670798646810184, utils.get_latitude(pollux_ec).value, self.places)
+
+        # Meeus: 113.215630
+        self.assertAlmostEqual(113.21571932194666, utils.get_longitude(pollux_ec).value, self.places)
+
+
+        return
+
+
 
 
 

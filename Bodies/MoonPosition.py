@@ -396,6 +396,8 @@ if __name__ == '__main__':
 
     # a_datetime = coords.datetime('1992-04-12T00:00')
 
+    a_datetime = coords.datetime('1992-04-12T00:00')
+
     print('Test date: {}'.format(a_datetime))
 
     ecLon, ecLat, distance = EclipticCoords(a_datetime)
@@ -410,4 +412,3 @@ if __name__ == '__main__':
     print('dec {}'.format(Transforms.utils.get_declination(moon_eq)))
     print('RA {}'.format(Transforms.utils.get_RA(moon_eq)))
 
-    
