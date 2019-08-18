@@ -222,7 +222,6 @@ class MeeusEclipticEquatorialTests(unittest.TestCase):
         this date. Meeus has 23.4392911 vs. 23.4373411286. If I
         hardcode this I get 6.669018753709949 for the declination and
         113.215629227584 for RA.
-
         """
 
         a_datetime = coords.datetime('2015-01-01T00:00:00')
@@ -232,11 +231,29 @@ class MeeusEclipticEquatorialTests(unittest.TestCase):
         pollux_ec = EclipticEquatorial.Meeus.toEcliptic(pollux, a_datetime)
 
         # Meeus: 6.684170
-        self.assertAlmostEqual(6.670798646810184, utils.get_latitude(pollux_ec).value, self.places)
+        self.assertAlmostEqual(6.685962149434033, utils.get_latitude(pollux_ec).value, self.places)
 
         # Meeus: 113.215630
         self.assertAlmostEqual(113.21571932194666, utils.get_longitude(pollux_ec).value, self.places)
 
+        return
+
+
+    def test_meeus_reverse_13a(self):
+
+        """Test Meeus example 13a in reverse"""
+
+        a_datetime = coords.datetime('2015-01-01T00:00:00')
+
+        pollux = utils.latlon2spherical(coords.latitude(6.68417), coords.angle(113.21563))
+
+        pollux_ec = EclipticEquatorial.Meeus.toEquatorial(pollux, a_datetime)
+
+        # Meeus: 07:45:18.946 vs. my 07:45:18.8357
+        self.assertAlmostEqual(7.755232144485258, utils.get_RA(pollux_ec).value, self.places)
+
+        # Meeus 28.026183
+        self.assertAlmostEqual(28.02443543646086, utils.get_declination(pollux_ec).value, self.places)
 
         return
 

@@ -162,14 +162,14 @@ class Meeus(object):
         a_dec = utils.get_declination(an_object)
 
         # Meeus eqn. 13.1
-        eLong = coords.angle()
-        eLong.radians = math.atan2(math.sin(a_RA.radians)*math.cos(eps.radians) + math.tan(a_dec.radians)*math.sin(eps.radians), math.cos(a_RA.radians))
+        ecLon = coords.angle()
+        ecLon.radians = math.atan2(math.sin(a_RA.radians)*math.cos(eps.radians) + math.tan(a_dec.radians)*math.sin(eps.radians), math.cos(a_RA.radians))
 
         # Meeus eqn. 13.2
-        eLat = coords.angle()
-        eLat.radians = math.sin(a_dec.radians)*math.cos(eps.radians) - math.cos(a_dec.radians)*math.sin(eps.radians)*math.sin(a_RA.radians)
+        ecLat = coords.angle()
+        ecLat.radians = math.asin(math.sin(a_dec.radians)*math.cos(eps.radians) - math.cos(a_dec.radians)*math.sin(eps.radians)*math.sin(a_RA.radians))
 
-        return utils.latlon2spherical(eLat, eLong)
+        return utils.latlon2spherical(ecLat, ecLon)
 
 
     @staticmethod
@@ -194,11 +194,21 @@ class Meeus(object):
 
         eps = obliquity(a_datetime) # see above
 
+        a_lat = utils.get_latitude(an_object)
+        a_lon = utils.get_longitude(an_object)
 
 
+        # Meeus eqn. 13.3
+        eqLon = coords.angle()
+        eqLon.radians = math.atan2(math.sin(a_lon.radians)*math.cos(eps.radians) - math.tan(a_lat.radians)*math.sin(eps.radians), math.cos(a_lon.radians))
 
 
-        return 'TODO'
+        # Meeus eqn. 13.4
+        eqLat = coords.angle()
+        eqLat.radians = math.asin(math.sin(a_lat.radians)*math.cos(eps.radians) + math.cos(a_lat.radians)*math.sin(eps.radians)*math.sin(a_lon.radians))
+
+
+        return utils.latlon2spherical(eqLat, eqLon)
 
 
 
