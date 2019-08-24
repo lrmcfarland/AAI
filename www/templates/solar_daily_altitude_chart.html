@@ -38,6 +38,7 @@
 	    $("#azimuth").text(sun_position_data.sun_marker_azimuth);
 	    $("#altitude").text(sun_position_data.sun_marker_altitude);
 
+	    {# observer #}
 
 	    $('input[name="latitude"]').val(sun_position_data.latitude);
 	    $('input[name="longitude"]').val(sun_position_data.longitude);
@@ -82,7 +83,7 @@
 			      'Summer Solstice',
 			      'Autumnal Equinox',
 			      'Winter Solstice',
-			      sun_position_data.sun_date_label,
+			      sun_position_data.date_label,
 			      {'type': 'string', 'role': 'style'}]];
 
 	{# ----- special format for sun marker ----- #}

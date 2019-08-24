@@ -1,0 +1,420 @@
+{# AAI lunar altitude chart #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+  <script type="text/javascript">
+
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    {# -------------------- #}
+    {# ----- init map ----- #}
+    {# -------------------- #}
+
+
+    {# ----- draw chart ----- #}
+
+
+    google.charts.load('current', {'packages':['corechart']});
+
+    function updateMoonChart(moon_position_data) {
+
+	if (moon_position_data.errors.length > 0) {
+
+	    $("#sun_rising").text("TBD");
+	    $("#sun_transit").text("TBD");
+	    $("#sun_setting").text("TBD");
+	    $("#sun_azimuth").text("TBD");
+	    $("#sun_altitude").text("TBD");
+
+	    $("#moon_rising").text("TBD");
+	    $("#moon_transit").text("TBD");
+	    $("#moon_setting").text("TBD");
+	    $("#moon_azimuth").text("TBD");
+	    $("#moon_altitude").text("TBD");
+
+	    alert("Errors: " + moon_position_data.errors.join(", "));
+
+	} else {
+
+	    $("#sun_rising").text(moon_position_data.sun_rising);
+	    $("#sun_transit").text(moon_position_data.sun_transit);
+	    $("#sun_setting").text(moon_position_data.sun_setting);
+	    $("#sun_azimuth").text(moon_position_data.sun_marker_azimuth);
+	    $("#sun_altitude").text(moon_position_data.sun_marker_altitude);
+
+	    $("#moon_rising").text(moon_position_data.moon_rising);
+	    $("#moon_transit").text(moon_position_data.moon_transit);
+	    $("#moon_setting").text(moon_position_data.moon_setting);
+	    $("#moon_azimuth").text(moon_position_data.moon_marker_azimuth);
+	    $("#moon_altitude").text(moon_position_data.moon_marker_altitude);
+
+
+	    {# observer #}
+	    $('input[name="latitude"]').val(moon_position_data.latitude);
+	    $('input[name="longitude"]').val(moon_position_data.longitude);
+
+
+	    {# TODO meh! use regex #}
+	    var a_datetime = moon_position_data.datetime.split('T');
+	    var a_timeandzone = [a_datetime[1], 0];
+	    var a_sign = '';
+
+	    if (/-/.test(a_datetime[1])) {
+
+		a_timeandzone = a_datetime[1].split('-');
+		a_sign = '-';
+
+	    } else if (/\+/.test(a_datetime[1])) {
+
+		a_timeandzone = a_datetime[1].split('+');
+		a_sign = '+';
+
+	    } else {
+		{# pass #}
+	    }
+
+	    $('input[name="date"]').val(a_datetime[0]);
+
+	    $('input[name="time"]').val(a_timeandzone[0]);
+	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
+
+
+	    drawMoonChart(moon_position_data);
+	};
+
+    }; {# end updateMoonChart(moon_position_data) #}
+
+
+    function drawMoonChart(moon_position_data) {
+
+	{# ----- formatting for google chart ----- #}
+	var moon_plot_data = [['time',
+			       moon_position_data.date_label,
+			       moon_position_data.date_label,
+			       {'type': 'string', 'role': 'style'}]];
+
+	{# ----- special format for moon marker ----- #}
+
+	for (var i = 0; i < moon_position_data.altitude_data_24h.length - 1; i++) {
+
+	    var plot_record = moon_position_data.altitude_data_24h[i];
+	    var next_plot_record = moon_position_data.altitude_data_24h[i+1];
+
+	    if (moon_position_data.moon_marker_time == plot_record[0]) {
+
+		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+	    } else if (moon_position_data.moon_marker_time > plot_record[0] &&
+		       moon_position_data.moon_marker_time < next_plot_record[0]) {
+
+		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+	    } else if (i == moon_position_data.altitude_data_24h.length - 1 &&
+		       moon_position_data.moon_marker_time == next_plot_record[0]) {
+
+		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
+
+	    } else if (moon_position_data.moon_marker_time > next_plot_record[0]) {
+
+		plot_record.push(null);
+
+	    } else {
+
+		plot_record.push(null);
+
+	    }
+
+
+	    moon_plot_data.push(plot_record);
+
+	}
+
+	var altitudeVtime_chart = new google.visualization.LineChart(
+	    document.getElementById('altitudeVtime'));
+
+	var altitude_table = google.visualization.arrayToDataTable(moon_plot_data);
+	var altitude_view = getMoonChartView(altitude_table, "Altitude over time for one day", "hour");
+
+	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
+
+
+
+    }; {# end drawMoonChart(moon_position_data) #}
+
+
+    function getMoonChartView (data_table, chart_title, hAxis_title) {
+
+	var view_data = {};
+
+	var current_color = "blue";
+
+
+	var options = {
+
+	    legend: "none",
+
+	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
+
+	    title: chart_title,
+
+	    hAxis: { title: hAxis_title},
+	    vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
+
+	    series: {
+		0: { lineDashStyle: [] }
+	    },
+
+	    colors: [current_color],
+
+	    pointSize: 1,
+	    dataOpacity: 0.7
+
+	};
+
+
+	var data = new google.visualization.DataView(data_table);
+
+	var hides = [];
+	var line_count = 0; {# assumes order ve, ss, ae, ws, current time #}
+
+	options.series[line_count++] = { color: "orange", lineDashStyle: [4, 2] };
+
+	options.series[line_count++] = { color: "green", lineDashStyle: [8, 4] };
+
+
+	view_data['data'] = data;
+	view_data['options'] = options;
+
+	return view_data;
+
+    };
+
+
+    {# ----------------- #}
+    {# ----- ready ----- #}
+    {# ----------------- #}
+
+    $(document).ready(function() {
+
+	{# ----- get data ----- #}
+
+	$("#get_lunar_daily_altitude").click(function(e) {
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude",
+		      {
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val(),
+			  dst: $("#_dst").is(':checked') {# jQuery selector #}
+
+		      },
+		      function(moon_position) {
+
+			  updateMoonChart(moon_position);
+
+		      }); {# end getJSON #}
+
+	    return false;
+
+	}); {# end get_lunar_daily_altitude click #}
+
+
+
+
+    }); {# end ready method #}
+
+
+  </script>
+
+{% endblock %}
+
+{% block title %}Daily Solar Altitude{% endblock %}
+
+{% block content %}
+
+<style>
+
+.page {
+    width: 60em;
+}
+
+.linechart {
+    width: 800px;
+    height: 400px;
+}
+
+table#moon_chart_legend {
+    width: 10em;
+}
+
+
+button#get_lunar_daily_altitude {
+
+    text-align: center;
+
+    font-size: 100%;
+    font-weight: bold;
+
+    margin: 0 auto;
+    display: block;
+
+    width: 100px;
+    height: 100px;
+
+    border-radius: 50%;
+
+    color:red;
+    background: silver;
+}
+
+
+</style>
+
+
+
+<h1>Daily Lunar Altitude</h1>
+
+<br>
+
+<div class="twocolumn">
+
+    This shows the
+    moon's <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
+    over the current day starting at local midnight.
+
+</div>
+
+<br>
+
+{% include "observer_location.html" %}
+
+<br>
+
+<button id="get_lunar_daily_altitude">get lunar altitude data</button>
+
+<h2>Daily Lunar Altitude</h2>
+
+
+<table>
+
+  <tr>
+
+    <td>
+      <div id="altitudeVtime" class="linechart"></div>
+    </td>
+
+    <td>
+
+      <table id="moon_chart_legend">
+
+	<tr>
+
+	  <td id="_solar_altitude_txt">
+	    Sun
+	  </td>
+
+	</tr>
+
+
+	<tr>
+
+	  <td id="_lunar_altitude_txt">
+	    Moon
+	  </td>
+
+	</tr>
+
+
+      </table>
+
+    </td>
+
+  </tr>
+
+  <tr>
+    <td colspan="2">
+
+      <table id="results_table" align="center">
+
+	<tr>
+	  <th>Sun</th>
+	</tr>
+
+	<tr>
+	  <th>Azimuth</th>
+	  <td id="sun_azimuth">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Altitude</th>
+	  <td id="sun_altitude">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Rising</th>
+	  <td id="sun_rising">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+
+	<tr>
+	  <th>Transit</th>
+	  <td id="sun_transit">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+	<tr>
+	  <th>Setting</th>
+	  <td id="sun_setting">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+	<tr>
+	  <th>Moon</th>
+	</tr>
+
+	<tr>
+	  <th>Azimuth</th>
+	  <td id="moon_azimuth">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Altitude</th>
+	  <td id="moon_altitude">TBD</td>
+	  <td>deg:min:sec (deg)</td>
+	</tr>
+
+	<tr>
+	  <th>Rising</th>
+	  <td id="moon_rising">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+
+	<tr>
+	  <th>Transit</th>
+	  <td id="moon_transit">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+	<tr>
+	  <th>Setting</th>
+	  <td id="moon_setting">TBD</td>
+	  <td>ISO8601</td>
+	</tr>
+
+      </table>
+
+    </td>
+  </tr>
+
+</table>
+
+{% endblock %}

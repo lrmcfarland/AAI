@@ -384,6 +384,32 @@ def EclipticCoords(a_datetime):
 
 
 
+def HorizontalCoords(an_observer, a_datetime):
+    """Calculate the location of the sun relaive to an observer
+
+    Args:
+
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
+
+    a_datetime (coords.datetime): The time of the observation.
+
+    Returns (coords.spherical): the position of the sun in horizon coordinates.
+    """
+
+    elong, elat, distance = EclipticCoords(a_datetime)
+
+    moon_ec = coords.spherical(distance, elat, elong)
+    moon_eq = Transforms.EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
+    moon_hz = Transforms.EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
+
+    return moon_hz
+
+
+
+
 # ================
 # ===== main =====
 # ================

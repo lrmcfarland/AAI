@@ -81,7 +81,7 @@ WORKDIR ${AAI_HOME}/AAI/
 
 # WARNING: set the branch here if not using master, but don't forget
 # to comment it out before merging back.
-# RUN git checkout configstore
+RUN git checkout moon-position-v2
 
 
 # -----------------
