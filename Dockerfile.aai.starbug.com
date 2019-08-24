@@ -81,8 +81,8 @@ WORKDIR ${AAI_HOME}/AAI/
 
 # WARNING: set the branch here if not using master, but don't forget
 # to comment it out before merging back.
-RUN git checkout moon-position-v2
-
+RUN git checkout moon-position-v7
+RUN git submodule update --init --recursive
 
 # -----------------
 # ----- build -----
