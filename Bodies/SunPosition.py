@@ -106,7 +106,7 @@ def SolarLongitude(a_datetime):
     return ecliptic_longitude, R
 
 
-def SunPosition(an_observer, a_datetime):
+def HorizontalCoords(an_observer, a_datetime):
     """Calculate the location of the sun relaive to an observer
 
     Args:
@@ -460,7 +460,7 @@ if __name__ == '__main__':
 
             current_datetime.fromJulianDate(a_datetime.toJulianDate() + 0.01*d)
 
-            sun = SunPosition(an_observer, current_datetime)
+            sun = HorizontalCoords(an_observer, current_datetime)
 
             print 0.01*d,
             print current_datetime,
@@ -479,7 +479,7 @@ if __name__ == '__main__':
 
             current_datetime += 1
 
-            sun = SunPosition(an_observer, current_datetime)
+            sun = HorizontalCoords(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
             print eot.value*60 + 180, Transforms.utils.get_altitude(sun).value
