@@ -63,10 +63,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(243.07115892922118, Transforms.utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(243.07115892922118, Transforms.utils.get_azimuth(sun).degrees, self.places)
 
-        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10').value/2)
-        self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=1)
+        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10')/2)
+        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
 
         return
 
@@ -93,10 +93,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(267.90829781482097, Transforms.utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(267.90829781482097, Transforms.utils.get_azimuth(sun).degrees, self.places)
 
-        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32').value/2)
-        self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=1)
+        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32')/2)
+        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
 
         return
 
@@ -121,10 +121,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(95.95981144985676, Transforms.utils.get_azimuth(sun).value, self.places)
+        self.assertAlmostEqual(95.95981144985676, Transforms.utils.get_azimuth(sun).degrees, self.places)
 
-        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46').value/2)
-        self.assertAlmostEqual(sextant_alt.value, Transforms.utils.get_altitude(sun).value, delta=2)
+        sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46')/2)
+        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=2)
 
         return
 
@@ -150,7 +150,7 @@ class EquationOfTimeTests(unittest.TestCase):
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -3.59 minutes
-        self.assertAlmostEqual(-3.901196866415546, eot.value*60, self.places)
+        self.assertAlmostEqual(-3.901196866415546, eot.degrees*60, self.places)
 
         return
 
@@ -167,7 +167,7 @@ class EquationOfTimeTests(unittest.TestCase):
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -14.24 minutes
-        self.assertAlmostEqual(-14.212711856485711, eot.value*60, self.places)
+        self.assertAlmostEqual(-14.212711856485711, eot.degrees*60, self.places)
 
         return
 
@@ -182,7 +182,7 @@ class EquationOfTimeTests(unittest.TestCase):
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -7.44 minutes
-        self.assertAlmostEqual(-7.563513810377245, eot.value*60, self.places)
+        self.assertAlmostEqual(-7.563513810377245, eot.degrees*60, self.places)
 
         return
 
@@ -199,7 +199,7 @@ class EquationOfTimeTests(unittest.TestCase):
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says 3.65 minutes
-        self.assertAlmostEqual(3.6588472510257475, eot.value*60, self.places)
+        self.assertAlmostEqual(3.6588472510257475, eot.degrees*60, self.places)
 
         return
 
@@ -216,7 +216,7 @@ class EquationOfTimeTests(unittest.TestCase):
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -6.54 minutes
-        self.assertAlmostEqual(-6.5354183954768175, eot.value*60, self.places)
+        self.assertAlmostEqual(-6.5354183954768175, eot.degrees*60, self.places)
 
         return
 
@@ -233,7 +233,7 @@ class EquationOfTimeTests(unittest.TestCase):
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says 16.48 minutes
-        self.assertAlmostEqual(16.43786410739647, eot.value*60, self.places)
+        self.assertAlmostEqual(16.43786410739647, eot.degrees*60, self.places)
 
         return
 

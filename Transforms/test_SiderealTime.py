@@ -76,7 +76,7 @@ class USNO_C163_Tests(unittest.TestCase):
         print '\nDatetime:', a_datetime
         print 'observer:', an_observer
         print 'GMST', a_gmst
-        print 'LSTA', a_lsta, a_lsta.value
+        print 'LSTA', a_lsta, a_lsta.degrees
 
 
     def test_JDo_0(self):

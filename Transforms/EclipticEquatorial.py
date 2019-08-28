@@ -57,7 +57,7 @@ def obliquity(a_datetime):
     T = utils.JulianCentury(a_datetime)
     eps = 0
     for i in xrange(len(obe)):
-        eps += obe[i].value * math.pow(T, i)
+        eps += obe[i] * math.pow(T, i)
     return coords.angle(eps)
 
 
@@ -157,7 +157,7 @@ class Meeus(object):
         eps = obliquity(a_datetime) # see above
 
         a_RA = utils.get_RA(an_object)
-        a_RA.value *= 15 # convert to degrees Meeus p. 91
+        a_RA *= 15 # convert to degrees Meeus p. 91
 
         a_dec = utils.get_declination(an_object)
 

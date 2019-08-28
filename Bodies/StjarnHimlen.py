@@ -33,7 +33,7 @@ def SolarLongitude(a_datetime):
     w = 282.9404 + 4.70935E-5 * d # argument of perihelion
     e = 0.016709 - 1.151E-9 * d # eccentricity
     M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
-    E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+    E = coords.angle(M.degrees + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
 
     xv = math.cos(E.radians) - e
     yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
@@ -57,7 +57,7 @@ def SolarRADec(a_datetime):
     w = 282.9404 + 4.70935E-5 * d # argument of perihelion
     e = 0.016709 - 1.151E-9 * d # eccentricity
     M = coords.angle(356.0470 + 0.9856002585 * d) # mean anomaly
-    E = coords.angle(M.value + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
+    E = coords.angle(M.degrees + e * (180/math.pi) * math.sin(M.radians) * ( 1.0 + e * math.cos(M.radians) ))
 
     xv = math.cos(E.radians) - e
     yv = math.sqrt(1.0 - e*e) * math.sin(E.radians)
@@ -89,7 +89,7 @@ def GMST0(a_datetime):
     """Calculate the Greenwich mean siderial time at Greenwich"""
 
     lonsun = SolarLongitude(a_datetime)
-    gmst0 = coords.angle(lonsun.value + 180) # TODO noon or midnight vs. GMST USNO
+    gmst0 = coords.angle(lonsun.degrees + 180) # TODO noon or midnight vs. GMST USNO
     gmst0.normalize(0, 360) # TODO as hours?
 
     return gmst0
@@ -102,7 +102,7 @@ def GMST(a_datetime):
 
     d = a_datetime.toJulianDate() - a_datetime.J2000
 
-    gmst = coords.angle(gmst0.value/15 + d*24) # sidereal_day.value) # TODO siderial day?
+    gmst = coords.angle(gmst0.degrees/15 + d*24) # sidereal_day.degrees) # TODO siderial day?
     gmst.normalize(-12, 12) # TODO as degrees?
 
     return gmst
@@ -145,18 +145,18 @@ def toHorizon(an_object, an_observer, a_local_datetime):
 
     print 'gmst', gmst # TODO rm
 
-    lst = gmst.value + an_observer.phi.value/15
+    lst = gmst.degrees + an_observer.phi.degrees/15
 
     # lst = 19.2242 # TODO USNO LSTA for 2014-12-31T20:41:00
 
     print 'lst', lst # TODO rm
 
-    ha = coords.angle(360*(lst - an_object.phi.value/15)/24) # degrees?
+    ha = coords.angle(360*(lst - an_object.phi.degrees/15)/24) # degrees?
     ha.normalize(-180, 180)
 
     print 'ha', ha, ha.radians
 
-    dec = coords.angle(90 - an_object.theta.value)
+    dec = coords.angle(90 - an_object.theta.degrees)
 
     print 'dec', dec
 

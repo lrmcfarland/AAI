@@ -306,15 +306,15 @@ def EclipticCoords(a_datetime):
 
     for record in table_47a:
 
-        bar = coords.angle(record['D']*D.value + record['Msun']*Msun.value + record['Mmoon']*Mmoon.value + record['F']*F.value)
+        bar = coords.angle(record['D']*D.degrees + record['Msun']*Msun.degrees + record['Mmoon']*Mmoon.degrees + record['F']*F.degrees)
 
         if record['Msun'] == 1 or record['Msun'] == -1:
 
-            sigmaL += record['Csin'] * E.value * math.sin(bar.radians)
+            sigmaL += record['Csin'] * E.degrees * math.sin(bar.radians)
 
         elif record['Msun'] == 2 or record['Msun'] == -2:
 
-            sigmaL += record['Csin'] * E2.value * math.sin(bar.radians)
+            sigmaL += record['Csin'] * E2.degrees * math.sin(bar.radians)
 
         else:
 
@@ -329,15 +329,15 @@ def EclipticCoords(a_datetime):
 
     for record in table_47a:
 
-        bar = coords.angle(record['D']*D.value + record['Msun']*Msun.value + record['Mmoon']*Mmoon.value + record['F']*F.value)
+        bar = coords.angle(record['D']*D.degrees + record['Msun']*Msun.degrees + record['Mmoon']*Mmoon.degrees + record['F']*F.degrees)
 
         if record['Msun'] == 1 or record['Msun'] == -1:
 
-            sigmaR += record['Ccos'] * E.value * math.cos(bar.radians)
+            sigmaR += record['Ccos'] * E.degrees * math.cos(bar.radians)
 
         elif record['Msun'] == 2 or record['Msun'] == -2:
 
-            sigmaR += record['Ccos'] * E2.value * math.cos(bar.radians)
+            sigmaR += record['Ccos'] * E2.degrees * math.cos(bar.radians)
 
         else:
 
@@ -352,15 +352,15 @@ def EclipticCoords(a_datetime):
 
     for record in table_47b:
 
-        bar = coords.angle(record['D']*D.value + record['Msun']*Msun.value + record['Mmoon']*Mmoon.value + record['F']*F.value)
+        bar = coords.angle(record['D']*D.degrees + record['Msun']*Msun.degrees + record['Mmoon']*Mmoon.degrees + record['F']*F.degrees)
 
         if record['Msun'] == 1 or record['Msun'] == -1:
 
-            sigmaB += record['Csin'] * E.value * math.sin(bar.radians)
+            sigmaB += record['Csin'] * E.degrees * math.sin(bar.radians)
 
         elif record['Msun'] == 2 or record['Msun'] == -2:
 
-            sigmaB += record['Csin'] * E2.value * math.sin(bar.radians)
+            sigmaB += record['Csin'] * E2.degrees * math.sin(bar.radians)
 
         else:
 
@@ -369,7 +369,7 @@ def EclipticCoords(a_datetime):
 
     # ecliptical longitude
 
-    elong = coords.angle(L.value + sigmaL/1e6)
+    elong = coords.angle(L.degrees + sigmaL/1e6)
 
     # ecliptical latitude beta
 
@@ -428,8 +428,8 @@ if __name__ == '__main__':
 
     ecLon, ecLat, distance = EclipticCoords(a_datetime)
 
-    print('ecLon {}'.format(ecLon.value))
-    print('ecLat {}'.format(ecLat.value))
+    print('ecLon {}'.format(ecLon.degrees))
+    print('ecLat {}'.format(ecLat.degrees))
     print('distance {}'.format(distance))
 
     moon_sph = Transforms.utils.latlon2spherical(ecLat, ecLon)

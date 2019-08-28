@@ -150,7 +150,7 @@ class USNO_C163(object):
         gmst = 280.46061837 + 360.98564736629 * D # in degrees
         gmst_angle = coords.angle(gmst)
         gmst_angle.normalize(-180, 180)
-        gmst_hours = coords.angle(gmst_angle.value/15.0)
+        gmst_hours = coords.angle(gmst_angle.degrees/15.0) # TODO use RA?
 
         return gmst_hours
 
@@ -215,7 +215,7 @@ class USNO_C163(object):
         """
 
         gmst = cls.GMST(a_datetime)
-        lst = gmst + coords.angle(an_observer.phi.value/15)
+        lst = gmst + coords.angle(an_observer.phi.degrees/15) # TODO use RA?
         lst.normalize(0, 24)
         return lst
 
@@ -238,7 +238,7 @@ class USNO_C163(object):
         """
 
         gast = cls.GAST(a_datetime)
-        lst = gast + coords.angle(an_observer.phi.value/15)
+        lst = gast + coords.angle(an_observer.phi.degrees/15) # TODO use RA?
         lst.normalize(0, 24)
         return lst
 
@@ -291,10 +291,10 @@ if __name__ == '__main__':
     print 'Julian Date', a_datetime.toJulianDate()
 
     eps_jpl = EclipticEquatorial.obliquity(a_datetime)
-    print 'obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.value), ')'))
+    print 'obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.degrees), ')'))
 
     eps_usno = USNO_C163.obliquity(a_datetime)
-    print 'obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.value), ')'))
+    print 'obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.degrees), ')'))
 
 
     print 'GMST', USNO_C163.GMST(a_datetime)

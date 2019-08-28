@@ -103,7 +103,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
 
-    local_hour_angle = coords.angle(gast.value*15 + an_observer.phi.value - an_object.phi.value)
+    local_hour_angle = coords.angle(gast.degrees*15 + an_observer.phi.degrees - an_object.phi.degrees)
     local_hour_angle.normalize(0, 360)
 
     # Meeus 13.6
@@ -129,11 +129,11 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     if is_verbose:
         print 'Datetime:', a_local_datetime.toJulianDate()
         print 'GAST:', gast
-        print 'Local hour angle:', local_hour_angle.value
-        print 'Observer longitude:', utils.get_longitude(an_observer).value
-        print 'Object latitude:', utils.get_latitude(an_object).value
-        print 'Altitude:', theta.complement(), '(', theta.complement().value, ')' # Altitude = 90 - theta
-        print 'Azimuth:', phi, '(', phi.value, ')'
+        print 'Local hour angle:', local_hour_angle.degrees
+        print 'Observer longitude:', utils.get_longitude(an_observer).degrees
+        print 'Object latitude:', utils.get_latitude(an_object).degrees
+        print 'Altitude:', theta.complement(), '(', theta.complement().degrees, ')' # Altitude = 90 - theta
+        print 'Azimuth:', phi, '(', phi.degrees, ')'
 
     return coords.spherical(1, theta, phi)
 
@@ -171,7 +171,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     # The calculation assumes "that Azimuth (A) is measured from the
     # South point, turning positive to the West". coords.spherical
     # assumes azimuth is measured from the x-axis as north.
-    azimuth = coords.angle(an_object.phi.value - 180)
+    azimuth = coords.angle(an_object.phi.degrees - 180)
 
     # Meeus, p. 94
     sindec = math.sin(utils.get_latitude(an_observer).radians) \
@@ -194,18 +194,18 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
 
     gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
 
-    object_longitude = coords.angle(15.0*gast.value + an_observer.phi.value - local_hour_angle.value )
+    object_longitude = coords.angle(15.0*gast.degrees + an_observer.phi.degrees - local_hour_angle.degrees )
     object_longitude.normalize(0, 360)
 
-    object_ra = coords.angle(24.0*object_longitude.value/360.0)
+    object_ra = coords.angle(24.0*object_longitude.degrees/360.0)
 
     if is_verbose:
         print 'Datetime:', a_local_datetime.toJulianDate()
         print 'GAST:', gast
-        print 'Local hour angle:', local_hour_angle.value
+        print 'Local hour angle:', local_hour_angle.degrees
         print 'Object declination', object_dec
-        print 'Object longitude:', object_longitude, '(', object_longitude.value, ')'
-        print 'Object R.A.:', object_ra, '(', object_ra.value, ')'
+        print 'Object longitude:', object_longitude, '(', object_longitude.degrees, ')'
+        print 'Object R.A.:', object_ra, '(', object_ra.degrees, ')'
 
     return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec)
 

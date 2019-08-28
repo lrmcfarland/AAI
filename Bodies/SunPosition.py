@@ -98,7 +98,7 @@ def SolarLongitude(a_datetime):
     g.normalize(0, 360)
 
     # ecliptic longitude
-    ecliptic_longitude = coords.angle(L.value + 1.915*math.sin(g.radians) + 0.020*math.sin(2.0*g.radians))
+    ecliptic_longitude = coords.angle(L + 1.915*math.sin(g.radians) + 0.020*math.sin(2.0*g.radians))
 
     # distance to sun in AU
     R = 1.00014 - 0.01671*math.cos(g.radians) - 0.00014*math.cos(2.0*g.radians)
@@ -155,13 +155,13 @@ def EquationOfTime(a_datetime):
 
     eot = coords.angle()
 
-    sun_ra = Transforms.utils.get_RA(sun_eq)
+    sun_ra = Transforms.utils.get_RA(sun_eq) # TODO use angle.RA
 
-    if gast.value - sun_ra.value < 12:
-        eot.value = gast.value - sun_ra.value
+    if gast.degrees - sun_ra.degrees < 12:
+        eot.degrees = gast.degrees - sun_ra.degrees
 
-    elif gast.value - sun_ra.value >= 12:
-        eot.value = gast.value - sun_ra.value - 24
+    elif gast.degrees - sun_ra.degrees >= 12:
+        eot.degrees = gast.degrees - sun_ra.degrees - 24
 
     else:
         raise Error('unsupported EoT case')
@@ -240,11 +240,11 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     observer_latitude = Transforms.utils.get_latitude(an_observer)
     observer_longitude = Transforms.utils.get_longitude(an_observer)
 
-    object_RA = coords.angle(Transforms.utils.get_RA(an_object).value * 15) # in degrees
+    object_RA = coords.angle(Transforms.utils.get_RA(an_object).degrees * 15) # in degrees  # TODO use angle.RA
     object_declination = Transforms.utils.get_declination(an_object)
 
     gmst = Transforms.SiderealTime.USNO_C163.GMST(midnight)
-    gmst.value *= 15 # in degrees
+    gmst.degrees *= 15 # in degrees
 
     cos_hour_angle = (math.sin(an_altitude.radians) \
         - math.sin(observer_latitude.radians) * math.sin(object_declination.radians)) \
@@ -264,11 +264,11 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     # -------------------
 
     # longitude sign convention is IAU, opposite Meeus p. 93
-    m0 = coords.angle((object_RA - observer_longitude - gmst).value/360.0)
+    m0 = coords.angle((object_RA - observer_longitude - gmst).degrees/360.0)
     m0.normalize(0, 1)
 
     transit_utc = coords.datetime()
-    transit_utc.fromJulianDate(JDo + m0.value)
+    transit_utc.fromJulianDate(JDo + m0.degrees)
 
 
     if not a_datetime.timezone:
@@ -308,11 +308,11 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     # ----- rising -----
     # ------------------
 
-    m1 = coords.angle(m0.value - hour_angle.value/360)
+    m1 = coords.angle(m0.degrees - hour_angle.degrees/360)
     m1.normalize(0, 1)
 
     rising_utc = coords.datetime()
-    rising_utc.fromJulianDate(JDo + m1.value)
+    rising_utc.fromJulianDate(JDo + m1.degrees)
 
     if not a_datetime.timezone:
         rising_loc = rising_utc
@@ -354,11 +354,11 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     # ----- setting -----
     # -------------------
 
-    m2 = coords.angle(m0.value + hour_angle.value/360)
+    m2 = coords.angle(m0.degrees + hour_angle.degrees/360)
     m2.normalize(0, 1)
 
     setting_utc = coords.datetime()
-    setting_utc.fromJulianDate(JDo + m2.value)
+    setting_utc.fromJulianDate(JDo + m2.degrees)
 
     if not a_datetime.timezone:
         setting_loc = setting_utc
@@ -464,8 +464,8 @@ if __name__ == '__main__':
 
             print 0.01*d,
             print current_datetime,
-            print Transforms.utils.get_azimuth(sun).value,
-            print Transforms.utils.get_altitude(sun).value
+            print Transforms.utils.get_azimuth(sun).degrees,
+            print Transforms.utils.get_altitude(sun).degrees
 
 
     elif options.output_mode.lower() == 'analemma':
@@ -482,7 +482,7 @@ if __name__ == '__main__':
             sun = HorizontalCoords(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
-            print eot.value*60 + 180, Transforms.utils.get_altitude(sun).value
+            print eot.degrees*60 + 180, Transforms.utils.get_altitude(sun).degrees
 
 
     elif options.output_mode.lower() == 'eot':
@@ -497,7 +497,7 @@ if __name__ == '__main__':
             current_date += 1
             eot = EquationOfTime(current_date)
 
-            print d, current_date, eot.value * 60
+            print d, current_date, eot.degrees * 60
 
 
     else:
@@ -523,15 +523,15 @@ if __name__ == '__main__':
         print 'Sun in horizon coordinates:', sun_hz
 
         sun_dec = coords.angle(90) - sun_eq.theta
-        print 'Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.value), ')'))
+        print 'Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.degrees), ')'))
 
         eot = EquationOfTime(a_datetime)
-        print 'Equation of time (minutes):', eot.value * 60
+        print 'Equation of time (minutes):', eot.degrees * 60
 
         print 'Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')'))
+        print ''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).degrees), ')'))
         print 'Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')'))
+        print ''.join(('(', str(Transforms.utils.get_altitude(sun_hz).degrees), ')'))
 
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)

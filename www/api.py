@@ -52,7 +52,7 @@ def dms2dec():
     result = {'errors': list()}
     try:
         dms = utils.request_angle('dms', flask.request)
-        result['dec'] = str(dms.getValue())
+        result['dec'] = str(dms.getDegrees())
     except (utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
@@ -142,8 +142,8 @@ def standardize():
 
                 body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
 
-                result['params']['ra'] = Transforms.utils.get_RA(body_eq).value
-                result['params']['dec'] = Transforms.utils.get_declination(body_eq).value
+                result['params']['ra'] = Transforms.utils.get_RA(body_eq).degrees # TODO use angle.RA
+                result['params']['dec'] = Transforms.utils.get_declination(body_eq).degrees # TODO use angle.RA
 
             except (utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
                 result['errors'].append(str(err))
@@ -164,7 +164,7 @@ def standardize():
                     continue
 
                 std_val = utils.request_angle(key, flask.request)
-                result['params'][key] = str(std_val.getValue())
+                result['params'][key] = str(std_val.getDegrees())
 
             elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
                 pass
@@ -202,8 +202,8 @@ def azalt2radec():
 
         body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
-        result['ra'] = Transforms.utils.get_RA(body_eq).value
-        result['dec'] = Transforms.utils.get_declination(body_eq).value
+        result['ra'] = Transforms.utils.get_RA(body_eq).degrees
+        result['dec'] = Transforms.utils.get_declination(body_eq).degrees
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -234,8 +234,8 @@ def radec2azalt():
 
         body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
-        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).value
-        result['altitude'] = Transforms.utils.get_altitude(body_hz).value
+        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).degrees
+        result['altitude'] = Transforms.utils.get_altitude(body_hz).degrees
 
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
@@ -384,8 +384,8 @@ def solar_daily_altitude():
                                                         utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
-        result['latitude'] = utils.request_angle('latitude', flask.request).value
-        result['longitude'] = utils.request_angle('longitude', flask.request).value
+        result['latitude'] = utils.request_angle('latitude', flask.request).degrees
+        result['longitude'] = utils.request_angle('longitude', flask.request).degrees
 
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
@@ -437,11 +437,11 @@ def solar_daily_altitude():
             sun_ws = Bodies.SunPosition.HorizontalCoords(an_observer, winter_solstice)
 
             altitude.append([dtime,
-                             Transforms.utils.get_altitude(sun_ve).value,
-                             Transforms.utils.get_altitude(sun_ss).value,
-                             Transforms.utils.get_altitude(sun_ae).value,
-                             Transforms.utils.get_altitude(sun_ws).value,
-                             Transforms.utils.get_altitude(sun_ct).value # needs to be last for sun position marker
+                             Transforms.utils.get_altitude(sun_ve).degrees,
+                             Transforms.utils.get_altitude(sun_ss).degrees,
+                             Transforms.utils.get_altitude(sun_ae).degrees,
+                             Transforms.utils.get_altitude(sun_ws).degrees,
+                             Transforms.utils.get_altitude(sun_ct).degrees # needs to be last for sun position marker
                          ]
             )
 
@@ -466,8 +466,8 @@ def solar_daily_altitude():
                                        is_dst)
 
 
-        result['sun_marker_altitude'] = ''.join((str(rts['altitude']), ' (', str(rts['altitude'].value), ')'))
-        result['sun_marker_azimuth']  = ''.join((str(rts['azimuth']), ' (', str(rts['azimuth'].value), ')'))
+        result['sun_marker_altitude'] = ''.join((str(rts['altitude']), ' (', str(rts['altitude'].degrees), ')'))
+        result['sun_marker_azimuth']  = ''.join((str(rts['azimuth']), ' (', str(rts['azimuth'].degrees), ')'))
 
         result['rising']   = str(rts['rising'])  # JSON-able
         result['transit']  = str(rts['transit']) # JSON-able
@@ -599,8 +599,8 @@ def sun_rise_set_azimuths():
                                                         utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
-        result['latitude'] = utils.request_angle('latitude', flask.request).value
-        result['longitude'] = utils.request_angle('longitude', flask.request).value
+        result['latitude'] = utils.request_angle('latitude', flask.request).degrees
+        result['longitude'] = utils.request_angle('longitude', flask.request).degrees
 
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
@@ -624,10 +624,10 @@ def sun_rise_set_azimuths():
         transit_azalt = get_sun_azalt(an_observer, rts['transit'])
         setting_azalt = get_sun_azalt(an_observer, rts['setting'])
 
-        result['current_azimuth'] = current_azalt['azimuth'].value
-        result['rising_azimuth'] = rising_azalt['azimuth'].value
-        result['transit_azimuth'] = transit_azalt['azimuth'].value
-        result['setting_azimuth'] = setting_azalt['azimuth'].value
+        result['current_azimuth'] = current_azalt['azimuth'].degrees
+        result['rising_azimuth'] = rising_azalt['azimuth'].degrees
+        result['transit_azimuth'] = transit_azalt['azimuth'].degrees
+        result['setting_azimuth'] = setting_azalt['azimuth'].degrees
 
         # string version for JSON
 
@@ -868,8 +868,8 @@ def lunar_daily_altitude():
                                                         utils.request_angle('longitude', flask.request))
 
         result['observer'] = str(an_observer) # TODO format? XML from c++ operator::<<()
-        result['latitude'] = utils.request_angle('latitude', flask.request).value
-        result['longitude'] = utils.request_angle('longitude', flask.request).value
+        result['latitude'] = utils.request_angle('latitude', flask.request).degrees
+        result['longitude'] = utils.request_angle('longitude', flask.request).degrees
 
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
@@ -907,8 +907,8 @@ def lunar_daily_altitude():
             # TODO azimuth vs altitude over time
 
             altitude.append([dtime,
-                             Transforms.utils.get_altitude(moon_position).value, # TODO needs to be last for sun position marker?
-                             Transforms.utils.get_altitude(sun_position).value  # TODO needs to be last for sun position marker?
+                             Transforms.utils.get_altitude(moon_position).degrees, # TODO needs to be last for sun position marker?
+                             Transforms.utils.get_altitude(sun_position).degrees  # TODO needs to be last for sun position marker?
                          ]
             )
 
@@ -932,8 +932,8 @@ def lunar_daily_altitude():
                                            is_dst)
 
 
-        result['sun_marker_altitude'] = ''.join((str(sun_rts['altitude']), ' (', str(sun_rts['altitude'].value), ')'))
-        result['sun_marker_azimuth']  = ''.join((str(sun_rts['azimuth']), ' (', str(sun_rts['azimuth'].value), ')'))
+        result['sun_marker_altitude'] = ''.join((str(sun_rts['altitude']), ' (', str(sun_rts['altitude'].degrees), ')'))
+        result['sun_marker_azimuth']  = ''.join((str(sun_rts['azimuth']), ' (', str(sun_rts['azimuth'].degrees), ')'))
 
         result['sun_rising']   = str(sun_rts['rising'])  # JSON-able
         result['sun_transit']  = str(sun_rts['transit']) # JSON-able
@@ -951,8 +951,8 @@ def lunar_daily_altitude():
                                              is_dst)
 
 
-        result['moon_marker_altitude'] = ''.join((str(moon_rts['altitude']), ' (', str(moon_rts['altitude'].value), ')'))
-        result['moon_marker_azimuth']  = ''.join((str(moon_rts['azimuth']), ' (', str(moon_rts['azimuth'].value), ')'))
+        result['moon_marker_altitude'] = ''.join((str(moon_rts['altitude']), ' (', str(moon_rts['altitude'].degrees), ')'))
+        result['moon_marker_azimuth']  = ''.join((str(moon_rts['azimuth']), ' (', str(moon_rts['azimuth'].degrees), ')'))
 
         result['moon_rising']   = str(moon_rts['rising'])  # JSON-able
         result['moon_transit']  = str(moon_rts['transit']) # JSON-able
