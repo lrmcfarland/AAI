@@ -21,13 +21,15 @@ Breakpoint 1 at /Users/rmcfarland/src/Astronomy/Bodies/APCBodies.py:42
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import time
 import unittest
 
 import coords
-import APCBodies
 
+import Bodies.APCBodies
 import Transforms.EclipticEquatorial
 import Transforms.utils
 
@@ -54,7 +56,7 @@ class MiniSun(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-01-01T12:00:00-08')
 
-        sun_hz = APCBodies.SunPosition(self.mlc404, a_datetime)
+        sun_hz = Bodies.APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # noaa: 176.85
         # SunPosition: 176.93209352
@@ -74,7 +76,7 @@ class MiniSun(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-29T12:00:00-07')
 
-        sun_hz = APCBodies.SunPosition(self.mlc404, a_datetime)
+        sun_hz = Bodies.APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # noaa: 143.1
         # SunPosition: 143.257198509
@@ -105,7 +107,7 @@ class MiniSun(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-05-01T09:05:00-07')
 
-        sun = APCBodies.SunPosition(self.mlc404, a_datetime)
+        sun = Bodies.APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # TODO way out from Star Walk
         self.assertAlmostEqual(56.3810698513805, Transforms.utils.get_azimuth(sun).degrees, self.places)
@@ -124,24 +126,24 @@ class MiniSun(unittest.TestCase):
         a_datetime = coords.datetime('2015-05-08T00:00:00-07')
 
 
-        apc_sun_ec = APCBodies.MiniSun(a_datetime)
-        print 'apc sun ec', apc_sun_ec
+        apc_sun_ec = Bodies.APCBodies.MiniSun(a_datetime)
+        print('apc sun ec', apc_sun_ec)
 
         ecliptic_longitude, R = SunPosition.SolarLongitude(a_datetime)
 
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        print 'sun ec', sun_ec
+        print('sun ec', sun_ec)
 
 
         sun_eq = Transforms.EclipticEquatorial.toEquatorial(apc_sun_ec, a_datetime)
 
-        print sun_eq
+        print(sun_eq)
 
 
-        foo = APCBodies.RiseAndSetTimes(sun_eq, self.mlc404, a_datetime)
+        foo = Bodies.APCBodies.RiseAndSetTimes(sun_eq, self.mlc404, a_datetime)
 
 
-        print 'rise and set', foo # TODO
+        print('rise and set', foo) # TODO
 
 
 
@@ -176,7 +178,7 @@ class MiniMoon(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-29T22:00:00-07')
 
-        moon_hz = APCBodies.MoonPosition(self.mlc404, a_datetime)
+        moon_hz = Bodies.APCBodies.MoonPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(182.38480914363294, Transforms.utils.get_azimuth(moon_hz).degrees, self.places)
         self.assertAlmostEqual(55.32447196217382, Transforms.utils.get_altitude(moon_hz).degrees, self.places)
@@ -201,7 +203,7 @@ class MiniMoon(unittest.TestCase):
 
         a_datetime = coords.datetime('2015-04-30T18:30:00-07')
 
-        moon_hz = APCBodies.MoonPosition(self.mlc404, a_datetime)
+        moon_hz = Bodies.APCBodies.MoonPosition(self.mlc404, a_datetime)
 
         self.assertAlmostEqual(109.72031148537829, Transforms.utils.get_azimuth(moon_hz).degrees, self.places)
         self.assertAlmostEqual(23.17296504771049, Transforms.utils.get_altitude(moon_hz).degrees, self.places)

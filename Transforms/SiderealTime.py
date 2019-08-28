@@ -21,8 +21,8 @@ Validation:
 import math
 
 import coords
-import EclipticEquatorial
-import utils
+import Transforms.EclipticEquatorial
+import Transforms.utils
 
 
 class Error(Exception):
@@ -272,32 +272,32 @@ if __name__ == '__main__':
     a_datetime = coords.datetime(args[0])
 
     if len(args) > 1:
-        a_latitude = utils.parse_angle_arg(args[1])
+        a_latitude = Transforms.utils.parse_angle_arg(args[1])
     else:
-        a_latitude = utils.parse_angle_arg('0')
+        a_latitude = Transforms.utils.parse_angle_arg('0')
 
     if len(args) > 2:
-        a_longitude = utils.parse_angle_arg(args[2])
+        a_longitude = Transforms.utils.parse_angle_arg(args[2])
     else:
-        a_longitude = utils.parse_angle_arg('0')
+        a_longitude = Transforms.utils.parse_angle_arg('0')
 
     an_observer = coords.spherical(1, a_latitude, a_longitude)
 
     # ----- results -----
 
-    print a_datetime
-    print an_observer
+    print(a_datetime)
+    print(an_observer)
 
-    print 'Julian Date', a_datetime.toJulianDate()
+    print('Julian Date', a_datetime.toJulianDate())
 
     eps_jpl = EclipticEquatorial.obliquity(a_datetime)
-    print 'obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.degrees), ')'))
+    print('obliquity JPL: ', eps_jpl, ''.join(('(', str(eps_jpl.degrees), ')')))
 
     eps_usno = USNO_C163.obliquity(a_datetime)
-    print 'obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.degrees), ')'))
+    print('obliquity USNO:', eps_usno, ''.join(('(', str(eps_usno.degrees), ')')))
 
 
-    print 'GMST', USNO_C163.GMST(a_datetime)
-    print 'GAST', USNO_C163.GAST(a_datetime)
-    print 'LSTM', USNO_C163.LSTM(an_observer, a_datetime)
-    print 'LSTA', USNO_C163.LSTA(an_observer, a_datetime)
+    print('GMST', USNO_C163.GMST(a_datetime))
+    print('GAST', USNO_C163.GAST(a_datetime))
+    print('LSTM', USNO_C163.LSTM(an_observer, a_datetime))
+    print('LSTA', USNO_C163.LSTA(an_observer, a_datetime))

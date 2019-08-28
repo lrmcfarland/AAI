@@ -23,12 +23,14 @@ s> /Users/lrm/src/Astronomy/Transforms/SiderealTime.py(79)GMST()
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import time
 import unittest
 
 import coords
-import SiderealTime
+import Transforms.SiderealTime
 
 class USNO_C163_Tests(unittest.TestCase):
 
@@ -49,8 +51,8 @@ class USNO_C163_Tests(unittest.TestCase):
         """Set up test parameters."""
 
         self.places = 5
-        self.xforms = SiderealTime.USNO_C163()
-
+        self.xforms = Transforms.SiderealTime.USNO_C163()
+        return
 
     @unittest.skip('hacking')
     def test_GMST(self):
@@ -59,9 +61,10 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
         a_gast = self.xforms.GAST(a_datetime)
 
-        print '\nDatetime:', a_datetime
-        print 'GMST', a_gmst
-        print 'GAST', a_gast # TODO rm
+        print('\nDatetime:', a_datetime)
+        print('GMST', a_gmst)
+        print('GAST', a_gast)
+        return
 
 
     @unittest.skip('hacking')
@@ -73,10 +76,11 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
         a_lsta = self.xforms.LSTA(a_datetime, an_observer)
 
-        print '\nDatetime:', a_datetime
-        print 'observer:', an_observer
-        print 'GMST', a_gmst
-        print 'LSTA', a_lsta, a_lsta.degrees
+        print('\nDatetime:', a_datetime)
+        print('observer:', an_observer)
+        print('GMST', a_gmst)
+        print('LSTA', a_lsta, a_lsta.degrees)
+        return
 
 
     def test_JDo_0(self):
@@ -94,6 +98,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual(2457023.5, a_JDo)
         self.assertEqual('2015-01-01T00:00:00', str(a_JDo_datetime))
+        return
 
 
     def test_JDo_1(self):
@@ -111,6 +116,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual(2457023.5, a_JDo)
         self.assertEqual('2015-01-01T00:00:00', str(a_JDo_datetime))
+        return
 
 
     def test_JDo_13(self):
@@ -129,6 +135,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual(2457054.5, a_JDo)
         self.assertEqual('2015-02-01T00:00:00', str(a_JDo_datetime))
+        return
 
 
     def test_JDo_23(self):
@@ -147,6 +154,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual(2457096.5, a_JDo)
         self.assertEqual('2015-03-15T00:00:00', str(a_JDo_datetime))
+        return
 
 
     def test_GMST_J2000(self):
@@ -156,6 +164,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual('18:41:50.5484', str(a_gmst))
         # Note: out of range of http://aa.usno.navy.mil/data/docs/siderealtime.php
+        return
 
 
     def test_GMST_J2000_plus_day(self):
@@ -167,6 +176,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
         # matches http://en.wikipedia.org/wiki/Sidereal_time
+        return
 
 
     def test_GMST_J2000_plus_halfday(self):
@@ -177,6 +187,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
         self.assertEqual('12:01:58.2777', str(a_gmst_1 - a_gmst_0))
+        return
 
 
     def test_GMST_kb(self):
@@ -193,6 +204,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
 
         self.assertEqual('11:39:5.06752', str(a_gmst))
+        return
 
 
     def test_GMST_standrews(self):
@@ -208,6 +220,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
         self.assertEqual('08:55:49.7347', str(a_gmst))
+        return
 
 
 
@@ -229,6 +242,7 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('19:13:27.243', str(a_lstm)) # Actual: 19 13 27.2412
         self.assertEqual('19:13:27.5422', str(a_lsta)) # Actual: 19 13 27.5386
 
+        return
 
     def test_GMST_2015_01_01_8am(self):
         """Test GMST 2015 01 01 8 am"""
@@ -249,6 +263,7 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('06:34:18.7854', str(a_lstm)) # Actual: 6 34 18.7836
         self.assertEqual('06:34:19.0855', str(a_lsta)) # Actual: 6 34 19.0828
 
+        return
 
     def test_GMST_2015_01_01_2pm(self):
         """Test GMST 2015 01 01 2 pm"""
@@ -269,6 +284,7 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('12:35:17.9242', str(a_lstm)) # Actual: 12 35 17.9224
         self.assertEqual('12:35:18.2247', str(a_lsta)) # Actual: 12 35 18.2227
 
+        return
 
 
     def test_GMST_2015_01_01_2pm_tz1(self):
@@ -283,6 +299,7 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('00:00:0.300518', str(an_eqeq)) # Actual: +0.3003 seconds
         # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=2&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&place=%28no+name+given%29&lon_sign=1&lon_deg=15&lon_min=&lon_sec=&lat_sign=1&lat_deg=0&lat_min=&lat_sec=
 
+        return
 
     def test_GMST_2pm_tzn1(self):
         """Test GMST 2015 01 01 2 pm timezone -1"""
@@ -296,6 +313,7 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('00:00:0.300386', str(an_eqeq)) # Actual: +0.3003 seconds
         # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=2&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&place=%28no+name+given%29&lon_sign=-1&lon_deg=15&lon_min=&lon_sec=&lat_sign=1&lat_deg=0&lat_min=&lat_sec=
 
+        return
 
 
     def test_GMST_simplified_J2000(self):
@@ -304,6 +322,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST_simplified(a_datetime)
         self.assertEqual('-5:18:9.45159', str(a_gmst))
 
+        return
 
     def test_GMST_simplified_J2000_plus_day(self):
         """Test GMST J2000 plus a day"""
@@ -314,6 +333,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
 
+        return
 
     def test_GMST_simplified_standrews(self):
         """Test GMST simplified at St. Andrews"""
@@ -328,6 +348,7 @@ class USNO_C163_Tests(unittest.TestCase):
         # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
         self.assertEqual('08:55:49.7347', str(a_gmst))
 
+        return
 
     def test_GMST_simplified_kb(self):
         """Test GMST simplified formula, in hours, with kburnett data"""
@@ -338,6 +359,7 @@ class USNO_C163_Tests(unittest.TestCase):
         # -0.00001 seconds different from given test data
         self.assertEqual('11:39:5.06724', str(a_gmst))
 
+        return
 
     def test_GMST_simplified2_kb(self):
         """Test GMST simplified formula 2, in degrees, with kburnett data"""
@@ -347,6 +369,7 @@ class USNO_C163_Tests(unittest.TestCase):
 
         # matches test data given when rouded to 0.0001 places
         self.assertEqual('11:39:5.06723', str(a_gmst))
+        return
 
 
     def test_GMST_meeus_12a(self):
@@ -365,6 +388,7 @@ class USNO_C163_Tests(unittest.TestCase):
         self.assertEqual('13:10:46.1154', str(a_gast))
         # Meeus: 13:10:46.1351. I am using a different algorithm for
         # obliquity of ecliptic (USNOs)
+        return
 
 
     def test_GMST_meeus_12b(self):
@@ -378,6 +402,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST(a_datetime)
         self.assertEqual('08:34:57.0896', str(a_gmst))
         # Meeus: 08:34:57.0896
+        return
 
 
 if __name__ == '__main__':

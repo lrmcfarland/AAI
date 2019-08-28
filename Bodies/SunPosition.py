@@ -62,6 +62,8 @@ EoT:
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 
 import coords
@@ -462,10 +464,10 @@ if __name__ == '__main__':
 
             sun = HorizontalCoords(an_observer, current_datetime)
 
-            print 0.01*d,
-            print current_datetime,
-            print Transforms.utils.get_azimuth(sun).degrees,
-            print Transforms.utils.get_altitude(sun).degrees
+            print(0.01*d)
+            print(current_datetime)
+            print(Transforms.utils.get_azimuth(sun).degrees)
+            print(Transforms.utils.get_altitude(sun).degrees)
 
 
     elif options.output_mode.lower() == 'analemma':
@@ -482,7 +484,7 @@ if __name__ == '__main__':
             sun = HorizontalCoords(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
-            print eot.degrees*60 + 180, Transforms.utils.get_altitude(sun).degrees
+            print(eot.degrees*60 + 180, Transforms.utils.get_altitude(sun).degrees)
 
 
     elif options.output_mode.lower() == 'eot':
@@ -497,45 +499,45 @@ if __name__ == '__main__':
             current_date += 1
             eot = EquationOfTime(current_date)
 
-            print d, current_date, eot.degrees * 60
+            print(d, current_date, eot.degrees * 60)
 
 
     else:
 
         # azimuth, altitude
 
-        print 'A datetime: ', a_datetime, ''.join(('(', str(a_datetime.toJulianDate()), ')'))
-        print 'An observer:', an_observer
+        print('A datetime: ', a_datetime, ''.join(('(', str(a_datetime.toJulianDate()), ')')))
+        print('An observer:', an_observer)
 
         ecliptic_longitude, R = SolarLongitude(a_datetime)
-        print 'Ecliptic longitude:', ecliptic_longitude
-        print 'Distance in AU:', R
+        print('Ecliptic longitude:', ecliptic_longitude)
+        print('Distance in AU:', R)
 
-        print 'Obliquity of the ecliptic:', Transforms.EclipticEquatorial.obliquity(a_datetime)
+        print('Obliquity of the ecliptic:', Transforms.EclipticEquatorial.obliquity(a_datetime))
 
         sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        print 'Sun in ecliptic coordinates:', sun_ec
+        print('Sun in ecliptic coordinates:', sun_ec)
 
         sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        print 'Sun in equatorial coordinates:', sun_eq
+        print('Sun in equatorial coordinates:', sun_eq)
 
         sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-        print 'Sun in horizon coordinates:', sun_hz
+        print('Sun in horizon coordinates:', sun_hz)
 
         sun_dec = coords.angle(90) - sun_eq.theta
-        print 'Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.degrees), ')'))
+        print('Solar Declination:', sun_dec, ''.join(('(', str(sun_dec.degrees), ')')))
 
         eot = EquationOfTime(a_datetime)
-        print 'Equation of time (minutes):', eot.degrees * 60
+        print('Equation of time (minutes):', eot.degrees * 60)
 
-        print 'Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).degrees), ')'))
-        print 'Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_altitude(sun_hz).degrees), ')'))
+        print('Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz))
+        print(''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).degrees), ')')))
+        print('Altitude (degrees):', Transforms.utils.get_altitude(sun_hz))
+        print(''.join(('(', str(Transforms.utils.get_altitude(sun_hz).degrees), ')')))
 
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)
 
-        print 'Rising :', rising
-        print 'Transit:', transit
-        print 'Setting:', setting
+        print('Rising :', rising)
+        print('Transit:', transit)
+        print('Setting:', setting)

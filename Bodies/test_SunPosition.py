@@ -14,6 +14,8 @@ next until import module:
 Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/SunPosition.py:17
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import time
 import unittest
@@ -163,7 +165,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 02, 11, 12)
+        a_datetime = coords.datetime(2015, 2, 11, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -14.24 minutes
@@ -178,7 +180,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 03, 20, 12)
+        a_datetime = coords.datetime(2015, 3, 20, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -7.44 minutes
@@ -195,7 +197,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 05, 14, 12)
+        a_datetime = coords.datetime(2015, 5, 14, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says 3.65 minutes
@@ -212,7 +214,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 07, 26, 12)
+        a_datetime = coords.datetime(2015, 7, 26, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says -6.54 minutes
@@ -229,7 +231,7 @@ class EquationOfTimeTests(unittest.TestCase):
         validate with http://www.esrl.noaa.gov/gmd/grad/solcalc/
         """
 
-        a_datetime = coords.datetime(2015, 11, 03, 12)
+        a_datetime = coords.datetime(2015, 11, 3, 12)
         eot = SunPosition.EquationOfTime(a_datetime)
 
         # NOAA says 16.48 minutes

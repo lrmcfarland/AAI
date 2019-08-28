@@ -27,10 +27,12 @@ Validation:
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import coords
 
-import utils
+import Transforms.utils
 
 
 class Error(Exception):
@@ -54,9 +56,9 @@ def obliquity(a_datetime):
 
     a_datetime (coords.datetime): The time of the observation.
     """
-    T = utils.JulianCentury(a_datetime)
+    T = Transforms.utils.JulianCentury(a_datetime)
     eps = 0
-    for i in xrange(len(obe)):
+    for i in range(len(obe)):
         eps += obe[i] * math.pow(T, i)
     return coords.angle(eps)
 
@@ -156,10 +158,10 @@ class Meeus(object):
 
         eps = obliquity(a_datetime) # see above
 
-        a_RA = utils.get_RA(an_object)
+        a_RA = Transforms.utils.get_RA(an_object)
         a_RA *= 15 # convert to degrees Meeus p. 91
 
-        a_dec = utils.get_declination(an_object)
+        a_dec = Transforms.utils.get_declination(an_object)
 
         # Meeus eqn. 13.1
         ecLon = coords.angle()
@@ -169,7 +171,7 @@ class Meeus(object):
         ecLat = coords.angle()
         ecLat.radians = math.asin(math.sin(a_dec.radians)*math.cos(eps.radians) - math.cos(a_dec.radians)*math.sin(eps.radians)*math.sin(a_RA.radians))
 
-        return utils.latlon2spherical(ecLat, ecLon)
+        return Transforms.utils.latlon2spherical(ecLat, ecLon)
 
 
     @staticmethod
@@ -194,8 +196,8 @@ class Meeus(object):
 
         eps = obliquity(a_datetime) # see above
 
-        a_lat = utils.get_latitude(an_object)
-        a_lon = utils.get_longitude(an_object)
+        a_lat = Transforms.utils.get_latitude(an_object)
+        a_lon = Transforms.utils.get_longitude(an_object)
 
 
         # Meeus eqn. 13.3
@@ -208,7 +210,7 @@ class Meeus(object):
         eqLat.radians = math.asin(math.sin(a_lat.radians)*math.cos(eps.radians) + math.cos(a_lat.radians)*math.sin(eps.radians)*math.sin(a_lon.radians))
 
 
-        return utils.latlon2spherical(eqLat, eqLon)
+        return Transforms.utils.latlon2spherical(eqLat, eqLon)
 
 
 
@@ -246,8 +248,8 @@ if __name__ == '__main__':
     if len(args) < 3:
         parser.error('missing object and/or datetime.')
 
-    an_object = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg(args[0]),
-                                      a_declination=utils.parse_angle_arg(args[1]))
+    an_object = Transforms.utils.radec2spherical(a_right_ascension=utils.parse_angle_arg(args[0]),
+                                                 a_declination=utils.parse_angle_arg(args[1]))
 
     a_datetime = coords.datetime(args[2])
 
@@ -259,8 +261,8 @@ if __name__ == '__main__':
 
     if options.toEcliptic is True:
         result = toEcliptic(an_object, a_datetime)
-        print 'Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', utils.get_longitude(result)
+        print('Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', utils.get_longitude(result))
 
     else:
         result = toEquatorial(an_object, a_datetime)
-        print 'RA:', utils.get_RA(result), ', Dec:', utils.get_declination(result)
+        print('RA:', utils.get_RA(result), ', Dec:', utils.get_declination(result))

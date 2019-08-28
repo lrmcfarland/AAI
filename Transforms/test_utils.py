@@ -21,6 +21,8 @@ Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/utils.py:14
 -> if not isinstance(a_point, coords.spherical):
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import time
 import unittest

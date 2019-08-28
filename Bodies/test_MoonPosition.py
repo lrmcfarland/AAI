@@ -1,7 +1,6 @@
-"""Unit tests for Moon Position calculations
+"""Unit tests for Moon Position calculations"""
 
-
-"""
+from __future__ import absolute_import # for python 2 and 3
 
 import math
 import time
