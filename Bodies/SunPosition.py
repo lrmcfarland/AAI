@@ -77,7 +77,7 @@ class Error(Exception):
     pass
 
 
-def SolarLongitude(a_datetime):
+def SolarLongitudeRange(a_datetime):
     """Calculate the longitude of the sun for the given date
 
     from http://en.wikipedia.org/wiki/Position_of_the_Sun
@@ -108,8 +108,8 @@ def SolarLongitude(a_datetime):
     return ecliptic_longitude, R
 
 
-def HorizontalCoords(an_observer, a_datetime):
-    """Calculate the location of the sun relaive to an observer
+def EclipticCoords(a_datetime):
+    """Calculate the location of the sun in ecliptic coordinates
 
     Args:
 
@@ -126,7 +126,49 @@ def HorizontalCoords(an_observer, a_datetime):
     ecliptic_longitude, R = SolarLongitudeRange(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
+
+    return sun_ec
+
+
+def EquatorialCoords(a_datetime):
+    """Calculate the location of the sun relaive to an observer in
+       equatorial coordinates
+
+    Args:
+
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
+
+    a_datetime (coords.datetime): The time of the observation.
+
+    Returns (coords.spherical): the position of the sun in horizon coordinates.
+
+    """
+
+    sun_ec = EclipticCoords(a_datetime)
     sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
+
+    return sun_eq
+
+
+def HorizontalCoords(an_observer, a_datetime):
+    """Calculate the location of the sun relaive to an observer
+
+    Args:
+
+    an_observer (coords.spherical): the latitude (in degrees) and
+    longitude of an observer as a spherical coordinate where theta
+    is the complement of latitude and longitude is measured
+    positive east. See utils.latlon2spherical.
+
+    a_datetime (coords.datetime): The time of the observation.
+
+    Returns (coords.spherical): the position of the sun in horizon coordinates.
+    """
+
+    sun_eq = EquatorialCoords(a_datetime)
     sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
     return sun_hz
@@ -150,7 +192,7 @@ def EquationOfTime(a_datetime):
     noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
     gast = Transforms.SiderealTime.USNO_C163.GAST(noon)
 
-    ecliptic_longitude, R = SolarLongitude(noon)
+    ecliptic_longitude, R = SolarLongitudeRange(noon)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
     sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, noon)
@@ -188,13 +230,14 @@ def SunRiseAndSet(an_observer, a_datetime):
     rising, transit and setting in local time.
     """
 
-    ecliptic_longitude, R = SolarLongitude(a_datetime)
+    ecliptic_longitude, R = SolarLongitudeRange(a_datetime)
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
     sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
 
     return RiseAndSet(sun_eq, an_observer, a_datetime, an_altitude=coords.angle(-0.8333))
 
 
+# TODO move to own module. shared with others like moon
 def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     """Rise and set times
 
@@ -509,7 +552,7 @@ if __name__ == '__main__':
         print('A datetime: ', a_datetime, ''.join(('(', str(a_datetime.toJulianDate()), ')')))
         print('An observer:', an_observer)
 
-        ecliptic_longitude, R = SolarLongitude(a_datetime)
+        ecliptic_longitude, R = SolarLongitudeRange(a_datetime)
         print('Ecliptic longitude:', ecliptic_longitude)
         print('Distance in AU:', R)
 

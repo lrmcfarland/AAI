@@ -22,11 +22,21 @@
 
 	if (moon_position_data.errors.length > 0) {
 
+	    $("#datetime").text("TBD");
 	    $("#sun_rising").text("TBD");
 	    $("#sun_transit").text("TBD");
 	    $("#sun_setting").text("TBD");
 	    $("#sun_azimuth").text("TBD");
 	    $("#sun_altitude").text("TBD");
+
+	    $("#moon_ec_longitude").text("TBD");
+	    $("#moon_ec_latitude").text("TBD");
+
+	    $("#moon_eq_ra").text("TBD");
+	    $("#moon_eq_dec").text("TBD");
+
+	    $("#moon_azimuth").text("TBD");
+	    $("#moon_altitude").text("TBD");
 
 	    $("#moon_rising").text("TBD");
 	    $("#moon_transit").text("TBD");
@@ -38,11 +48,34 @@
 
 	} else {
 
+	    $("#datetime").text(moon_position_data.datetime);
+
+	    $("#sun_ec_latitude").text(moon_position_data.sun_ec_latitude_dms);
+	    $("#sun_ec_longitude").text(moon_position_data.sun_ec_longitude_dms);
+
+	    $("#sun_eq_ra").text(moon_position_data.sun_eq_ra_dms);
+	    $("#sun_eq_dec").text(moon_position_data.sun_eq_dec_dms);
+
+	    $("#sun_altitude").text(moon_position_data.sun_altitude_dms);
+	    $("#sun_azimuth").text(moon_position_data.sun_azimuth_dms);
+
+
 	    $("#sun_rising").text(moon_position_data.sun_rising);
 	    $("#sun_transit").text(moon_position_data.sun_transit);
 	    $("#sun_setting").text(moon_position_data.sun_setting);
 	    $("#sun_azimuth").text(moon_position_data.sun_marker_azimuth);
 	    $("#sun_altitude").text(moon_position_data.sun_marker_altitude);
+
+
+
+	    $("#moon_ec_latitude").text(moon_position_data.moon_ec_latitude_dms);
+	    $("#moon_ec_longitude").text(moon_position_data.moon_ec_longitude_dms);
+
+	    $("#moon_eq_ra").text(moon_position_data.moon_eq_ra_dms);
+	    $("#moon_eq_dec").text(moon_position_data.moon_eq_dec_dms);
+
+	    $("#moon_altitude").text(moon_position_data.moon_altitude_dms);
+	    $("#moon_azimuth").text(moon_position_data.moon_azimuth_dms);
 
 	    $("#moon_rising").text(moon_position_data.moon_rising);
 	    $("#moon_transit").text(moon_position_data.moon_transit);
@@ -80,6 +113,12 @@
 	    $('input[name="time"]').val(a_timeandzone[0]);
 	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
 
+	    $('input[name="dst"]').removeAttr("checked");
+
+
+	    {# TODO reset dst #}
+
+
 
 	    drawMoonChart(moon_position_data);
 	};
@@ -89,108 +128,78 @@
 
     function drawMoonChart(moon_position_data) {
 
-	{# ----- formatting for google chart ----- #}
-	var moon_plot_data = [['time',
-			       moon_position_data.date_label,
-			       moon_position_data.date_label,
-			       {'type': 'string', 'role': 'style'}]];
-
-	{# ----- special format for moon marker ----- #}
-
-	for (var i = 0; i < moon_position_data.altitude_data_24h.length - 1; i++) {
-
-	    var plot_record = moon_position_data.altitude_data_24h[i];
-	    var next_plot_record = moon_position_data.altitude_data_24h[i+1];
-
-	    if (moon_position_data.moon_marker_time == plot_record[0]) {
-
-		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
-
-	    } else if (moon_position_data.moon_marker_time > plot_record[0] &&
-		       moon_position_data.moon_marker_time < next_plot_record[0]) {
-
-		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
-
-	    } else if (i == moon_position_data.altitude_data_24h.length - 1 &&
-		       moon_position_data.moon_marker_time == next_plot_record[0]) {
-
-		plot_record.push('point { size: 18; shape-type: circle; fill-color: #FFD700; }');
-
-	    } else if (moon_position_data.moon_marker_time > next_plot_record[0]) {
-
-		plot_record.push(null);
-
-	    } else {
-
-		plot_record.push(null);
-
+	var daily_sun_path = {
+	    name: 'Sun path',
+	    x: moon_position_data.daily_sun_azimuth,
+	    y: moon_position_data.daily_sun_altitude,
+	    mode: 'line',
+	    type: 'scatter',
+	    line: {
+		color: 'gold',
 	    }
+	};
 
-
-	    moon_plot_data.push(plot_record);
-
-	}
-
-	var altitudeVtime_chart = new google.visualization.LineChart(
-	    document.getElementById('altitudeVtime'));
-
-	var altitude_table = google.visualization.arrayToDataTable(moon_plot_data);
-	var altitude_view = getMoonChartView(altitude_table, "Altitude over time for one day", "hour");
-
-	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
-
-
-
-    }; {# end drawMoonChart(moon_position_data) #}
-
-
-    function getMoonChartView (data_table, chart_title, hAxis_title) {
-
-	var view_data = {};
-
-	var current_color = "blue";
-
-
-	var options = {
-
-	    legend: "none",
-
-	    chartArea: {left: "10%", top: "10%", width:"90%", height:"80%"},
-
-	    title: chart_title,
-
-	    hAxis: { title: hAxis_title},
-	    vAxis: { title: "altitude in degrees above the horizon", minValue: -100, maxValue: 100},
-
-	    series: {
-		0: { lineDashStyle: [] }
-	    },
-
-	    colors: [current_color],
-
-	    pointSize: 1,
-	    dataOpacity: 0.7
-
+	var current_sun_position = {
+	    name: 'Sun position',
+	    x: [moon_position_data.sun_azimuth],
+	    y: [moon_position_data.sun_altitude],
+	    mode: 'markers',
+	    type: 'scatter',
+	    marker: {
+		color: 'gold',
+		size: 25
+	    }
 	};
 
 
-	var data = new google.visualization.DataView(data_table);
+	var daily_moon_path = {
+	    name: 'Moon path',
+	    x: moon_position_data.daily_moon_azimuth,
+	    y: moon_position_data.daily_moon_altitude,
+	    mode: 'line',
+	    type: 'scatter',
+	    line: {
+		color: 'silver',
+	    }
+	};
 
-	var hides = [];
-	var line_count = 0; {# assumes order ve, ss, ae, ws, current time #}
+	var current_moon_position = {
+	    name: 'Moon position',
+	    x: [moon_position_data.moon_azimuth],
+	    y: [moon_position_data.moon_altitude],
+	    mode: 'markers',
+	    type: 'scatter',
+	    marker: {
+		color: 'silver',
+		size: 20
+	    }
+	};
 
 
-	options.series[line_count++] = { color: "silver", lineDashStyle: [4, 2] };
 
-	options.series[line_count++] = { color: "gold", lineDashStyle: [8, 4] };
+	var data = [daily_sun_path, current_sun_position, daily_moon_path, current_moon_position];
+
+	var layout = {
+	    title:'Altitude vs Azimuth over one day',
+	    xaxis: {
+		title: {
+		    text: 'Azimuth in degrees from true north'
+		},
+		range: [0, 360]
+	    },
+	    yaxis: {
+		title: {
+		    text: 'Altitude in degrees from the horizon'
+		},
+		range: [-100, 100]
+	    }
+	};
 
 
-	view_data['data'] = data;
-	view_data['options'] = options;
+	Plotly.newPlot('altitudeVtime', data, layout);
 
-	return view_data;
 
-    };
+    }; {# end drawMoonChart(moon_position_data) #}
 
 
     {# ----------------- #}
@@ -233,7 +242,7 @@
 
 {% endblock %}
 
-{% block title %}Daily Solar Altitude{% endblock %}
+{% block title %}Daily Lunar Altitude{% endblock %}
 
 {% block content %}
 
@@ -246,10 +255,6 @@
 .linechart {
     width: 800px;
     height: 400px;
-}
-
-table#moon_chart_legend {
-    width: 10em;
 }
 
 
@@ -308,31 +313,6 @@ button#get_lunar_daily_altitude {
       <div id="altitudeVtime" class="linechart"></div>
     </td>
 
-    <td>
-
-      <table id="moon_chart_legend">
-
-	<tr>
-
-	  <td id="_solar_altitude_txt">
-	    Sun
-	  </td>
-
-	</tr>
-
-
-	<tr>
-
-	  <td id="_lunar_altitude_txt">
-	    Moon
-	  </td>
-
-	</tr>
-
-
-      </table>
-
-    </td>
 
   </tr>
 
@@ -342,74 +322,105 @@ button#get_lunar_daily_altitude {
       <table id="results_table" align="center">
 
 	<tr>
+	  <th>Current Time</th>
+	  <td id="datetime">TBD</td>
+	  <td></td>
+	  <td>ISO8601</td>
+	</tr>
+
+	<tr>
+	  <td></td>
 	  <th>Sun</th>
-	</tr>
-
-	<tr>
-	  <th>Azimuth</th>
-	  <td id="sun_azimuth">TBD</td>
-	  <td>deg:min:sec (deg)</td>
-	</tr>
-
-	<tr>
-	  <th>Altitude</th>
-	  <td id="sun_altitude">TBD</td>
-	  <td>deg:min:sec (deg)</td>
-	</tr>
-
-	<tr>
-	  <th>Rising</th>
-	  <td id="sun_rising">TBD</td>
-	  <td>ISO8601</td>
-	</tr>
-
-
-	<tr>
-	  <th>Transit</th>
-	  <td id="sun_transit">TBD</td>
-	  <td>ISO8601</td>
-	</tr>
-
-	<tr>
-	  <th>Setting</th>
-	  <td id="sun_setting">TBD</td>
-	  <td>ISO8601</td>
-	</tr>
-
-	<tr>
 	  <th>Moon</th>
+	  <td></td>
+	</tr>
+
+
+	<tr>
+	  <th>Ecliptic Longitude</th>
+
+	  <td id="sun_ec_longitude">TBD</td>
+	  <td id="moon_ec_longitude">TBD</td>
+
+	  <td>deg:min:sec</td>
+	</tr>
+
+	<tr>
+	  <th>Ecliptic Latitude</th>
+
+	  <td id="sun_ec_latitude">TBD</td>
+	  <td id="moon_ec_latitude">TBD</td>
+
+	  <td>deg:min:sec</td>
+	</tr>
+
+
+	<tr>
+	  <th>Right Ascension</th>
+
+	  <td id="sun_eq_ra">TBD</td>
+	  <td id="moon_eq_ra">TBD</td>
+
+	  <td>hr:min:sec</td>
+	</tr>
+
+
+	<tr>
+	  <th>Declination</th>
+
+	  <td id="sun_eq_dec">TBD</td>
+	  <td id="moon_eq_dec">TBD</td>
+
+	  <td>deg:min:sec</td>
+
 	</tr>
 
 	<tr>
 	  <th>Azimuth</th>
+
+	  <td id="sun_azimuth">TBD</td>
 	  <td id="moon_azimuth">TBD</td>
-	  <td>deg:min:sec (deg)</td>
+
+	  <td>deg:min:sec</td>
 	</tr>
 
 	<tr>
 	  <th>Altitude</th>
+
+	  <td id="sun_altitude">TBD</td>
 	  <td id="moon_altitude">TBD</td>
-	  <td>deg:min:sec (deg)</td>
+
+	  <td>deg:min:sec</td>
 	</tr>
 
 	<tr>
 	  <th>Rising</th>
+
+	  <td id="sun_rising">TBD</td>
 	  <td id="moon_rising">TBD</td>
+
 	  <td>ISO8601</td>
 	</tr>
 
 
 	<tr>
 	  <th>Transit</th>
+
+	  <td id="sun_transit">TBD</td>
 	  <td id="moon_transit">TBD</td>
+
 	  <td>ISO8601</td>
 	</tr>
 
 	<tr>
 	  <th>Setting</th>
+
+	  <td id="sun_setting">TBD</td>
 	  <td id="moon_setting">TBD</td>
+
 	  <td>ISO8601</td>
 	</tr>
+
 
       </table>
 

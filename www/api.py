@@ -256,26 +256,15 @@ def solar_ecliptic_coords():
     result = {'errors': list()}
 
     try:
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
-
-        result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
-
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
-
         result['datetime'] = str(a_datetime)
 
+        sun_ec = Bodies.SunPosition.EclipticCoords(a_datetime)
 
-        ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
-
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-
-        result['R'] = R
-        result['longitude'] = str(ecliptic_longitude)
-        result['latitude'] = str(Transforms.utils.get_declination(sun_ec))
-
+        result['longitude'] = str(Transforms.utils.get_longitude(sun_ec).degrees)
+        result['latitude'] =  str(Transforms.utils.get_latitude(sun_ec).degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -291,31 +280,20 @@ def solar_equatorial_coords(an_observer, a_datetime):
     result = {'errors': list()}
 
     try:
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
-
-        result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
-
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
-
         result['datetime'] = str(a_datetime)
 
-        ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
+        sun_eq = Bodies.SunPosition.EquatorialCoords(a_datetime)
 
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-
-        result['declination'] = str(Transforms.utils.get_declination(sun_eq))
-        result['RA'] = str(Transforms.utils.get_RA(sun_eq))
+        result['declination'] = str(Transforms.utils.get_declination(sun_eq).degrees)
+        result['RA'] = str(Transforms.utils.get_RA(sun_eq).degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
-
-
 
 
 @api.route("/solar/horizontal_coords")
@@ -331,23 +309,16 @@ def solar_horizontal_coords(an_observer, a_datetime):
     try:
         an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
                                                         utils.request_angle('longitude', flask.request))
-
         result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
-
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
-
         result['datetime'] = str(a_datetime)
 
-        ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
+        sun_eq = Bodies.SunPosition.HorizontalCoords(an_observer, a_datetime)
 
-        sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-        sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-
-        result['azimuth'] = str(Transforms.utils.get_azimuth(sun_hz))
-        result['altitude'] = str(Transforms.utils.get_altitude(sun_hz))
+        result['azimuth'] = str(Transforms.utils.get_azimuth(sun_hz).degrees)
+        result['altitude'] = str(Transforms.utils.get_altitude(sun_hz).degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -557,7 +528,6 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 # solar azimuth
 
 
-
 def get_sun_azalt(an_observer, a_datetime):
     """Calculate the azimuth and altitude of the sun for an observer at a_datetime
 
@@ -569,8 +539,7 @@ def get_sun_azalt(an_observer, a_datetime):
     """
     result = dict()
 
-
-    ecliptic_longitude, R = Bodies.SunPosition.SolarLongitude(a_datetime)
+    ecliptic_longitude, R = Bodies.SunPosition.SolarLongitudeRange(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
     sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
@@ -661,31 +630,20 @@ def lunar_ecliptic_coords():
     result = {'errors': list()}
 
     try:
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
-
-        result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
-
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
-
         result['datetime'] = str(a_datetime)
 
-        elong, elat, distance = Bodies.MoonPosition.EclipticCoords(a_datetime)
+        moon_ec = Bodies.MoonPosition.EclipticCoords(a_datetime)
 
-        moon_ec = coords.spherical(R, elat, elong)
-
-        result['R'] = R
-        result['longitude'] = str(ecliptic_longitude)
-        result['latitude'] = str(Transforms.utils.get_declination(moon_ec))
-
+        result['longitude'] = str(Transforms.utils.get_longitude(moon_ec).degrees)
+        result['latitude'] =  str(Transforms.utils.get_latitude(moon_ec).degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
-
 
 
 @api.route("/lunar/equatorial_coords")
@@ -695,31 +653,20 @@ def lunar_equatorial_coords(an_observer, a_datetime):
     result = {'errors': list()}
 
     try:
-        an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
-                                                        utils.request_angle('longitude', flask.request))
-
-        result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
-
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
-
         result['datetime'] = str(a_datetime)
 
-        elong, elat, distance = Bodies.MoonPositionEclipticCoords(a_datetime)
+        moon_eq = Bodies.MoonPosition.EquatorialCoords(a_datetime)
 
-        moon_ec = coords.spherical(R, elat, elong)
-        moon_eq = Transforms.EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
-
-        result['declination'] = str(Transforms.utils.get_declination(moon_eq))
-        result['RA'] = str(Transforms.utils.get_RA(moon_eq))
+        result['declination'] = str(Transforms.utils.get_declination(moon_eq).degrees)
+        result['RA'] = str(Transforms.utils.get_RA(moon_eq).degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
-
-
 
 
 @api.route("/lunar/horizontal_coords")
@@ -735,29 +682,22 @@ def lunar_horizontal_coords(an_observer, a_datetime):
     try:
         an_observer = Transforms.utils.latlon2spherical(utils.request_angle('latitude', flask.request),
                                                         utils.request_angle('longitude', flask.request))
-
         result['observer'] = str(an_observer)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
-
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
-
         result['datetime'] = str(a_datetime)
 
-        elong, elat, distance = EclipticCoords(a_datetime)
+        moon_eq = Bodies.MoonPosition.HorizontalCoords(an_observer, a_datetime)
 
-        moon_ec = coords.spherical(R, elat, elong)
-        moon_eq = Transforms.EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
-        moon_hz = Transforms.EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
+        result['azimuth'] = str(Transforms.utils.get_azimuth(moon_hz).degrees)
+        result['altitude'] = str(Transforms.utils.get_altitude(moon_hz).degrees)
 
-        result['azimuth'] = str(Transforms.utils.get_azimuth(moon_hz))
-        result['altitude'] = str(Transforms.utils.get_altitude(moon_hz))
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
-
 
 
 def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
@@ -781,12 +721,7 @@ def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 
     an_observer = Transforms.utils.latlon2spherical(a_latitude, a_longitude)
 
-
-    elong, elat, distance = Bodies.MoonPosition.EclipticCoords(a_datetime)
-
-    moon_ec = coords.spherical(distance, elat, elong)
-    moon_eq = Transforms.EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
-
+    moon_eq = Bodies.MoonPosition.EquatorialCoords(a_datetime)
 
     rising, transit, setting = Bodies.SunPosition.RiseAndSet(moon_eq, an_observer, a_datetime)
 
@@ -875,8 +810,6 @@ def lunar_daily_altitude():
 
         result['datetime'] = str(a_datetime)
 
-        result['sun_marker_time'] = a_datetime.hour + a_datetime.minute/60.0 # distance on x-axis to plot sun marker
-
         result['date_label'] = '{year}-{month}-{day}'.format(year=a_datetime.year,
                                                              month=a_datetime.month,
                                                              day=a_datetime.day)
@@ -885,6 +818,46 @@ def lunar_daily_altitude():
         result['sun_ec_latitude']  = str(Transforms.utils.get_latitude(sun_ec_position))
         result['sun_ec_longitude']  = str(Transforms.utils.get_longitude(sun_ec_position))
 
+        sun_ec_position = Bodies.SunPosition.EclipticCoords(a_datetime)
+        result['sun_ec_latitude']  = str(Transforms.utils.get_latitude(sun_ec_position).degrees)
+        result['sun_ec_latitude_dms']  = str(Transforms.utils.get_latitude(sun_ec_position))
+        result['sun_ec_longitude']  = str(Transforms.utils.get_longitude(sun_ec_position).degrees)
+        result['sun_ec_longitude_dms']  = str(Transforms.utils.get_longitude(sun_ec_position))
+
+        sun_eq_position = Transforms.EclipticEquatorial.toEquatorial(sun_ec_position, a_datetime)
+        result['sun_eq_ra']  = str(Transforms.utils.get_RA(sun_eq_position).degrees)
+        result['sun_eq_ra_dms']  = str(Transforms.utils.get_RA(sun_eq_position))
+        result['sun_eq_dec']  = str(Transforms.utils.get_declination(sun_eq_position).degrees)
+        result['sun_eq_dec_dms']  = str(Transforms.utils.get_declination(sun_eq_position))
+
+        sun_hz_position = Transforms.EquatorialHorizon.toHorizon(sun_eq_position, an_observer, a_datetime)
+        result['sun_altitude']  = str(Transforms.utils.get_altitude(sun_hz_position).degrees)
+        result['sun_altitude_dms']  = str(Transforms.utils.get_altitude(sun_hz_position))
+        result['sun_azimuth']  = str(Transforms.utils.get_azimuth(sun_hz_position).degrees)
+        result['sun_azimuth_dms']  = str(Transforms.utils.get_azimuth(sun_hz_position))
+
+
+        moon_ec_position = Bodies.MoonPosition.EclipticCoords(a_datetime)
+        result['moon_ec_latitude']  = str(Transforms.utils.get_latitude(moon_ec_position).degrees)
+        result['moon_ec_latitude_dms']  = str(Transforms.utils.get_latitude(moon_ec_position))
+        result['moon_ec_longitude']  = str(Transforms.utils.get_longitude(moon_ec_position).degrees)
+        result['moon_ec_longitude_dms']  = str(Transforms.utils.get_longitude(moon_ec_position))
+
+        moon_eq_position = Transforms.EclipticEquatorial.toEquatorial(moon_ec_position, a_datetime)
+        result['moon_eq_ra']  = str(Transforms.utils.get_RA(moon_eq_position).degrees)
+        result['moon_eq_ra_dms']  = str(Transforms.utils.get_RA(moon_eq_position))
+        result['moon_eq_dec']  = str(Transforms.utils.get_declination(moon_eq_position).degrees)
+        result['moon_eq_dec_dms']  = str(Transforms.utils.get_declination(moon_eq_position))
+
+        moon_hz_position = Transforms.EquatorialHorizon.toHorizon(moon_eq_position, an_observer, a_datetime)
+        result['moon_altitude']  = str(Transforms.utils.get_altitude(moon_hz_position).degrees)
+        result['moon_altitude_dms']  = str(Transforms.utils.get_altitude(moon_hz_position))
+        result['moon_azimuth']  = str(Transforms.utils.get_azimuth(moon_hz_position).degrees)
+        result['moon_azimuth_dms']  = str(Transforms.utils.get_azimuth(moon_hz_position))
+
+
+
+        # ----- plot data -----
 
         npts = 24*4
 
@@ -892,38 +865,52 @@ def lunar_daily_altitude():
 
         if is_dst:
             dtime = 1
-            result['sun_marker_time'] += 1
         else:
             dtime = 0
 
-        altitude = list()
+        moon_azal = list()
 
         current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
         current_time.timezone = a_datetime.timezone
         current_time += a_datetime.timezone * 1.0/24 # to center plot at local noon
 
-        for d in range(0, npts + 1):
+        daily_sun_azimuth = list()
+        daily_sun_altitude = list()
 
-            sun_position = Bodies.SunPosition.HorizontalCoords(an_observer, current_time)
-            moon_position = Bodies.MoonPosition.HorizontalCoords(an_observer, current_time)
+        daily_moon_azimuth = list()
+        daily_moon_altitude = list()
 
-            # TODO azimuth vs altitude over time
+        for i in range(0, npts):
 
-            altitude.append([dtime,
-                             Transforms.utils.get_altitude(moon_position).degrees, # TODO needs to be last for sun position marker?
-                             Transforms.utils.get_altitude(sun_position).degrees  # TODO needs to be last for sun position marker?
-                         ]
-            )
+            current_time += 1.0/npts # previous day on 0?
 
+            current_sun_position_hz = Bodies.SunPosition.HorizontalCoords(an_observer, current_time)
+            # break wrap
+            if i > 0 and Transforms.utils.get_azimuth(current_sun_position_hz).degrees < daily_sun_azimuth[-1]:
+                daily_sun_azimuth.append(None)
 
-            dtime += 1.0/npts*24
-
-            current_time += 1.0/npts
-
-
-        result['altitude_data_24h'] = altitude # list
+            daily_sun_azimuth.append(Transforms.utils.get_azimuth(current_sun_position_hz).degrees)
+            daily_sun_altitude.append(Transforms.utils.get_altitude(current_sun_position_hz).degrees)
 
 
+            current_moon_position_hz = Bodies.MoonPosition.HorizontalCoords(an_observer, current_time)
+            # break wrap
+            if i > 0 and Transforms.utils.get_azimuth(current_moon_position_hz).degrees < daily_moon_azimuth[-1]:
+                daily_moon_azimuth.append(None)
+
+            daily_moon_azimuth.append(Transforms.utils.get_azimuth(current_moon_position_hz).degrees)
+            daily_moon_altitude.append(Transforms.utils.get_altitude(current_moon_position_hz).degrees)
+
+
+
+        result['daily_sun_azimuth'] = daily_sun_azimuth
+        result['daily_sun_altitude'] = daily_sun_altitude
+
+        result['daily_moon_azimuth'] = daily_moon_azimuth
+        result['daily_moon_altitude'] = daily_moon_altitude
+
+
+        # ----- rise, transit, set -----
 
         sun_rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
                                            utils.request_angle('longitude', flask.request),
@@ -935,16 +922,13 @@ def lunar_daily_altitude():
                                            is_dst)
 
 
-        result['sun_marker_altitude'] = ''.join((str(sun_rts['altitude']), ' (', str(sun_rts['altitude'].degrees), ')'))
-        result['sun_marker_azimuth']  = ''.join((str(sun_rts['azimuth']), ' (', str(sun_rts['azimuth'].degrees), ')'))
-
         result['sun_rising']   = str(sun_rts['rising'])  # JSON-able
         result['sun_transit']  = str(sun_rts['transit']) # JSON-able
         result['sun_setting']  = str(sun_rts['setting']) # JSON-able
 
 
-        # TODO moon
-        moon_rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
+
+        moon_rts = get_moon_rise_transit_set(utils.request_angle('latitude', flask.request),
                                              utils.request_angle('longitude', flask.request),
                                              utils.request_datetime('date',
                                                                     'time',
@@ -954,29 +938,12 @@ def lunar_daily_altitude():
                                              is_dst)
 
 
-        result['moon_marker_altitude'] = ''.join((str(moon_rts['altitude']), ' (', str(moon_rts['altitude'].degrees), ')'))
-        result['moon_marker_azimuth']  = ''.join((str(moon_rts['azimuth']), ' (', str(moon_rts['azimuth'].degrees), ')'))
-
         result['moon_rising']   = str(moon_rts['rising'])  # JSON-able
         result['moon_transit']  = str(moon_rts['transit']) # JSON-able
         result['moon_setting']  = str(moon_rts['setting']) # JSON-able
 
 
-    except Bodies.SunPosition.Error as err:
-
-        result['sun_marker_altitude'] = str(err)
-        result['sun_marker_azimuth']  = str(err)
-        result['sun_rising']   = str(err)
-        result['sun_transit']  = str(err)
-        result['sun_setting']  = str(err)
-
-        result['moon_marker_altitude'] = str(err)
-        result['moon_marker_azimuth']  = str(err)
-        result['moon_rising']   = str(err)
-        result['moon_transit']  = str(err)
-        result['moon_setting']  = str(err)
-
-    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+    except (Bodies.SunPosition.Error, utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)

@@ -16,3 +16,8 @@ echo '============'
 echo 'Sun Position'
 echo '============'
 python test_SunPosition.py "$@"
+
+echo '============'
+echo 'Moon Position'
+echo '============'
+python test_MoonPosition.py "$@"

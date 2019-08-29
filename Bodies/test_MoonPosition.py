@@ -35,7 +35,7 @@ class MoonPositionsTests(unittest.TestCase):
 
         a_datetime = coords.datetime('1992-04-12T00:00:00')
 
-        ecLon, ecLat, distance = MoonPosition.EclipticCoords(a_datetime)
+        ecLon, ecLat, distance = MoonPosition.LunarLongLatRange(a_datetime)
 
         self.assertAlmostEqual(133.16061721952093, ecLon.degrees, self.places) # Meeus p. 342    133.162655 + TODO nutation
         self.assertAlmostEqual(-3.227006655576363, ecLat.degrees, self.places) # Meeus p. 342     -3.229126
