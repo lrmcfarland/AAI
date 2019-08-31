@@ -881,6 +881,9 @@ def lunar_daily_altitude():
                                                              month=a_datetime.month,
                                                              day=a_datetime.day)
 
+        sun_ec_position = Bodies.SunPosition.EclipticCoords(a_datetime)
+        result['sun_ec_latitude']  = str(Transforms.utils.get_latitude(sun_ec_position))
+        result['sun_ec_longitude']  = str(Transforms.utils.get_longitude(sun_ec_position))
 
 
         npts = 24*4

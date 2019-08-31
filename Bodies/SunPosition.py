@@ -123,7 +123,7 @@ def HorizontalCoords(an_observer, a_datetime):
     Returns (coords.spherical): the position of the sun in horizon coordinates.
     """
 
-    ecliptic_longitude, R = SolarLongitude(a_datetime)
+    ecliptic_longitude, R = SolarLongitudeRange(a_datetime)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
     sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
