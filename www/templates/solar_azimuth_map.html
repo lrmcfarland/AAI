@@ -8,12 +8,9 @@
 
 <style>
 
-.page {
-    width: 60em;
-}
 
 .aaimap {
-    width: 950px;
+    width: 800px;
     height: 600px;
 }
 
@@ -273,6 +270,7 @@ button#get_solar_azimuth_map {
 	    $('input[name="time"]').val(a_timeandzone[0]);
 	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
 
+	    $('input[name="dst"]').removeAttr("checked");
 
 
 	    sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
