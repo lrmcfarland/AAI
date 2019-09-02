@@ -882,18 +882,38 @@ def lunar_daily_altitude():
             current_time += 1.0/npts # previous day on 0?
 
             current_sun_position_hz = Bodies.SunPosition.HorizontalCoords(an_observer, current_time)
+
             # break wrap
-            if i > 0 and Transforms.utils.get_azimuth(current_sun_position_hz).degrees < daily_sun_azimuth[-1]:
-                daily_sun_azimuth.append(None)
+            if i > 0:
+
+                # opposite in southern hemisphere
+                if utils.request_angle('latitude', flask.request).degrees < 0:
+                    if Transforms.utils.get_azimuth(current_sun_position_hz).degrees > daily_sun_azimuth[-1]:
+                        daily_sun_azimuth.append(None)
+
+                else:
+
+                    if Transforms.utils.get_azimuth(current_sun_position_hz).degrees < daily_sun_azimuth[-1]:
+                        daily_sun_azimuth.append(None)
 
             daily_sun_azimuth.append(Transforms.utils.get_azimuth(current_sun_position_hz).degrees)
             daily_sun_altitude.append(Transforms.utils.get_altitude(current_sun_position_hz).degrees)
 
 
             current_moon_position_hz = Bodies.MoonPosition.HorizontalCoords(an_observer, current_time)
+
             # break wrap
-            if i > 0 and Transforms.utils.get_azimuth(current_moon_position_hz).degrees < daily_moon_azimuth[-1]:
-                daily_moon_azimuth.append(None)
+            if i > 0:
+
+                # opposite in southern hemisphere
+                if utils.request_angle('latitude', flask.request).degrees < 0:
+                    if Transforms.utils.get_azimuth(current_moon_position_hz).degrees > daily_moon_azimuth[-1]:
+                        daily_moon_azimuth.append(None)
+
+                else:
+
+                    if Transforms.utils.get_azimuth(current_moon_position_hz).degrees < daily_moon_azimuth[-1]:
+                        daily_moon_azimuth.append(None)
 
             daily_moon_azimuth.append(Transforms.utils.get_azimuth(current_moon_position_hz).degrees)
             daily_moon_altitude.append(Transforms.utils.get_altitude(current_moon_position_hz).degrees)
