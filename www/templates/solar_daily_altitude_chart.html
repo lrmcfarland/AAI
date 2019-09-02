@@ -43,30 +43,9 @@
 	    $('input[name="latitude"]').val(sun_position_data.latitude);
 	    $('input[name="longitude"]').val(sun_position_data.longitude);
 
-
-	    {# TODO meh! use regex #}
-	    var a_datetime = sun_position_data.datetime.split('T');
-	    var a_timeandzone = [a_datetime[1], 0];
-	    var a_sign = '';
-
-	    if (/-/.test(a_datetime[1])) {
-
-		a_timeandzone = a_datetime[1].split('-');
-		a_sign = '-';
-
-	    } else if (/\+/.test(a_datetime[1])) {
-
-		a_timeandzone = a_datetime[1].split('+');
-		a_sign = '+';
-
-	    } else {
-		{# pass #}
-	    }
-
-	    $('input[name="date"]').val(a_datetime[0]);
-
-	    $('input[name="time"]').val(a_timeandzone[0]);
-	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
+	    $('input[name="date"]').val(sun_position_data.current_date)
+	    $('input[name="time"]').val(sun_position_data.current_time);
+	    $('input[name="timezone"]').val(sun_position_data.current_timezone);
 
 	    $('input[name="dst"]').removeAttr("checked");
 
@@ -85,7 +64,7 @@
 			      'Summer Solstice',
 			      'Autumnal Equinox',
 			      'Winter Solstice',
-			      sun_position_data.date_label,
+			      sun_position_data.current_date,
 			      {'type': 'string', 'role': 'style'}]];
 
 	{# ----- special format for sun marker ----- #}

@@ -87,8 +87,7 @@ button#get_solar_azimuth_map {
 
 <button id="get_solar_azimuth_map">get solar azimuth map</button>
 
-<h2>Solar Azimuth Map</h2>
-
+<br>
 
 <table align="center">
 
@@ -113,7 +112,7 @@ button#get_solar_azimuth_map {
 	<tr>
 	  <th></th>
 	  <th>degrees from North</th>
-	  <th>ISO8601</th>
+	  <th>local time</th>
 	</tr>
 
 
@@ -230,7 +229,7 @@ button#get_solar_azimuth_map {
 
 
 	    $("#current_azimuth").text(sun_position.current_azimuth_str);
-	    $("#current_time").text(sun_position.current_time_str);
+	    $("#current_time").text(sun_position.current_time);
 
 	    $("#rising_azimuth").text(sun_position.rising_azimuth_str);
 	    $("#rising_time").text(sun_position.rising_time_str);
@@ -246,29 +245,9 @@ button#get_solar_azimuth_map {
 	    $('input[name="longitude"]').val(sun_position.longitude);
 
 
-	    {# TODO meh! use regex #}
-	    var a_datetime = sun_position.datetime.split('T');
-	    var a_timeandzone = [a_datetime[1], 0];
-	    var a_sign = '';
-
-	    if (/-/.test(a_datetime[1])) {
-
-		a_timeandzone = a_datetime[1].split('-');
-		a_sign = '-';
-
-	    } else if (/\+/.test(a_datetime[1])) {
-
-		a_timeandzone = a_datetime[1].split('+');
-		a_sign = '+';
-
-	    } else {
-		{# pass #}
-	    }
-
-	    $('input[name="date"]').val(a_datetime[0]);
-
-	    $('input[name="time"]').val(a_timeandzone[0]);
-	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
+	    $('input[name="date"]').val(sun_position.current_date)
+	    $('input[name="time"]').val(sun_postion.current_time);
+	    $('input[name="timezone"]').val(sun_position.current_timezone);
 
 	    $('input[name="dst"]').removeAttr("checked");
 

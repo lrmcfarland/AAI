@@ -362,6 +362,10 @@ def solar_daily_altitude():
 
         result['datetime'] = str(a_datetime)
 
+        result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
+        result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
+        result['current_timezone'] = '{}'.format(a_datetime.timezone)
+
         result['sun_marker_time'] = a_datetime.hour + a_datetime.minute/60.0 # distance on x-axis to plot sun marker
 
         vernal_equinox = coords.datetime(a_datetime.year, 3, 20)
@@ -513,9 +517,9 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
                                   setting.timezone)
 
 
-    result['rising'] = '{:02}:{:02}:{:02}'.format(rising.hour, rising.minute, round(rising.second, 2))
-    result['transit'] = '{:02}:{:02}:{:02}'.format(transit.hour, transit.minute, round(transit.second, 2))
-    result['setting'] = '{:02}:{:02}:{:02}'.format(setting.hour, setting.minute, round(setting.second, 2))
+    result['rising'] = '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second)
+    result['transit'] = '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)
+    result['setting'] = '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second)
 
 
     sun_azalt = get_sun_azalt(an_observer, a_datetime)
@@ -575,7 +579,9 @@ def sun_rise_set_azimuths():
 
         a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
 
-        result['datetime'] = str(a_datetime)
+        result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
+        result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
+        result['current_timezone'] = '{}'.format(a_datetime.timezone)
 
         is_dst = True if flask.request.args.get('dst') == 'true' else False
 
@@ -590,20 +596,42 @@ def sun_rise_set_azimuths():
                                        is_dst)
 
 
-        current_azalt = get_sun_azalt(an_observer, a_datetime)
-        rising_azalt = get_sun_azalt(an_observer, rts['rising'])
-        transit_azalt = get_sun_azalt(an_observer, rts['transit'])
-        setting_azalt = get_sun_azalt(an_observer, rts['setting'])
 
-        result['current_azimuth'] = current_azalt['azimuth'].degrees
+
+        result['current_altitude_str'] = '{}'.format(str(rts['altitude']))
+        result['current_azimuth_str']  = '{}'.format(str(rts['azimuth']))
+
+        result['rising']   = rts['rising']
+        result['transit']  = rts['transit']
+        result['setting']  = rts['setting']
+
+
+        # TODO does not support fractional time zones like India yet
+        if a_datetime.timezone < 0:
+            timezone = '{:03}'.format(int(a_datetime.timezone))
+        else:
+            timezone = '+{:02}'.format(int(a_datetime.timezone))
+
+
+        a_rising_datetime = coords.datetime('{}-{:02}-{:02}T{}{}'.format(a_datetime.year, a_datetime.month, a_datetime.day,
+                                                                         result['rising'], timezone))
+
+        a_transit_datetime = coords.datetime('{}-{:02}-{:02}T{}{}'.format(a_datetime.year, a_datetime.month, a_datetime.day,
+                                                                          result['transit'], timezone))
+
+        a_setting_datetime = coords.datetime('{}-{:02}-{:02}T{}{}'.format(a_datetime.year, a_datetime.month, a_datetime.day,
+                                                                          result['setting'], timezone))
+
+
+        rising_azalt = get_sun_azalt(an_observer, a_rising_datetime)
+        transit_azalt = get_sun_azalt(an_observer, a_transit_datetime)
+        setting_azalt = get_sun_azalt(an_observer, a_setting_datetime)
+
         result['rising_azimuth'] = rising_azalt['azimuth'].degrees
         result['transit_azimuth'] = transit_azalt['azimuth'].degrees
         result['setting_azimuth'] = setting_azalt['azimuth'].degrees
 
         # string version for JSON
-
-        result['current_azimuth_str'] = str(current_azalt['azimuth'])
-        result['current_time_str'] = str(a_datetime)
 
         result['rising_azimuth_str'] = str(rising_azalt['azimuth'])
         result['rising_time_str'] = str(rts['rising'])
@@ -755,9 +783,9 @@ def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
                                   setting.timezone)
 
 
-    result['rising'] = '{:02}:{:02}:{:02}'.format(rising.hour, rising.minute, round(rising.second, 2))
-    result['transit'] = '{:02}:{:02}:{:02}'.format(transit.hour, transit.minute, round(transit.second, 2))
-    result['setting'] = '{:02}:{:02}:{:02}'.format(setting.hour, setting.minute, round(setting.second, 2))
+    result['rising'] = '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second)
+    result['transit'] = '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)
+    result['setting'] = '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second)
 
     return result
 
@@ -807,9 +835,10 @@ def lunar_daily_altitude():
 
         result['datetime'] = str(a_datetime)
 
-        result['date_label'] = '{year}-{month}-{day}'.format(year=a_datetime.year,
-                                                             month=a_datetime.month,
-                                                             day=a_datetime.day)
+        result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
+        result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
+        result['current_timezone'] = '{}'.format(a_datetime.timezone)
+
 
         sun_ec_position = Bodies.SunPosition.EclipticCoords(a_datetime)
         result['sun_ec_latitude']  = str(Transforms.utils.get_latitude(sun_ec_position))
