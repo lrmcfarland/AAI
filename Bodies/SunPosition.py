@@ -253,6 +253,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     TODO error check for timezone and observer location?
 
+
+
     Args:
 
     an_object: the vector to transform in theta (90 - declination),
@@ -327,28 +329,6 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
         transit_loc += a_datetime.timezone/24
 
-        # can be two days off! and infinite failure for 2018-02-28 +=1
-        # TODO bug in last day in feb += 1?
-
-
-        if transit_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
-            transit_loc -= 2 # test case TODO
-
-        elif transit_loc.toJulianDate() - a_datetime.toJulianDate() > 0.5:
-            transit_loc -= 1 # test case 2018-04-18T17:00:00+08
-
-        elif transit_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
-            transit_loc += 2 # test case TODO
-
-        elif transit_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
-            transit_loc += 1 # test case 2018-04-18T07:00:00-08
-
-        elif math.fabs(transit_loc.toJulianDate() - a_datetime.toJulianDate()) < 0.5:
-            pass
-
-        else:
-            raise Error('transit: unsupported timezone mod case {}'.format(a_datetime))
-
     # ------------------
     # ----- rising -----
     # ------------------
@@ -369,30 +349,6 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
                                      a_datetime.timezone)
 
         rising_loc += a_datetime.timezone/24
-
-        # TODO de-hack this
-        
-        if rising_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
-            rising_loc -= 2 # test case 2018-04-18T17:00:00+08
-
-        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() > 0.5:
-            rising_loc -= 1 # test case 2015-05-22T12:00:00+06, 2018-10-18T15:00:00+08,
-
-        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
-            rising_loc += 2 # test case TODO
-
-        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -1.0:
-            rising_loc += 1 # test case 2018-04-18T07:00:00-08
-
-        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
-            pass
-
-        elif rising_loc.toJulianDate() - a_datetime.toJulianDate() < 0.5:
-            pass
-
-        else:
-            raise Error('rising: unsupported timezone mod case {}'.format(a_datetime))
-
 
 
     # -------------------
@@ -416,32 +372,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
         setting_loc += a_datetime.timezone/24
 
-        # TODO de-hack this
 
-        if setting_loc.toJulianDate() - a_datetime.toJulianDate() > 1.5:
-            setting_loc -= 2 # test case TODO
-
-        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() > 0.5:
-            setting_loc -= 1 # test case 2018-04-18T17:00:00+08
-
-        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -1.5:
-            setting_loc += 2 # test case 2018-04-18T07:00:00-08
-
-        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -1.25: # TODO meh?!?
-            setting_loc += 2 # test case
-
-        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < -0.5:
-            setting_loc += 1 # test case 2018-01-31T12:55:00-08,
-                             # 2018-02-01T12:55:00-08,
-                             # 2018-04-18T09:00:00-08,
-                             # 2015-05-22T12:00:00-06,
-                             # 2018-03-01T10:00:00-08
-
-        elif setting_loc.toJulianDate() - a_datetime.toJulianDate() < 0.5:
-            pass
-
-        else:
-            raise Error('setting: unsupported timezone mod case {}'.format(a_datetime))
+    # TODO the dates on this algorithm can be off +/- 1
 
     return rising_loc, transit_loc, setting_loc
 

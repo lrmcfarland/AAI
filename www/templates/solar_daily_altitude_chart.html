@@ -68,6 +68,8 @@
 	    $('input[name="time"]').val(a_timeandzone[0]);
 	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
 
+	    $('input[name="dst"]').removeAttr("checked");
+
 
 	    drawSunChart(sun_position_data);
 	};
@@ -160,7 +162,7 @@
 
 	var view_data = {};
 
-	var current_color = "blue";
+	var current_color = "gold";
 	var vernal_color = "green";
 	var summer_color = "red";
 	var autumnal_color = "orange";
@@ -519,32 +521,32 @@ button#get_solar_daily_altitude {
 	<tr>
 	  <th>Azimuth</th>
 	  <td id="azimuth">TBD</td>
-	  <td>deg:min:sec (deg)</td>
+	  <td>deg:min:sec</td>
 	</tr>
 
 	<tr>
 	  <th>Altitude</th>
 	  <td id="altitude">TBD</td>
-	  <td>deg:min:sec (deg)</td>
+	  <td>deg:min:sec</td>
 	</tr>
 
 	<tr>
 	  <th>Rising</th>
 	  <td id="rising">TBD</td>
-	  <td>ISO8601</td>
+	  <td>local time</td>
 	</tr>
 
 
 	<tr>
 	  <th>Transit</th>
 	  <td id="transit">TBD</td>
-	  <td>ISO8601</td>
+	  <td>local time</td>
 	</tr>
 
 	<tr>
 	  <th>Setting</th>
 	  <td id="setting">TBD</td>
-	  <td>ISO8601</td>
+	  <td>local time</td>
 	</tr>
 
       </table>

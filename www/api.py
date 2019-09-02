@@ -437,12 +437,12 @@ def solar_daily_altitude():
                                        is_dst)
 
 
-        result['sun_marker_altitude'] = ''.join((str(rts['altitude']), ' (', str(rts['altitude'].degrees), ')'))
-        result['sun_marker_azimuth']  = ''.join((str(rts['azimuth']), ' (', str(rts['azimuth'].degrees), ')'))
+        result['sun_marker_altitude'] = '{}'.format(str(rts['altitude']))
+        result['sun_marker_azimuth']  = '{}'.format(str(rts['azimuth']))
 
-        result['rising']   = str(rts['rising'])  # JSON-able
-        result['transit']  = str(rts['transit']) # JSON-able
-        result['setting']  = str(rts['setting']) # JSON-able
+        result['rising']   = rts['rising']
+        result['transit']  = rts['transit']
+        result['setting']  = rts['setting']
 
 
     except Bodies.SunPosition.Error as err:
@@ -485,6 +485,7 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 
     rising, transit, setting = Bodies.SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
+    # TODO this hack messes with leap day
     if is_dst:
 
         rising = coords.datetime(rising.year,
@@ -512,15 +513,16 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
                                   setting.timezone)
 
 
-    result['rising'] = rising
-    result['transit'] = transit
-    result['setting'] = setting
+    result['rising'] = '{:02}:{:02}:{:02}'.format(rising.hour, rising.minute, round(rising.second, 2))
+    result['transit'] = '{:02}:{:02}:{:02}'.format(transit.hour, transit.minute, round(transit.second, 2))
+    result['setting'] = '{:02}:{:02}:{:02}'.format(setting.hour, setting.minute, round(setting.second, 2))
 
 
     sun_azalt = get_sun_azalt(an_observer, a_datetime)
 
-    result['azimuth'] = sun_azalt['azimuth']
-    result['altitude'] = sun_azalt['altitude']
+    result['azimuth'] = '{}'.format(sun_azalt['azimuth'])
+    result['altitude'] = '{}'.format(sun_azalt['altitude'])
+
 
     return result
 
@@ -725,6 +727,7 @@ def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 
     rising, transit, setting = Bodies.SunPosition.RiseAndSet(moon_eq, an_observer, a_datetime)
 
+    # TODO this hack messes with leap day
     if is_dst:
 
         rising = coords.datetime(rising.year,
@@ -752,15 +755,9 @@ def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
                                   setting.timezone)
 
 
-    result['rising'] = rising
-    result['transit'] = transit
-    result['setting'] = setting
-
-
-    sun_azalt = get_sun_azalt(an_observer, a_datetime)
-
-    result['azimuth'] = sun_azalt['azimuth']
-    result['altitude'] = sun_azalt['altitude']
+    result['rising'] = '{:02}:{:02}:{:02}'.format(rising.hour, rising.minute, round(rising.second, 2))
+    result['transit'] = '{:02}:{:02}:{:02}'.format(transit.hour, transit.minute, round(transit.second, 2))
+    result['setting'] = '{:02}:{:02}:{:02}'.format(setting.hour, setting.minute, round(setting.second, 2))
 
     return result
 
@@ -921,11 +918,9 @@ def lunar_daily_altitude():
                                                                   flask.request),
                                            is_dst)
 
-
-        result['sun_rising']   = str(sun_rts['rising'])  # JSON-able
-        result['sun_transit']  = str(sun_rts['transit']) # JSON-able
-        result['sun_setting']  = str(sun_rts['setting']) # JSON-able
-
+        result['sun_rising']   = sun_rts['rising']
+        result['sun_transit']  = sun_rts['transit']
+        result['sun_setting']  = sun_rts['setting']
 
 
         moon_rts = get_moon_rise_transit_set(utils.request_angle('latitude', flask.request),
@@ -937,10 +932,9 @@ def lunar_daily_altitude():
                                                                     flask.request),
                                              is_dst)
 
-
-        result['moon_rising']   = str(moon_rts['rising'])  # JSON-able
-        result['moon_transit']  = str(moon_rts['transit']) # JSON-able
-        result['moon_setting']  = str(moon_rts['setting']) # JSON-able
+        result['moon_rising']   = moon_rts['rising']
+        result['moon_transit']  = moon_rts['transit']
+        result['moon_setting']  = moon_rts['setting']
 
 
     except (Bodies.SunPosition.Error, utils.Error, TypeError, ValueError, RuntimeError) as err:
