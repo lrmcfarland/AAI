@@ -841,14 +841,12 @@ def lunar_daily_altitude():
 
 
         sun_ec_position = Bodies.SunPosition.EclipticCoords(a_datetime)
-        result['sun_ec_latitude']  = str(Transforms.utils.get_latitude(sun_ec_position))
-        result['sun_ec_longitude']  = str(Transforms.utils.get_longitude(sun_ec_position))
-
-        sun_ec_position = Bodies.SunPosition.EclipticCoords(a_datetime)
         result['sun_ec_latitude']  = str(Transforms.utils.get_latitude(sun_ec_position).degrees)
         result['sun_ec_latitude_dms']  = str(Transforms.utils.get_latitude(sun_ec_position))
         result['sun_ec_longitude']  = str(Transforms.utils.get_longitude(sun_ec_position).degrees)
         result['sun_ec_longitude_dms']  = str(Transforms.utils.get_longitude(sun_ec_position))
+
+        result['sun_range'] = '{:6.4f}'.format((sun_ec_position.r / 6.6845871226706E-12)/ 299792458.0) # AU/(AU/m)/m/light-second
 
         sun_eq_position = Transforms.EclipticEquatorial.toEquatorial(sun_ec_position, a_datetime)
         result['sun_eq_ra']  = str(Transforms.utils.get_RA(sun_eq_position).degrees)
@@ -868,6 +866,8 @@ def lunar_daily_altitude():
         result['moon_ec_latitude_dms']  = str(Transforms.utils.get_latitude(moon_ec_position))
         result['moon_ec_longitude']  = str(Transforms.utils.get_longitude(moon_ec_position).degrees)
         result['moon_ec_longitude_dms']  = str(Transforms.utils.get_longitude(moon_ec_position))
+
+        result['moon_range'] = '{:6.4f}'.format(moon_ec_position.r / 299792.458) # km / (km/light-second)
 
         moon_eq_position = Transforms.EclipticEquatorial.toEquatorial(moon_ec_position, a_datetime)
         result['moon_eq_ra']  = str(Transforms.utils.get_RA(moon_eq_position).degrees)

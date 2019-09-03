@@ -23,11 +23,20 @@
 	if (moon_position_data.errors.length > 0) {
 
 	    $("#datetime").text("TBD");
+
+	    $("#sun_ec_longitude").text("TBD");
+	    $("#sun_ec_latitude").text("TBD");
+
+	    $("#sun_eq_ra").text("TBD");
+	    $("#sun_eq_dec").text("TBD");
+
+	    $("#sun_azimuth").text("TBD");
+	    $("#sun_altitude").text("TBD");
+
 	    $("#sun_rising").text("TBD");
 	    $("#sun_transit").text("TBD");
 	    $("#sun_setting").text("TBD");
-	    $("#sun_azimuth").text("TBD");
-	    $("#sun_altitude").text("TBD");
+	    $("#sun_range").text("TBD");
 
 	    $("#moon_ec_longitude").text("TBD");
 	    $("#moon_ec_latitude").text("TBD");
@@ -41,8 +50,8 @@
 	    $("#moon_rising").text("TBD");
 	    $("#moon_transit").text("TBD");
 	    $("#moon_setting").text("TBD");
-	    $("#moon_azimuth").text("TBD");
-	    $("#moon_altitude").text("TBD");
+	    $("#moon_range").text("TBD");
+
 
 	    alert("Errors: " + moon_position_data.errors.join(", "));
 
@@ -59,13 +68,10 @@
 	    $("#sun_altitude").text(moon_position_data.sun_altitude_dms);
 	    $("#sun_azimuth").text(moon_position_data.sun_azimuth_dms);
 
-
 	    $("#sun_rising").text(moon_position_data.sun_rising);
 	    $("#sun_transit").text(moon_position_data.sun_transit);
 	    $("#sun_setting").text(moon_position_data.sun_setting);
-	    $("#sun_azimuth").text(moon_position_data.sun_marker_azimuth);
-	    $("#sun_altitude").text(moon_position_data.sun_marker_altitude);
-
+	    $("#sun_range").text(moon_position_data.sun_range);
 
 
 	    $("#moon_ec_latitude").text(moon_position_data.moon_ec_latitude_dms);
@@ -80,8 +86,7 @@
 	    $("#moon_rising").text(moon_position_data.moon_rising);
 	    $("#moon_transit").text(moon_position_data.moon_transit);
 	    $("#moon_setting").text(moon_position_data.moon_setting);
-	    $("#moon_azimuth").text(moon_position_data.moon_marker_azimuth);
-	    $("#moon_altitude").text(moon_position_data.moon_marker_altitude);
+	    $("#moon_range").text(moon_position_data.moon_range);
 
 
 	    {# observer #}
@@ -153,10 +158,10 @@
 
 
 
-	var data = [daily_sun_path, current_sun_position, daily_moon_path, current_moon_position];
+	var data = [current_sun_position, daily_sun_path, current_moon_position, daily_moon_path];
 
 	var layout = {
-	    title:'Altitude vs Azimuth over one day',
+	    title:'Altitude vs Azimuth ' + moon_position_data.datetime,
 	    xaxis: {
 		title: {
 		    text: 'Azimuth in degrees from true north'
@@ -255,7 +260,7 @@ button#get_lunar_daily_altitude {
 
 
 
-<h1>Daily Lunar Altitude</h1>
+<h1>Daily Sun and Moon Altitude</h1>
 
 <br>
 
@@ -292,19 +297,23 @@ button#get_lunar_daily_altitude {
       <table id="results_table" align="center">
 
 	<tr>
-	  <th>Current Time</th>
-	  <td id="datetime">TBD</td>
-	  <td></td>
-	  <td>ISO8601</td>
-	</tr>
-
-	<tr>
 	  <td></td>
 	  <th>Sun</th>
 	  <th>Moon</th>
 	  <td></td>
 	</tr>
 
+
+	<tr>
+	  <th>Range</th>
+
+	  <td id="sun_range">TBD</td>
+	  <td id="moon_range">TBD</td>
+
+	  <td>light-seconds</td>
+	</tr>
+
+	<tr><td></td></tr>
 
 	<tr>
 	  <th>Ecliptic Longitude</th>
@@ -324,6 +333,7 @@ button#get_lunar_daily_altitude {
 	  <td>deg:min:sec</td>
 	</tr>
 
+	<tr><td></td></tr>
 
 	<tr>
 	  <th>Right Ascension</th>
@@ -345,6 +355,8 @@ button#get_lunar_daily_altitude {
 
 	</tr>
 
+	<tr><td></td></tr>
+
 	<tr>
 	  <th>Azimuth</th>
 
@@ -362,6 +374,8 @@ button#get_lunar_daily_altitude {
 
 	  <td>deg:min:sec</td>
 	</tr>
+
+	<tr><td></td></tr>
 
 	<tr>
 	  <th>Rising</th>
