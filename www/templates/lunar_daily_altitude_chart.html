@@ -214,6 +214,38 @@
 	}); {# end get_lunar_daily_altitude click #}
 
 
+	$("#get_next_hour").click(function(e) {
+
+
+	    {# TODO calculate next hour #}
+
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude",
+		      {
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val(),
+			  dst: $("#_dst").is(':checked') {# jQuery selector #}
+
+		      },
+		      function(moon_position) {
+
+			  updateMoonChart(moon_position);
+
+		      }); {# end getJSON #}
+
+	    return false;
+
+	}); {# end get_next_hour click #}
+
+
+
+
+
+
+
 
 
     }); {# end ready method #}
@@ -278,9 +310,38 @@ button#get_lunar_daily_altitude {
 
 <br>
 
-<button id="get_lunar_daily_altitude">get lunar altitude data</button>
 
 <table>
+
+  <tr>
+    <td colspan="2">
+
+      <table id="time_table" align="center">
+
+	<td>
+
+	  <button id="get_prev_hour">Previous Hour</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_lunar_daily_altitude">get lunar altitude data</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_next_hour">Next Hour</button>
+
+	</td>
+
+      </table>
+
+    </td>
+
+  </tr>
+
 
   <tr>
 
