@@ -9,7 +9,7 @@
 
     daily_solar_altitude
 
-    curl http://0.0.0.0:8080/api/v1/daily_solar_altitude\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8\&dst=false
+    curl http://0.0.0.0:8080/api/v1/daily_solar_altitude\?latitude=37\&longitude=-122\&date=2017-12-11\&time=14\%3A37\%3A54\&timezone=-8
 
 
 
@@ -109,12 +109,11 @@ def standardize():
 
     if 'time' in flask.request.args and \
        'date' in flask.request.args and \
-       'timezone' in flask.request.args and \
-       'dst' in flask.request.args:
+       'timezone' in flask.request.args:
 
         try:
 
-            std_datetime = utils.request_datetime('date', 'time', 'timezone', 'dst', flask.request)
+            std_datetime = utils.request_datetime('date', 'time', 'timezone', flask.request)
             result['params']['iso8601'] = str(std_datetime)
 
         except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
@@ -166,7 +165,7 @@ def standardize():
                 std_val = utils.request_angle(key, flask.request)
                 result['params'][key] = str(std_val.getDegrees())
 
-            elif key in ('azalt', 'date', 'dst', 'notes', 'observer', 'target', 'time', 'timezone'):
+            elif key in ('azalt', 'date', 'notes', 'observer', 'target', 'time', 'timezone'):
                 pass
 
             else:
@@ -192,7 +191,7 @@ def azalt2radec():
 
         result['observer'] = str(an_observer)
 
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -223,9 +222,7 @@ def radec2azalt():
 
         result['observer'] = str(an_observer)
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -256,9 +253,7 @@ def solar_ecliptic_coords():
     result = {'errors': list()}
 
     try:
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
         result['datetime'] = str(a_datetime)
 
         sun_ec = Bodies.SunPosition.EclipticCoords(a_datetime)
@@ -280,9 +275,7 @@ def solar_equatorial_coords(an_observer, a_datetime):
     result = {'errors': list()}
 
     try:
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
         result['datetime'] = str(a_datetime)
 
         sun_eq = Bodies.SunPosition.EquatorialCoords(a_datetime)
@@ -311,8 +304,7 @@ def solar_horizontal_coords(an_observer, a_datetime):
                                                         utils.request_angle('longitude', flask.request))
         result['observer'] = str(an_observer)
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
         result['datetime'] = str(a_datetime)
 
         sun_eq = Bodies.SunPosition.HorizontalCoords(an_observer, a_datetime)
@@ -358,7 +350,7 @@ def solar_daily_altitude():
         result['latitude'] = utils.request_angle('latitude', flask.request).degrees
         result['longitude'] = utils.request_angle('longitude', flask.request).degrees
 
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -387,15 +379,11 @@ def solar_daily_altitude():
         result['date_label'] = '{year}-{month}-{day}'.format(year=a_datetime.year,
                                                              month=a_datetime.month,
                                                              day=a_datetime.day),
+
+        # ----- plot path -----
+
         npts = 24*4
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        if is_dst:
-            dtime = 1
-            result['sun_marker_time'] += 1
-        else:
-            dtime = 0
+        dtime = 0
 
         altitude = list()
 
@@ -436,10 +424,7 @@ def solar_daily_altitude():
                                        utils.request_datetime('date',
                                                               'time',
                                                               'timezone',
-                                                              'dst',
-                                                              flask.request),
-                                       is_dst)
-
+                                                              flask.request))
 
         result['sun_marker_altitude'] = '{}'.format(str(rts['altitude']))
         result['sun_marker_azimuth']  = '{}'.format(str(rts['azimuth']))
@@ -463,14 +448,13 @@ def solar_daily_altitude():
     return flask.jsonify(**result)
 
 
-def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
+def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime):
     """Calculate the sun position at rise, transit and set.
 
     Args:
         a_latitude (coords.angle): observer's latitude
         a_longitude (coords.angle): observer's longitude
         a_datetime (coords.datetime): observer's time
-        a_dst (bool): daylight saving time
 
 
     return results dictionary
@@ -480,7 +464,6 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     result['latitude'] = a_latitude
     result['longitude'] = a_longitude
     result['datetime'] = a_datetime
-    result['dst'] = is_dst
 
     result['eot'] = Bodies.SunPosition.EquationOfTime(a_datetime)
     result['obliquity'] = Transforms.EclipticEquatorial.obliquity(a_datetime)
@@ -489,38 +472,9 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
 
     rising, transit, setting = Bodies.SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-    # TODO this hack messes with leap day
-    if is_dst:
-
-        rising = coords.datetime(rising.year,
-                                 rising.month,
-                                 rising.day,
-                                 rising.hour + 1,
-                                 rising.minute,
-                                 rising.second,
-                                 rising.timezone)
-
-        transit = coords.datetime(transit.year,
-                                  transit.month,
-                                  transit.day,
-                                  transit.hour + 1,
-                                  transit.minute,
-                                  transit.second,
-                                  transit.timezone)
-
-        setting = coords.datetime(setting.year,
-                                  setting.month,
-                                  setting.day,
-                                  setting.hour + 1,
-                                  setting.minute,
-                                  setting.second,
-                                  setting.timezone)
-
-
     result['rising'] = '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second)
     result['transit'] = '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)
     result['setting'] = '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second)
-
 
     sun_azalt = get_sun_azalt(an_observer, a_datetime)
 
@@ -577,25 +531,18 @@ def sun_rise_set_azimuths():
         result['latitude'] = utils.request_angle('latitude', flask.request).degrees
         result['longitude'] = utils.request_angle('longitude', flask.request).degrees
 
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
 
         result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
         result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
         result['current_timezone'] = '{}'.format(a_datetime.timezone)
-
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
 
         rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
                                        utils.request_angle('longitude', flask.request),
                                        utils.request_datetime('date',
                                                               'time',
                                                               'timezone',
-                                                              'dst',
-                                                              flask.request),
-                                       is_dst)
-
-
+                                                              flask.request))
 
 
         result['current_altitude_str'] = '{}'.format(str(rts['altitude']))
@@ -661,8 +608,7 @@ def lunar_ecliptic_coords():
 
     try:
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
         result['datetime'] = str(a_datetime)
 
         moon_ec = Bodies.MoonPosition.EclipticCoords(a_datetime)
@@ -684,8 +630,7 @@ def lunar_equatorial_coords(an_observer, a_datetime):
 
     try:
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
         result['datetime'] = str(a_datetime)
 
         moon_eq = Bodies.MoonPosition.EquatorialCoords(a_datetime)
@@ -714,8 +659,7 @@ def lunar_horizontal_coords(an_observer, a_datetime):
                                                         utils.request_angle('longitude', flask.request))
         result['observer'] = str(an_observer)
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
         result['datetime'] = str(a_datetime)
 
         moon_eq = Bodies.MoonPosition.HorizontalCoords(an_observer, a_datetime)
@@ -730,15 +674,13 @@ def lunar_horizontal_coords(an_observer, a_datetime):
     return flask.jsonify(**result)
 
 
-def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
+def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime):
     """Calculate the moon position at local rise, transit set
 
     Args:
         a_latitude (coords.angle): observer's latitude
         a_longitude (coords.angle): observer's longitude
         a_datetime (coords.datetime): observer's time
-        a_dst (bool): daylight saving time
-
 
     return results dictionary
     """
@@ -747,41 +689,12 @@ def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime, is_dst):
     result['latitude'] = a_latitude
     result['longitude'] = a_longitude
     result['datetime'] = a_datetime
-    result['dst'] = is_dst
 
     an_observer = Transforms.utils.latlon2spherical(a_latitude, a_longitude)
 
     moon_eq = Bodies.MoonPosition.EquatorialCoords(a_datetime)
 
     rising, transit, setting = Bodies.SunPosition.RiseAndSet(moon_eq, an_observer, a_datetime)
-
-    # TODO this hack messes with leap day
-    if is_dst:
-
-        rising = coords.datetime(rising.year,
-                                 rising.month,
-                                 rising.day,
-                                 rising.hour + 1,
-                                 rising.minute,
-                                 rising.second,
-                                 rising.timezone)
-
-        transit = coords.datetime(transit.year,
-                                  transit.month,
-                                  transit.day,
-                                  transit.hour + 1,
-                                  transit.minute,
-                                  transit.second,
-                                  transit.timezone)
-
-        setting = coords.datetime(setting.year,
-                                  setting.month,
-                                  setting.day,
-                                  setting.hour + 1,
-                                  setting.minute,
-                                  setting.second,
-                                  setting.timezone)
-
 
     result['rising'] = '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second)
     result['transit'] = '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)
@@ -831,7 +744,7 @@ def lunar_daily_altitude():
         result['latitude'] = utils.request_angle('latitude', flask.request).degrees
         result['longitude'] = utils.request_angle('longitude', flask.request).degrees
 
-        a_datetime = utils.request_datetime('date','time', 'timezone','dst', flask.request)
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -887,12 +800,7 @@ def lunar_daily_altitude():
 
         npts = 24*4
 
-        is_dst = True if flask.request.args.get('dst') == 'true' else False
-
-        if is_dst:
-            dtime = 1
-        else:
-            dtime = 0
+        dtime = 0
 
         moon_azal = list()
 
@@ -963,9 +871,7 @@ def lunar_daily_altitude():
                                            utils.request_datetime('date',
                                                                   'time',
                                                                   'timezone',
-                                                                  'dst',
-                                                                  flask.request),
-                                           is_dst)
+                                                                  flask.request))
 
         result['sun_rising']   = sun_rts['rising']
         result['sun_transit']  = sun_rts['transit']
@@ -977,9 +883,7 @@ def lunar_daily_altitude():
                                              utils.request_datetime('date',
                                                                     'time',
                                                                     'timezone',
-                                                                    'dst',
-                                                                    flask.request),
-                                             is_dst)
+                                                                    flask.request))
 
         result['moon_rising']   = moon_rts['rising']
         result['moon_transit']  = moon_rts['transit']

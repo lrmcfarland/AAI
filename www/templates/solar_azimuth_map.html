@@ -112,7 +112,7 @@ button#get_solar_azimuth_map {
 	<tr>
 	  <th></th>
 	  <th>degrees from North</th>
-	  <th>local time</th>
+	  <th id="st_or_dst">ST</th>
 	</tr>
 
 
@@ -183,14 +183,14 @@ button#get_solar_azimuth_map {
     }; {# end initSolarMap() #}
 
 
-    function drawSolarMarker(azimuth_marker, sun_position, lat_off, lon_off, marker_rotation, marker_color) {
+    function drawSolarMarker(azimuth_marker, sun_position_data, lat_off, lon_off, marker_rotation, marker_color) {
 
 	if (azimuth_marker != null) {
 	    azimuth_marker.setMap(null);
 	}
 
 	azimuth_marker = new google.maps.Marker({
-	    position: {lat: sun_position.latitude + lat_off, lng: sun_position.longitude + lon_off},
+	    position: {lat: sun_position_data.latitude + lat_off, lng: sun_position_data.longitude + lon_off},
 	    icon: {
 		path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
 		scale: 10,
@@ -207,9 +207,9 @@ button#get_solar_azimuth_map {
     }; {# end drawSolarMarker() #}
 
 
-    function drawSolarMap(sun_position) {
+    function drawSolarMap(sun_position_data) {
 
-	if (sun_position.errors.length > 0) {
+	if (sun_position_data.errors.length > 0) {
 
 	    $("#current_azimuth").text("TBD");
 	    $("#current_time").text("TBD");
@@ -223,40 +223,52 @@ button#get_solar_azimuth_map {
 	    $("#setting_azimuth").text("TBD");
 	    $("#setting_time").text("TBD");
 
-	    alert("Errors: " + sun_position.errors.join(", "));
+	    alert("Errors: " + sun_position_data.errors.join(", "));
 
 	} else {
 
-
-	    $("#current_azimuth").text(sun_position.current_azimuth_str);
-	    $("#current_time").text(sun_position.current_time);
-
-	    $("#rising_azimuth").text(sun_position.rising_azimuth_str);
-	    $("#rising_time").text(sun_position.rising_time_str);
-
-	    $("#transit_azimuth").text(sun_position.transit_azimuth_str);
-	    $("#transit_time").text(sun_position.transit_time_str);
-
-	    $("#setting_azimuth").text(sun_position.setting_azimuth_str);
-	    $("#setting_time").text(sun_position.setting_time_str);
+	    $("#current_azimuth").text(sun_position_data.current_azimuth_str);
 
 
-	    $('input[name="latitude"]').val(sun_position.latitude);
-	    $('input[name="longitude"]').val(sun_position.longitude);
+	    $("#rising_azimuth").text(sun_position_data.rising_azimuth_str);
+	    $("#transit_azimuth").text(sun_position_data.transit_azimuth_str);
+	    $("#setting_azimuth").text(sun_position_data.setting_azimuth_str);
 
 
-	    $('input[name="date"]').val(sun_position.current_date)
-	    $('input[name="time"]').val(sun_postion.current_time);
-	    $('input[name="timezone"]').val(sun_position.current_timezone);
+	    var today = $('input[name="date"]').val();
+	    var current_datetime = new Date(today + ' ' + $('input[name="time"]').val());
+	    var rising_datetime = new Date(today + ' ' + sun_position_data.rising);
+	    var transit_datetime = new Date(today + ' ' + sun_position_data.transit);
+	    var setting_datetime = new Date(today + ' ' + sun_position_data.setting);
 
-	    $('input[name="dst"]').removeAttr("checked");
+	    if ($("#_dst").is(':checked')) {
+		rising_datetime.setHours(rising_datetime.getHours() + 1);
+		transit_datetime.setHours(transit_datetime.getHours() + 1);
+		setting_datetime.setHours(setting_datetime.getHours() + 1);
+
+		$("#st_or_dst").text('DST');
+
+	    } else {
+
+		$("#st_or_dst").text('ST');
+
+	    };
 
 
-	    sazmap.setCenter({lat:sun_position.latitude, lng:sun_position.longitude});
+	    $("#current_time").text(current_datetime.toLocaleTimeString());
+	    $("#rising_time").text(rising_datetime.toLocaleTimeString());
+	    $("#transit_time").text(transit_datetime.toLocaleTimeString());
+	    $("#setting_time").text(setting_datetime.toLocaleTimeString());
 
-	    current_azimuth_marker = drawSolarMarker(current_azimuth_marker, sun_position, -0.005, 0,  sun_position.current_azimuth, '#ffD700');
-	    rising_azimuth_marker = drawSolarMarker(rising_azimuth_marker,   sun_position,  0,  0.005, sun_position.rising_azimuth,  '#0F0');
-	    setting_azimuth_marker = drawSolarMarker(setting_azimuth_marker, sun_position,  0, -0.005, sun_position.setting_azimuth, '#F00');
+
+	    {# TODO adjust markers for DST #}
+
+
+	    sazmap.setCenter({lat:sun_position_data.latitude, lng:sun_position_data.longitude});
+
+	    current_azimuth_marker = drawSolarMarker(current_azimuth_marker, sun_position_data, -0.005, 0,  sun_position_data.current_azimuth, '#ffD700');
+	    rising_azimuth_marker = drawSolarMarker(rising_azimuth_marker,   sun_position_data,  0,  0.005, sun_position_data.rising_azimuth,  '#0F0');
+	    setting_azimuth_marker = drawSolarMarker(setting_azimuth_marker, sun_position_data,  0, -0.005, sun_position_data.setting_azimuth, '#F00');
 
 	};
 
@@ -280,8 +292,7 @@ button#get_solar_azimuth_map {
 			  longitude: $('input[name="longitude"]').val(),
 			  date: $('input[name="date"]').val(),
 			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val(),
-			  dst: $("#_dst").is(':checked') {# jQuery selector #}
+			  timezone: $('input[name="timezone"]').val()
 
 		      },
 		      function(sun_position) {
@@ -299,24 +310,30 @@ button#get_solar_azimuth_map {
 
 	$("#get_stonehenge_summer_azimuth_map").click(function(e) {
 
+	    $('input[name="latitude"]').val('51:10:50');
+	    $('input[name="longitude"]').val('-1:49:34');
+
+	    $('input[name="date"]').val('2018-06-21');
+	    $('input[name="time"]').val('03:52:18');
+	    $('input[name="timezone"]').val('0');
+
+	    $('input[name="dst"]').removeAttr("checked"); {# TODO set? #}
 
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		      {
-			  latitude: '51:10:50',
-			  longitude: '-1:49:34',
-			  date: '2018-06-21',
-			  time: '03:52:18',
-			  timezone: '0',
-			  dst: 'false'
+		{
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+		},
+		function(sun_position) {
+		    drawSolarMap(sun_position);
 
-		      },
-		      function(sun_position) {
-
-			  drawSolarMap(sun_position);
-
-		      }); {# end getJSON #}
+	    }); {# end getJSON #}
 
 	    return false;
+
 
 	}); {# end get_stonehenge_summer_azimuth_map click #}
 
@@ -325,42 +342,52 @@ button#get_solar_azimuth_map {
 	$("#get_stonehenge_winter_azimuth_map").click(function(e) {
 
 
+	    $('input[name="latitude"]').val('51:10:50');
+	    $('input[name="longitude"]').val('-1:49:34');
+
+	    $('input[name="date"]').val('2018-12-21');
+	    $('input[name="time"]').val('16:02');
+	    $('input[name="timezone"]').val('0');
+
+	    $('input[name="dst"]').removeAttr("checked");
+
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		      {
-			  latitude: '51:10:50',
-			  longitude: '-1:49:34',
-			  date: '2018-12-21',
-			  time: '16:02',
-			  timezone: '0',
-			  dst: 'false'
+		{
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+		},
+		function(sun_position) {
+		    drawSolarMap(sun_position);
 
-		      },
-		      function(sun_position) {
-
-			  drawSolarMap(sun_position);
-
-		      }); {# end getJSON #}
+	    }); {# end getJSON #}
 
 	    return false;
+
 
 	}); {# end get_stonehenge_summer_azimuth_map click #}
 
 
-
-
-
 	$("#get_manhattenhenge_summer1_azimuth_map").click(function(e) {
 
+	    $('input[name="latitude"]').val('40.759');
+	    $('input[name="longitude"]').val('-73.99');
+
+	    $('input[name="date"]').val('2018-05-30');
+	    $('input[name="time"]').val('19:22');
+	    $('input[name="timezone"]').val('-5');
+
+	    $('input[name="dst"]').removeAttr("checked"); {# TODO set? #}
 
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
 		      {
-			  latitude: '40.759',
-			  longitude: '-73.99',
-			  date: '2018-05-30',
-			  time: '19:22',
-			  timezone: '-5',
-			  dst: 'false'
-
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val()
 		      },
 		      function(sun_position) {
 
@@ -373,19 +400,24 @@ button#get_solar_azimuth_map {
 	}); {# end get_manhattenhenge_summer1_azimuth_map click #}
 
 
-
 	$("#get_manhattenhenge_summer2_azimuth_map").click(function(e) {
 
+	    $('input[name="latitude"]').val('40.759');
+	    $('input[name="longitude"]').val('-73.99');
+
+	    $('input[name="date"]').val('2018-07-12');
+	    $('input[name="time"]').val('19:30');
+	    $('input[name="timezone"]').val('-5');
+
+	    $('input[name="dst"]').removeAttr("checked"); {# TODO set? #}
 
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
 		      {
-			  latitude: '40.759',
-			  longitude: '-73.99',
-			  date: '2018-07-12',
-			  time: '19:30',
-			  timezone: '-5',
-			  dst: 'false'
-
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val()
 		      },
 		      function(sun_position) {
 
@@ -401,16 +433,23 @@ button#get_solar_azimuth_map {
 
 	$("#get_manhattenhenge_winter1_azimuth_map").click(function(e) {
 
+	    $('input[name="latitude"]').val('40.759');
+	    $('input[name="longitude"]').val('-73.99');
+
+	    $('input[name="date"]').val('2018-12-05');
+	    $('input[name="time"]').val('07:07');
+	    $('input[name="timezone"]').val('-5');
+
+	    $('input[name="dst"]').removeAttr("checked");
+
 
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
 		      {
-			  latitude: '40.759',
-			  longitude: '-73.99',
-			  date: '2018-12-05',
-			  time: '07:07',
-			  timezone: '-5',
-			  dst: 'false'
-
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val()
 		      },
 		      function(sun_position) {
 
@@ -426,16 +465,22 @@ button#get_solar_azimuth_map {
 
 	$("#get_manhattenhenge_winter2_azimuth_map").click(function(e) {
 
+	    $('input[name="latitude"]').val('40.759');
+	    $('input[name="longitude"]').val('-73.99');
+
+	    $('input[name="date"]').val('2018-01-08');
+	    $('input[name="time"]').val('07:20');
+	    $('input[name="timezone"]').val('-5');
+
+	    $('input[name="dst"]').removeAttr("checked");
 
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
 		      {
-			  latitude: '40.759',
-			  longitude: '-73.99',
-			  date: '2018-01-08',
-			  time: '07:20',
-			  timezone: '-5',
-			  dst: 'false'
-
+			  latitude: $('input[name="latitude"]').val(),
+			  longitude: $('input[name="longitude"]').val(),
+			  date: $('input[name="date"]').val(),
+			  time: $('input[name="time"]').val(),
+			  timezone: $('input[name="timezone"]').val()
 		      },
 		      function(sun_position) {
 

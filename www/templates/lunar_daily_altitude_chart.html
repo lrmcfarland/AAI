@@ -59,6 +59,7 @@
 
 	    $("#datetime").text(moon_position_data.datetime);
 
+	    $("#sun_range").text(moon_position_data.sun_range);
 	    $("#sun_ec_latitude").text(moon_position_data.sun_ec_latitude_dms);
 	    $("#sun_ec_longitude").text(moon_position_data.sun_ec_longitude_dms);
 
@@ -68,12 +69,36 @@
 	    $("#sun_altitude").text(moon_position_data.sun_altitude_dms);
 	    $("#sun_azimuth").text(moon_position_data.sun_azimuth_dms);
 
-	    $("#sun_rising").text(moon_position_data.sun_rising);
-	    $("#sun_transit").text(moon_position_data.sun_transit);
-	    $("#sun_setting").text(moon_position_data.sun_setting);
-	    $("#sun_range").text(moon_position_data.sun_range);
+
+	    var today = $('input[name="date"]').val();
+
+	    var sun_rising_datetime = new Date(today + ' ' + moon_position_data.sun_rising);
+	    var sun_transit_datetime = new Date(today + ' ' + moon_position_data.sun_transit);
+	    var sun_setting_datetime = new Date(today + ' ' + moon_position_data.sun_setting);
+
+	    if ($("#_dst").is(':checked')) {
+		sun_rising_datetime.setHours(sun_rising_datetime.getHours() + 1);
+		sun_transit_datetime.setHours(sun_transit_datetime.getHours() + 1);
+		sun_setting_datetime.setHours(sun_setting_datetime.getHours() + 1);
+
+                $("#rising_dst").text('DST');
+		$("#transit_dst").text('DST');
+		$("#setting_dst").text('DST');
+
+	    } else {
+
+		$("#rising_dst").text('ST');
+		$("#transit_dst").text('ST');
+		$("#setting_dst").text('ST');
+	    };
+
+	    $("#sun_rising").text(sun_rising_datetime.toLocaleTimeString());
+	    $("#sun_transit").text(sun_transit_datetime.toLocaleTimeString());
+	    $("#sun_setting").text(sun_setting_datetime.toLocaleTimeString());
 
 
+
+	    $("#moon_range").text(moon_position_data.moon_range);
 	    $("#moon_ec_latitude").text(moon_position_data.moon_ec_latitude_dms);
 	    $("#moon_ec_longitude").text(moon_position_data.moon_ec_longitude_dms);
 
@@ -83,23 +108,20 @@
 	    $("#moon_altitude").text(moon_position_data.moon_altitude_dms);
 	    $("#moon_azimuth").text(moon_position_data.moon_azimuth_dms);
 
-	    $("#moon_rising").text(moon_position_data.moon_rising);
-	    $("#moon_transit").text(moon_position_data.moon_transit);
-	    $("#moon_setting").text(moon_position_data.moon_setting);
-	    $("#moon_range").text(moon_position_data.moon_range);
 
+	    var moon_rising_datetime = new Date(today + ' ' + moon_position_data.moon_rising);
+	    var moon_transit_datetime = new Date(today + ' ' + moon_position_data.moon_transit);
+	    var moon_setting_datetime = new Date(today + ' ' + moon_position_data.moon_setting);
 
-	    {# observer #}
-	    $('input[name="latitude"]').val(moon_position_data.latitude);
-	    $('input[name="longitude"]').val(moon_position_data.longitude);
+	    if ($("#_dst").is(':checked')) {
+		moon_rising_datetime.setHours(moon_rising_datetime.getHours() + 1);
+		moon_transit_datetime.setHours(moon_transit_datetime.getHours() + 1);
+		moon_setting_datetime.setHours(moon_setting_datetime.getHours() + 1);
+	    };
 
-
-	    $('input[name="date"]').val(moon_position_data.current_date)
-	    $('input[name="time"]').val(moon_position_data.current_time);
-	    $('input[name="timezone"]').val(moon_position_data.current_timezone);
-
-	    $('input[name="dst"]').removeAttr("checked");
-
+	    $("#moon_rising").text(moon_rising_datetime.toLocaleTimeString());
+	    $("#moon_transit").text(moon_transit_datetime.toLocaleTimeString());
+	    $("#moon_setting").text(moon_setting_datetime.toLocaleTimeString());
 
 	    drawMoonChart(moon_position_data);
 	};
@@ -194,13 +216,13 @@
 	$("#get_lunar_daily_altitude").click(function(e) {
 
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude",
+
 		      {
 			  latitude: $('input[name="latitude"]').val(),
 			  longitude: $('input[name="longitude"]').val(),
 			  date: $('input[name="date"]').val(),
 			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val(),
-			  dst: $("#_dst").is(':checked') {# jQuery selector #}
+			  timezone: $('input[name="timezone"]').val()
 
 		      },
 		      function(moon_position) {
@@ -239,12 +261,6 @@
 	    return false;
 
 	}); {# end get_next_hour click #}
-
-
-
-
-
-
 
 
 
@@ -443,8 +459,7 @@ button#get_lunar_daily_altitude {
 
 	  <td id="sun_rising">TBD</td>
 	  <td id="moon_rising">TBD</td>
-
-	  <td>local time</td>
+	  <td id="rising_dst">ST</td>
 	</tr>
 
 
@@ -453,8 +468,8 @@ button#get_lunar_daily_altitude {
 
 	  <td id="sun_transit">TBD</td>
 	  <td id="moon_transit">TBD</td>
+	  <td id="transit_dst">ST</td>
 
-	  <td>local time</td>
 	</tr>
 
 	<tr>
@@ -462,8 +477,8 @@ button#get_lunar_daily_altitude {
 
 	  <td id="sun_setting">TBD</td>
 	  <td id="moon_setting">TBD</td>
+	  <td id="setting_dst">ST</td>
 
-	  <td>local time</td>
 	</tr>
 
 
