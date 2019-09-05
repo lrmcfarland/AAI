@@ -25,10 +25,8 @@ aai.setLocation = function() {
 	document.getElementById(latitude_id).value = latitude;
 	document.getElementById(longitude_id).value = longitude;
 
-	// TODO floor < 0, ceiling > 0 better for timezone?
-	timezone = Math.ceil(Math.round(longitude / 15)); // assumes degrees
+	aai.setTimezoneFromLocation(longitude_id, timezone_id);
 
-	document.getElementById(timezone_id).value = timezone;
     };
 
     function error(err) {
@@ -41,5 +39,32 @@ aai.setLocation = function() {
     } else {
 	navigator.geolocation.getCurrentPosition(success, error);
     }
+
+};
+
+
+aai.setTimezoneFromLocation = function() {
+    // from https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
+
+    // closure
+    var longitude_id = arguments[0];
+    var timezone_id = arguments[1];
+
+    var longitude = document.getElementById(longitude_id).value;
+
+    // TODO fractionial timezones, e.g. India +05:30, AU
+    timezone = Math.ceil(Math.round(longitude / 15)); // assumes degrees
+
+
+    if (timezone < 0) {
+
+	document.getElementById(timezone_id).value = "-" + ("0" + -timezone).slice(-2) + ":00";
+
+    } else {
+
+	document.getElementById(timezone_id).value = "+" + ("0" + timezone).slice(-2) + ":00";
+
+    };
+
 
 };
