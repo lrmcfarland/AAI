@@ -236,6 +236,24 @@
 
 	$("#get_solar_daily_altitude").click(function(e) {
 
+	    {# TODO adjust for DST #}
+
+	    try {
+
+		var zulu_time = new Date($('input[name="date"]').val()
+					  + " " + $('input[name="time"]').val()
+					  + " GMT" + $('input[name="timezone"]').val());
+
+		console.log('zulu datetime: ' + zulu_time.toISOString()); {# TODO rm #}
+		console.log('zulu date: ' + zulu_time.toISOString().slice(0, 10)); {# TODO rm #}
+		console.log('zulu ISO time: ' + zulu_time.toISOString().slice(11, -1)); {# TODO rm #}
+
+	    } catch (err) {
+		alert(err);
+		return false;
+	    }
+
+
 	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude",
 		{
 		    latitude: $('input[name="latitude"]').val(),
