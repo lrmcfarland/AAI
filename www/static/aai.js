@@ -10,7 +10,7 @@ var aai = aai || {};
 
 
 
-aai.DDtoDMS = function () {
+aai.dd2dms = function () {
     // convert decimal degrees into a string of degrees:minutes:seconds for display
 
     let a_degree = arguments[0];
@@ -43,8 +43,8 @@ aai.setLocation = function() {
 	let latitude = pos.coords.latitude;
 	let longitude = pos.coords.longitude;
 
-	document.getElementById(latitude_id).value = aai.DDtoDMS(latitude);
-	document.getElementById(longitude_id).value = aai.DDtoDMS(longitude);
+	document.getElementById(latitude_id).value = aai.dd2dms(latitude);
+	document.getElementById(longitude_id).value = aai.dd2dms(longitude);
 
 	aai.setTimezoneFromLocation(longitude_id, timezone_id);
 
@@ -131,6 +131,38 @@ aai.standardTimezone = function() {
     let timezone_str = timezone_hours_str + ':' + timezone_minutes_str;
 
     return {timezone_factor, timezone_str};
+};
+
+
+aai.standardTime = function() {
+    // Return timezone in ST adjusting for timezone and dst
+
+    let a_date_str = arguments[0]; // str 2019-09-08
+    let a_time_str = arguments[1]; // str 12:34:56.789
+    let a_timezone_str = arguments[2]; // str -08:00
+    let is_dst = arguments[3]; // bool
+
+
+    let standard_time = {date_str: a_date_str,
+			 time_str: a_time_str,
+			 timezone_str: a_timezone_str}
+
+    if (is_dst) {
+
+	standard_time = aai.DST2ST(a_date_str,
+				   a_time_str,
+				   a_timezone_str);
+
+    } else {
+
+	std_tz = aai.standardTimezone(a_timezone_str);
+	standard_time.timezone_str = std_tz.timezone_str;
+
+    };
+
+
+    return standard_time
+
 };
 
 
