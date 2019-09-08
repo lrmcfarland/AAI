@@ -16,11 +16,8 @@ aai.DDtoDMS = function () {
     let a_degree = arguments[0];
 
     let deg = parseInt(a_degree);
-
     let m = Math.abs((a_degree - deg) * 60);
-
     let min = Math.floor(m);
-
     let sec = (m - min) * 60;
 
     let result = deg.toString() + ':' + ('0' + min.toString()).slice(-2) + ':' +  sec.toFixed(4);
@@ -156,7 +153,7 @@ aai.changeTime = function() {
 
     // fakes it by moving to zulu time but keeping the same timezone
 
-    let local_time = new Date(zulu_time.getTime() + 3600000*std_timezone.timezone_factor - a_delta_time*1000);
+    let local_time = new Date(zulu_time.getTime() + 3600000*std_timezone.timezone_factor + a_delta_time*1000);
 
     let date_str = local_time.toISOString().slice(0, 10);
     let time_str = local_time.toISOString().slice(11, -1);

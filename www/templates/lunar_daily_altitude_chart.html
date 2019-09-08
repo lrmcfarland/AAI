@@ -211,7 +211,7 @@
 
     $(document).ready(function() {
 
-	{# ----- get data ----- #}
+	{# ----- get lunar daily altitude data ----- #}
 
 	$("#get_lunar_daily_altitude").click(function(e) {
 
@@ -262,29 +262,230 @@
 	$("#get_next_hour").click(function(e) {
 
 
-	    {# TODO calculate next hour #}
+	    try {
+
+		{# adjust for DST #}
+
+		let standard_time = {date_str: $('input[name="date"]').val(),
+				     time_str: $('input[name="time"]').val(),
+				     timezone_str: $('input[name="timezone"]').val()};
+
+		if ($("#_dst").is(':checked')) {
+
+		    standard_time = aai.DST2ST($('input[name="date"]').val(),
+					       $('input[name="time"]').val(),
+					       $('input[name="timezone"]').val());
+
+		} else {
+
+		    std_tz = aai.standardTimezone($('input[name="timezone"]').val());
+		    standard_time.timezone_str = std_tz.timezone_str;
+
+		};
 
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude",
-		      {
-			  latitude: $('input[name="latitude"]').val(),
-			  longitude: $('input[name="longitude"]').val(),
-			  date: $('input[name="date"]').val(),
-			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val(),
-			  dst: $("#_dst").is(':checked') {# jQuery selector #}
+		{# calculate next hour #}
 
-		      },
-		      function(moon_position) {
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, 60*60);
 
-			  updateMoonChart(moon_position);
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
 
-		      }); {# end getJSON #}
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
 
 	    return false;
 
 	}); {# end get_next_hour click #}
 
+
+	$("#get_next_day").click(function(e) {
+
+
+	    try {
+
+		{# adjust for DST #}
+
+		let standard_time = {date_str: $('input[name="date"]').val(),
+				     time_str: $('input[name="time"]').val(),
+				     timezone_str: $('input[name="timezone"]').val()};
+
+		if ($("#_dst").is(':checked')) {
+
+		    standard_time = aai.DST2ST($('input[name="date"]').val(),
+					       $('input[name="time"]').val(),
+					       $('input[name="timezone"]').val());
+
+		} else {
+
+		    std_tz = aai.standardTimezone($('input[name="timezone"]').val());
+		    standard_time.timezone_str = std_tz.timezone_str;
+
+		};
+
+
+		{# calculate next day #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, 24*60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_next_day click #}
+
+
+
+	$("#get_prev_hour").click(function(e) {
+
+
+	    try {
+
+		{# adjust for DST #}
+
+		let standard_time = {date_str: $('input[name="date"]').val(),
+				     time_str: $('input[name="time"]').val(),
+				     timezone_str: $('input[name="timezone"]').val()};
+
+		if ($("#_dst").is(':checked')) {
+
+		    standard_time = aai.DST2ST($('input[name="date"]').val(),
+					       $('input[name="time"]').val(),
+					       $('input[name="timezone"]').val());
+
+		} else {
+
+		    std_tz = aai.standardTimezone($('input[name="timezone"]').val());
+		    standard_time.timezone_str = std_tz.timezone_str;
+
+		};
+
+
+		{# calculate prev hour #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, -60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_prev_hour click #}
+
+
+	$("#get_prev_day").click(function(e) {
+
+
+	    try {
+
+		{# adjust for DST #}
+
+		let standard_time = {date_str: $('input[name="date"]').val(),
+				     time_str: $('input[name="time"]').val(),
+				     timezone_str: $('input[name="timezone"]').val()};
+
+		if ($("#_dst").is(':checked')) {
+
+		    standard_time = aai.DST2ST($('input[name="date"]').val(),
+					       $('input[name="time"]').val(),
+					       $('input[name="timezone"]').val());
+
+		} else {
+
+		    std_tz = aai.standardTimezone($('input[name="timezone"]').val());
+		    standard_time.timezone_str = std_tz.timezone_str;
+
+		};
+
+
+		{# calculate prev day #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, -24*60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_prev_day click #}
 
 
     }); {# end ready method #}
@@ -353,9 +554,15 @@ button#get_lunar_daily_altitude {
 <table>
 
   <tr>
-    <td colspan="2">
+    <td colspan="5">
 
       <table id="time_table" align="center">
+
+	<td>
+
+	  <button id="get_prev_day">Previous day</button>
+
+	</td>
 
 	<td>
 
@@ -372,6 +579,12 @@ button#get_lunar_daily_altitude {
 	<td>
 
 	  <button id="get_next_hour">Next Hour</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_next_day">Next Day</button>
 
 	</td>
 
