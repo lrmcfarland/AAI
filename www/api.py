@@ -548,6 +548,9 @@ def sun_rise_set_azimuths():
         result['current_altitude_str'] = '{}'.format(str(rts['altitude']))
         result['current_azimuth_str']  = '{}'.format(str(rts['azimuth']))
 
+        current_azalt = get_sun_azalt(an_observer, a_datetime)
+        result['current_azimuth'] = current_azalt['azimuth'].degrees
+
         result['rising']   = rts['rising']
         result['transit']  = rts['transit']
         result['setting']  = rts['setting']
