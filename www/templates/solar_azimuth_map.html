@@ -234,31 +234,50 @@ button#get_solar_azimuth_map {
 	    $("#transit_azimuth").text(sun_position_data.transit_azimuth_str);
 	    $("#setting_azimuth").text(sun_position_data.setting_azimuth_str);
 
+            {# adjust for DST #}
 
-	    var today = $('input[name="date"]').val();
-	    var current_datetime = new Date(today + ' ' + $('input[name="time"]').val());
-	    var rising_datetime = new Date(today + ' ' + sun_position_data.rising);
-	    var transit_datetime = new Date(today + ' ' + sun_position_data.transit);
-	    var setting_datetime = new Date(today + ' ' + sun_position_data.setting);
+            let current_datetime = {date_str: $('input[name="date"]').val(),
+                                    time_str: $('input[name="time"]').val(),
+                                    timezone_str: $('input[name="timezone"]').val()};
+
+            let rising_datetime = {date_str: $('input[name="date"]').val(),
+                                   time_str: sun_position_data.rising,
+                                   timezone_str: $('input[name="timezone"]').val()};
+
+            let transit_datetime = {date_str: $('input[name="date"]').val(),
+                                    time_str: sun_position_data.transit,
+                                    timezone_str: $('input[name="timezone"]').val()};
+
+            let setting_datetime = {date_str: $('input[name="date"]').val(),
+                                    time_str: sun_position_data.setting,
+                                    timezone_str: $('input[name="timezone"]').val()};
+
 
 	    if ($("#_dst").is(':checked')) {
-		rising_datetime.setHours(rising_datetime.getHours() + 1);
-		transit_datetime.setHours(transit_datetime.getHours() + 1);
-		setting_datetime.setHours(setting_datetime.getHours() + 1);
 
-		$("#st_or_dst").text('DST');
+                current_datetime = aai.ST2DST(current_datetime.date_str, current_datetime.time_str, current_datetime.timezone_str);
+                rising_datetime = aai.ST2DST(rising_datetime.date_str, rising_datetime.time_str, rising_datetime.timezone_str);
+                transit_datetime = aai.ST2DST(transit_datetime.date_str, transit_datetime.time_str, transit_datetime.timezone_str);
+                setting_datetime = aai.ST2DST(setting_datetime.date_str, setting_datetime.time_str, setting_datetime.timezone_str);
+
+		$("#current_dst").text('DST');
+		$("#rising_dst").text('DST');
+		$("#transit_dst").text('DST');
+		$("#setting_dst").text('DST');
 
 	    } else {
 
-		$("#st_or_dst").text('ST');
+		$("#current_dst").text('ST');
+		$("#rising_dst").text('ST');
+		$("#transit_dst").text('ST');
+		$("#setting_dst").text('ST');
 
 	    };
 
-
-	    $("#current_time").text(current_datetime.toLocaleTimeString());
-	    $("#rising_time").text(rising_datetime.toLocaleTimeString());
-	    $("#transit_time").text(transit_datetime.toLocaleTimeString());
-	    $("#setting_time").text(setting_datetime.toLocaleTimeString());
+	    $("#current_time").text(current_datetime.time_str);
+	    $("#rising_time").text(rising_datetime.time_str);
+	    $("#transit_time").text(transit_datetime.time_str);
+	    $("#setting_time").text(setting_datetime.time_str);
 
 
 	    {# TODO adjust markers for DST #}

@@ -9,7 +9,6 @@
 var aai = aai || {};
 
 
-
 aai.dd2dms = function () {
     // convert decimal degrees into a string of degrees:minutes:seconds for display
 
@@ -179,8 +178,8 @@ aai.changeTime = function() {
 
     std_timezone = aai.standardTimezone(a_timezone);
 
-    let zulu_time = new Date($('input[name="date"]').val()
-			     + " " + $('input[name="time"]').val()
+    let zulu_time = new Date(a_date.replace(/-/g, "/")
+			     + " " + a_time
 			     + " GMT" + std_timezone.timezone_str);
 
     // fakes it by moving to zulu time but keeping the same timezone
@@ -206,5 +205,18 @@ aai.DST2ST = function() {
     let a_timezone = arguments[2];
 
     return aai.changeTime(a_date, a_time, a_timezone, -60*60);
+
+};
+
+
+aai.ST2DST = function() {
+
+    // returns date, time, timezone in daylight saving time for same in standard time
+
+    let a_date = arguments[0];
+    let a_time = arguments[1];
+    let a_timezone = arguments[2];
+
+    return aai.changeTime(a_date, a_time, a_timezone, 60*60);
 
 };

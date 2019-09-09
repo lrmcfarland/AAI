@@ -545,8 +545,8 @@ def sun_rise_set_azimuths():
                                                               flask.request))
 
 
-        result['current_altitude_str'] = '{}'.format(str(rts['altitude']))
-        result['current_azimuth_str']  = '{}'.format(str(rts['azimuth']))
+        result['current_altitude_str'] = rts['altitude']
+        result['current_azimuth_str']  = rts['azimuth']
 
         current_azalt = get_sun_azalt(an_observer, a_datetime)
         result['current_azimuth'] = current_azalt['azimuth'].degrees
