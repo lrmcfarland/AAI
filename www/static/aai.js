@@ -178,9 +178,9 @@ aai.changeTime = function() {
 
     std_timezone = aai.standardTimezone(a_timezone);
 
-    let zulu_time = new Date(a_date.replace(/-/g, "/")
-			     + " " + a_time
-			     + " GMT" + std_timezone.timezone_str);
+    let zulu_time = new Date(a_date
+			     + "T" + a_time
+			     + std_timezone.timezone_str);
 
     // fakes it by moving to zulu time but keeping the same timezone
 
