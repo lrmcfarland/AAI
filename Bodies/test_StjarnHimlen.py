@@ -19,6 +19,8 @@ Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/StjarnHimlen.py:31
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import time
 import unittest
@@ -64,8 +66,8 @@ class StjarnHimlenTests(unittest.TestCase):
         a_datetime = coords.datetime('2015-01-01T00:00:00')
         a_gmst = StjarnHimlen.GMST(a_datetime)
 
-        print '\nDatetime:', a_datetime # TODO rm
-        print 'gmst', a_gmst # TODO rm
+        print('\nDatetime:', a_datetime) # TODO rm
+        print('gmst', a_gmst) # TODO rm
 
 
 
@@ -74,7 +76,7 @@ class StjarnHimlenTests(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         a_solar_longitude = StjarnHimlen.SolarLongitude(j2000)
 
-        self.assertAlmostEqual(278.34302342798696, a_solar_longitude.value, self.places)
+        self.assertAlmostEqual(278.34302342798696, a_solar_longitude.degrees, self.places)
 
 
     def test_SolarRADec_J2000(self):
@@ -82,8 +84,8 @@ class StjarnHimlenTests(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         RA, Dec = StjarnHimlen.SolarRADec(j2000)
 
-        self.assertAlmostEqual(279.0813909223767, RA.value, self.places)
-        self.assertAlmostEqual(-23.17667313807378, Dec.value, self.places)
+        self.assertAlmostEqual(279.0813909223767, RA.degrees, self.places)
+        self.assertAlmostEqual(-23.17667313807378, Dec.degrees, self.places)
 
 
     def test_GMST0_J2000(self):
@@ -91,7 +93,7 @@ class StjarnHimlenTests(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         gmst0 = StjarnHimlen.GMST0(j2000)
 
-        self.assertAlmostEqual(98.34302342798696, gmst0.value, self.places)
+        self.assertAlmostEqual(98.34302342798696, gmst0.degrees, self.places)
 
 
     def test_GMST_J2000(self):
@@ -99,7 +101,7 @@ class StjarnHimlenTests(unittest.TestCase):
         j2000 = coords.datetime('2000-01-01T00:00:00')
         gmst = StjarnHimlen.GMST(j2000)
 
-        self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
+        self.assertAlmostEqual(-5.443798438134203, gmst.degrees, self.places)
 
 
     @unittest.skip('TODO delta 8 seconds longer!')
@@ -119,7 +121,7 @@ class StjarnHimlenTests(unittest.TestCase):
         a_datetime = coords.datetime('2000-01-01T00:00:00')
         gmst = StjarnHimlen.GMST(a_datetime)
 
-        self.assertAlmostEqual(-5.443798438134203, gmst.value, self.places)
+        self.assertAlmostEqual(-5.443798438134203, gmst.degrees, self.places)
 
 
 
@@ -138,7 +140,7 @@ class StjarnHimlenTests(unittest.TestCase):
                 for k in xrange(1, 28):
                     a_datetime = coords.datetime('201%d-%02d-%02dT00:00:00' % (i, j, k))
                     a_solar_longitude = StjarnHimlen.SolarLongitude(a_datetime)
-                    print a_datetime, a_solar_longitude
+                    print(a_datetime, a_solar_longitude)
 
 
 
@@ -183,7 +185,7 @@ class StjarnHimlenTests(unittest.TestCase):
 
         sirius_hz = StjarnHimlen.toHorizon(sirius, an_observer, a_datetime)
 
-        print 'sirius', sirius_hz
+        print('sirius', sirius_hz)
 
         # TODO validate something
 

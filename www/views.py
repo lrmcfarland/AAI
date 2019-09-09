@@ -25,6 +25,13 @@ def home():
     return flask.render_template('home.html')
 
 
+@home_page.route("/lunar_daily_altitude_chart")
+def lunar_daily_altitude_chart():
+    """Plot the moon's altitude for the observer's location"""
+
+    return flask.render_template('lunar_daily_altitude_chart.html')
+
+
 @home_page.route("/solar_azimuth_map")
 def solar_azimuth_map():
     """Plot the sun's azimuth for the observer's location"""
@@ -32,11 +39,11 @@ def solar_azimuth_map():
     return flask.render_template('solar_azimuth_map.html')
 
 
-@home_page.route("/daily_solar_altitude_chart")
-def daily_solar_altitude_chart():
+@home_page.route("/solar_daily_altitude_chart")
+def solar_daily_altitude_chart():
     """Plot the sun's altitude for the observer's location"""
 
-    return flask.render_template('daily_solar_altitude_chart.html')
+    return flask.render_template('solar_daily_altitude_chart.html')
 
 
 @home_page.route("/eqhz_transforms")

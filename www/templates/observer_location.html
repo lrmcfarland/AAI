@@ -85,7 +85,7 @@ table#observer_location {
 
     $("#set_location").click(function(e) {
       {# aai.js uses document.getElementById #}
-      aai.setLocation("_latitude", "_longitude", "_timezone", e);
+      aai.setLocation("_latitude", "_longitude", "_timezone");
     });
 
 
@@ -113,8 +113,7 @@ table#observer_location {
     {# ----- set timezone from longitude ----- #}
 
     $("#_longitude").change(function() {
-      var timezone = Math.floor((parseFloat($("#_longitude").val()) + 7.5) / 15.0);
-      $("#_timezone").val(timezone);
+      aai.setTimezoneFromLocation("_longitude", "_timezone");
     });
 
 
@@ -206,7 +205,7 @@ table#observer_location {
       <td>
 	<input type="text" id="_timezone" name="timezone" value="0">
       </td>
-      <td>hr</td>
+      <td>hr[:mm]</td>
 
     </tr>
 

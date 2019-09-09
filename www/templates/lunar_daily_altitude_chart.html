@@ -1,0 +1,759 @@
+{# AAI lunar altitude chart #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+  <script type="text/javascript">
+
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    {# -------------------- #}
+    {# ----- init map ----- #}
+    {# -------------------- #}
+
+
+    {# ----- draw chart ----- #}
+
+
+    google.charts.load('current', {'packages':['corechart']});
+
+    function updateMoonChart(moon_position_data) {
+
+	if (moon_position_data.errors.length > 0) {
+
+	    $("#datetime").text("TBD");
+
+	    $("#sun_ec_longitude").text("TBD");
+	    $("#sun_ec_latitude").text("TBD");
+
+	    $("#sun_eq_ra").text("TBD");
+	    $("#sun_eq_dec").text("TBD");
+
+	    $("#sun_azimuth").text("TBD");
+	    $("#sun_altitude").text("TBD");
+
+	    $("#sun_rising").text("TBD");
+	    $("#sun_transit").text("TBD");
+	    $("#sun_setting").text("TBD");
+	    $("#sun_range").text("TBD");
+
+	    $("#moon_ec_longitude").text("TBD");
+	    $("#moon_ec_latitude").text("TBD");
+
+	    $("#moon_eq_ra").text("TBD");
+	    $("#moon_eq_dec").text("TBD");
+
+	    $("#moon_azimuth").text("TBD");
+	    $("#moon_altitude").text("TBD");
+
+	    $("#moon_rising").text("TBD");
+	    $("#moon_transit").text("TBD");
+	    $("#moon_setting").text("TBD");
+	    $("#moon_range").text("TBD");
+
+
+	    alert("Errors: " + moon_position_data.errors.join(", "));
+
+	} else {
+
+	    $("#datetime").text(moon_position_data.datetime);
+
+	    $("#sun_range").text(moon_position_data.sun_range);
+	    $("#sun_ec_latitude").text(moon_position_data.sun_ec_latitude_dms);
+	    $("#sun_ec_longitude").text(moon_position_data.sun_ec_longitude_dms);
+
+	    $("#sun_eq_ra").text(moon_position_data.sun_eq_ra_dms);
+	    $("#sun_eq_dec").text(moon_position_data.sun_eq_dec_dms);
+
+	    $("#sun_altitude").text(moon_position_data.sun_altitude_dms);
+	    $("#sun_azimuth").text(moon_position_data.sun_azimuth_dms);
+
+
+	    var today = $('input[name="date"]').val();
+
+	    var sun_rising_datetime = new Date(today + ' ' + moon_position_data.sun_rising);
+	    var sun_transit_datetime = new Date(today + ' ' + moon_position_data.sun_transit);
+	    var sun_setting_datetime = new Date(today + ' ' + moon_position_data.sun_setting);
+
+	    if ($("#_dst").is(':checked')) {
+		sun_rising_datetime.setHours(sun_rising_datetime.getHours() + 1);
+		sun_transit_datetime.setHours(sun_transit_datetime.getHours() + 1);
+		sun_setting_datetime.setHours(sun_setting_datetime.getHours() + 1);
+
+		$("#rising_dst").text('DST');
+		$("#transit_dst").text('DST');
+		$("#setting_dst").text('DST');
+
+	    } else {
+
+		$("#rising_dst").text('ST');
+		$("#transit_dst").text('ST');
+		$("#setting_dst").text('ST');
+	    };
+
+	    $("#sun_rising").text(sun_rising_datetime.toLocaleTimeString());
+	    $("#sun_transit").text(sun_transit_datetime.toLocaleTimeString());
+	    $("#sun_setting").text(sun_setting_datetime.toLocaleTimeString());
+
+
+
+	    $("#moon_range").text(moon_position_data.moon_range);
+	    $("#moon_ec_latitude").text(moon_position_data.moon_ec_latitude_dms);
+	    $("#moon_ec_longitude").text(moon_position_data.moon_ec_longitude_dms);
+
+	    $("#moon_eq_ra").text(moon_position_data.moon_eq_ra_dms);
+	    $("#moon_eq_dec").text(moon_position_data.moon_eq_dec_dms);
+
+	    $("#moon_altitude").text(moon_position_data.moon_altitude_dms);
+	    $("#moon_azimuth").text(moon_position_data.moon_azimuth_dms);
+
+
+	    var moon_rising_datetime = new Date(today + ' ' + moon_position_data.moon_rising);
+	    var moon_transit_datetime = new Date(today + ' ' + moon_position_data.moon_transit);
+	    var moon_setting_datetime = new Date(today + ' ' + moon_position_data.moon_setting);
+
+	    if ($("#_dst").is(':checked')) {
+		moon_rising_datetime.setHours(moon_rising_datetime.getHours() + 1);
+		moon_transit_datetime.setHours(moon_transit_datetime.getHours() + 1);
+		moon_setting_datetime.setHours(moon_setting_datetime.getHours() + 1);
+	    };
+
+	    $("#moon_rising").text(moon_rising_datetime.toLocaleTimeString());
+	    $("#moon_transit").text(moon_transit_datetime.toLocaleTimeString());
+	    $("#moon_setting").text(moon_setting_datetime.toLocaleTimeString());
+
+	    drawMoonChart(moon_position_data);
+	};
+
+    }; {# end updateMoonChart(moon_position_data) #}
+
+
+    function drawMoonChart(moon_position_data) {
+
+	var daily_sun_path = {
+	    name: 'Sun path',
+	    x: moon_position_data.daily_sun_azimuth,
+	    y: moon_position_data.daily_sun_altitude,
+	    mode: 'line',
+	    type: 'scatter',
+	    line: {
+		color: 'gold',
+	    }
+	};
+
+	var current_sun_position = {
+	    name: 'Sun position',
+	    x: [moon_position_data.sun_azimuth],
+	    y: [moon_position_data.sun_altitude],
+	    mode: 'markers',
+	    type: 'scatter',
+	    marker: {
+		color: 'gold',
+		size: 25
+	    }
+	};
+
+
+	var daily_moon_path = {
+	    name: 'Moon path',
+	    x: moon_position_data.daily_moon_azimuth,
+	    y: moon_position_data.daily_moon_altitude,
+	    mode: 'line',
+	    type: 'scatter',
+	    line: {
+		color: 'silver',
+	    }
+	};
+
+	var current_moon_position = {
+	    name: 'Moon position',
+	    x: [moon_position_data.moon_azimuth],
+	    y: [moon_position_data.moon_altitude],
+	    mode: 'markers',
+	    type: 'scatter',
+	    marker: {
+		color: 'silver',
+		size: 20
+	    }
+	};
+
+
+
+	var data = [current_sun_position, daily_sun_path, current_moon_position, daily_moon_path];
+
+	var layout = {
+	    title:'Altitude vs Azimuth ' + moon_position_data.datetime,
+	    xaxis: {
+		title: {
+		    text: 'Azimuth in degrees from true north'
+		},
+		range: [0, 360]
+	    },
+	    yaxis: {
+		title: {
+		    text: 'Altitude in degrees from the horizon'
+		},
+		range: [-100, 100]
+	    }
+	};
+
+
+	Plotly.newPlot('altitudeVtime', data, layout);
+
+
+    }; {# end drawMoonChart(moon_position_data) #}
+
+
+    {# ----------------- #}
+    {# ----- ready ----- #}
+    {# ----------------- #}
+
+    $(document).ready(function() {
+
+
+	{# ----- get lunar daily altitude data ----- #}
+
+
+	$("#get_lunar_daily_altitude").click(function(e) {
+
+	    try {
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: standard_time.date_str,
+		    time: standard_time.time_str,
+		    timezone: standard_time.timezone_str
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_lunar_daily_altitude click #}
+
+
+	$("#get_next_hour").click(function(e) {
+
+
+	    try {
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+		{# calculate next hour #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, 60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_next_hour click #}
+
+
+	$("#get_next_day").click(function(e) {
+
+	    try {
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+		{# calculate next day #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, 24*60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_next_day click #}
+
+
+
+	$("#get_prev_hour").click(function(e) {
+
+
+	    try {
+
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+		{# calculate prev hour #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, -60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_prev_hour click #}
+
+
+	$("#get_prev_day").click(function(e) {
+
+
+	    try {
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+		{# calculate prev day #}
+
+		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, -24*60*60);
+
+		$('input[name="date"]').val(new_time.date_str);
+		$('input[name="time"]').val(new_time.time_str);
+		$('input[name="timezone"]').val(new_time.timezone_str);
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end get_prev_day click #}
+
+
+
+
+	$("#eclipse_2017_aug_21").click(function(e) {
+
+
+	    try {
+
+		$('input[name="latitude"]').val('37:24:01');
+		$('input[name="longitude"]').val('-122:04:56');
+
+		$('input[name="date"]').val('2017-08-21');
+		$('input[name="time"]').val('09:00');
+		$('input[name="timezone"]').val('-08:00');
+		$('input[name="dst"]').prop('checked', true);
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end eclipse_2017_aug_21 click #}
+
+
+	$("#eclipse_2019_dec_26").click(function(e) {
+
+
+	    try {
+
+		$('input[name="latitude"]').val('37:24:01');
+		$('input[name="longitude"]').val('-122:04:56');
+
+		$('input[name="date"]').val('2019-12-26');
+		$('input[name="time"]').val('12:00');
+		$('input[name="timezone"]').val('-08:00');
+		$('input[name="dst"]').prop('checked', true);
+
+		standard_time = aai.standardTime($('input[name="date"]').val(),
+						 $('input[name="time"]').val(),
+						 $('input[name="timezone"]').val(),
+						 $("#_dst").is(':checked'));
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end eclipse_2019_dec_26 click #}
+
+
+    }); {# end ready method #}
+
+
+  </script>
+
+{% endblock %}
+
+{% block title %}Daily Lunar Altitude{% endblock %}
+
+{% block content %}
+
+<style>
+
+
+.linechart {
+    width: 800px;
+    height: 400px;
+}
+
+
+button#get_lunar_daily_altitude {
+
+    text-align: center;
+
+    font-size: 90%;
+    font-weight: bold;
+
+    margin: 0 auto;
+    display: block;
+
+    width: 75px;
+    height: 75px;
+
+    border-radius: 50%;
+
+    color:red;
+    background: silver;
+}
+
+
+</style>
+
+
+
+<h1>Daily Sun and Moon Paths</h1>
+
+<br>
+
+<div class="twocolumn">
+
+    This page shows the paths of the sun and moon as a plot
+    of <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">azimuth
+    vs. altitude</a> over a day starting at local midnight.  This uses
+    Jean Meeus' simplified algorithm for the moon position.  He
+    estimates accuracy at 10 arc-seconds in longitude and 4
+    arc-seconds in latitude.  I am seeing even greater differences
+    when comparing my results to Star Walk.
+
+  <p>
+    I do see a partial eclipse I
+    observed <button id="eclipse_2017_aug_21">Eclipse 2017 Aug
+    21</button> but I don't have more precise data on that time.
+    This shows there is one comming on <button id="eclipse_2019_dec_26">Eclipse 2019 Dec
+      26</button> so I will have a chance to see how accurate this is.
+
+  </p>
+
+  <p>
+    The sun and moon markers are not to scale.
+  </p>
+
+
+</div>
+
+<br>
+
+{% include "observer_location.html" %}
+
+<br>
+
+
+<table>
+
+  <tr>
+    <td colspan="5">
+
+      <table id="time_table" align="center">
+
+	<td>
+
+	  <button id="get_prev_day">Previous day</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_prev_hour">Previous Hour</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_lunar_daily_altitude">get lunar altitude data</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_next_hour">Next Hour</button>
+
+	</td>
+
+	<td>
+
+	  <button id="get_next_day">Next Day</button>
+
+	</td>
+
+      </table>
+
+    </td>
+
+  </tr>
+
+
+  <tr>
+
+    <td>
+      <div id="altitudeVtime" class="linechart"></div>
+    </td>
+
+
+  </tr>
+
+  <tr>
+    <td colspan="2">
+
+      <table id="results_table" align="center">
+
+	<tr>
+	  <td></td>
+	  <th>Sun</th>
+	  <th>Moon</th>
+	  <td></td>
+	</tr>
+
+
+	<tr>
+	  <th>Range</th>
+
+	  <td id="sun_range" align="right">TBD</td>
+	  <td id="moon_range" align="right">TBD</td>
+
+	  <td><i>light-seconds</i></td>
+	</tr>
+
+	<tr><td></td></tr>
+
+	<tr>
+	  <th>Ecliptic Longitude</th>
+
+	  <td id="sun_ec_longitude" align="right">TBD</td>
+	  <td id="moon_ec_longitude" align="right">TBD</td>
+
+	  <td><i>deg:min:sec</i></td>
+	</tr>
+
+	<tr>
+	  <th>Ecliptic Latitude</th>
+
+	  <td id="sun_ec_latitude" align="right">TBD</td>
+	  <td id="moon_ec_latitude" align="right">TBD</td>
+
+	  <td><i>deg:min:sec</i></td>
+	</tr>
+
+	<tr><td></td></tr>
+
+	<tr>
+	  <th>Right Ascension</th>
+
+	  <td id="sun_eq_ra" align="right">TBD</td>
+	  <td id="moon_eq_ra" align="right">TBD</td>
+
+	  <td><i>hr:min:sec</i></td>
+	</tr>
+
+
+	<tr>
+	  <th>Declination</th>
+
+	  <td id="sun_eq_dec" align="right">TBD</td>
+	  <td id="moon_eq_dec" align="right">TBD</td>
+
+	  <td><i>deg:min:sec</i></td>
+
+	</tr>
+
+	<tr><td></td></tr>
+
+	<tr>
+	  <th>Azimuth</th>
+
+	  <td id="sun_azimuth" align="right">TBD</td>
+	  <td id="moon_azimuth" align="right">TBD</td>
+
+	  <td><i>deg:min:sec</i></td>
+	</tr>
+
+	<tr>
+	  <th>Altitude</th>
+
+	  <td id="sun_altitude" align="right">TBD</td>
+	  <td id="moon_altitude" align="right">TBD</td>
+
+	  <td><i>deg:min:sec</i></td>
+	</tr>
+
+	<tr><td></td></tr>
+
+	<tr>
+	  <th>Rising</th>
+
+	  <td id="sun_rising" align="right">TBD</td>
+	  <td id="moon_rising" align="right">TBD</td>
+	  <td id="rising_dst"><i>ST</i></td>
+	</tr>
+
+
+	<tr>
+	  <th>Transit</th>
+
+	  <td id="sun_transit" align="right">TBD</td>
+	  <td id="moon_transit" align="right">TBD</td>
+	  <td id="transit_dst"><i>ST</i></td>
+
+	</tr>
+
+	<tr>
+	  <th>Setting</th>
+
+	  <td id="sun_setting" align="right">TBD</td>
+	  <td id="moon_setting" align="right">TBD</td>
+	  <td id="setting_dst"><i>ST</i></td>
+
+	</tr>
+
+
+      </table>
+
+    </td>
+  </tr>
+
+</table>
+
+{% endblock %}

@@ -104,14 +104,15 @@ def request_angle(an_angle_key, a_flask_request):
     return coords.angle(degrees, minutes, seconds)
 
 
-def request_datetime(a_date_key, a_time_key, a_timezone_key, a_dst_key, a_flask_request):
+def request_datetime(a_date_key, a_time_key, a_timezone_key, a_flask_request):
     """Gets the degree minute second values from the request args
+
+    Assumes daylight saving time has already been accounted for
 
     Arg:
         a_date_key (str): date key
         a_time_key (str): time key
         a_timezone_key (str): timezone key
-        a_dst_key (str): daylight saving time key
         a_flask_request (werkzeug.local.LocalProxy): reference to the flask request object
 
     Returns: coords.datetime
@@ -165,10 +166,6 @@ def request_datetime(a_date_key, a_time_key, a_timezone_key, a_dst_key, a_flask_
 
     if tz_elements['sign'] == '-':
         timezone *= -1
-
-    # handle daylight saving time
-    if flask.request.args[a_dst_key] == 'true':
-        hour -= 1
 
     a_datetime = coords.datetime(year, month, day, hour, minute, seconds, timezone)
 

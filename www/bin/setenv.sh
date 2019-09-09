@@ -28,7 +28,7 @@ export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${CARTESIAN_LIBRARY_PATH}
 
 COORDS_PYTHON_ROOT=Coordinates/Python/Boost
 
-COORDS_SO=`find ${COORDS_ROOT}/${COORDS_PYTHON_ROOT} -name coords.so`
+COORDS_SO=`find ${COORDS_ROOT}/${COORDS_PYTHON_ROOT} -name "coords*.so"`
 
 if [ -n "$COORDS_SO" ]; then
     echo "# coords.so:" $COORDS_SO

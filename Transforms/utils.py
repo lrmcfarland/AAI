@@ -48,6 +48,8 @@ def parse_angle_arg(an_arg):
 def JulianCentury(a_datetime):
     """Calculates the Julian century relative to J2000 of the given date
 
+    Meeus eq. 22.1, p. 143
+
     Args:
 
         a_datetime: local date and time of the observation in coords.datetime
@@ -129,7 +131,7 @@ def get_RA(a_point):
     Returns an angle with a value equal to the Right Ascension.
     """
 
-    return coords.angle(get_longitude(a_point).value/15.0)
+    return coords.angle(get_longitude(a_point)/15.0)
 
 
 def get_declination(a_point):
@@ -196,8 +198,7 @@ def radec2spherical(a_right_ascension, a_declination, a_radius=1):
     Returns coords.spherical.
     """
 
-    if a_right_ascension.value < 0 or a_right_ascension.value > 24:
+    if a_right_ascension.RA < 0 or a_right_ascension.RA > 24:
         raise Error('Right Ascension out of range: %s' % (a_right_ascension,))
 
-    return coords.spherical(a_radius, a_declination.complement(),
-                            coords.angle(a_right_ascension.value * 15))
+    return coords.spherical(a_radius, a_declination.complement(), a_right_ascension * 15)

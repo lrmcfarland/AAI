@@ -1,4 +1,4 @@
-{# AAI daily solar altitude chart #}
+{# AAI solar altitude chart #}
 
 {% extends "base.html" %}
 
@@ -32,40 +32,35 @@
 
 	} else {
 
-	    $("#rising").text(sun_position_data.rising);
-	    $("#transit").text(sun_position_data.transit);
-	    $("#setting").text(sun_position_data.setting);
 	    $("#azimuth").text(sun_position_data.sun_marker_azimuth);
 	    $("#altitude").text(sun_position_data.sun_marker_altitude);
 
+	    var today = $('input[name="date"]').val();
+	    var rising_datetime = new Date(today + ' ' + sun_position_data.rising);
+	    var transit_datetime = new Date(today + ' ' + sun_position_data.transit);
+	    var setting_datetime = new Date(today + ' ' + sun_position_data.setting);
 
-	    $('input[name="latitude"]').val(sun_position_data.latitude);
-	    $('input[name="longitude"]').val(sun_position_data.longitude);
+	    if ($("#_dst").is(':checked')) {
 
+		rising_datetime.setHours(rising_datetime.getHours() + 1);
+		transit_datetime.setHours(transit_datetime.getHours() + 1);
+		setting_datetime.setHours(setting_datetime.getHours() + 1);
 
-	    {# TODO meh! use regex #}
-	    var a_datetime = sun_position_data.datetime.split('T');
-	    var a_timeandzone = [a_datetime[1], 0];
-	    var a_sign = '';
-
-	    if (/-/.test(a_datetime[1])) {
-
-		a_timeandzone = a_datetime[1].split('-');
-		a_sign = '-';
-
-	    } else if (/\+/.test(a_datetime[1])) {
-
-		a_timeandzone = a_datetime[1].split('+');
-		a_sign = '+';
+		$("#rising_dst").text('DST');
+		$("#transit_dst").text('DST');
+		$("#setting_dst").text('DST');
 
 	    } else {
-		{# pass #}
-	    }
 
-	    $('input[name="date"]').val(a_datetime[0]);
+		$("#rising_dst").text('ST');
+		$("#transit_dst").text('ST');
+		$("#setting_dst").text('ST');
 
-	    $('input[name="time"]').val(a_timeandzone[0]);
-	    $('input[name="timezone"]').val(a_sign + a_timeandzone[1]);
+	    };
+
+	    $("#rising").text(rising_datetime.toLocaleTimeString());
+	    $("#transit").text(transit_datetime.toLocaleTimeString());
+	    $("#setting").text(setting_datetime.toLocaleTimeString());
 
 
 	    drawSunChart(sun_position_data);
@@ -82,7 +77,7 @@
 			      'Summer Solstice',
 			      'Autumnal Equinox',
 			      'Winter Solstice',
-			      sun_position_data.sun_date_label,
+			      sun_position_data.current_date,
 			      {'type': 'string', 'role': 'style'}]];
 
 	{# ----- special format for sun marker ----- #}
@@ -117,7 +112,18 @@
 	    }
 
 
-	    sun_plot_data.push(plot_record);
+
+	    if ($("#_dst").is(':checked')) {
+
+		plot_record[0] += 1.0;
+		sun_plot_data.push(plot_record);
+
+	    } else {
+
+		sun_plot_data.push(plot_record);
+
+	    };
+
 
 	}
 
@@ -125,7 +131,13 @@
 	    document.getElementById('altitudeVtime'));
 
 	var altitude_table = google.visualization.arrayToDataTable(sun_plot_data);
-	var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour");
+
+	if ($("#_dst").is(':checked')) {
+	    var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour after local 1 am ");
+
+	} else {
+	    var altitude_view = getSunChartView(altitude_table, "Altitude over time for one day", "hour after local midnight");
+	};
 
 	altitudeVtime_chart.draw(altitude_view.data, altitude_view.options);
 
@@ -159,7 +171,7 @@
 
 	var view_data = {};
 
-	var current_color = "blue";
+	var current_color = "gold";
 	var vernal_color = "green";
 	var summer_color = "red";
 	var autumnal_color = "orange";
@@ -239,46 +251,77 @@
 
 	{# ----- get data ----- #}
 
-	$("#get_daily_solar_altitude").click(function(e) {
+	$("#get_solar_daily_altitude").click(function(e) {
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
-		      {
-			  latitude: $('input[name="latitude"]').val(),
-			  longitude: $('input[name="longitude"]').val(),
-			  date: $('input[name="date"]').val(),
-			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val(),
-			  dst: $("#_dst").is(':checked') {# jQuery selector #}
 
-		      },
-		      function(sun_position) {
+	    try {
 
-			  updateSunChart(sun_position);
+		{# adjust for DST #}
 
-		      }); {# end getJSON #}
+		let standard_time = {date_str: $('input[name="date"]').val(),
+				     time_str: $('input[name="time"]').val(),
+				     timezone_str: $('input[name="timezone"]').val()};
+
+		if ($("#_dst").is(':checked')) {
+
+		    standard_time = aai.DST2ST($('input[name="date"]').val(),
+					       $('input[name="time"]').val(),
+					       $('input[name="timezone"]').val());
+
+		} else {
+
+		    std_tz = aai.standardTimezone($('input[name="timezone"]').val());
+		    standard_time.timezone_str = std_tz.timezone_str;
+
+		};
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: standard_time.date_str,
+		    time: standard_time.time_str,
+		    timezone: standard_time.timezone_str
+
+		}, function(sun_position) {
+
+		    updateSunChart(sun_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
 
 	    return false;
 
-	}); {# end get_daily_solar_altitude click #}
+	}); {# end get_solar_daily_altitude click #}
 
 
 
 	$("#get_midnight_sun").click(function(e) {
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
-		      {
-			  latitude: '66:33',
-			  longitude: '0:0:0',
-			  date: '2018-06-21',
-			  time: '12:00:00',
-			  timezone: '0',
-			  dst: 'false'
-		      },
-		      function(sun_position) {
+	    $('input[name="latitude"]').val('66:33');
+	    $('input[name="longitude"]').val('00:00');
 
-			  updateSunChart(sun_position);
+	    $('input[name="date"]').val('2018-06-21');
+	    $('input[name="time"]').val('12:00:00');
+	    $('input[name="timezone"]').val('00:00');
 
-		      }); {# end getJSON #}
+	    $('input[name="dst"]').removeAttr("checked");
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude",
+		{
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+		},
+		function(sun_position) {
+		    updateSunChart(sun_position);
+
+	    }); {# end getJSON #}
 
 	    return false;
 
@@ -287,20 +330,27 @@
 
 	$("#get_darkness_at_noon").click(function(e) {
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
-		      {
-			  latitude: '66:33',
-			  longitude: '0:0:0',
-			  date: '2018-12-21',
-			  time: '12:00:00',
-			  timezone: '0',
-			  dst: 'false'
-		      },
-		      function(sun_position) {
+	    $('input[name="latitude"]').val('66:33');
+	    $('input[name="longitude"]').val('00:00');
 
-			  updateSunChart(sun_position);
+	    $('input[name="date"]').val('2018-12-21');
+	    $('input[name="time"]').val('12:00:00');
+	    $('input[name="timezone"]').val('00:00');
 
-		      }); {# end getJSON #}
+	    $('input[name="dst"]').removeAttr("checked");
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude",
+		{
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+		},
+		function(sun_position) {
+		    updateSunChart(sun_position);
+
+	    }); {# end getJSON #}
 
 	    return false;
 
@@ -309,20 +359,27 @@
 
 	$("#get_no_shadow_at_noon").click(function(e) {
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/daily_solar_altitude",
-		      {
-			  latitude: '23:05',
-			  longitude: '32:54',
-			  date: '2018-06-21',
-			  time: '12:00:00',
-			  timezone: '2',
-			  dst: 'false'
-		      },
-		      function(sun_position) {
+	    $('input[name="latitude"]').val('23:05');
+	    $('input[name="longitude"]').val('32:54');
 
-			  updateSunChart(sun_position);
+	    $('input[name="date"]').val('2018-06-21');
+	    $('input[name="time"]').val('12:00:00');
+	    $('input[name="timezone"]').val('+02:00');
 
-		      }); {# end getJSON #}
+	    $('input[name="dst"]').removeAttr("checked");
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude",
+		{
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+		},
+		function(sun_position) {
+		    updateSunChart(sun_position);
+
+	    }); {# end getJSON #}
 
 	    return false;
 
@@ -343,17 +400,13 @@
 
 <style>
 
-.page {
-    width: 60em;
-}
-
 .linechart {
-    width: 800px;
+    width: 700px;
     height: 400px;
 }
 
 table#sun_chart_legend {
-    width: 10em;
+    width: 5em;
 }
 
 #_vernal_equinox_txt {
@@ -373,7 +426,7 @@ table#sun_chart_legend {
 }
 
 
-button#get_daily_solar_altitude {
+button#get_solar_daily_altitude {
 
     text-align: center;
 
@@ -438,10 +491,7 @@ button#get_daily_solar_altitude {
 
 <br>
 
-<button id="get_daily_solar_altitude">get solar altitude data</button>
-
-<h2>Daily Solar Altitude</h2>
-
+<button id="get_solar_daily_altitude">get solar altitude data</button>
 
 <table>
 
@@ -517,33 +567,33 @@ button#get_daily_solar_altitude {
 
 	<tr>
 	  <th>Azimuth</th>
-	  <td id="azimuth">TBD</td>
-	  <td>deg:min:sec (deg)</td>
+	  <td id="azimuth" align="right">TBD</td>
+	  <td>deg:min:sec</td>
 	</tr>
 
 	<tr>
 	  <th>Altitude</th>
-	  <td id="altitude">TBD</td>
-	  <td>deg:min:sec (deg)</td>
+	  <td id="altitude" align="right">TBD</td>
+	  <td>deg:min:sec</td>
 	</tr>
 
 	<tr>
 	  <th>Rising</th>
-	  <td id="rising">TBD</td>
-	  <td>ISO8601</td>
+	  <td id="rising" align="right">TBD</td>
+	  <td id="rising_dst">ST</td>
 	</tr>
 
 
 	<tr>
 	  <th>Transit</th>
-	  <td id="transit">TBD</td>
-	  <td>ISO8601</td>
+	  <td id="transit" align="right">TBD</td>
+	  <td id="transit_dst">ST</td>
 	</tr>
 
 	<tr>
 	  <th>Setting</th>
-	  <td id="setting">TBD</td>
-	  <td>ISO8601</td>
+	  <td id="setting" align="right">TBD</td>
+	  <td id="setting_dst">ST</td>
 	</tr>
 
       </table>

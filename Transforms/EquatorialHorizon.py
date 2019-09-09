@@ -59,11 +59,14 @@ Equatorial Coordinate System
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
+
 import math
 import coords
 
-import SiderealTime
-import utils
+import Transforms.SiderealTime
+import Transforms.utils
 
 
 class Error(Exception):
@@ -101,16 +104,16 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
+    gast = Transforms.SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
 
-    local_hour_angle = coords.angle(gast.value*15 + an_observer.phi.value - an_object.phi.value)
+    local_hour_angle = coords.angle(gast.degrees*15 + an_observer.phi.degrees - an_object.phi.degrees)
     local_hour_angle.normalize(0, 360)
 
     # Meeus 13.6
-    sinaltitude = math.sin(utils.get_latitude(an_observer).radians)  \
-                  * math.sin(utils.get_declination(an_object).radians) \
-                  + math.cos(utils.get_latitude(an_observer).radians)  \
-                  * math.cos(utils.get_declination(an_object).radians) \
+    sinaltitude = math.sin(Transforms.utils.get_latitude(an_observer).radians)  \
+                  * math.sin(Transforms.utils.get_declination(an_object).radians) \
+                  + math.cos(Transforms.utils.get_latitude(an_observer).radians)  \
+                  * math.cos(Transforms.utils.get_declination(an_object).radians) \
                   * math.cos(local_hour_angle.radians)
 
     theta = coords.angle(coords.angle().rad2deg(math.pi/2 - math.asin(sinaltitude)))
@@ -119,21 +122,21 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     # Meeus 13.5
     nom = math.sin(local_hour_angle.radians)
     den = math.cos(local_hour_angle.radians) \
-          * math.sin(utils.get_latitude(an_observer).radians) \
-          - math.tan(utils.get_declination(an_object).radians) \
-          * math.cos(utils.get_latitude(an_observer).radians)
+          * math.sin(Transforms.utils.get_latitude(an_observer).radians) \
+          - math.tan(Transforms.utils.get_declination(an_object).radians) \
+          * math.cos(Transforms.utils.get_latitude(an_observer).radians)
 
     # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
     phi = coords.angle(coords.angle().rad2deg(math.atan2(nom, den) + math.pi))
 
     if is_verbose:
-        print 'Datetime:', a_local_datetime.toJulianDate()
-        print 'GAST:', gast
-        print 'Local hour angle:', local_hour_angle.value
-        print 'Observer longitude:', utils.get_longitude(an_observer).value
-        print 'Object latitude:', utils.get_latitude(an_object).value
-        print 'Altitude:', theta.complement(), '(', theta.complement().value, ')' # Altitude = 90 - theta
-        print 'Azimuth:', phi, '(', phi.value, ')'
+        print('Datetime:', a_local_datetime.toJulianDate())
+        print('GAST:', gast)
+        print('Local hour angle:', local_hour_angle.degrees)
+        print('Observer longitude:', Transforms.utils.get_longitude(an_observer).degrees)
+        print('Object latitude:', Transforms.utils.get_latitude(an_object).degrees)
+        print('Altitude:', theta.complement(), '(', theta.complement().degrees, ')') # Altitude = 90 - theta
+        print('Azimuth:', phi, '(', phi.degrees, ')')
 
     return coords.spherical(1, theta, phi)
 
@@ -171,12 +174,12 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     # The calculation assumes "that Azimuth (A) is measured from the
     # South point, turning positive to the West". coords.spherical
     # assumes azimuth is measured from the x-axis as north.
-    azimuth = coords.angle(an_object.phi.value - 180)
+    azimuth = coords.angle(an_object.phi.degrees - 180)
 
     # Meeus, p. 94
-    sindec = math.sin(utils.get_latitude(an_observer).radians) \
+    sindec = math.sin(Transforms.utils.get_latitude(an_observer).radians) \
              * math.sin(altitude.radians) \
-             - math.cos(utils.get_latitude(an_observer).radians) \
+             - math.cos(Transforms.utils.get_latitude(an_observer).radians) \
              * math.cos(altitude.radians) \
              * math.cos(azimuth.radians)
 
@@ -185,29 +188,29 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     # Meeus, p. 94
     nom = math.sin(azimuth.radians)
     den = math.cos(azimuth.radians) \
-          * math.sin(utils.get_latitude(an_observer).radians) \
+          * math.sin(Transforms.utils.get_latitude(an_observer).radians) \
           + math.tan(altitude.radians) \
-          * math.cos(utils.get_latitude(an_observer).radians)
+          * math.cos(Transforms.utils.get_latitude(an_observer).radians)
 
     local_hour_angle = coords.angle(coords.angle().rad2deg(math.atan2(nom, den)))
     local_hour_angle.normalize(0, 360)
 
-    gast = SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
+    gast = Transforms.SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
 
-    object_longitude = coords.angle(15.0*gast.value + an_observer.phi.value - local_hour_angle.value )
+    object_longitude = coords.angle(15.0*gast.degrees + an_observer.phi.degrees - local_hour_angle.degrees )
     object_longitude.normalize(0, 360)
 
-    object_ra = coords.angle(24.0*object_longitude.value/360.0)
+    object_ra = coords.angle(24.0*object_longitude.degrees/360.0)
 
     if is_verbose:
-        print 'Datetime:', a_local_datetime.toJulianDate()
-        print 'GAST:', gast
-        print 'Local hour angle:', local_hour_angle.value
-        print 'Object declination', object_dec
-        print 'Object longitude:', object_longitude, '(', object_longitude.value, ')'
-        print 'Object R.A.:', object_ra, '(', object_ra.value, ')'
+        print('Datetime:', a_local_datetime.toJulianDate())
+        print('GAST:', gast)
+        print('Local hour angle:', local_hour_angle.degrees)
+        print('Object declination', object_dec)
+        print('Object longitude:', object_longitude, '(', object_longitude.degrees, ')')
+        print('Object R.A.:', object_ra, '(', object_ra.degrees, ')')
 
-    return utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec)
+    return Transforms.utils.radec2spherical(a_right_ascension=object_ra, a_declination=object_dec)
 
 
 
@@ -254,8 +257,8 @@ if __name__ == '__main__':
         parser.error('missing object RA, DEC or observer latitude, longitude or datetime.')
 
 
-    an_observer = utils.latlon2spherical(a_latitude=utils.parse_angle_arg(args[2]),
-                                         a_longitude=utils.parse_angle_arg(args[3]))
+    an_observer = Transforms.utils.latlon2spherical(a_latitude=Transforms.utils.parse_angle_arg(args[2]),
+                                                    a_longitude=Transforms.utils.parse_angle_arg(args[3]))
 
     a_datetime = coords.datetime(args[4])
 
@@ -267,20 +270,20 @@ if __name__ == '__main__':
 
     if options.toEquatorial is True:
 
-        an_object = utils.azalt2spherical(an_azimuth=utils.parse_angle_arg(args[0]),
-                                          an_altitude=utils.parse_angle_arg(args[1]))
+        an_object = Transforms.utils.azalt2spherical(an_azimuth=Transforms.utils.parse_angle_arg(args[0]),
+                                                     an_altitude=Transforms.utils.parse_angle_arg(args[1]))
 
         result = toEquatorial(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
-        print 'Equatorial Latitude:', utils.get_latitude(result),
-        print ', Longitude:', utils.get_longitude(result),
+        print('Equatorial Latitude:', Transforms.utils.get_latitude(result))
+        print('Longitude:', Transforms.utils.get_longitude(result))
 
     else:
 
-        an_object = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg(args[0]),
-                                          a_declination=utils.parse_angle_arg(args[1]))
+        an_object = Transforms.utils.radec2spherical(a_right_ascension=Transforms.utils.parse_angle_arg(args[0]),
+                                                     a_declination=Transforms.utils.parse_angle_arg(args[1]))
 
         result = toHorizon(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
-        print 'Azimuth:', utils.get_azimuth(result),
-        print ', Altitude:', utils.get_altitude(result)
+        print('Azimuth:', Transforms.utils.get_azimuth(result))
+        print(', Altitude:', Transforms.utils.get_altitude(result))

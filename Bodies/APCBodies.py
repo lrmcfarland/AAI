@@ -21,6 +21,8 @@ to test:
 
 """
 
+from __future__ import absolute_import # for python 2 and 3
+
 import math
 import coords
 
@@ -187,33 +189,33 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
 
 
     hour_angle = coords.angle(math.acos(cos_hour_angle))
-    print 'hour angle', hour_angle, 'for altitude', altitude
+    print('hour angle', hour_angle, 'for altitude', altitude)
 
     object_ra = Transforms.utils.get_RA(an_object)
-    print 'RA', object_ra
+    print('RA', object_ra)
 
 
     gmst = Transforms.APCTransforms.GMST(a_datetime)
-    print 'apc gmst', gmst
+    print('apc gmst', gmst)
 
     rise_time = gmst - object_ra + hour_angle
-    print 'gmst rise time', rise_time
+    print('gmst rise time', rise_time)
 
     set_time = object_ra + hour_angle - gmst
-    print 'gmst set time', set_time
+    print('gmst set time', set_time)
 
 
     gmst = Transforms.SideralTime.USNO_C163.GMST(a_datetime)
-    print 'usno gmst', gmst
+    print('usno gmst', gmst)
 
     lstm = Transforms.SideralTime.USNO_C163.LSTM(an_object, a_datetime)
-    print 'usno lstm', lstm
+    print('usno lstm', lstm)
 
     rise_time = lstm - object_ra + hour_angle
-    print 'lstm rise time', rise_time
+    print('lstm rise time', rise_time)
 
     set_time = object_ra + hour_angle - lstm
-    print 'lstm set time', set_time
+    print('lstm set time', set_time)
 
 
     return hour_angle
@@ -270,41 +272,41 @@ if __name__ == '__main__':
     # ----- calculate position -----
     # ------------------------------
 
-    print '# A datetime: ', a_datetime
-    print '# An observer:', an_observer
+    print('# A datetime: ', a_datetime)
+    print('# An observer:', an_observer)
 
     if options.body.lower() == 'sun':
 
         sun_ec = MiniSun(a_datetime)
-        print 'Sun in ecliptic coordinates:\n\t', sun_ec
+        print('Sun in ecliptic coordinates:\n\t', sun_ec)
 
         sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
-        print 'Sun in equatorial coordinates:\n\t', sun_eq
+        print('Sun in equatorial coordinates:\n\t', sun_eq)
 
         sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
-        print 'Sun in horizon coordinates:\n\t', sun_hz
+        print('Sun in horizon coordinates:\n\t', sun_hz)
 
-        print 'Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')'))
-        print 'Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),
-        print ''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')'))
+        print('Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),)
+        print(''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')')))
+        print('Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),)
+        print(''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')')))
 
     elif options.body.lower() == 'moon':
 
 
         moon_ec = MiniMoon(a_datetime)
-        print 'Moon in ecliptic coordinates:\n\t', moon_ec
+        print('Moon in ecliptic coordinates:\n\t', moon_ec)
 
         moon_eq = Transforms.EclipticEquatorial.toEquatorial(moon_ec, a_datetime)
-        print 'Moon in equatorial coordinates:\n\t', moon_eq
+        print('Moon in equatorial coordinates:\n\t', moon_eq)
 
         moon_hz = Transforms.EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
-        print 'Moon in horizon coordinates:\n\t', moon_hz
+        print('Moon in horizon coordinates:\n\t', moon_hz)
 
-        print 'Azimuth (degrees):', Transforms.utils.get_azimuth(moon_hz),
-        print ''.join(('(', str(Transforms.utils.get_azimuth(moon_hz).value), ')'))
-        print 'Altitude (degrees):', Transforms.utils.get_altitude(moon_hz),
-        print ''.join(('(', str(Transforms.utils.get_altitude(moon_hz).value), ')'))
+        print('Azimuth (degrees):', Transforms.utils.get_azimuth(moon_hz),)
+        print(''.join(('(', str(Transforms.utils.get_azimuth(moon_hz).value), ')')))
+        print('Altitude (degrees):', Transforms.utils.get_altitude(moon_hz),)
+        print(''.join(('(', str(Transforms.utils.get_altitude(moon_hz).value), ')')))
 
 
     elif options.body.lower() == 'tbd':
@@ -317,12 +319,12 @@ if __name__ == '__main__':
 
             moon = MoonPosition(current_datetime, an_observer)
 
-            print 0.01*d,
-            print current_datetime,
-            print Transforms.utils.get_azimuth(moon).value,
-            print Transforms.utils.get_altitude(moon).value
+            print(0.01*d,)
+            print(current_datetime,)
+            print(Transforms.utils.get_azimuth(moon).value,)
+            print(Transforms.utils.get_altitude(moon).value)
 
 
     else:
 
-        print 'unknown option'
+        print('unknown option')
