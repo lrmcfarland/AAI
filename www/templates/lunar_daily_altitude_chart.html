@@ -256,17 +256,17 @@
 
 	    try {
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
+		let lunar_standard_time = aai.standardTime($('input[name="date"]').val(),
+							   $('input[name="time"]').val(),
+							   $('input[name="timezone"]').val(),
+							   $("#_dst").is(':checked'));
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
 		    latitude: $('input[name="latitude"]').val(),
 		    longitude: $('input[name="longitude"]').val(),
-		    date: standard_time.date_str,
-		    time: standard_time.time_str,
-		    timezone: standard_time.timezone_str
+		    date: lunar_standard_time.date_str,
+		    time: lunar_standard_time.time_str,
+		    timezone: lunar_standard_time.timezone_str
 
 		}, function(moon_position) {
 
@@ -289,25 +289,39 @@
 
 	    try {
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
+		let standard_time_nh = aai.standardTime($('input[name="date"]').val(),
+							$('input[name="time"]').val(),
+							$('input[name="timezone"]').val(),
+							$("#_dst").is(':checked'));
 
-		{# calculate next hour #}
+		let next_hour = aai.changeTime(standard_time_nh.date_str,
+					       standard_time_nh.time_str,
+					       standard_time_nh.timezone_str,
+					       60*60);
 
-		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, 60*60);
+		if ($("#_dst").is(':checked')) {
 
-		$('input[name="date"]').val(new_time.date_str);
-		$('input[name="time"]').val(new_time.time_str);
-		$('input[name="timezone"]').val(new_time.timezone_str);
+		    let dst_nh = aai.ST2DST(next_hour.date_str,
+					    next_hour.time_str,
+					    next_hour.timezone_str);
+
+		    $('input[name="time"]').val(dst_nh.time_str);
+
+
+		} else {
+
+		    $('input[name="time"]').val(next_hour.time_str);
+
+		}
+
+
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
 		    latitude: $('input[name="latitude"]').val(),
 		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
+		    date: next_hour.date_str,
+		    time: next_hour.time_str,
+		    timezone: next_hour.timezone_str,
 
 		}, function(moon_position) {
 
@@ -329,18 +343,31 @@
 
 	    try {
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
 
-		{# calculate next day #}
+		let standard_time_nd = aai.standardTime($('input[name="date"]').val(),
+							$('input[name="time"]').val(),
+							$('input[name="timezone"]').val(),
+							$("#_dst").is(':checked'));
 
-		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, 24*60*60);
+		let next_day = aai.changeTime(standard_time_nd.date_str,
+					      standard_time_nd.time_str,
+					      standard_time_nd.timezone_str,
+					      24*60*60);
 
-		$('input[name="date"]').val(new_time.date_str);
-		$('input[name="time"]').val(new_time.time_str);
-		$('input[name="timezone"]').val(new_time.timezone_str);
+		if ($("#_dst").is(':checked')) {
+
+		    let dst_nd = aai.ST2DST(next_day.date_str,
+					    next_day.time_str,
+					    next_day.timezone_str);
+
+		    $('input[name="date"]').val(dst_nd.date_str);
+
+
+		} else {
+
+		    $('input[name="date"]').val(next_day.date_str);
+
+		}
 
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
@@ -373,18 +400,30 @@
 	    try {
 
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
+		let standard_time_ph = aai.standardTime($('input[name="date"]').val(),
+							$('input[name="time"]').val(),
+							$('input[name="timezone"]').val(),
+							$("#_dst").is(':checked'));
 
-		{# calculate prev hour #}
+		let prev_hour = aai.changeTime(standard_time_ph.date_str,
+					       standard_time_ph.time_str,
+					       standard_time_ph.timezone_str,
+					       -60*60);
 
-		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, -60*60);
+		if ($("#_dst").is(':checked')) {
 
-		$('input[name="date"]').val(new_time.date_str);
-		$('input[name="time"]').val(new_time.time_str);
-		$('input[name="timezone"]').val(new_time.timezone_str);
+		    let dst_ph = aai.ST2DST(prev_hour.date_str,
+					    prev_hour.time_str,
+					    prev_hour.timezone_str);
+
+		    $('input[name="time"]').val(dst_ph.time_str);
+
+
+		} else {
+
+		    $('input[name="time"]').val(prev_hour.time_str);
+
+		}
 
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
@@ -415,18 +454,31 @@
 
 	    try {
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
 
-		{# calculate prev day #}
+		let standard_time_pd = aai.standardTime($('input[name="date"]').val(),
+							$('input[name="time"]').val(),
+							$('input[name="timezone"]').val(),
+							$("#_dst").is(':checked'));
 
-		let new_time = aai.changeTime(standard_time.date_str, standard_time.time_str, standard_time.timezone_str, -24*60*60);
+		let next_day = aai.changeTime(standard_time_pd.date_str,
+					      standard_time_pd.time_str,
+					      standard_time_pd.timezone_str,
+					      -24*60*60);
 
-		$('input[name="date"]').val(new_time.date_str);
-		$('input[name="time"]').val(new_time.time_str);
-		$('input[name="timezone"]').val(new_time.timezone_str);
+		if ($("#_dst").is(':checked')) {
+
+		    let dst_pd = aai.ST2DST(next_day.date_str,
+					    next_day.time_str,
+					    next_day.timezone_str);
+
+		    $('input[name="date"]').val(dst_pd.date_str);
+
+
+		} else {
+
+		    $('input[name="date"]').val(next_day.date_str);
+
+		}
 
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
@@ -467,10 +519,10 @@
 		$('input[name="timezone"]').val('-08:00');
 		$('input[name="dst"]').prop('checked', true);
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
+		let standard_time = aai.standardTime($('input[name="date"]').val(),
+						     $('input[name="time"]').val(),
+						     $('input[name="timezone"]').val(),
+						     $("#_dst").is(':checked'));
 
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
@@ -507,12 +559,12 @@
 		$('input[name="date"]').val('2019-12-26');
 		$('input[name="time"]').val('12:00');
 		$('input[name="timezone"]').val('-08:00');
-		$('input[name="dst"]').prop('checked', true);
+		$('input[name="dst"]').prop('checked', false);
 
-		standard_time = aai.standardTime($('input[name="date"]').val(),
-						 $('input[name="time"]').val(),
-						 $('input[name="timezone"]').val(),
-						 $("#_dst").is(':checked'));
+		let standard_time = aai.standardTime($('input[name="date"]').val(),
+						     $('input[name="time"]').val(),
+						     $('input[name="timezone"]').val(),
+						     $("#_dst").is(':checked'));
 
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
