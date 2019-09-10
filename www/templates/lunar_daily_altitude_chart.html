@@ -460,23 +460,23 @@
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let next_day = aai.changeTime(standard_time_pd.date_str,
+		let prev_day = aai.changeTime(standard_time_pd.date_str,
 					      standard_time_pd.time_str,
 					      standard_time_pd.timezone_str,
 					      -24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_pd = aai.ST2DST(next_day.date_str,
-					    next_day.time_str,
-					    next_day.timezone_str);
+		    let dst_pd = aai.ST2DST(prev_day.date_str,
+					    prev_day.time_str,
+					    prev_day.timezone_str);
 
 		    $('input[name="date"]').val(dst_pd.date_str);
 
 
 		} else {
 
-		    $('input[name="date"]').val(next_day.date_str);
+		    $('input[name="date"]').val(prev_day.date_str);
 
 		}
 
