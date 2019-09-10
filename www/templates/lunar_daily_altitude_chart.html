@@ -59,6 +59,8 @@
 
 	    $("#datetime").text(moon_position_data.datetime);
 
+	    {# ----- Sun ----- #}
+
 	    $("#sun_range").text(moon_position_data.sun_range);
 	    $("#sun_ec_latitude").text(moon_position_data.sun_ec_latitude_dms);
 	    $("#sun_ec_longitude").text(moon_position_data.sun_ec_longitude_dms);
@@ -70,16 +72,26 @@
 	    $("#sun_azimuth").text(moon_position_data.sun_azimuth_dms);
 
 
-	    var today = $('input[name="date"]').val();
+	    {# adjust for DST #}
 
-	    var sun_rising_datetime = new Date(today + ' ' + moon_position_data.sun_rising);
-	    var sun_transit_datetime = new Date(today + ' ' + moon_position_data.sun_transit);
-	    var sun_setting_datetime = new Date(today + ' ' + moon_position_data.sun_setting);
+	    let sun_rising_datetime = {date_str: $('input[name="date"]').val(),
+				       time_str: moon_position_data.sun_rising,
+				       timezone_str: $('input[name="timezone"]').val()};
+
+	    let sun_transit_datetime = {date_str: $('input[name="date"]').val(),
+					time_str: moon_position_data.sun_transit,
+					timezone_str: $('input[name="timezone"]').val()};
+
+	    let sun_setting_datetime = {date_str: $('input[name="date"]').val(),
+					time_str: moon_position_data.sun_setting,
+					timezone_str: $('input[name="timezone"]').val()};
+
 
 	    if ($("#_dst").is(':checked')) {
-		sun_rising_datetime.setHours(sun_rising_datetime.getHours() + 1);
-		sun_transit_datetime.setHours(sun_transit_datetime.getHours() + 1);
-		sun_setting_datetime.setHours(sun_setting_datetime.getHours() + 1);
+
+		sun_rising_datetime = aai.ST2DST(sun_rising_datetime.date_str, sun_rising_datetime.time_str, sun_rising_datetime.timezone_str);
+		sun_transit_datetime = aai.ST2DST(sun_transit_datetime.date_str, sun_transit_datetime.time_str, sun_transit_datetime.timezone_str);
+		sun_setting_datetime = aai.ST2DST(sun_setting_datetime.date_str, sun_setting_datetime.time_str, sun_setting_datetime.timezone_str);
 
 		$("#rising_dst").text('DST');
 		$("#transit_dst").text('DST');
@@ -90,12 +102,15 @@
 		$("#rising_dst").text('ST');
 		$("#transit_dst").text('ST');
 		$("#setting_dst").text('ST');
+
 	    };
 
-	    $("#sun_rising").text(sun_rising_datetime.toLocaleTimeString());
-	    $("#sun_transit").text(sun_transit_datetime.toLocaleTimeString());
-	    $("#sun_setting").text(sun_setting_datetime.toLocaleTimeString());
+	    $("#sun_rising").text(sun_rising_datetime.time_str);
+	    $("#sun_transit").text(sun_transit_datetime.time_str);
+	    $("#sun_setting").text(sun_setting_datetime.time_str);
 
+
+	    {# ----- Moon ----- #}
 
 
 	    $("#moon_range").text(moon_position_data.moon_range);
@@ -108,20 +123,42 @@
 	    $("#moon_altitude").text(moon_position_data.moon_altitude_dms);
 	    $("#moon_azimuth").text(moon_position_data.moon_azimuth_dms);
 
+	    {# adjust for DST #}
 
-	    var moon_rising_datetime = new Date(today + ' ' + moon_position_data.moon_rising);
-	    var moon_transit_datetime = new Date(today + ' ' + moon_position_data.moon_transit);
-	    var moon_setting_datetime = new Date(today + ' ' + moon_position_data.moon_setting);
+	    let moon_rising_datetime = {date_str: $('input[name="date"]').val(),
+				       time_str: moon_position_data.moon_rising,
+				       timezone_str: $('input[name="timezone"]').val()};
+
+	    let moon_transit_datetime = {date_str: $('input[name="date"]').val(),
+					time_str: moon_position_data.moon_transit,
+					timezone_str: $('input[name="timezone"]').val()};
+
+	    let moon_setting_datetime = {date_str: $('input[name="date"]').val(),
+					time_str: moon_position_data.moon_setting,
+					timezone_str: $('input[name="timezone"]').val()};
+
 
 	    if ($("#_dst").is(':checked')) {
-		moon_rising_datetime.setHours(moon_rising_datetime.getHours() + 1);
-		moon_transit_datetime.setHours(moon_transit_datetime.getHours() + 1);
-		moon_setting_datetime.setHours(moon_setting_datetime.getHours() + 1);
+
+		moon_rising_datetime = aai.ST2DST(moon_rising_datetime.date_str, moon_rising_datetime.time_str, moon_rising_datetime.timezone_str);
+		moon_transit_datetime = aai.ST2DST(moon_transit_datetime.date_str, moon_transit_datetime.time_str, moon_transit_datetime.timezone_str);
+		moon_setting_datetime = aai.ST2DST(moon_setting_datetime.date_str, moon_setting_datetime.time_str, moon_setting_datetime.timezone_str);
+
+		$("#rising_dst").text('DST');
+		$("#transit_dst").text('DST');
+		$("#setting_dst").text('DST');
+
+	    } else {
+
+		$("#rising_dst").text('ST');
+		$("#transit_dst").text('ST');
+		$("#setting_dst").text('ST');
+
 	    };
 
-	    $("#moon_rising").text(moon_rising_datetime.toLocaleTimeString());
-	    $("#moon_transit").text(moon_transit_datetime.toLocaleTimeString());
-	    $("#moon_setting").text(moon_setting_datetime.toLocaleTimeString());
+	    $("#moon_rising").text(moon_rising_datetime.time_str);
+	    $("#moon_transit").text(moon_transit_datetime.time_str);
+	    $("#moon_setting").text(moon_setting_datetime.time_str);
 
 	    drawMoonChart(moon_position_data);
 	};
