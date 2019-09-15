@@ -53,10 +53,10 @@ class EquatorialHorizonTests(unittest.TestCase):
         return
 
 
-    def assertSpacesAreEqual(self, lhs_space, rhs_space, places=13, delta=None):
+    def assertSpacesAreEqual(self, lhs_space, rhs_space, places=12, delta=None):
         """Space assert helper method with limited places.
 
-        default 13 works for most.
+        default 12 works for most.
         """
         if delta:
             self.assertAlmostEqual(lhs_space.r, rhs_space.r, delta=delta)
@@ -123,8 +123,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = Transforms.EquatorialHorizon.toHorizon(self.sirius, self.mlc404, a_datetime)
 
-        self.assertEqual(16.39849173155956, Transforms.utils.get_latitude(sirius_hz).degrees)
-        self.assertEqual(127.04325555303262, Transforms.utils.get_longitude(sirius_hz).degrees)
+        self.assertEqual(16.813794241451888, Transforms.utils.get_latitude(sirius_hz).degrees)
+        self.assertEqual(127.53668547673463, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
@@ -175,11 +175,13 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         # convertalot has 25.8550
         # http://www.stargazing.net has 24:04:27
-        self.assertEqual(25.81263044474126,  Transforms.utils.get_latitude(sirius_hz).degrees)
+        # this is 25:50:15.7818
+        self.assertEqual(25.837717155453788,  Transforms.utils.get_latitude(sirius_hz).degrees)
 
         # convertalot has 177.1526
         # http://www.stargazing.net has 161:20:22
-        self.assertEqual(176.41734602707757, Transforms.utils.get_longitude(sirius_hz).degrees)
+        # this is 177:06:57.4295
+        self.assertEqual(177.1159526380051, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
@@ -201,11 +203,13 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         # convertalot has 55.7983
         # http://www.stargazing.net has 51:47:34
-        self.assertEqual(55.72303697392837, Transforms.utils.get_latitude(sirius_hz).degrees)
+        # this is 55:46:46.5697
+        self.assertEqual(55.77960268086638, Transforms.utils.get_latitude(sirius_hz).degrees)
 
         # convertalot has 175.4386
         # http://www.stargazing.net has 151:48:55
-        self.assertEqual(174.26757064015055, Transforms.utils.get_longitude(sirius_hz).degrees)
+        # this is 175:22:52.6989
+        self.assertEqual(175.3813052419757, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
@@ -227,11 +231,13 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         # convertalot has 87.3485
         # http://www.stargazing.net has 73:00:46
-        self.assertEqual(86.7091165016879, Transforms.utils.get_latitude(sirius_hz).degrees)
+        # this is 87:19:13.4142
+        self.assertEqual(87.32039282432778, Transforms.utils.get_latitude(sirius_hz).degrees)
 
         # convertalot has 75.0877
         # http://www.stargazing.net has 90:49:36
-        self.assertEqual(78.50352226233457, Transforms.utils.get_longitude(sirius_hz).degrees)
+        # this is 75:36:50.4176
+        self.assertEqual(75.61400487954215, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, an_observer, a_datetime)
 
@@ -250,8 +256,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = Transforms.EquatorialHorizon.toHorizon(self.sirius, self.mlc404, a_datetime)
 
-        self.assertEqual(-7.659047114058083, Transforms.utils.get_latitude(sirius_hz).degrees)
-        self.assertEqual(254.78103688257121, Transforms.utils.get_longitude(sirius_hz).degrees)
+        self.assertEqual(-8.163203278636573, Transforms.utils.get_latitude(sirius_hz).degrees)
+        self.assertEqual(255.16133834965282, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
@@ -270,8 +276,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = Transforms.EquatorialHorizon.toHorizon(self.sirius, self.mlc404, a_datetime)
 
-        self.assertEqual(-69.16138963605425, Transforms.utils.get_latitude(sirius_hz).degrees)
-        self.assertEqual(352.24085136954625, Transforms.utils.get_longitude(sirius_hz).degrees)
+        self.assertEqual(-69.22390534164711, Transforms.utils.get_latitude(sirius_hz).degrees)
+        self.assertEqual(354.00379188870545, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
@@ -290,8 +296,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = Transforms.EquatorialHorizon.toHorizon(self.sirius, self.mlc404, a_datetime)
 
-        self.assertEqual(19.832549744165608, Transforms.utils.get_latitude(sirius_hz).degrees)
-        self.assertEqual(131.34888940517624, Transforms.utils.get_longitude(sirius_hz).degrees)
+        self.assertEqual(20.22283964580123, Transforms.utils.get_latitude(sirius_hz).degrees)
+        self.assertEqual(131.8743636461398, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
@@ -310,8 +316,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         sirius_hz = Transforms.EquatorialHorizon.toHorizon(self.sirius, self.mlc404, a_datetime)
 
-        self.assertEqual(12.866172856786932, Transforms.utils.get_latitude(sirius_hz).degrees)
-        self.assertEqual(123.09452281510741, Transforms.utils.get_longitude(sirius_hz).degrees)
+        self.assertEqual(13.302334306322493, Transforms.utils.get_latitude(sirius_hz).degrees)
+        self.assertEqual(123.56028959199841, Transforms.utils.get_longitude(sirius_hz).degrees)
 
         sirius_eq = Transforms.EquatorialHorizon.toEquatorial(sirius_hz, self.mlc404, a_datetime)
 
@@ -333,8 +339,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         rigel_hz = Transforms.EquatorialHorizon.toHorizon(self.rigel, self.mlc404, a_datetime)
 
-        self.assertEqual(32.104349976543396, Transforms.utils.get_latitude(rigel_hz).degrees)
-        self.assertEqual(133.76324019981976, Transforms.utils.get_longitude(rigel_hz).degrees)
+        self.assertEqual(32.4793615897622, Transforms.utils.get_latitude(rigel_hz).degrees)
+        self.assertEqual(134.39183589599364, Transforms.utils.get_longitude(rigel_hz).degrees)
 
         rigel_eq = Transforms.EquatorialHorizon.toEquatorial(rigel_hz, self.mlc404, a_datetime)
 
@@ -356,11 +362,11 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         venus_hz = Transforms.EquatorialHorizon.toHorizon(venus, self.mlc404, a_datetime)
 
-        # starwalk has 7:14:07, this is 07:41:43.1496
-        self.assertEqual(7.695319341649835,  Transforms.utils.get_latitude(venus_hz).degrees)
+        # starwalk has 7:14:07, this is 07:12:59.6683
+        self.assertEqual(7.216574514195472,  Transforms.utils.get_latitude(venus_hz).degrees)
 
-        # starwalk has 246:42:18, this is 246:17:44.4737
-        self.assertEqual(246.2956871304181, Transforms.utils.get_longitude(venus_hz).degrees)
+        # starwalk has 246:42:18, this is 246:43:19.2959
+        self.assertEqual(246.7220266352129, Transforms.utils.get_longitude(venus_hz).degrees)
 
         venus_eq = Transforms.EquatorialHorizon.toEquatorial(venus_hz, self.mlc404, a_datetime)
 
@@ -386,11 +392,11 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         castor_hz = Transforms.EquatorialHorizon.toHorizon(castor, self.mlc404, a_datetime)
 
-        # starwalk has 79:19:17, this is 78:49:46.7591
-        self.assertEqual(78.82965531052908, Transforms.utils.get_latitude(castor_hz).degrees)
+        # starwalk has 79:19:17, this is 79:17:43.1787
+        self.assertEqual(79.29532740421266, Transforms.utils.get_latitude(castor_hz).degrees)
 
-        # starwalk has 118:06:19, this is 116:03:33.4654
-        self.assertAlmostEqual(116.05929595036575, Transforms.utils.get_longitude(castor_hz).degrees)
+        # starwalk has 118:06:19, this is 117:40:45.2907
+        self.assertAlmostEqual(117.67924742061244, Transforms.utils.get_longitude(castor_hz).degrees)
 
         castor_eq = Transforms.EquatorialHorizon.toEquatorial(castor_hz, self.mlc404, a_datetime)
 
@@ -417,11 +423,11 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         polaris_hz = Transforms.EquatorialHorizon.toHorizon(polaris, self.mlc404, a_datetime)
 
-        # starwalk has 37:45:56, this is 37:43:15.9847
-        self.assertEqual(37.72110687177799, Transforms.utils.get_latitude(polaris_hz).degrees)
+        # starwalk has 37:45:56, this is 37:42:48.5173
+        self.assertEqual(37.71347701529356, Transforms.utils.get_latitude(polaris_hz).degrees)
 
-        # starwalk has 359:09:47, this is 359:09:53.2487
-        self.assertEqual(359.16479129492996, Transforms.utils.get_longitude(polaris_hz).degrees)
+        # starwalk has 359:09:47, this is 359:09:36.8436
+        self.assertEqual(359.16023434085207, Transforms.utils.get_longitude(polaris_hz).degrees)
 
         polaris_eq = Transforms.EquatorialHorizon.toEquatorial(polaris_hz, self.mlc404, a_datetime)
 
@@ -448,11 +454,11 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         alpha_crucis_hz = Transforms.EquatorialHorizon.toHorizon(alpha_crucis, self.mlc404, a_datetime)
 
-        # starwalk has -30, 21, 21, this is -30:36:42.4172
-        self.assertEqual(-30.611782558848248, Transforms.utils.get_latitude(alpha_crucis_hz).degrees)
+        # starwalk has -30:21:21, this is -30:20:20.4192
+        self.assertEqual(-30.339005322141443, Transforms.utils.get_latitude(alpha_crucis_hz).degrees)
 
-        # starwalk has 148:33:49, this is 148:25:38.7502
-        self.assertEqual(148.4274306016521, Transforms.utils.get_longitude(alpha_crucis_hz).degrees)
+        # starwalk has 148:33:49, this is 148:33:52.6635
+        self.assertEqual(148.56462874067802, Transforms.utils.get_longitude(alpha_crucis_hz).degrees)
 
         alpha_crucis_eq = Transforms.EquatorialHorizon.toEquatorial(alpha_crucis_hz, self.mlc404, a_datetime)
 

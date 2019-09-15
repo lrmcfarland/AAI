@@ -65,7 +65,7 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(243.07115892922118, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(243.30488300565906, Transforms.utils.get_azimuth(sun).degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10')/2)
         self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
@@ -95,7 +95,7 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(267.90829781482097, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(268.1014512724721, Transforms.utils.get_azimuth(sun).degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32')/2)
         self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
@@ -123,7 +123,7 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(95.95981144985676, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(95.79970206137686, Transforms.utils.get_azimuth(sun).degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46')/2)
         self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=2)
@@ -267,12 +267,11 @@ class RiseAndSetTests(unittest.TestCase):
 
         venus = Transforms.utils.radec2spherical(coords.angle(41.73129/15), coords.angle(18.44092))
 
-
         rising, transit, setting = SunPosition.RiseAndSet(venus, boston, a_datetime, coords.angle(-0.5667))
 
-        self.assertEqual('1988-03-20T12:26:9.28415', str(rising))
-        self.assertEqual('1988-03-20T19:40:17.533', str(transit))
-        self.assertEqual('1988-03-20T02:54:25.782', str(setting))
+        self.assertEqual('1988-03-20T12:26:9.28415', str(rising)) # Meeus p. 104: 12:25
+        self.assertEqual('1988-03-20T19:40:17.533', str(transit)) # Meeus p. 104: 19:41
+        self.assertEqual('1988-03-20T02:54:25.782', str(setting)) # Meeus p. 104: 02:55
 
         return
 
@@ -333,9 +332,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('2015-05-22T04:26:4.97515+01', str(rising))  # NOAA 04:24
-        self.assertEqual('2015-05-22T11:58:46.9625+01', str(transit)) # NOAA 11:56:39
-        self.assertEqual('2015-05-22T19:31:28.9499+01', str(setting)) # NOAA 19:30
+        self.assertEqual('2015-05-22T04:25:49.8102+0100', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:58:26.8796+0100', str(transit)) # NOAA 11:56:39
+        self.assertEqual('2015-05-22T19:31:3.94916+0100', str(setting)) # NOAA 19:30
 
         return
 
@@ -350,9 +349,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('2015-05-22T04:25:49.8102-01', str(rising))  # NOAA 04:24
-        self.assertEqual('2015-05-22T11:58:26.8797-01', str(transit)) # NOAA 11:56:39
-        self.assertEqual('2015-05-22T19:31:3.94921-01', str(setting)) # NOAA 19:30
+        self.assertEqual('2015-05-22T04:26:4.97516-0100', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:58:46.9625-0100', str(transit)) # NOAA 11:56:39
+        self.assertEqual('2015-05-22T19:31:28.9499-0100', str(setting)) # NOAA 19:30
 
         return
 
@@ -373,9 +372,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('04:26:42.95', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('11:59:37.19', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('19:32:31.42', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('04:25:11.96', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('11:57:36.69', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('19:30:01.42', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -390,9 +389,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('04:25:11.96', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))    # NOAA 04:24
-        self.assertEqual('11:57:36.69', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)) # NOAA 11:56:40
-        self.assertEqual('19:30:01.42', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))  # NOAA 19:30
+        self.assertEqual('04:26:42.95', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))    # NOAA 04:24
+        self.assertEqual('11:59:37.19', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)) # NOAA 11:56:40
+        self.assertEqual('19:32:31.42', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))  # NOAA 19:30
 
         return
 
@@ -403,9 +402,9 @@ class SunRiseAndSetTests(unittest.TestCase):
         a_datetime = coords.datetime('2018-01-31T12:55:00-08')
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('07:13:26.50', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:22:31.11', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('17:31:35.71', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('07:15:31.66', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:25:14.61', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('17:34:57.56', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -417,9 +416,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('07:12:37.42', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:22:39.68', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('17:32:41.94', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('07:14:41.50', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:25:22.64', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('17:36:03.78', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
 
         return
@@ -438,9 +437,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('06:41:52.70', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:21:24.11', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:00:55.52', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('06:43:35.75', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:23:54.37', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:04:13.00', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -452,9 +451,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('06:40:24.71', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:21:04.27', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:01:43.83', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('06:42:07.31', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:23:34.21', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:05:01.11', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -475,9 +474,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:33:58.60', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:11:35.12', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:49:11.64', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:31:45.75', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:10:07.33', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:48:28.91', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -495,9 +494,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:30:14.99', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:07:57.15', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:45:39.32', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:31:58.74', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:10:25.94', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:48:53.14', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -517,9 +516,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.antimlc404, a_datetime)
 
-        self.assertEqual('05:12:14.72', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('11:51:04.38', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:29:54.03', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:14:27.36', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('11:52:32.06', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:30:36.76', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -537,9 +536,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.antimlc404, a_datetime)
 
-        self.assertEqual('05:15:58.27', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('11:54:42.31', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:33:26.36', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:14:14.39', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('11:52:13.46', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:30:12.53', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -552,9 +551,9 @@ class SunRiseAndSetTests(unittest.TestCase):
         rising, transit, setting = SunPosition.SunRiseAndSet(self.antimlc404, a_datetime)
 
 
-        self.assertEqual('06:06:47.34', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('11:40:31.19', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('17:14:15.05', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('06:03:31.51', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('11:38:01.14', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('17:12:30.76', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -566,9 +565,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:37:57.05', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:09:06.83', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:40:16.60', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:41:07.94', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:11:32.03', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:41:56.12', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -584,9 +583,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:31:11.10', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:10:59.52', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:50:47.93', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:28:59.27', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:09:32.26', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:50:05.25', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -601,9 +600,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:28:33.06', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:08:54.92', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:49:16.78', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:26:21.50', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:07:27.80', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:48:34.10', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -615,9 +614,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:28:33.27', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:10:34.88', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:52:36.48', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:26:22.56', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:09:08.20', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:51:53.84', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
@@ -629,9 +628,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(self.mlc404, a_datetime)
 
-        self.assertEqual('05:26:09.31', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
-        self.assertEqual('12:08:49.45', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
-        self.assertEqual('18:51:29.60', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
+        self.assertEqual('05:23:58.94', '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second))
+        self.assertEqual('12:07:22.95', '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second))
+        self.assertEqual('18:50:46.97', '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second))
 
         return
 
