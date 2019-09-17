@@ -548,17 +548,17 @@
 	}); {# end eclipse_2017_aug_21 click #}
 
 
-	$("#eclipse_2019_dec_26").click(function(e) {
+	$("#eclipse_2019_dec_26_Lat24").click(function(e) {
 
 
 	    try {
 
-		$('input[name="latitude"]').val('37:24:01');
-		$('input[name="longitude"]').val('-122:04:56');
+		$('input[name="latitude"]').val('24');
+		$('input[name="longitude"]').val('102');
 
 		$('input[name="date"]').val('2019-12-26');
 		$('input[name="time"]').val('12:00');
-		$('input[name="timezone"]').val('-08:00');
+		$('input[name="timezone"]').val('+07:00');
 		$('input[name="dst"]').prop('checked', false);
 
 		let standard_time = aai.standardTime($('input[name="date"]').val(),
@@ -587,7 +587,50 @@
 
 	    return false;
 
-	}); {# end eclipse_2019_dec_26 click #}
+	}); {# end eclipse_2019_dec_26_Lat24 click #}
+
+
+	$("#eclipse_2019_dec_26_Lat20").click(function(e) {
+
+
+	    try {
+
+		$('input[name="latitude"]').val('20');
+		$('input[name="longitude"]').val('102');
+
+		$('input[name="date"]').val('2019-12-26');
+		$('input[name="time"]').val('12:00');
+		$('input[name="timezone"]').val('+07:00');
+		$('input[name="dst"]').prop('checked', false);
+
+		let standard_time = aai.standardTime($('input[name="date"]').val(),
+						     $('input[name="time"]').val(),
+						     $('input[name="timezone"]').val(),
+						     $("#_dst").is(':checked'));
+
+
+		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		    latitude: $('input[name="latitude"]').val(),
+		    longitude: $('input[name="longitude"]').val(),
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
+
+		}, function(moon_position) {
+
+		    updateMoonChart(moon_position);
+
+		}); {# end getJSON #}
+
+
+	    } catch (err) {
+		alert(err);
+	    }
+
+	    return false;
+
+	}); {# end eclipse_2019_dec_26_Lat20 click #}
+
 
 
     }); {# end ready method #}
@@ -642,24 +685,28 @@ button#get_lunar_daily_altitude {
 
     This page shows the paths of the sun and moon as a plot
     of <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">azimuth
-    vs. altitude</a> over a day starting at local midnight.  This uses
-    Jean Meeus' simplified algorithm for the moon position.  He
-    estimates accuracy at 10 arc-seconds in longitude and 4
-    arc-seconds in latitude.  I am seeing even greater differences
-    when comparing my results to Star Walk.
+    vs. altitude</a> over a day starting at local midnight.
 
+    This uses
+    Jean Meeus' simplified algorithm for the moon position.
+    estimates accuracy at 10&deg; arc-seconds in longitude and 4&deg;
+    arc-seconds in latitude.
+
+    All implementation mistakes are mine.
+    
   <p>
-    I do see a partial eclipse I
-    observed <button id="eclipse_2017_aug_21">Eclipse 2017 Aug
-    21</button> but I don't have more precise data on that time.
-    This shows there is one comming on <button id="eclipse_2019_dec_26">Eclipse 2019 Dec
-      26</button> so I will have a chance to see how accurate this is.
+    I get good results for an eclipse I
+    observed on <button id="eclipse_2017_aug_21">Aug 21, 2017</button>.
 
-  </p>
+    I have been trying some of the ones I find on <a href="">the List
+    of solar eclipses in the 21st century</a> I found have a
+    problem with latitudes near the Earth's axial tilt.
 
-  <p>
-    The sun and moon markers are not to scale.
-  </p>
+    On solar eclipse for Dec 26, 2019, for example,
+    the path plot starts to distort from
+    <button id="eclipse_2019_dec_26_Lat24">24&deg;</button>
+    to <button id="eclipse_2019_dec_26_Lat20">20&deg;</button> and
+    lower.
 
 
 </div>
