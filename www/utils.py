@@ -135,6 +135,7 @@ def request_datetime(a_date_key, a_time_key, a_timezone_key, a_flask_request):
     if hms_match is None:
         raise Error('unsupported date format {}'.format(flask.request.args[a_date_key]))
 
+    # TODO unneeded
     hms = hms_match.groupdict()
 
     hour = int(hms['hour'])
@@ -150,6 +151,7 @@ def request_datetime(a_date_key, a_time_key, a_timezone_key, a_flask_request):
     if tz_match is None:
         raise Error('unsupported timezone format {}'.format(flask.request.args[a_timezone_key]))
 
+    # TODO unused
     tz_elements = tz_match.groupdict()
 
     timezone = float(tz_elements['hrs'])
@@ -167,6 +169,8 @@ def request_datetime(a_date_key, a_time_key, a_timezone_key, a_flask_request):
     if tz_elements['sign'] == '-':
         timezone *= -1
 
-    a_datetime = coords.datetime(year, month, day, hour, minute, seconds, timezone)
+
+    # TODO construct from float? construct from strings?
+    a_datetime = coords.datetime(year, month, day, hour, minute, seconds, str(flask.request.args[a_timezone_key]))
 
     return a_datetime

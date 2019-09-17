@@ -188,14 +188,14 @@ def EquationOfTime(a_datetime):
     Returns (coords.angle): equation of time as an angle in degrees. *60 for minutes.
     """
 
-    noon = coords.datetime()
-    noon.fromJulianDate(math.floor(a_datetime.toJulianDate()))
-    gast = Transforms.SiderealTime.USNO_C163.GAST(noon)
+    zulu_time = a_datetime.inTimezoneOffset(0)
 
-    ecliptic_longitude, R = SolarLongitudeRange(noon)
+    gast = Transforms.SiderealTime.USNO_C163.GAST(zulu_time)
+
+    ecliptic_longitude, R = SolarLongitudeRange(zulu_time)
 
     sun_ec = coords.spherical(R, coords.angle(90), ecliptic_longitude)
-    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, noon)
+    sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, zulu_time)
 
     eot = coords.angle()
 
@@ -243,18 +243,6 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     from Meeus, ch. 15
 
-    WARNING: I found adding the m0, m1 and m2 could mess with my timezone
-    adjustments by up to 2 days, hence the adjustments.
-
-    TODO try not normalizing m0, m1 or m2
-
-    TODO more than just sun position, return local time, altitude
-    configurable to astronomical, nautical, civil, star, sun, moon
-
-    TODO error check for timezone and observer location?
-
-
-
     Args:
 
     an_object: the vector to transform in theta (90 - declination),
@@ -279,10 +267,9 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     """
 
-    JD, JDo = Transforms.SiderealTime.USNO_C163.JulianDate0(a_datetime)
+    JD, JDo = Transforms.SiderealTime.USNO_C163.JulianDate0(a_datetime.inTimezoneOffset(0))
 
-    midnight = coords.datetime()
-    midnight.fromJulianDate(JDo)
+    midnight = a_datetime.fromJulianDate(JDo)
 
     observer_latitude = Transforms.utils.get_latitude(an_observer)
     observer_longitude = Transforms.utils.get_longitude(an_observer)
@@ -314,20 +301,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     m0 = coords.angle((object_RA - observer_longitude - gmst).degrees/360.0)
     m0.normalize(0, 1)
 
-    transit_utc = coords.datetime()
-    transit_utc.fromJulianDate(JDo + m0.degrees)
+    transit_loc = a_datetime.fromJulianDate(JDo + m0.degrees)
 
-
-    if not a_datetime.timezone:
-        transit_loc = transit_utc
-
-    else:
-
-        transit_loc = coords.datetime(midnight.year, midnight.month, midnight.day,
-                                      transit_utc.hour, transit_utc.minute, transit_utc.second,
-                                      a_datetime.timezone)
-
-        transit_loc += a_datetime.timezone/24
 
     # ------------------
     # ----- rising -----
@@ -336,19 +311,7 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     m1 = coords.angle(m0.degrees - hour_angle.degrees/360)
     m1.normalize(0, 1)
 
-    rising_utc = coords.datetime()
-    rising_utc.fromJulianDate(JDo + m1.degrees)
-
-    if not a_datetime.timezone:
-        rising_loc = rising_utc
-
-    else:
-
-        rising_loc = coords.datetime(midnight.year, midnight.month, midnight.day,
-                                     rising_utc.hour, rising_utc.minute, rising_utc.second,
-                                     a_datetime.timezone)
-
-        rising_loc += a_datetime.timezone/24
+    rising_loc = a_datetime.fromJulianDate(JDo + m1.degrees)
 
 
     # -------------------
@@ -358,24 +321,14 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     m2 = coords.angle(m0.degrees + hour_angle.degrees/360)
     m2.normalize(0, 1)
 
-    setting_utc = coords.datetime()
-    setting_utc.fromJulianDate(JDo + m2.degrees)
-
-    if not a_datetime.timezone:
-        setting_loc = setting_utc
-
-    else:
-
-        setting_loc = coords.datetime(midnight.year, midnight.month, midnight.day,
-                                      setting_utc.hour, setting_utc.minute, setting_utc.second,
-                                      a_datetime.timezone)
-
-        setting_loc += a_datetime.timezone/24
+    setting_loc = a_datetime.fromJulianDate(JDo + m2.degrees)
 
 
     # TODO the dates on this algorithm can be off +/- 1
 
-    return rising_loc, transit_loc, setting_loc
+    return (rising_loc.inTimezoneOffset(a_datetime.offset()),
+            transit_loc.inTimezoneOffset(a_datetime.offset()),
+            setting_loc.inTimezoneOffset(a_datetime.offset()))
 
 
 # ================

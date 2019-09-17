@@ -88,10 +88,8 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime = coords.datetime('2015-01-01T00:00:00')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
 
-        a_JD_datetime = coords.datetime()
-        a_JD_datetime.fromJulianDate(a_JD)
-        a_JDo_datetime = coords.datetime()
-        a_JDo_datetime.fromJulianDate(a_JDo)
+        a_JD_datetime = a_datetime.fromJulianDate(a_JD)
+        a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457023.5, a_JD)
         self.assertEqual('2015-01-01T00:00:00', str(a_JD_datetime))
@@ -106,10 +104,8 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime = coords.datetime('2015-01-01T01:00:00')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
 
-        a_JD_datetime = coords.datetime()
-        a_JD_datetime.fromJulianDate(a_JD)
-        a_JDo_datetime = coords.datetime()
-        a_JDo_datetime.fromJulianDate(a_JDo)
+        a_JD_datetime = a_datetime.fromJulianDate(a_JD)
+        a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457023.5416666665, a_JD)
         self.assertEqual('2015-01-01T01:00:00', str(a_JD_datetime))
@@ -125,10 +121,8 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime = coords.datetime('2015-02-01T13:00:00')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
 
-        a_JD_datetime = coords.datetime()
-        a_JD_datetime.fromJulianDate(a_JD)
-        a_JDo_datetime = coords.datetime()
-        a_JDo_datetime.fromJulianDate(a_JDo)
+        a_JD_datetime = a_datetime.fromJulianDate(a_JD)
+        a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457055.0416666665, a_JD)
         self.assertEqual('2015-02-01T13:00:00', str(a_JD_datetime))
@@ -144,10 +138,8 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime = coords.datetime('2015-03-15T23:59:59')
         a_JD, a_JDo = self.xforms.JulianDate0(a_datetime)
 
-        a_JD_datetime = coords.datetime()
-        a_JD_datetime.fromJulianDate(a_JD)
-        a_JDo_datetime = coords.datetime()
-        a_JDo_datetime.fromJulianDate(a_JDo)
+        a_JD_datetime = a_datetime.fromJulianDate(a_JD)
+        a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457097.499988426, a_JD)
         self.assertEqual('2015-03-15T23:59:59', str(a_JD_datetime))
@@ -294,12 +286,12 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gast = self.xforms.GAST(a_datetime)
         an_eqeq = a_gast - a_gmst
 
-        self.assertEqual('20:43:46.9807', str(a_gmst)) # Actual: 20 43 37.1224
-        self.assertEqual('20:43:47.2812', str(a_gast)) # Actual: 20 43 37.4227
-        self.assertEqual('00:00:0.300518', str(an_eqeq)) # Actual: +0.3003 seconds
-        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=2&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&place=%28no+name+given%29&lon_sign=1&lon_deg=15&lon_min=&lon_sec=&lat_sign=1&lat_deg=0&lat_min=&lat_sec=
+        self.assertEqual('19:43:27.2677', str(a_gmst))
+        self.assertEqual('19:43:27.5681', str(a_gast))
+        self.assertEqual('00:00:0.300386', str(an_eqeq))
 
         return
+
 
     def test_GMST_2pm_tzn1(self):
         """Test GMST 2015 01 01 2 pm timezone -1"""
@@ -308,10 +300,9 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gast = self.xforms.GAST(a_datetime)
         an_eqeq = a_gast - a_gmst
 
-        self.assertEqual('20:43:27.2677', str(a_gmst)) # Actual: 20 43 37.1224
-        self.assertEqual('20:43:27.5681', str(a_gast)) # Actual: 20 43 37.4227
-        self.assertEqual('00:00:0.300386', str(an_eqeq)) # Actual: +0.3003 seconds
-        # validate http://aa.usno.navy.mil/cgi-bin/aa_siderealtime.pl?form=2&year=2015&month=1&day=01&hr=14&min=0&sec=0.0&intv_mag=1.0&intv_unit=1&reps=5&place=%28no+name+given%29&lon_sign=-1&lon_deg=15&lon_min=&lon_sec=&lat_sign=1&lat_deg=0&lat_min=&lat_sec=
+        self.assertEqual('21:43:46.9807', str(a_gmst))
+        self.assertEqual('21:43:47.2812', str(a_gast))
+        self.assertEqual('00:00:0.300518', str(an_eqeq))
 
         return
 

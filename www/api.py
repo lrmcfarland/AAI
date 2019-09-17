@@ -191,7 +191,7 @@ def azalt2radec():
 
         result['observer'] = str(an_observer)
 
-        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
+        a_datetime = utils.request_datetime('date', 'time', 'timezone', flask.request)
 
         result['datetime'] = str(a_datetime)
 
@@ -356,25 +356,26 @@ def solar_daily_altitude():
 
         result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
         result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
-        result['current_timezone'] = '{}'.format(a_datetime.timezone)
+        result['current_timezone'] = '{}'.format(a_datetime.offset())
 
-        result['sun_marker_time'] = a_datetime.hour + a_datetime.minute/60.0 # distance on x-axis to plot sun marker
+        result['sun_marker_time'] = a_datetime.hour + a_datetime.minute/60.0
+        # distance on x-axis to plot sun marker
 
         vernal_equinox = coords.datetime(a_datetime.year, 3, 20)
-        vernal_equinox.timezone = a_datetime.timezone
-        vernal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        vernal_equinox.timezone = a_datetime.offset()
+        vernal_equinox -= a_datetime.offset() * 1.0/24 # to center plot at local noon
 
         summer_solstice = coords.datetime(a_datetime.year, 6, 20)
-        summer_solstice.timezone = a_datetime.timezone
-        summer_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        summer_solstice.timezone = a_datetime.offset()
+        summer_solstice -= a_datetime.offset() * 1.0/24 # to center plot at local noon
 
         autumnal_equinox = coords.datetime(a_datetime.year, 9, 22)
-        autumnal_equinox.timezone = a_datetime.timezone
-        autumnal_equinox += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        autumnal_equinox.timezone = a_datetime.offset()
+        autumnal_equinox -= a_datetime.offset() * 1.0/24 # to center plot at local noon
 
         winter_solstice = coords.datetime(a_datetime.year, 12, 21)
-        winter_solstice.timezone = a_datetime.timezone
-        winter_solstice += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        winter_solstice.timezone = a_datetime.offset()
+        winter_solstice -= a_datetime.offset() * 1.0/24 # to center plot at local noon
 
         result['date_label'] = '{year}-{month}-{day}'.format(year=a_datetime.year,
                                                              month=a_datetime.month,
@@ -388,8 +389,8 @@ def solar_daily_altitude():
         altitude = list()
 
         current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
-        current_time.timezone = a_datetime.timezone
-        current_time += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        current_time.timezone = a_datetime.offset()
+        current_time -= a_datetime.offset() * 1.0/24 # to center plot at local noon
 
         for d in range(0, npts + 1):
 
@@ -518,7 +519,10 @@ def get_sun_azalt(an_observer, a_datetime):
 
 @api.route("/sun_rise_set_azimuths")
 def sun_rise_set_azimuths():
-    """Get the sun rise and set azimuths"""
+    """Get the sun rise and set azimuths
+
+    TODO check timezone
+    """
 
     result = {'errors': list()}
 
@@ -535,7 +539,7 @@ def sun_rise_set_azimuths():
 
         result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
         result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
-        result['current_timezone'] = '{}'.format(a_datetime.timezone)
+        result['current_timezone'] = '{}'.format(a_datetime.offset())
 
         rts = get_sun_rise_transit_set(utils.request_angle('latitude', flask.request),
                                        utils.request_angle('longitude', flask.request),
@@ -557,10 +561,10 @@ def sun_rise_set_azimuths():
 
 
         # TODO does not support fractional time zones like India yet
-        if a_datetime.timezone < 0:
-            timezone = '{:03}'.format(int(a_datetime.timezone))
+        if a_datetime.offset() < 0:
+            timezone = '{:03}'.format(int(a_datetime.offset()))
         else:
-            timezone = '+{:02}'.format(int(a_datetime.timezone))
+            timezone = '+{:02}'.format(int(a_datetime.offset()))
 
 
         a_rising_datetime = coords.datetime('{}-{:02}-{:02}T{}{}'.format(a_datetime.year, a_datetime.month, a_datetime.day,
@@ -753,7 +757,7 @@ def lunar_daily_altitude():
 
         result['current_date'] = '{}-{:02}-{:02}'.format(a_datetime.year, a_datetime.month, a_datetime.day)
         result['current_time'] = '{:02}:{:02}:{:05.2f}'.format(a_datetime.hour, a_datetime.minute, a_datetime.second)
-        result['current_timezone'] = '{}'.format(a_datetime.timezone)
+        result['current_timezone'] = '{}'.format(a_datetime.offset())
 
 
         sun_ec_position = Bodies.SunPosition.EclipticCoords(a_datetime)
@@ -808,8 +812,8 @@ def lunar_daily_altitude():
         moon_azal = list()
 
         current_time = coords.datetime(a_datetime.year, a_datetime.month, a_datetime.day)
-        current_time.timezone = a_datetime.timezone
-        current_time += a_datetime.timezone * 1.0/24 # to center plot at local noon
+        current_time.timezone = a_datetime.offset()
+        current_time += a_datetime.offset() * 1.0/24 # to center plot at local noon
 
         daily_sun_azimuth = list()
         daily_sun_altitude = list()

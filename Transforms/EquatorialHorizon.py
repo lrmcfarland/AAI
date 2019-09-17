@@ -73,7 +73,7 @@ class Error(Exception):
     pass
 
 
-def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
+def toHorizon(an_object, an_observer, a_datetime, is_verbose=False):
     """Transforms a coordinate vector from equatorial to horizon coordinates.
 
     Astronomical Algorithms 2ed, Jean Meeus ISBN 0-943396-61-1
@@ -104,7 +104,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     if not isinstance(an_observer, coords.spherical):
         raise Error('observer must be in spherical coordinates')
 
-    gast = Transforms.SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
+    gast = Transforms.SiderealTime.USNO_C163.GAST(a_datetime.inTimezoneOffset(0))
 
     local_hour_angle = coords.angle(gast.degrees*15 + an_observer.phi.degrees - an_object.phi.degrees)
     local_hour_angle.normalize(0, 360)
@@ -130,7 +130,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     phi = coords.angle(coords.angle().rad2deg(math.atan2(nom, den) + math.pi))
 
     if is_verbose:
-        print('Datetime:', a_local_datetime.toJulianDate())
+        print('Datetime:', a_datetime.toJulianDate())
         print('GAST:', gast)
         print('Local hour angle:', local_hour_angle.degrees)
         print('Observer longitude:', Transforms.utils.get_longitude(an_observer).degrees)
@@ -141,7 +141,7 @@ def toHorizon(an_object, an_observer, a_local_datetime, is_verbose=False):
     return coords.spherical(1, theta, phi)
 
 
-def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
+def toEquatorial(an_object, an_observer, a_datetime, is_verbose=False):
     """Transforms a coordinate vector from horizon to equatorial coordinates.
 
     Astronomical Algorithms 2ed, Jean Meeus ISBN 0-943396-61-1
@@ -195,7 +195,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     local_hour_angle = coords.angle(coords.angle().rad2deg(math.atan2(nom, den)))
     local_hour_angle.normalize(0, 360)
 
-    gast = Transforms.SiderealTime.USNO_C163.GAST(a_local_datetime) - coords.angle(a_local_datetime.timezone) # hours
+    gast = Transforms.SiderealTime.USNO_C163.GAST(a_datetime.inTimezoneOffset(0)) # hours
 
     object_longitude = coords.angle(15.0*gast.degrees + an_observer.phi.degrees - local_hour_angle.degrees )
     object_longitude.normalize(0, 360)
@@ -203,7 +203,7 @@ def toEquatorial(an_object, an_observer, a_local_datetime, is_verbose=False):
     object_ra = coords.angle(24.0*object_longitude.degrees/360.0)
 
     if is_verbose:
-        print('Datetime:', a_local_datetime.toJulianDate())
+        print('Datetime:', a_datetime.toJulianDate())
         print('GAST:', gast)
         print('Local hour angle:', local_hour_angle.degrees)
         print('Object declination', object_dec)

@@ -84,7 +84,7 @@ class USNO_C163(object):
         Returns (coords.angle): GMST as an angle in hours
         """
 
-        JD, JDo = cls.JulianDate0(a_datetime)
+        JD, JDo = cls.JulianDate0(a_datetime.inTimezoneOffset(0))
 
         D = JD - a_datetime.J2000
         Do = JDo - a_datetime.J2000
@@ -93,7 +93,7 @@ class USNO_C163(object):
 
         gmst = 6.697374558 + 0.06570982441908*Do + 1.00273790935*H + 0.000026*T*T
 
-        gmst_hours = coords.angle(gmst - a_datetime.timezone)
+        gmst_hours = coords.angle(gmst)
         gmst_hours.normalize(0, 24)
 
         return gmst_hours
