@@ -92,10 +92,10 @@ class USNO_C163_Tests(unittest.TestCase):
         a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457023.5, a_JD)
-        self.assertEqual('2015-01-01T00:00:00', str(a_JD_datetime))
+        self.assertEqual('2015-01-01T00:00:00.0', str(a_JD_datetime))
 
         self.assertEqual(2457023.5, a_JDo)
-        self.assertEqual('2015-01-01T00:00:00', str(a_JDo_datetime))
+        self.assertEqual('2015-01-01T00:00:00.0', str(a_JDo_datetime))
         return
 
 
@@ -108,10 +108,10 @@ class USNO_C163_Tests(unittest.TestCase):
         a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457023.5416666665, a_JD)
-        self.assertEqual('2015-01-01T01:00:00', str(a_JD_datetime))
+        self.assertEqual('2015-01-01T01:00:00.0', str(a_JD_datetime))
 
         self.assertEqual(2457023.5, a_JDo)
-        self.assertEqual('2015-01-01T00:00:00', str(a_JDo_datetime))
+        self.assertEqual('2015-01-01T00:00:00.0', str(a_JDo_datetime))
         return
 
 
@@ -125,10 +125,10 @@ class USNO_C163_Tests(unittest.TestCase):
         a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457055.0416666665, a_JD)
-        self.assertEqual('2015-02-01T13:00:00', str(a_JD_datetime))
+        self.assertEqual('2015-02-01T13:00:00.0', str(a_JD_datetime))
 
         self.assertEqual(2457054.5, a_JDo)
-        self.assertEqual('2015-02-01T00:00:00', str(a_JDo_datetime))
+        self.assertEqual('2015-02-01T00:00:00.0', str(a_JDo_datetime))
         return
 
 
@@ -142,10 +142,10 @@ class USNO_C163_Tests(unittest.TestCase):
         a_JDo_datetime = a_datetime.fromJulianDate(a_JDo)
 
         self.assertEqual(2457097.499988426, a_JD)
-        self.assertEqual('2015-03-15T23:59:59', str(a_JD_datetime))
+        self.assertEqual('2015-03-15T23:59:59.0', str(a_JD_datetime))
 
         self.assertEqual(2457096.5, a_JDo)
-        self.assertEqual('2015-03-15T00:00:00', str(a_JDo_datetime))
+        self.assertEqual('2015-03-15T00:00:00.0', str(a_JDo_datetime))
         return
 
 
