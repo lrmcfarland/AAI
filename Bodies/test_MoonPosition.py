@@ -45,11 +45,11 @@ class MoonPositionsTests(unittest.TestCase):
         moon_eq = Transforms.EclipticEquatorial.Meeus.toEquatorial(moon_sph, a_datetime)
 
         self.assertAlmostEqual(8.978830825564946, Transforms.utils.get_RA(moon_eq).degrees, self.places) # Meeus p. 342
-        self.assertEqual('08:58:43.791', str(Transforms.utils.get_RA(moon_eq))) # Meeus p. 342 08:58:45.2
+        self.assertEqual('08:58:43.8', str(Transforms.utils.get_RA(moon_eq))) # Meeus p. 342 08:58:45.2
 
 
         self.assertAlmostEqual(13.772019869740845, Transforms.utils.get_declination(moon_eq).degrees, self.places) # Meeus p. 342 13.768368
-        self.assertEqual('13:46:19.2715', str(Transforms.utils.get_declination(moon_eq))) # Meeus p. 342 13:46:06
+        self.assertEqual('13:46:19.3', str(Transforms.utils.get_declination(moon_eq))) # Meeus p. 342 13:46:06
 
         return
 

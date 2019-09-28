@@ -154,7 +154,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST(a_datetime)
 
-        self.assertEqual('18:41:50.5484', str(a_gmst))
+        self.assertEqual('18:41:50.5', str(a_gmst))
         # Note: out of range of http://aa.usno.navy.mil/data/docs/siderealtime.php
         return
 
@@ -166,7 +166,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
         a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
-        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('00:03:56.6', str(a_gmst_1 - a_gmst_0))
         # matches http://en.wikipedia.org/wiki/Sidereal_time
         return
 
@@ -178,7 +178,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime_1 = coords.datetime('2000-01-02T00:00:00')
         a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
-        self.assertEqual('12:01:58.2777', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('12:01:58.3', str(a_gmst_1 - a_gmst_0))
         return
 
 
@@ -195,7 +195,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime = coords.datetime('1994-06-16T18:00:00')
         a_gmst = self.xforms.GMST(a_datetime)
 
-        self.assertEqual('11:39:5.06752', str(a_gmst))
+        self.assertEqual('11:39:05.1', str(a_gmst))
         return
 
 
@@ -208,10 +208,10 @@ class USNO_C163_Tests(unittest.TestCase):
         sta_long = coords.angle(2, 48)
 
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
-        self.assertEqual('02:47:60', str(sta_long))
+        self.assertEqual('02:47:60.0', str(sta_long))
 
         # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
-        self.assertEqual('08:55:49.7347', str(a_gmst))
+        self.assertEqual('08:55:49.7', str(a_gmst))
         return
 
 
@@ -228,11 +228,11 @@ class USNO_C163_Tests(unittest.TestCase):
         a_lstm = self.xforms.LSTM(an_observer, a_datetime)
         a_lsta = self.xforms.LSTA(an_observer, a_datetime)
 
-        self.assertEqual('03:21:46.443', str(a_gmst)) # Actual: 3 21 46.4412
-        self.assertEqual('03:21:46.7422', str(a_gast)) # Actual: 3 21 46.7386
-        self.assertEqual('00:00:0.299296', str(an_eqeq)) # Actual: +0.2975 seconds
-        self.assertEqual('19:13:27.243', str(a_lstm)) # Actual: 19 13 27.2412
-        self.assertEqual('19:13:27.5422', str(a_lsta)) # Actual: 19 13 27.5386
+        self.assertEqual('03:21:46.4', str(a_gmst)) # Actual: 3 21 46.4412
+        self.assertEqual('03:21:46.7', str(a_gast)) # Actual: 3 21 46.7386
+        self.assertEqual('00:00:00.3', str(an_eqeq)) # Actual: +0.2975 seconds
+        self.assertEqual('19:13:27.2', str(a_lstm)) # Actual: 19 13 27.2412
+        self.assertEqual('19:13:27.5', str(a_lsta)) # Actual: 19 13 27.5386
 
         return
 
@@ -249,11 +249,11 @@ class USNO_C163_Tests(unittest.TestCase):
         a_lstm = self.xforms.LSTM(an_observer, a_datetime)
         a_lsta = self.xforms.LSTA(an_observer, a_datetime)
 
-        self.assertEqual('14:42:37.9854', str(a_gmst)) # Actual: 14 42 37.9836
-        self.assertEqual('14:42:38.2855', str(a_gast)) # Actual: 14 42 38.2828
-        self.assertEqual('00:00:0.300053', str(an_eqeq)) # Actual: +0.2992 seconds
-        self.assertEqual('06:34:18.7854', str(a_lstm)) # Actual: 6 34 18.7836
-        self.assertEqual('06:34:19.0855', str(a_lsta)) # Actual: 6 34 19.0828
+        self.assertEqual('14:42:38.0', str(a_gmst)) # Actual: 14 42 37.9836
+        self.assertEqual('14:42:38.3', str(a_gast)) # Actual: 14 42 38.2828
+        self.assertEqual('00:00:00.3', str(an_eqeq)) # Actual: +0.2992 seconds
+        self.assertEqual('06:34:18.8', str(a_lstm)) # Actual: 6 34 18.7836
+        self.assertEqual('06:34:19.1', str(a_lsta)) # Actual: 6 34 19.0828
 
         return
 
@@ -270,11 +270,11 @@ class USNO_C163_Tests(unittest.TestCase):
         a_lstm = self.xforms.LSTM(an_observer, a_datetime)
         a_lsta = self.xforms.LSTA(an_observer, a_datetime)
 
-        self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
-        self.assertEqual('20:43:37.4247', str(a_gast)) # Actual: 20 43 37.4227
-        self.assertEqual('00:00:0.300452', str(an_eqeq)) # Actual: +0.3003 seconds
-        self.assertEqual('12:35:17.9242', str(a_lstm)) # Actual: 12 35 17.9224
-        self.assertEqual('12:35:18.2247', str(a_lsta)) # Actual: 12 35 18.2227
+        self.assertEqual('20:43:37.1', str(a_gmst)) # Actual: 20 43 37.1224
+        self.assertEqual('20:43:37.4', str(a_gast)) # Actual: 20 43 37.4227
+        self.assertEqual('00:00:00.3', str(an_eqeq)) # Actual: +0.3003 seconds
+        self.assertEqual('12:35:17.9', str(a_lstm)) # Actual: 12 35 17.9224
+        self.assertEqual('12:35:18.2', str(a_lsta)) # Actual: 12 35 18.2227
 
         return
 
@@ -286,9 +286,9 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gast = self.xforms.GAST(a_datetime)
         an_eqeq = a_gast - a_gmst
 
-        self.assertEqual('19:43:27.2677', str(a_gmst))
-        self.assertEqual('19:43:27.5681', str(a_gast))
-        self.assertEqual('00:00:0.300386', str(an_eqeq))
+        self.assertEqual('19:43:27.3', str(a_gmst))
+        self.assertEqual('19:43:27.6', str(a_gast))
+        self.assertEqual('00:00:00.3', str(an_eqeq))
 
         return
 
@@ -300,9 +300,9 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gast = self.xforms.GAST(a_datetime)
         an_eqeq = a_gast - a_gmst
 
-        self.assertEqual('21:43:46.9807', str(a_gmst))
-        self.assertEqual('21:43:47.2812', str(a_gast))
-        self.assertEqual('00:00:0.300518', str(an_eqeq))
+        self.assertEqual('21:43:47.0', str(a_gmst))
+        self.assertEqual('21:43:47.3', str(a_gast))
+        self.assertEqual('00:00:00.3', str(an_eqeq))
 
         return
 
@@ -311,9 +311,10 @@ class USNO_C163_Tests(unittest.TestCase):
         """Test GMST simplified J2000"""
         a_datetime = coords.datetime(self.xforms.J2000)
         a_gmst = self.xforms.GMST_simplified(a_datetime)
-        self.assertEqual('-5:18:9.45159', str(a_gmst))
+        self.assertEqual('-5:18:09.5', str(a_gmst))
 
         return
+
 
     def test_GMST_simplified_J2000_plus_day(self):
         """Test GMST J2000 plus a day"""
@@ -322,9 +323,10 @@ class USNO_C163_Tests(unittest.TestCase):
         a_datetime_1 = coords.datetime('2000-01-02T12:00:00')
         a_gmst_1 = self.xforms.GMST_simplified(a_datetime_1)
 
-        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('00:03:56.6', str(a_gmst_1 - a_gmst_0))
 
         return
+
 
     def test_GMST_simplified_standrews(self):
         """Test GMST simplified at St. Andrews"""
@@ -334,12 +336,13 @@ class USNO_C163_Tests(unittest.TestCase):
 
         sta_long = coords.angle(2, 48)
         # TODO is 02:47:60, should be 2:48 but is not rounding 60 seconds up
-        self.assertEqual('02:47:60', str(sta_long))
+        self.assertEqual('02:47:60.0', str(sta_long))
 
         # TODO this is 11 minutes off from answer6, but 11 minutes from GMT.
-        self.assertEqual('08:55:49.7347', str(a_gmst))
+        self.assertEqual('08:55:49.7', str(a_gmst))
 
         return
+
 
     def test_GMST_simplified_kb(self):
         """Test GMST simplified formula, in hours, with kburnett data"""
@@ -348,7 +351,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST_simplified(a_datetime)
 
         # -0.00001 seconds different from given test data
-        self.assertEqual('11:39:5.06724', str(a_gmst))
+        self.assertEqual('11:39:05.1', str(a_gmst))
 
         return
 
@@ -359,7 +362,7 @@ class USNO_C163_Tests(unittest.TestCase):
         a_gmst = self.xforms.GMST_simplified2(a_datetime)
 
         # matches test data given when rouded to 0.0001 places
-        self.assertEqual('11:39:5.06723', str(a_gmst))
+        self.assertEqual('11:39:05.1', str(a_gmst))
         return
 
 
@@ -372,11 +375,11 @@ class USNO_C163_Tests(unittest.TestCase):
         # Meeus: 2446895.5
 
         a_gmst = self.xforms.GMST(a_datetime)
-        self.assertEqual('13:10:46.3668', str(a_gmst))
+        self.assertEqual('13:10:46.4', str(a_gmst))
         # Meeus: 13:10:46.3668
 
         a_gast = self.xforms.GAST(a_datetime)
-        self.assertEqual('13:10:46.1154', str(a_gast))
+        self.assertEqual('13:10:46.1', str(a_gast))
         # Meeus: 13:10:46.1351. I am using a different algorithm for
         # obliquity of ecliptic (USNOs)
         return
@@ -391,7 +394,7 @@ class USNO_C163_Tests(unittest.TestCase):
         # Meeus: 2446896.30625
 
         a_gmst = self.xforms.GMST(a_datetime)
-        self.assertEqual('08:34:57.0896', str(a_gmst))
+        self.assertEqual('08:34:57.1', str(a_gmst))
         # Meeus: 08:34:57.0896
         return
 

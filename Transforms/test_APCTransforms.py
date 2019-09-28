@@ -57,7 +57,7 @@ class APCTransformTests(unittest.TestCase):
         a_gmst = Transforms.APCTransforms.GMST(a_datetime)
 
         # TODO does not match USNO result which is not valid at this date.
-        self.assertEqual('06:39:52.2707', str(a_gmst))
+        self.assertEqual('06:39:52.3', str(a_gmst))
         return
 
 
@@ -68,7 +68,7 @@ class APCTransformTests(unittest.TestCase):
         a_datetime_1 = coords.datetime('2000-01-02T00:00:00')
         a_gmst_1 = Transforms.APCTransforms.GMST(a_datetime_1)
 
-        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('00:03:56.6', str(a_gmst_1 - a_gmst_0))
         return
 
 
@@ -79,7 +79,7 @@ class APCTransformTests(unittest.TestCase):
         a_datetime_1 = coords.datetime('2005-01-02T00:00:00')
         a_gmst_1 = Transforms.APCTransforms.GMST(a_datetime_1)
 
-        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('00:03:56.6', str(a_gmst_1 - a_gmst_0))
         return
 
 
@@ -90,7 +90,7 @@ class APCTransformTests(unittest.TestCase):
         a_datetime_1 = coords.datetime('2015-01-11T12:30:00')
         a_gmst_1 = Transforms.APCTransforms.GMST(a_datetime_1)
 
-        self.assertEqual('00:03:56.5554', str(a_gmst_1 - a_gmst_0))
+        self.assertEqual('00:03:56.6', str(a_gmst_1 - a_gmst_0))
         # matches http://en.wikipedia.org/wiki/Sidereal_time
         return
 
@@ -109,7 +109,7 @@ class APCTransformTests(unittest.TestCase):
         a_gmst = Transforms.APCTransforms.GMST(a_datetime)
 
         # almost matches test data given above: 11h 39m 05.0675s
-        self.assertEqual('11:39:5.06752', str(a_gmst))
+        self.assertEqual('11:39:05.1', str(a_gmst))
         return
 
 
@@ -119,7 +119,7 @@ class APCTransformTests(unittest.TestCase):
         a_datetime = coords.datetime('1998-02-04T00:00:00')
         a_gmst = Transforms.APCTransforms.GMST(a_datetime)
 
-        self.assertEqual('08:55:49.7347', str(a_gmst))
+        self.assertEqual('08:55:49.7', str(a_gmst))
         return
 
 
@@ -129,7 +129,7 @@ class APCTransformTests(unittest.TestCase):
         a_datetime = coords.datetime('2014-12-31T20:41:00')
         a_gmst = Transforms.APCTransforms.GMST(a_datetime)
 
-        self.assertEqual('03:21:46.4429', str(a_gmst)) # Actual: 3 21 46.4412
+        self.assertEqual('03:21:46.4', str(a_gmst)) # Actual: 3 21 46.4412
 
         return
 
@@ -140,7 +140,7 @@ class APCTransformTests(unittest.TestCase):
         a_datetime = coords.datetime('2015-01-01T14:00:00')
         a_gmst = Transforms.APCTransforms.GMST(a_datetime)
 
-        self.assertEqual('20:43:37.1242', str(a_gmst)) # Actual: 20 43 37.1224
+        self.assertEqual('20:43:37.1', str(a_gmst)) # Actual: 20 43 37.1224
 
         return
 
@@ -183,8 +183,8 @@ class APCTransformTests(unittest.TestCase):
 
         # TODO close, but still several minutes difference from USNO results
 
-        self.assertEqual('17:48:6.85604', str(coords.angle(90) - sirius_hz.theta))
-        self.assertEqual('128:44:20.3828', str(sirius_hz.phi))
+        self.assertEqual('17:48:06.9', str(coords.angle(90) - sirius_hz.theta))
+        self.assertEqual('128:44:20.4', str(sirius_hz.phi))
 
         sirius_eq = Transforms.APCTransforms.toEquatorial(sirius_hz, an_observer, a_datetime)
 
