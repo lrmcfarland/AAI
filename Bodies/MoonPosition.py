@@ -474,6 +474,5 @@ if __name__ == '__main__':
     moon_sph = Transforms.utils.latlon2spherical(ecLat, ecLon)
     moon_eq = Transforms.EclipticEquatorial.Meeus.toEquatorial(moon_sph, a_datetime)
 
-    print('dec {}'.format(Transforms.utils.get_declination(moon_eq)))
-    print('RA {}'.format(Transforms.utils.get_RA(moon_eq)))
-
+    print('dec {}'.format(moon_eq.theta.complement()))
+    print('RA {}'.format(moon_eq.phi.RA))

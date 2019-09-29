@@ -187,7 +187,7 @@ aai.changeTime = function() {
     let local_time = new Date(zulu_time.getTime() + 3600000*std_timezone.timezone_factor + a_delta_time*1000);
 
     let date_str = local_time.toISOString().slice(0, 10);
-    let time_str = local_time.toISOString().slice(11, -1);
+    let time_str = local_time.toISOString().slice(11, -3); // rounds to 0.1 seconds
     let timezone_str = std_timezone.timezone_str;
 
     return {date_str, time_str, timezone_str};

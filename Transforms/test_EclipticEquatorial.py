@@ -252,10 +252,10 @@ class MeeusEclipticEquatorialTests(unittest.TestCase):
         pollux_ec = Transforms.EclipticEquatorial.Meeus.toEquatorial(pollux, a_datetime)
 
         # Meeus: 07:45:18.946 vs. my 07:45:18.8357
-        self.assertAlmostEqual(7.755232144485258, Transforms.utils.get_RA(pollux_ec).degrees, self.places)
+        self.assertAlmostEqual(7.755232144485258, pollux_ec.phi.RA, self.places)
 
         # Meeus 28.026183
-        self.assertAlmostEqual(28.02443543646086, Transforms.utils.get_declination(pollux_ec).degrees, self.places)
+        self.assertAlmostEqual(28.02443543646086, pollux_ec.theta.complement().degrees, self.places)
 
         return
 

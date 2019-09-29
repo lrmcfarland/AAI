@@ -89,8 +89,8 @@ class EquatorialHorizonTests(unittest.TestCase):
 
         venus_eq = Transforms.EquatorialHorizon.toEquatorial(venus_hz, usno, a_datetime)
 
-        self.assertAlmostEqual(-6.719891666666669, Transforms.utils.get_declination(venus_eq).degrees)
-        self.assertAlmostEqual(23.319337500000056, Transforms.utils.get_RA(venus_eq).degrees, delta=1)
+        self.assertAlmostEqual(-6.719891666666669, venus_eq.theta.complement().degrees)
+        self.assertAlmostEqual(23.319337500000056, venus_eq.phi.RA, delta=1)
 
         self.assertSpacesAreEqual(venus, venus_eq, places=5)
 

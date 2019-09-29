@@ -64,6 +64,8 @@ def dec2dms():
 
     """Converts decimal degrees into a string of deg[:min[:sec]]
 
+    TODO use utils.dec2dms?
+
     Returns: JSON
         result.degrees
         result.errors = list()
@@ -141,8 +143,8 @@ def standardize():
 
                 body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, std_datetime)
 
-                result['params']['ra'] = Transforms.utils.get_RA(body_eq).degrees # TODO use angle.RA
-                result['params']['dec'] = Transforms.utils.get_declination(body_eq).degrees # TODO use angle.RA
+                result['params']['ra'] = str(body_eq.phi.RA)
+                result['params']['dec'] = str(body_eq.theta.complement().degrees)
 
             except (utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
                 result['errors'].append(str(err))
@@ -201,8 +203,8 @@ def azalt2radec():
 
         body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
-        result['ra'] = Transforms.utils.get_RA(body_eq).degrees
-        result['dec'] = Transforms.utils.get_declination(body_eq).degrees
+        result['ra'] = str(body_eq.phi.RA)
+        result['dec'] = str(body_eq.theta.complement().degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -280,8 +282,8 @@ def solar_equatorial_coords(an_observer, a_datetime):
 
         sun_eq = Bodies.SunPosition.EquatorialCoords(a_datetime)
 
-        result['declination'] = str(Transforms.utils.get_declination(sun_eq).degrees)
-        result['RA'] = str(Transforms.utils.get_RA(sun_eq).degrees)
+        result['RA'] = str(sun_eq.phi.RA)
+        result['declination'] = str(sun_eq.theta.complement().degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -473,13 +475,13 @@ def get_sun_rise_transit_set(a_latitude, a_longitude, a_datetime):
 
     rising, transit, setting = Bodies.SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-    result['rising'] = '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second)
-    result['transit'] = '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)
-    result['setting'] = '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second)
+    result['rising']  = '{:02}:{:02}:{:04.1f}'.format(rising.hour, rising.minute, rising.second)
+    result['transit'] = '{:02}:{:02}:{:04.1f}'.format(transit.hour, transit.minute, transit.second)
+    result['setting'] = '{:02}:{:02}:{:04.1f}'.format(setting.hour, setting.minute, setting.second)
 
     sun_azalt = get_sun_azalt(an_observer, a_datetime)
 
-    result['azimuth'] = '{}'.format(sun_azalt['azimuth'])
+    result['azimuth']  = '{}'.format(sun_azalt['azimuth'])
     result['altitude'] = '{}'.format(sun_azalt['altitude'])
 
 
@@ -642,8 +644,8 @@ def lunar_equatorial_coords(an_observer, a_datetime):
 
         moon_eq = Bodies.MoonPosition.EquatorialCoords(a_datetime)
 
-        result['declination'] = str(Transforms.utils.get_declination(moon_eq).degrees)
-        result['RA'] = str(Transforms.utils.get_RA(moon_eq).degrees)
+        result['RA'] = str(moon_eq.phi.RA)
+        result['declination'] = str(moon_eq.theta.complement().degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -703,9 +705,9 @@ def get_moon_rise_transit_set(a_latitude, a_longitude, a_datetime):
 
     rising, transit, setting = Bodies.SunPosition.RiseAndSet(moon_eq, an_observer, a_datetime)
 
-    result['rising'] = '{:02}:{:02}:{:05.2f}'.format(rising.hour, rising.minute, rising.second)
-    result['transit'] = '{:02}:{:02}:{:05.2f}'.format(transit.hour, transit.minute, transit.second)
-    result['setting'] = '{:02}:{:02}:{:05.2f}'.format(setting.hour, setting.minute, setting.second)
+    result['rising']  = '{:02}:{:02}:{:04.1f}'.format(rising.hour, rising.minute, rising.second)
+    result['transit'] = '{:02}:{:02}:{:04.1f}'.format(transit.hour, transit.minute, transit.second)
+    result['setting'] = '{:02}:{:02}:{:04.1f}'.format(setting.hour, setting.minute, setting.second)
 
     return result
 
@@ -769,10 +771,8 @@ def lunar_daily_altitude():
         result['sun_range'] = '{:6.4f}'.format((sun_ec_position.r / 6.6845871226706E-12)/ 299792458.0) # AU/(AU/m)/m/light-second
 
         sun_eq_position = Transforms.EclipticEquatorial.toEquatorial(sun_ec_position, a_datetime)
-        result['sun_eq_ra']  = str(Transforms.utils.get_RA(sun_eq_position).degrees)
-        result['sun_eq_ra_dms']  = str(Transforms.utils.get_RA(sun_eq_position))
-        result['sun_eq_dec']  = str(Transforms.utils.get_declination(sun_eq_position).degrees)
-        result['sun_eq_dec_dms']  = str(Transforms.utils.get_declination(sun_eq_position))
+        result['sun_eq_ra_dms']  = utils.dd2dms(sun_eq_position.phi.RA)
+        result['sun_eq_dec_dms']  = utils.dd2dms(sun_eq_position.theta.complement().degrees)
 
         sun_hz_position = Transforms.EquatorialHorizon.toHorizon(sun_eq_position, an_observer, a_datetime)
         result['sun_altitude']  = str(Transforms.utils.get_altitude(sun_hz_position).degrees)
@@ -790,10 +790,8 @@ def lunar_daily_altitude():
         result['moon_range'] = '{:6.4f}'.format(moon_ec_position.r / 299792.458) # km / (km/light-second)
 
         moon_eq_position = Transforms.EclipticEquatorial.toEquatorial(moon_ec_position, a_datetime)
-        result['moon_eq_ra']  = str(Transforms.utils.get_RA(moon_eq_position).degrees)
-        result['moon_eq_ra_dms']  = str(Transforms.utils.get_RA(moon_eq_position))
-        result['moon_eq_dec']  = str(Transforms.utils.get_declination(moon_eq_position).degrees)
-        result['moon_eq_dec_dms']  = str(Transforms.utils.get_declination(moon_eq_position))
+        result['moon_eq_ra_dms'] = utils.dd2dms(moon_eq_position.phi.RA)
+        result['moon_eq_dec_dms'] = utils.dd2dms(moon_eq_position.theta.complement().degrees)
 
         moon_hz_position = Transforms.EquatorialHorizon.toHorizon(moon_eq_position, an_observer, a_datetime)
         result['moon_altitude']  = str(Transforms.utils.get_altitude(moon_hz_position).degrees)

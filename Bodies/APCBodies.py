@@ -184,14 +184,14 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
     # TODO error check for circumpolar situations
 
     cos_hour_angle = (math.sin(altitude) - \
-                      math.sin(Transforms.utils.get_latitude(an_observer).radians)*math.sin(Transforms.utils.get_declination(an_object).radians)) \
-        / math.cos(Transforms.utils.get_latitude(an_observer).radians)*math.cos(Transforms.utils.get_declination(an_object).radians)
+                      math.sin(Transforms.utils.get_latitude(an_observer).radians)*math.sin(an_object.theta.complement().radians)) \
+        / math.cos(Transforms.utils.get_latitude(an_observer).radians)*math.cos(an_object.theta.complement().radians)
 
 
     hour_angle = coords.angle(math.acos(cos_hour_angle))
     print('hour angle', hour_angle, 'for altitude', altitude)
 
-    object_ra = Transforms.utils.get_RA(an_object)
+    object_ra = an_object.phi.RA
     print('RA', object_ra)
 
 

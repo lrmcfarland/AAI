@@ -111,9 +111,9 @@ def toHorizon(an_object, an_observer, a_datetime, is_verbose=False):
 
     # Meeus 13.6
     sinaltitude = math.sin(Transforms.utils.get_latitude(an_observer).radians)  \
-                  * math.sin(Transforms.utils.get_declination(an_object).radians) \
+                  * math.sin(an_object.theta.complement().radians) \
                   + math.cos(Transforms.utils.get_latitude(an_observer).radians)  \
-                  * math.cos(Transforms.utils.get_declination(an_object).radians) \
+                  * math.cos(an_object.theta.complement().radians) \
                   * math.cos(local_hour_angle.radians)
 
     theta = coords.angle(coords.angle().rad2deg(math.pi/2 - math.asin(sinaltitude)))
@@ -123,7 +123,7 @@ def toHorizon(an_object, an_observer, a_datetime, is_verbose=False):
     nom = math.sin(local_hour_angle.radians)
     den = math.cos(local_hour_angle.radians) \
           * math.sin(Transforms.utils.get_latitude(an_observer).radians) \
-          - math.tan(Transforms.utils.get_declination(an_object).radians) \
+          - math.tan(an_object.theta.complement().radians) \
           * math.cos(Transforms.utils.get_latitude(an_observer).radians)
 
     # "Note that Azimuth (A) is measured from the South point, turning positive to the West."

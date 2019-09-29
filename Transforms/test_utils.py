@@ -125,8 +125,8 @@ class UtilsTests(unittest.TestCase):
     def test_get_RA_45_east(self):
         """Test get_RA 45 east"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
-        a_right_ascension = utils.get_RA(a_point)
-        self.assertEqual(3, a_right_ascension.degrees)
+        a_right_ascension = a_point.phi.RA
+        self.assertEqual(3, a_right_ascension)
 
         return
 
@@ -134,8 +134,8 @@ class UtilsTests(unittest.TestCase):
     def test_get_RA_45_west(self):
         """Test get_RA 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
-        a_right_ascension = utils.get_RA(a_point)
-        self.assertEqual(-3.0, a_right_ascension.degrees)
+        a_right_ascension = a_point.phi.RA
+        self.assertEqual(21.0, a_right_ascension)
 
         return
 
@@ -167,8 +167,8 @@ class UtilsTests(unittest.TestCase):
         a_point = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg('23:09:16.641'),
                                         a_declination=utils.parse_angle_arg('-6:43:11.61'))
 
-        self.assertAlmostEqual(23.154622500000002, utils.get_RA(a_point).degrees)
-        self.assertAlmostEqual(-6.719891666666669, utils.get_declination(a_point).degrees)
+        self.assertAlmostEqual(23.154622500000002, a_point.phi.RA)
+        self.assertAlmostEqual(-6.719891666666669, a_point.theta.complement().degrees)
 
         return
 

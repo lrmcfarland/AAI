@@ -199,13 +199,11 @@ def EquationOfTime(a_datetime):
 
     eot = coords.angle()
 
-    sun_ra = Transforms.utils.get_RA(sun_eq) # TODO use angle.RA
+    if gast.degrees - sun_eq.phi.RA < 12:
+        eot.degrees = gast.degrees - sun_eq.phi.RA
 
-    if gast.degrees - sun_ra.degrees < 12:
-        eot.degrees = gast.degrees - sun_ra.degrees
-
-    elif gast.degrees - sun_ra.degrees >= 12:
-        eot.degrees = gast.degrees - sun_ra.degrees - 24
+    elif gast.degrees - sun_eq.phi.RA >= 12:
+        eot.degrees = gast.degrees - sun_eq.phi.RA - 24
 
     else:
         raise Error('unsupported EoT case')
@@ -274,8 +272,7 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     observer_latitude = Transforms.utils.get_latitude(an_observer)
     observer_longitude = Transforms.utils.get_longitude(an_observer)
 
-    object_RA = coords.angle(Transforms.utils.get_RA(an_object).degrees * 15) # in degrees  # TODO use angle.RA
-    object_declination = Transforms.utils.get_declination(an_object)
+    object_declination = an_object.theta.complement()
 
     gmst = Transforms.SiderealTime.USNO_C163.GMST(midnight)
     gmst.degrees *= 15 # in degrees
@@ -298,7 +295,7 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
     # -------------------
 
     # longitude sign convention is IAU, opposite Meeus p. 93
-    m0 = coords.angle((object_RA - observer_longitude - gmst).degrees/360.0)
+    m0 = coords.angle((an_object.phi - observer_longitude - gmst).degrees/360.0)
     m0.normalize(0, 1)
 
     transit_loc = a_datetime.fromJulianDate(JDo + m0.degrees)
