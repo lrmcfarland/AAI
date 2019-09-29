@@ -12,11 +12,7 @@
     {# ----- init map ----- #}
     {# -------------------- #}
 
-
     {# ----- draw chart ----- #}
-
-
-    google.charts.load('current', {'packages':['corechart']});
 
     function updateMoonChart(moon_position_data) {
 
@@ -248,25 +244,26 @@
 
     $(document).ready(function() {
 
+	{# ------------------------- #}
+	{# ----- time controls ----- #}
+	{# ------------------------- #}
 
-	{# ----- get lunar daily altitude data ----- #}
 
-
-	$("#get_lunar_daily_altitude").click(function(e) {
+	$("#get_current_time").click(function(e) {
 
 	    try {
 
-		let lunar_standard_time = aai.standardTime($('input[name="date"]').val(),
-							   $('input[name="time"]').val(),
-							   $('input[name="timezone"]').val(),
-							   $("#_dst").is(':checked'));
+		let current_time = aai.standardTime($('input[name="date"]').val(),
+						    $('input[name="time"]').val(),
+						    $('input[name="timezone"]').val(),
+						    $("#_dst").is(':checked'));
 
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
 		    latitude: $('input[name="latitude"]').val(),
 		    longitude: $('input[name="longitude"]').val(),
-		    date: lunar_standard_time.date_str,
-		    time: lunar_standard_time.time_str,
-		    timezone: lunar_standard_time.timezone_str
+		    date: current_time.date_str,
+		    time: current_time.time_str,
+		    timezone: current_time.timezone_str
 
 		}, function(moon_position) {
 
@@ -281,7 +278,7 @@
 
 	    return false;
 
-	}); {# end get_lunar_daily_altitude click #}
+	}); {# end get_current_time click #}
 
 
 	$("#get_next_hour").click(function(e) {
@@ -305,23 +302,24 @@
 					    next_hour.time_str,
 					    next_hour.timezone_str);
 
+		    $('input[name="date"]').val(dst_nh.date_str);
 		    $('input[name="time"]').val(dst_nh.time_str);
 
 
 		} else {
 
+		    $('input[name="date"]').val(next_hour.date_str);
 		    $('input[name="time"]').val(next_hour.time_str);
 
 		}
 
 
-
 		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
 		    latitude: $('input[name="latitude"]').val(),
 		    longitude: $('input[name="longitude"]').val(),
-		    date: next_hour.date_str,
-		    time: next_hour.time_str,
-		    timezone: next_hour.timezone_str,
+		    date: $('input[name="date"]').val(),
+		    time: $('input[name="time"]').val(),
+		    timezone: $('input[name="timezone"]').val()
 
 		}, function(moon_position) {
 
@@ -361,11 +359,13 @@
 					    next_day.timezone_str);
 
 		    $('input[name="date"]').val(dst_nd.date_str);
+		    $('input[name="time"]').val(dst_nd.time_str);
 
 
 		} else {
 
 		    $('input[name="date"]').val(next_day.date_str);
+		    $('input[name="time"]').val(next_day.time_str);
 
 		}
 
@@ -393,7 +393,6 @@
 	}); {# end get_next_day click #}
 
 
-
 	$("#get_prev_hour").click(function(e) {
 
 
@@ -416,11 +415,13 @@
 					    prev_hour.time_str,
 					    prev_hour.timezone_str);
 
+		    $('input[name="date"]').val(dst_ph.date_str);
 		    $('input[name="time"]').val(dst_ph.time_str);
 
 
 		} else {
 
+		    $('input[name="date"]').val(prev_hour.date_str);
 		    $('input[name="time"]').val(prev_hour.time_str);
 
 		}
@@ -472,11 +473,13 @@
 					    prev_day.timezone_str);
 
 		    $('input[name="date"]').val(dst_pd.date_str);
+		    $('input[name="time"]').val(dst_pd.time_str);
 
 
 		} else {
 
 		    $('input[name="date"]').val(prev_day.date_str);
+		    $('input[name="time"]').val(prev_day.time_str);
 
 		}
 
@@ -504,6 +507,9 @@
 	}); {# end get_prev_day click #}
 
 
+	{# ------------------- #}
+	{# ----- presets ----- #}
+	{# ------------------- #}
 
 
 	$("#eclipse_2017_aug_21").click(function(e) {
@@ -646,32 +652,10 @@
 
 <style>
 
-
 .linechart {
     width: 800px;
     height: 400px;
 }
-
-
-button#get_lunar_daily_altitude {
-
-    text-align: center;
-
-    font-size: 90%;
-    font-weight: bold;
-
-    margin: 0 auto;
-    display: block;
-
-    width: 75px;
-    height: 75px;
-
-    border-radius: 50%;
-
-    color:red;
-    background: silver;
-}
-
 
 </style>
 
@@ -693,7 +677,7 @@ button#get_lunar_daily_altitude {
     arc-seconds in latitude.
 
     All implementation mistakes are mine.
-    
+
   <p>
     I get good results for an eclipse I
     observed on <button id="eclipse_2017_aug_21">Aug 21, 2017</button>.
@@ -719,47 +703,6 @@ button#get_lunar_daily_altitude {
 
 
 <table>
-
-  <tr>
-    <td colspan="5">
-
-      <table id="time_table" align="center">
-
-	<td>
-
-	  <button id="get_prev_day">Previous day</button>
-
-	</td>
-
-	<td>
-
-	  <button id="get_prev_hour">Previous Hour</button>
-
-	</td>
-
-	<td>
-
-	  <button id="get_lunar_daily_altitude">get lunar altitude data</button>
-
-	</td>
-
-	<td>
-
-	  <button id="get_next_hour">Next Hour</button>
-
-	</td>
-
-	<td>
-
-	  <button id="get_next_day">Next Day</button>
-
-	</td>
-
-      </table>
-
-    </td>
-
-  </tr>
 
 
   <tr>
