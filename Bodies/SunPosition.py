@@ -391,8 +391,8 @@ if __name__ == '__main__':
 
             print(0.01*d)
             print(current_datetime)
-            print(Transforms.utils.get_azimuth(sun).degrees)
-            print(Transforms.utils.get_altitude(sun).degrees)
+            print(sun.phi.degrees)
+            print(sun.theta.complement().degrees)
 
 
     elif options.output_mode.lower() == 'analemma':
@@ -409,7 +409,7 @@ if __name__ == '__main__':
             sun = HorizontalCoords(an_observer, current_datetime)
             eot = EquationOfTime(current_datetime)
 
-            print(eot.degrees*60 + 180, Transforms.utils.get_altitude(sun).degrees)
+            print(eot.degrees*60 + 180, sun.theta.complement().degrees)
 
 
     elif options.output_mode.lower() == 'eot':
@@ -455,10 +455,10 @@ if __name__ == '__main__':
         eot = EquationOfTime(a_datetime)
         print('Equation of time (minutes):', eot.degrees * 60)
 
-        print('Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz))
-        print(''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).degrees), ')')))
-        print('Altitude (degrees):', Transforms.utils.get_altitude(sun_hz))
-        print(''.join(('(', str(Transforms.utils.get_altitude(sun_hz).degrees), ')')))
+        print('Azimuth (degrees):', sun_hz.phi)
+        print(''.join(('(', sun_hz.phi.degrees, ')')))
+        print('Altitude (degrees):', sun_hz.theta.complement())
+        print(''.join(('(', sun_hz.theta.complement().degrees, ')')))
 
 
         rising, transit, setting = SunRiseAndSet(an_observer, a_datetime)

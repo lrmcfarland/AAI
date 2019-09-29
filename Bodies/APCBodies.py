@@ -286,10 +286,10 @@ if __name__ == '__main__':
         sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
         print('Sun in horizon coordinates:\n\t', sun_hz)
 
-        print('Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),)
-        print(''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')')))
-        print('Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),)
-        print(''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')')))
+        print('Azimuth (degrees):', sun_hz.phi,)
+        print(''.join(('(', sun_hz.phi.degrees, ')')))
+        print('Altitude (degrees):', sun_hz.theta.complement(),)
+        print(''.join(('(', sun_hz.theta.complement().degrees, ')')))
 
     elif options.body.lower() == 'moon':
 
@@ -303,10 +303,10 @@ if __name__ == '__main__':
         moon_hz = Transforms.EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
         print('Moon in horizon coordinates:\n\t', moon_hz)
 
-        print('Azimuth (degrees):', Transforms.utils.get_azimuth(moon_hz),)
-        print(''.join(('(', str(Transforms.utils.get_azimuth(moon_hz).value), ')')))
-        print('Altitude (degrees):', Transforms.utils.get_altitude(moon_hz),)
-        print(''.join(('(', str(Transforms.utils.get_altitude(moon_hz).value), ')')))
+        print('Azimuth (degrees):', moon_hz.phi,)
+        print(''.join(('(', moon_hz.phi.degrees, ')')))
+        print('Altitude (degrees):', moon_hz.theta.complement(),)
+        print(''.join(('(', moon_hz.theta.complement().degrees, ')')))
 
 
     elif options.body.lower() == 'tbd':
@@ -321,8 +321,8 @@ if __name__ == '__main__':
 
             print(0.01*d,)
             print(current_datetime,)
-            print(Transforms.utils.get_azimuth(moon).value,)
-            print(Transforms.utils.get_altitude(moon).value)
+            print(moon.phi.degrees)
+            print(moon.theta.complement().degrees)
 
 
     else:

@@ -285,5 +285,5 @@ if __name__ == '__main__':
 
         result = toHorizon(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
-        print('Azimuth:', Transforms.utils.get_azimuth(result))
-        print(', Altitude:', Transforms.utils.get_altitude(result))
+        print('Azimuth:', result.phi)
+        print(', Altitude:', result.theta.complement())

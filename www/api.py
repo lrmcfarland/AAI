@@ -233,8 +233,9 @@ def radec2azalt():
 
         body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
-        result['azimuth'] = Transforms.utils.get_azimuth(body_hz).degrees
-        result['altitude'] = Transforms.utils.get_altitude(body_hz).degrees
+        # TODO no str?
+        result['azimuth']  = body_hz.phi.degrees
+        result['altitude'] = body_hz.theta.complement().degrees
 
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
@@ -311,8 +312,8 @@ def solar_horizontal_coords(an_observer, a_datetime):
 
         sun_eq = Bodies.SunPosition.HorizontalCoords(an_observer, a_datetime)
 
-        result['azimuth'] = str(Transforms.utils.get_azimuth(sun_hz).degrees)
-        result['altitude'] = str(Transforms.utils.get_altitude(sun_hz).degrees)
+        result['azimuth'] = str(sun_hz.phi.degrees)
+        result['altitude'] = str(sun_hz.theta.complement().degrees)
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
         result['errors'].append(str(err))
@@ -403,11 +404,11 @@ def solar_daily_altitude():
             sun_ws = Bodies.SunPosition.HorizontalCoords(an_observer, winter_solstice)
 
             altitude.append([dtime,
-                             Transforms.utils.get_altitude(sun_ve).degrees,
-                             Transforms.utils.get_altitude(sun_ss).degrees,
-                             Transforms.utils.get_altitude(sun_ae).degrees,
-                             Transforms.utils.get_altitude(sun_ws).degrees,
-                             Transforms.utils.get_altitude(sun_ct).degrees # needs to be last for sun position marker
+                             sun_ve.theta.complement().degrees,
+                             sun_ss.theta.complement().degrees,
+                             sun_ae.theta.complement().degrees,
+                             sun_ws.theta.complement().degrees,
+                             sun_ct.theta.complement().degrees # needs to be last for sun position marker
                          ]
             )
 
@@ -513,8 +514,8 @@ def get_sun_azalt(an_observer, a_datetime):
     result['R'] = R
     result['ecliptic_longitude'] = str(ecliptic_longitude)
 
-    result['azimuth'] = Transforms.utils.get_azimuth(sun_hz)
-    result['altitude'] = Transforms.utils.get_altitude(sun_hz)
+    result['azimuth'] = sun_hz.phi
+    result['altitude'] = sun_hz.theta.complement()
 
     return result
 
@@ -673,8 +674,8 @@ def lunar_horizontal_coords(an_observer, a_datetime):
 
         moon_eq = Bodies.MoonPosition.HorizontalCoords(an_observer, a_datetime)
 
-        result['azimuth'] = str(Transforms.utils.get_azimuth(moon_hz).degrees)
-        result['altitude'] = str(Transforms.utils.get_altitude(moon_hz).degrees)
+        result['azimuth'] = str(moon_hz.phi.degrees)
+        result['altitude'] = str(moon_hz.theta.complement().degrees)
 
 
     except (TypeError, ValueError, RuntimeError, utils.Error) as err:
@@ -775,10 +776,10 @@ def lunar_daily_altitude():
         result['sun_eq_dec_dms']  = utils.dd2dms(sun_eq_position.theta.complement().degrees)
 
         sun_hz_position = Transforms.EquatorialHorizon.toHorizon(sun_eq_position, an_observer, a_datetime)
-        result['sun_altitude']  = str(Transforms.utils.get_altitude(sun_hz_position).degrees)
-        result['sun_altitude_dms']  = str(Transforms.utils.get_altitude(sun_hz_position))
-        result['sun_azimuth']  = str(Transforms.utils.get_azimuth(sun_hz_position).degrees)
-        result['sun_azimuth_dms']  = str(Transforms.utils.get_azimuth(sun_hz_position))
+        result['sun_altitude']  = str(sun_hz_position.theta.complement().degrees)
+        result['sun_altitude_dms']  = str(sun_hz_position.theta.complement())
+        result['sun_azimuth']  = str(sun_hz_position.phi.degrees)
+        result['sun_azimuth_dms']  = str(sun_hz_position.phi)
 
 
         moon_ec_position = Bodies.MoonPosition.EclipticCoords(a_datetime)
@@ -794,10 +795,10 @@ def lunar_daily_altitude():
         result['moon_eq_dec_dms'] = utils.dd2dms(moon_eq_position.theta.complement().degrees)
 
         moon_hz_position = Transforms.EquatorialHorizon.toHorizon(moon_eq_position, an_observer, a_datetime)
-        result['moon_altitude']  = str(Transforms.utils.get_altitude(moon_hz_position).degrees)
-        result['moon_altitude_dms']  = str(Transforms.utils.get_altitude(moon_hz_position))
-        result['moon_azimuth']  = str(Transforms.utils.get_azimuth(moon_hz_position).degrees)
-        result['moon_azimuth_dms']  = str(Transforms.utils.get_azimuth(moon_hz_position))
+        result['moon_altitude']  = str(moon_hz_position.theta.complement().degrees)
+        result['moon_altitude_dms']  = str(moon_hz_position.theta.complement())
+        result['moon_azimuth']  = str(moon_hz_position.phi.degrees)
+        result['moon_azimuth_dms']  = str(moon_hz_position.phi)
 
 
 
@@ -830,16 +831,16 @@ def lunar_daily_altitude():
 
                 # opposite in southern hemisphere
                 if utils.request_angle('latitude', flask.request).degrees < 0:
-                    if Transforms.utils.get_azimuth(current_sun_position_hz).degrees > daily_sun_azimuth[-1]:
+                    if current_sun_position_hz.phi.degrees > daily_sun_azimuth[-1]:
                         daily_sun_azimuth.append(None)
 
                 else:
 
-                    if Transforms.utils.get_azimuth(current_sun_position_hz).degrees < daily_sun_azimuth[-1]:
+                    if current_sun_position_hz.phi.degrees < daily_sun_azimuth[-1]:
                         daily_sun_azimuth.append(None)
 
-            daily_sun_azimuth.append(Transforms.utils.get_azimuth(current_sun_position_hz).degrees)
-            daily_sun_altitude.append(Transforms.utils.get_altitude(current_sun_position_hz).degrees)
+            daily_sun_azimuth.append(current_sun_position_hz.phi.degrees)
+            daily_sun_altitude.append(current_sun_position_hz.theta.complement().degrees)
 
 
             current_moon_position_hz = Bodies.MoonPosition.HorizontalCoords(an_observer, current_time)
@@ -849,17 +850,16 @@ def lunar_daily_altitude():
 
                 # opposite in southern hemisphere
                 if utils.request_angle('latitude', flask.request).degrees < 0:
-                    if Transforms.utils.get_azimuth(current_moon_position_hz).degrees > daily_moon_azimuth[-1]:
+                    if current_moon_position_hz.phi.degrees > daily_moon_azimuth[-1]:
                         daily_moon_azimuth.append(None)
 
                 else:
 
-                    if Transforms.utils.get_azimuth(current_moon_position_hz).degrees < daily_moon_azimuth[-1]:
+                    if current_moon_position_hz.phi.degrees < daily_moon_azimuth[-1]:
                         daily_moon_azimuth.append(None)
 
-            daily_moon_azimuth.append(Transforms.utils.get_azimuth(current_moon_position_hz).degrees)
-            daily_moon_altitude.append(Transforms.utils.get_altitude(current_moon_position_hz).degrees)
-
+            daily_moon_azimuth.append(current_moon_position_hz.phi.degrees)
+            daily_moon_altitude.append(current_moon_position_hz.theta.complement().degrees)
 
 
         result['daily_sun_azimuth'] = daily_sun_azimuth

@@ -65,10 +65,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(243.30488300565906, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(243.30488300565906, sun.phi.degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10')/2)
-        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
+        self.assertAlmostEqual(sextant_alt.degrees, sun.theta.complement().degrees, delta=1)
 
         return
 
@@ -95,10 +95,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(268.1014512724721, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(268.1014512724721, sun.phi.degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32')/2)
-        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
+        self.assertAlmostEqual(sextant_alt.degrees, sun.theta.complement().degrees, delta=1)
 
         return
 
@@ -123,10 +123,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(95.79970206137686, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(95.79970206137686, sun.phi.degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46')/2)
-        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=2)
+        self.assertAlmostEqual(sextant_alt.degrees, sun.theta.complement().degrees, delta=2)
 
         return
 

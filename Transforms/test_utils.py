@@ -145,8 +145,8 @@ class UtilsTests(unittest.TestCase):
         a_point = utils.azalt2spherical(an_azimuth=utils.parse_angle_arg('248:02:0.77676'),
                                         an_altitude=utils.parse_angle_arg('15:07:30.0779'))
 
-        self.assertAlmostEqual(248.03354910000002, utils.get_azimuth(a_point).degrees)
-        self.assertAlmostEqual(15.125021649800004, utils.get_altitude(a_point).degrees)
+        self.assertAlmostEqual(248.03354910000002, a_point.phi.degrees) # azimuth
+        self.assertAlmostEqual(15.125021649800004, a_point.theta.complement().degrees) # altiude
 
         return
 
@@ -179,42 +179,38 @@ class GetAzimuthTests(unittest.TestCase):
 
 
     def test_theta0(self):
-        """Test at latitude 90 degrees"""
+        """Test at latitude 0, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
 
     def test_theta45(self):
-        """Test at latitude 45 degrees"""
+        """Test at latitude 45, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(45), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
 
 
     def test_theta135(self):
-        """Test at latitude -45 degrees"""
+        """Test at latitude 135, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(90+45), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
 
     def test_theta180(self):
-        """Test at latitude -90 degrees"""
+        """Test at latitude 180, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(180), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
