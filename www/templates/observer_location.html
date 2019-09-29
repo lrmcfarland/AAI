@@ -6,7 +6,14 @@
     margin:   2px;
     border:   1px solid navy;
     padding: 10px;
+
 }
+
+.observer_input {
+	text-align: right;
+	width: 80px;
+}
+
 
 table#observer_location {
     width: 90%;
@@ -154,7 +161,7 @@ table#observer_location {
       <th>Latitude</th>
 
       <td>
-	<input type="text" id="_latitude" name="latitude">
+	<input type="text" id="_latitude" name="latitude" class="observer_input">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -169,7 +176,7 @@ table#observer_location {
       <th>Longitude</th>
 
       <td>
-	<input type="text" id="_longitude" name="longitude">
+	<input type="text" id="_longitude" name="longitude" class="observer_input">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -182,7 +189,7 @@ table#observer_location {
       <th>Date</th>
 
       <td>
-	<input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
+	<input type="text" id="_date" name="date" class="observer_input"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
     </tr>
@@ -194,7 +201,7 @@ table#observer_location {
       </td>
 
       <th>Local Time</th>
-      <td><input type="text" id="_time" name="time" value="12:00"></td>
+      <td><input type="text" id="_time" name="time" value="12:00" class="observer_input"></td>
       <td>hr[:min[:sec]]</td>
     </tr>
 
@@ -203,7 +210,7 @@ table#observer_location {
 
       <th>Time Zone</th>
       <td>
-	<input type="text" id="_timezone" name="timezone" value="0">
+	<input type="text" id="_timezone" name="timezone" value="0" class="observer_input">
       </td>
       <td>hr[:mm]</td>
 
@@ -212,14 +219,18 @@ table#observer_location {
     <tr>
 
       <td>
-	<button type="button" id="show_help">Help</button>
       </td>
 
-      <th>Daylight Saving Time</th>
+      <th>DST</th>
 
       <td>
 	<input type="checkbox" id="_dst" name="dst">
       </td>
+
+      <td>
+	daylight saving time
+      </td>
+
     </tr>
 
   </table>

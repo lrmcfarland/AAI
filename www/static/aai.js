@@ -18,8 +18,9 @@ aai.dd2dms = function () {
     let m = Math.abs((a_degree - deg) * 60);
     let min = Math.floor(m);
     let sec = (m - min) * 60;
+    let sec_1 = sec.toFixed(1);
 
-    let result = deg.toString() + ':' + ('0' + min.toString()).slice(-2) + ':' +  sec.toFixed(4);
+    let result = deg.toString() + ':' + ('0' + min.toString()).slice(-2) + ':' +  ('0' + sec_1.toString()).slice(-4)
 
     return result;
 
