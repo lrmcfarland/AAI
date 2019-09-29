@@ -57,36 +57,6 @@ def JulianCentury(a_datetime):
     return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
 
 
-def get_latitude(a_point):
-    """Spherical to latitude
-
-    Converts spherical coordinate theta (angle to +z axis) to
-    latitude (angle to the equator).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns coords.angle, the angle to the latitude.
-    """
-
-    return a_point.theta.complement()
-
-
-def get_longitude(a_point):
-    """Spherical to longitude
-
-    Converts spherical coordinate phi (angle to +x axis of
-    projection in xy plane) to longitude (angle to the prime meridian).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns coords.angle, the angle to the longitude.
-    """
-
-    return a_point.phi
-
-
 def azalt2spherical(an_azimuth, an_altitude, a_radius=1):
     """Converts a given altitude and azimuth into spherical coordinates
 

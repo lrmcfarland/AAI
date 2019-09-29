@@ -269,8 +269,8 @@ def RiseAndSet(an_object, an_observer, a_datetime, an_altitude=coords.angle(0)):
 
     midnight = a_datetime.fromJulianDate(JDo)
 
-    observer_latitude = Transforms.utils.get_latitude(an_observer)
-    observer_longitude = Transforms.utils.get_longitude(an_observer)
+    observer_latitude = an_observer.theta.complement()
+    observer_longitude = an_observer.phi
 
     object_declination = an_object.theta.complement()
 

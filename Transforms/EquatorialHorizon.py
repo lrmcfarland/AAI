@@ -110,9 +110,9 @@ def toHorizon(an_object, an_observer, a_datetime, is_verbose=False):
     local_hour_angle.normalize(0, 360)
 
     # Meeus 13.6
-    sinaltitude = math.sin(Transforms.utils.get_latitude(an_observer).radians)  \
+    sinaltitude = math.sin(an_observer.theta.complement().radians)  \
                   * math.sin(an_object.theta.complement().radians) \
-                  + math.cos(Transforms.utils.get_latitude(an_observer).radians)  \
+                  + math.cos(an_observer.theta.complement().radians)  \
                   * math.cos(an_object.theta.complement().radians) \
                   * math.cos(local_hour_angle.radians)
 
@@ -122,9 +122,9 @@ def toHorizon(an_object, an_observer, a_datetime, is_verbose=False):
     # Meeus 13.5
     nom = math.sin(local_hour_angle.radians)
     den = math.cos(local_hour_angle.radians) \
-          * math.sin(Transforms.utils.get_latitude(an_observer).radians) \
+          * math.sin(an_observer.theta.complement().radians) \
           - math.tan(an_object.theta.complement().radians) \
-          * math.cos(Transforms.utils.get_latitude(an_observer).radians)
+          * math.cos(an_observer.theta.complement().radians)
 
     # "Note that Azimuth (A) is measured from the South point, turning positive to the West."
     phi = coords.angle(coords.angle().rad2deg(math.atan2(nom, den) + math.pi))
@@ -133,8 +133,8 @@ def toHorizon(an_object, an_observer, a_datetime, is_verbose=False):
         print('Datetime:', a_datetime.toJulianDate())
         print('GAST:', gast)
         print('Local hour angle:', local_hour_angle.degrees)
-        print('Observer longitude:', Transforms.utils.get_longitude(an_observer).degrees)
-        print('Object latitude:', Transforms.utils.get_latitude(an_object).degrees)
+        print('Observer longitude:', an_observer.phi.degrees)
+        print('Object latitude:', an_object.theta.complement().degrees)
         print('Altitude:', theta.complement(), '(', theta.complement().degrees, ')') # Altitude = 90 - theta
         print('Azimuth:', phi, '(', phi.degrees, ')')
 
@@ -177,9 +177,9 @@ def toEquatorial(an_object, an_observer, a_datetime, is_verbose=False):
     azimuth = coords.angle(an_object.phi.degrees - 180)
 
     # Meeus, p. 94
-    sindec = math.sin(Transforms.utils.get_latitude(an_observer).radians) \
+    sindec = math.sin(an_observer.theta.complement().radians) \
              * math.sin(altitude.radians) \
-             - math.cos(Transforms.utils.get_latitude(an_observer).radians) \
+             - math.cos(an_observer.theta.complement().radians) \
              * math.cos(altitude.radians) \
              * math.cos(azimuth.radians)
 
@@ -188,9 +188,9 @@ def toEquatorial(an_object, an_observer, a_datetime, is_verbose=False):
     # Meeus, p. 94
     nom = math.sin(azimuth.radians)
     den = math.cos(azimuth.radians) \
-          * math.sin(Transforms.utils.get_latitude(an_observer).radians) \
+          * math.sin(an_observer.theta.complement().radians) \
           + math.tan(altitude.radians) \
-          * math.cos(Transforms.utils.get_latitude(an_observer).radians)
+          * math.cos(an_observer.theta.complement().radians)
 
     local_hour_angle = coords.angle(coords.angle().rad2deg(math.atan2(nom, den)))
     local_hour_angle.normalize(0, 360)
@@ -275,8 +275,8 @@ if __name__ == '__main__':
 
         result = toEquatorial(an_object, an_observer, a_datetime, is_verbose=options.verbose)
 
-        print('Equatorial Latitude:', Transforms.utils.get_latitude(result))
-        print('Longitude:', Transforms.utils.get_longitude(result))
+        print('Equatorial Latitude:', result.theta.complement())
+        print('Longitude:', result.phi)
 
     else:
 

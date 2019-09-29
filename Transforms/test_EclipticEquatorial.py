@@ -54,12 +54,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(coords.Cartesian.Ux)
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2000)
-        self.assertAlmostEqual(0, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(0, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(0, an_object_ec.theta.complement().degrees, self.places) # latitude
+        self.assertAlmostEqual(0, an_object_ec.phi.degrees, self.places) # longitude
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2000)
-        self.assertAlmostEqual(0, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(0, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(0, an_object_eq.theta.complement().degrees, self.places) # latitude
+        self.assertAlmostEqual(0, an_object_eq.phi.degrees, self.places) # longitude
 
         return
 
@@ -71,12 +71,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(90), coords.angle(0))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2000)
-        self.assertAlmostEqual(66.56071, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(90, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(66.56071, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(90, an_object_ec.phi.degrees, self.places)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2000)
-        self.assertAlmostEqual(66.56071, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(-90, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(66.56071, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-90, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -88,12 +88,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(0), coords.angle(15))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2000)
-        self.assertAlmostEqual(-5.90920, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(13.81162, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(-5.90920, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(13.81162, an_object_ec.phi.degrees, self.places)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2000)
-        self.assertAlmostEqual(5.90920, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(13.81162, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(5.90920, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(13.81162, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -105,12 +105,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(0), coords.angle(345))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2000)
-        self.assertAlmostEqual(5.90920, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(-13.811618068210032, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(5.90920, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-13.811618068210032, an_object_ec.phi.degrees, self.places)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2000)
-        self.assertAlmostEqual(-5.90920, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(-13.811618068210034, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(-5.90920, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-13.811618068210034, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -122,12 +122,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(45), coords.angle(100))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2000)
-        self.assertAlmostEqual(21.82420, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(97.60065, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(21.82420, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(97.60065, an_object_ec.phi.degrees, self.places)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2000)
-        self.assertAlmostEqual(67.78257, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(108.94923, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(67.78257, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(108.94923, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -139,12 +139,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(-30), coords.angle(-30))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2000)
-        self.assertAlmostEqual(-16.64844, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(-38.480953003793914, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(-16.64844, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-38.480953003793914, an_object_ec.phi.degrees, self.places)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2000)
-        self.assertAlmostEqual(-39.12273, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(-14.81672658697858, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(-39.12273, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-14.81672658697858, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -156,12 +156,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(-60), coords.angle(200))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2015)
-        self.assertAlmostEqual(-46.59844, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(-133.14157249262468, Transforms.utils.get_longitude(an_object_ec).degrees, self.places)
+        self.assertAlmostEqual(-46.59844, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-133.14157249262468, an_object_ec.phi.degrees, self.places)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2015)
-        self.assertAlmostEqual(-59.60899, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(158.23870, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(-59.60899, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(158.23870, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -173,12 +173,12 @@ class EclipticEquatorialTests(unittest.TestCase):
         an_object = coords.spherical(1, coords.declination(20), coords.angle(-10))
 
         an_object_ec = Transforms.EclipticEquatorial.toEcliptic(an_object, j2015)
-        self.assertAlmostEqual(22.25346, Transforms.utils.get_latitude(an_object_ec).degrees, self.places)
-        self.assertAlmostEqual(-0.8466711266760562, Transforms.utils.get_longitude(an_object_ec).degrees, 0)
+        self.assertAlmostEqual(22.25346, an_object_ec.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-0.8466711266760562, an_object_ec.phi.degrees, 0)
 
         an_object_eq = Transforms.EclipticEquatorial.toEquatorial(an_object, j2015)
-        self.assertAlmostEqual(14.41240, Transforms.utils.get_latitude(an_object_eq).degrees, self.places)
-        self.assertAlmostEqual(-17.159651455501656, Transforms.utils.get_longitude(an_object_eq).degrees, self.places)
+        self.assertAlmostEqual(14.41240, an_object_eq.theta.complement().degrees, self.places)
+        self.assertAlmostEqual(-17.159651455501656, an_object_eq.phi.degrees, self.places)
 
         return
 
@@ -194,10 +194,10 @@ class EclipticEquatorialTests(unittest.TestCase):
         pollux_ec = Transforms.EclipticEquatorial.toEcliptic(pollux, a_datetime)
 
         # Meeus: 6.684170
-        self.assertAlmostEqual(6.685962149434033, Transforms.utils.get_latitude(pollux_ec).degrees, self.places)
+        self.assertAlmostEqual(6.685962149434033, pollux_ec.theta.complement().degrees, self.places)
 
         # Meeus: 113.215630
-        self.assertAlmostEqual(113.21571932194666, Transforms.utils.get_longitude(pollux_ec).degrees, self.places)
+        self.assertAlmostEqual(113.21571932194666, pollux_ec.phi.degrees, self.places)
 
 
         return
@@ -233,10 +233,10 @@ class MeeusEclipticEquatorialTests(unittest.TestCase):
         pollux_ec = Transforms.EclipticEquatorial.Meeus.toEcliptic(pollux, a_datetime)
 
         # Meeus: 6.684170
-        self.assertAlmostEqual(6.685962149434033, Transforms.utils.get_latitude(pollux_ec).degrees, self.places)
+        self.assertAlmostEqual(6.685962149434033, pollux_ec.theta.complement().degrees, self.places)
 
         # Meeus: 113.215630
-        self.assertAlmostEqual(113.21571932194666, Transforms.utils.get_longitude(pollux_ec).degrees, self.places)
+        self.assertAlmostEqual(113.21571932194666, pollux_ec.phi.degrees, self.places)
 
         return
 

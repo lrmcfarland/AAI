@@ -195,8 +195,8 @@ class Meeus(object):
 
         eps = obliquity(a_datetime) # see above
 
-        a_lat = Transforms.utils.get_latitude(an_object)
-        a_lon = Transforms.utils.get_longitude(an_object)
+        a_lat = an_object.theta.complement()
+        a_lon = an_object.phi
 
 
         # Meeus eqn. 13.3
@@ -260,7 +260,7 @@ if __name__ == '__main__':
 
     if options.toEcliptic is True:
         result = toEcliptic(an_object, a_datetime)
-        print('Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', utils.get_longitude(result))
+        print('Ecliptic Latitude:', result.theta.complement(), ', Longitude:', result.phi)
 
     else:
         result = toEquatorial(an_object, a_datetime)
