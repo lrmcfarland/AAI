@@ -65,10 +65,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(243.30488300565906, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(243.30488300565906, sun.phi.degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('70:10')/2)
-        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
+        self.assertAlmostEqual(sextant_alt.degrees, sun.theta.complement().degrees, delta=1)
 
         return
 
@@ -95,10 +95,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(268.1014512724721, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(268.1014512724721, sun.phi.degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('44:32')/2)
-        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=1)
+        self.assertAlmostEqual(sextant_alt.degrees, sun.theta.complement().degrees, delta=1)
 
         return
 
@@ -123,10 +123,10 @@ class SunPositionsTests(unittest.TestCase):
 
         sun = SunPosition.HorizontalCoords(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(95.79970206137686, Transforms.utils.get_azimuth(sun).degrees, self.places)
+        self.assertAlmostEqual(95.79970206137686, sun.phi.degrees, self.places)
 
         sextant_alt = coords.angle(Transforms.utils.parse_angle_arg('66:46')/2)
-        self.assertAlmostEqual(sextant_alt.degrees, Transforms.utils.get_altitude(sun).degrees, delta=2)
+        self.assertAlmostEqual(sextant_alt.degrees, sun.theta.complement().degrees, delta=2)
 
         return
 
@@ -269,9 +269,9 @@ class RiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.RiseAndSet(venus, boston, a_datetime, coords.angle(-0.5667))
 
-        self.assertEqual('1988-03-20T12:26:9.28415', str(rising)) # Meeus p. 104: 12:25
-        self.assertEqual('1988-03-20T19:40:17.533', str(transit)) # Meeus p. 104: 19:41
-        self.assertEqual('1988-03-20T02:54:25.782', str(setting)) # Meeus p. 104: 02:55
+        self.assertEqual('1988-03-20T12:26:09.3', str(rising)) # Meeus p. 104: 12:25
+        self.assertEqual('1988-03-20T19:40:17.5', str(transit)) # Meeus p. 104: 19:41
+        self.assertEqual('1988-03-20T02:54:25.8', str(setting)) # Meeus p. 104: 02:55
 
         return
 
@@ -332,9 +332,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('2015-05-22T04:25:49.8102+0100', str(rising))  # NOAA 04:24
-        self.assertEqual('2015-05-22T11:58:26.8796+0100', str(transit)) # NOAA 11:56:39
-        self.assertEqual('2015-05-22T19:31:3.94916+0100', str(setting)) # NOAA 19:30
+        self.assertEqual('2015-05-22T04:25:49.8+0100', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:58:26.9+0100', str(transit)) # NOAA 11:56:39
+        self.assertEqual('2015-05-22T19:31:03.9+0100', str(setting)) # NOAA 19:30
 
         return
 
@@ -349,9 +349,9 @@ class SunRiseAndSetTests(unittest.TestCase):
 
         rising, transit, setting = SunPosition.SunRiseAndSet(an_observer, a_datetime)
 
-        self.assertEqual('2015-05-22T04:26:4.97516-0100', str(rising))  # NOAA 04:24
-        self.assertEqual('2015-05-22T11:58:46.9625-0100', str(transit)) # NOAA 11:56:39
-        self.assertEqual('2015-05-22T19:31:28.9499-0100', str(setting)) # NOAA 19:30
+        self.assertEqual('2015-05-22T04:26:05.0-0100', str(rising))  # NOAA 04:24
+        self.assertEqual('2015-05-22T11:58:47.0-0100', str(transit)) # NOAA 11:56:39
+        self.assertEqual('2015-05-22T19:31:28.9-0100', str(setting)) # NOAA 19:30
 
         return
 

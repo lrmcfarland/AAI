@@ -60,10 +60,10 @@ class MiniSun(unittest.TestCase):
         sun_hz = Bodies.APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # noaa: 176.85
-        self.assertAlmostEqual(176.33544231521523, Transforms.utils.get_azimuth(sun_hz).degrees, self.places)
+        self.assertAlmostEqual(176.33544231521523, sun_hz.phi.degrees, self.places)
 
         # noaa: 29.59
-        self.assertAlmostEqual(29.574659546386947, Transforms.utils.get_altitude(sun_hz).degrees, self.places)
+        self.assertAlmostEqual(29.574659546386947, sun_hz.theta.complement().degrees, self.places)
 
         return
 
@@ -79,8 +79,8 @@ class MiniSun(unittest.TestCase):
 
         sun_hz = Bodies.APCBodies.SunPosition(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(89.33498487414312, Transforms.utils.get_azimuth(sun_hz).degrees, self.places)
-        self.assertAlmostEqual(40.009075743665896, Transforms.utils.get_altitude(sun_hz).degrees, self.places)
+        self.assertAlmostEqual(89.33498487414312, sun_hz.phi.degrees, self.places)
+        self.assertAlmostEqual(40.009075743665896, sun_hz.theta.complement().degrees, self.places)
 
         return
 
@@ -106,8 +106,8 @@ class MiniSun(unittest.TestCase):
         sun = Bodies.APCBodies.SunPosition(self.mlc404, a_datetime)
 
         # TODO way out from Star Walk
-        self.assertAlmostEqual(56.446933443151295, Transforms.utils.get_azimuth(sun).degrees, self.places)
-        self.assertAlmostEqual(-3.9202205930785112, Transforms.utils.get_altitude(sun).degrees, delta=2)
+        self.assertAlmostEqual(56.446933443151295, sun.phi.degrees, self.places)
+        self.assertAlmostEqual(-3.9202205930785112, sun.theta.complement().degrees, delta=2)
 
         return
 
@@ -178,8 +178,8 @@ class MiniMoon(unittest.TestCase):
 
         moon_hz = Bodies.APCBodies.MoonPosition(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(196.23224856102752, Transforms.utils.get_azimuth(moon_hz).degrees, self.places)
-        self.assertAlmostEqual(51.91068989668054, Transforms.utils.get_altitude(moon_hz).degrees, self.places)
+        self.assertAlmostEqual(196.23224856102752, moon_hz.phi.degrees, self.places)
+        self.assertAlmostEqual(51.91068989668054, moon_hz.theta.complement().degrees, self.places)
 
         return
 
@@ -205,8 +205,8 @@ class MiniMoon(unittest.TestCase):
 
         moon_hz = Bodies.APCBodies.MoonPosition(self.mlc404, a_datetime)
 
-        self.assertAlmostEqual(118.0909154049349, Transforms.utils.get_azimuth(moon_hz).degrees, self.places)
-        self.assertAlmostEqual(27.7603428465914, Transforms.utils.get_altitude(moon_hz).degrees, self.places)
+        self.assertAlmostEqual(118.0909154049349, moon_hz.phi.degrees, self.places)
+        self.assertAlmostEqual(27.7603428465914, moon_hz.theta.complement().degrees, self.places)
 
         return
 

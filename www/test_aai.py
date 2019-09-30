@@ -122,7 +122,7 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
         self.assertEqual(0, len(jresp['errors']))
-        self.assertAlmostEqual('37:30:30', jresp['dms'])
+        self.assertEqual('37:30:30.0', jresp['dms'])
 
         return
 
@@ -137,7 +137,7 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
         self.assertEqual(0, len(jresp['errors']))
-        self.assertAlmostEqual('45:00:00', jresp['dms'])
+        self.assertEqual('45:00:00.0', jresp['dms'])
 
         return
 
@@ -152,7 +152,7 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
         self.assertEqual(0, len(jresp['errors']))
-        self.assertAlmostEqual('-45:30:00', jresp['dms'])
+        self.assertEqual('-45:30:00.0', jresp['dms'])
 
         return
 
@@ -188,7 +188,7 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
 
-        self.assertEqual('2018-01-11T10:14:56.123-08', jresp['params']['iso8601'])
+        self.assertEqual('2018-01-11T10:14:56.1-0800', jresp['params']['iso8601'])
         self.assertAlmostEqual(-6.25, float(jresp['params']['alt']))
         self.assertAlmostEqual(12.2583333333, float(jresp['params']['az']))
         self.assertAlmostEqual(10.5125, float(jresp['params']['dec']))
@@ -209,7 +209,7 @@ class AAITests(unittest.TestCase):
 
         jresp = json.loads(response.data)
 
-        self.assertEqual(u'2018-08-21T12:45:00-08', jresp['params']['iso8601'])
+        self.assertEqual(u'2018-08-21T13:45:00.0-0800', jresp['params']['iso8601'])
         self.assertAlmostEqual(6.25, float(jresp['params']['alt']))
         self.assertAlmostEqual(12.2583333333, float(jresp['params']['az']))
         self.assertAlmostEqual(10, float(jresp['params']['dec']))
@@ -247,11 +247,12 @@ class AAITests(unittest.TestCase):
         jresp = json.loads(response.data)
 
         # TODO order from sorted dict ok?
-        self.assertEqual(2, len(jresp['warnings']))
+        self.assertEqual(3, len(jresp['warnings']))
         self.assertEqual(u'Unsupported standard type baz: 10', jresp['warnings'][0])
-        self.assertEqual(u'Unsupported standard type foo: bar', jresp['warnings'][1])
+        self.assertEqual(u'Unsupported standard type dst: false', jresp['warnings'][1])
+        self.assertEqual(u'Unsupported standard type foo: bar', jresp['warnings'][2])
 
-        self.assertEqual('2018-01-11T10:14:56-08', jresp['params']['iso8601'])
+        self.assertEqual('2018-01-11T10:14:56.0-0800', jresp['params']['iso8601'])
         self.assertAlmostEqual(-6.25, float(jresp['params']['alt']))
         self.assertAlmostEqual(12.2583333333, float(jresp['params']['az']))
         self.assertAlmostEqual(10.5125, float(jresp['params']['dec']))
@@ -278,7 +279,7 @@ class AAITests(unittest.TestCase):
         self.assertEqual(u'unsupported format for az: str12:15:30', jresp['errors'][1])
         self.assertEqual(u'unsupported format for dec: ***10:30:45', jresp['errors'][2])
 
-        self.assertEqual(u'2018-07-11T09:30:00-08', jresp['params']['iso8601'])
+        self.assertEqual(u'2018-07-11T10:30:00.0-0800', jresp['params']['iso8601'])
 
         self.assertAlmostEqual(37, float(jresp['params']['latitude']))
         self.assertAlmostEqual(-122.75, float(jresp['params']['longitude']))
@@ -298,9 +299,9 @@ class AAITests(unittest.TestCase):
 
         xform_data = json.loads(response.data)
 
-        self.assertEqual(u'2018-01-11T10:14:56-08', xform_data[u'datetime'])
-        self.assertAlmostEqual(-6.159799566504844, xform_data[u'altitude'])
-        self.assertAlmostEqual(85.3351397270823, xform_data[u'azimuth'])
+        self.assertEqual(u'2018-01-11T10:14:56.0-0800', xform_data[u'datetime'])
+        self.assertAlmostEqual(-5.636608250906519, xform_data[u'altitude'])
+        self.assertAlmostEqual(85.73481703227495, xform_data[u'azimuth'])
 
         return
 
@@ -315,9 +316,9 @@ class AAITests(unittest.TestCase):
 
         xform_data = json.loads(response.data)
 
-        self.assertEqual(u'2018-01-11T10:14:56-08', xform_data[u'datetime'])
-        self.assertAlmostEqual(0, xform_data[u'ra'])
-        self.assertAlmostEqual(0, xform_data[u'dec'])
+        self.assertEqual(u'2018-01-11T10:14:56.0-0800', xform_data[u'datetime'])
+        self.assertEqual(u'0.04380680324830261', xform_data[u'ra'])
+        self.assertEqual(u'-1.4210854715202004e-14', xform_data[u'dec'])
 
         return
 
@@ -326,25 +327,25 @@ class AAITests(unittest.TestCase):
     # ----- daily solar altitude -----
     # --------------------------------
 
-    def test_daily_solar_altitude_404mlc_2017_12_11(self):
+    def test_solar_daily_altitude_404mlc_2017_12_11(self):
         """sun daily solar altitude for 2017 dec 11"""
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2017-12-11&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=37&longitude=-122&date=2017-12-11&time=14%3A37%3A54&timezone=-08')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
         position_data = json.loads(response.data)
 
-        self.assertEqual(u'218:05:11.8683 (218.086630087)', position_data[u'sun_marker_azimuth'])
-        self.assertEqual(u'19:33:0.925497 (19.5502570824)', position_data[u'sun_marker_altitude'])
+        self.assertEqual(u'217:59:36.2', position_data[u'sun_marker_azimuth'])
+        self.assertEqual(u'19:32:39.0', position_data[u'sun_marker_altitude'])
 
         self.assertAlmostEqual(14.616666666666667, position_data[u'sun_marker_time'])
 
         return
 
 
-    def test_daily_solar_altitude_404mlc_2018_01_03(self):
+    def test_solar_daily_altitude_404mlc_2018_01_03(self):
         """sun daily solar altitude for 2018 jan 03"""
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2018-01-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=37&longitude=-122&date=2018-01-03&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
@@ -355,12 +356,12 @@ class AAITests(unittest.TestCase):
         return
 
 
-    def test_daily_solar_altitude_404mlc_2018_02_03(self):
+    def test_solar_daily_altitude_404mlc_2018_02_03(self):
         """sun daily solar altitude for 2018 feb 03
 
         this had a problem with the sun marker time calculation that caused it to be > 24 hrs
         """
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2018-02-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=37&longitude=-122&date=2018-02-03&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
@@ -371,9 +372,9 @@ class AAITests(unittest.TestCase):
         return
 
 
-    def test_daily_solar_altitude_404mlc_2018_03_03(self):
+    def test_solar_daily_altitude_404mlc_2018_03_03(self):
         """sun daily solar altitude for 2018 mar 03"""
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37&longitude=-122&date=2018-03-03&time=14%3A37%3A54&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=37&longitude=-122&date=2018-03-03&time=14%3A37%3A54&timezone=-8&dst=false')
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
 
@@ -384,9 +385,9 @@ class AAITests(unittest.TestCase):
         return
 
 
-    def test_daily_solar_altitude_below_horizon(self):
+    def test_solar_daily_altitude_below_horizon(self):
         """test error object below horizon"""
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=97&longitude=-122&date=2018-02-19&time=11%3A24%3A35&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=97&longitude=-122&date=2018-02-19&time=11%3A24%3A35&timezone=-8&dst=false')
 
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
@@ -398,9 +399,9 @@ class AAITests(unittest.TestCase):
         return
 
 
-    def test_daily_solar_altitude_bad_longitude(self):
+    def test_solar_daily_altitude_bad_longitude(self):
         """test error object below horizon"""
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=badlongitude&longitude=-122asdf&date=2018-02-19&time=11%3A24%3A35&timezone=-8&dst=false')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=badlongitude&longitude=-122asdf&date=2018-02-19&time=11%3A24%3A35&timezone=-8&dst=false')
 
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
@@ -413,9 +414,9 @@ class AAITests(unittest.TestCase):
         return
 
 
-    def test_daily_solar_altitude_incomplete_parameters(self):
+    def test_solar_daily_altitude_incomplete_parameters(self):
         """test error object below horizon"""
-        response = self.app.get('/api/v1/daily_solar_altitude?latitude=37')
+        response = self.app.get('/api/v1/solar_daily_altitude?latitude=37')
 
         self.assertEqual('200 OK', response.status)
         self.assertEqual(200, response.status_code)
@@ -423,7 +424,7 @@ class AAITests(unittest.TestCase):
         position_data = json.loads(response.data)
 
         self.assertEqual(1, len(position_data['errors']))
-        self.assertEqual(u'expected string or buffer', position_data[u'errors'][0])
+        self.assertEqual(u'expected string or bytes-like object', position_data[u'errors'][0]) # py2 expected string or buffer
 
         return
 

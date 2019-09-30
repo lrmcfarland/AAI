@@ -14,11 +14,12 @@ repeat until
 (Pdb)
 > /Users/lrm/src/Astronomy/Transforms/test_utils.py(17)<module>()
 -> import utils
-(Pdb) b utils.get_latitude
-Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/utils.py:14
+
+(Pdb) b utils.parse_angle_arg
+Breakpoint 1 at /Users/lrm/src/Astronomy/Transforms/utils.py:17
+
 (Pdb) c
-..> /Users/lrm/src/Astronomy/Transforms/utils.py(23)get_latitude()
--> if not isinstance(a_point, coords.spherical):
+
 """
 
 from __future__ import absolute_import # for python 2 and 3
@@ -62,8 +63,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_latitude_npole(self):
         """Test get_latitude north pole"""
         a_point = coords.spherical(1)
-        a_latitude = utils.get_latitude(a_point)
-        self.assertEqual(90, a_latitude.degrees)
+        self.assertEqual(90, a_point.theta.complement().degrees)
 
         return
 
@@ -71,8 +71,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_latitude_equator(self):
         """Test get_latitude equator"""
         a_point = coords.spherical(1, coords.angle(90))
-        a_latitude = utils.get_latitude(a_point)
-        self.assertEqual(0, a_latitude.degrees)
+        self.assertEqual(0, a_point.theta.complement().degrees)
 
         return
 
@@ -80,8 +79,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_latitude_spole(self):
         """Test get_latitude south pole"""
         a_point = coords.spherical(1, coords.angle(180))
-        a_latitude = utils.get_latitude(a_point)
-        self.assertEqual(-90, a_latitude.degrees)
+        self.assertEqual(-90, a_point.theta.complement().degrees)
 
         return
 
@@ -89,8 +87,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_longitude_prime_meridian(self):
         """Test get_latitude prime meridian"""
         a_point = coords.spherical(1)
-        a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(0, a_longitude.degrees)
+        self.assertEqual(0, a_point.phi.degrees)
 
         return
 
@@ -98,8 +95,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_longitude_dateline(self):
         """Test get_latitude date line"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(180))
-        a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(180, a_longitude.degrees)
+        self.assertEqual(180, a_point.phi.degrees)
 
         return
 
@@ -107,8 +103,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_longitude_45_east(self):
         """Test get_latitude 45 east"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
-        a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(45, a_longitude.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
@@ -116,8 +111,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_longitude_45_west(self):
         """Test get_latitude 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
-        a_longitude = utils.get_longitude(a_point)
-        self.assertEqual(-45, a_longitude.degrees)
+        self.assertEqual(-45, a_point.phi.degrees)
 
         return
 
@@ -125,8 +119,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_RA_45_east(self):
         """Test get_RA 45 east"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
-        a_right_ascension = utils.get_RA(a_point)
-        self.assertEqual(3, a_right_ascension.degrees)
+        self.assertEqual(3, a_point.phi.RA)
 
         return
 
@@ -134,8 +127,7 @@ class UtilsTests(unittest.TestCase):
     def test_get_RA_45_west(self):
         """Test get_RA 45 west"""
         a_point = coords.spherical(1, coords.angle(0), coords.angle(-45))
-        a_right_ascension = utils.get_RA(a_point)
-        self.assertEqual(-3.0, a_right_ascension.degrees)
+        self.assertEqual(21.0, a_point.phi.RA)
 
         return
 
@@ -145,8 +137,8 @@ class UtilsTests(unittest.TestCase):
         a_point = utils.azalt2spherical(an_azimuth=utils.parse_angle_arg('248:02:0.77676'),
                                         an_altitude=utils.parse_angle_arg('15:07:30.0779'))
 
-        self.assertAlmostEqual(248.03354910000002, utils.get_azimuth(a_point).degrees)
-        self.assertAlmostEqual(15.125021649800004, utils.get_altitude(a_point).degrees)
+        self.assertAlmostEqual(248.03354910000002, a_point.phi.degrees) # azimuth
+        self.assertAlmostEqual(15.125021649800004, a_point.theta.complement().degrees) # altiude
 
         return
 
@@ -156,8 +148,8 @@ class UtilsTests(unittest.TestCase):
         a_point = utils.latlon2spherical(a_latitude=utils.parse_angle_arg('37:24'),
                                          a_longitude=utils.parse_angle_arg('-122:04:57'))
 
-        self.assertAlmostEqual(37.4, utils.get_latitude(a_point).degrees)
-        self.assertAlmostEqual(-122.0825, utils.get_longitude(a_point).degrees)
+        self.assertAlmostEqual(37.4, a_point.theta.complement().degrees)
+        self.assertAlmostEqual(-122.0825, a_point.phi.degrees)
 
         return
 
@@ -167,8 +159,8 @@ class UtilsTests(unittest.TestCase):
         a_point = utils.radec2spherical(a_right_ascension=utils.parse_angle_arg('23:09:16.641'),
                                         a_declination=utils.parse_angle_arg('-6:43:11.61'))
 
-        self.assertAlmostEqual(23.154622500000002, utils.get_RA(a_point).degrees)
-        self.assertAlmostEqual(-6.719891666666669, utils.get_declination(a_point).degrees)
+        self.assertAlmostEqual(23.154622500000002, a_point.phi.RA)
+        self.assertAlmostEqual(-6.719891666666669, a_point.theta.complement().degrees)
 
         return
 
@@ -179,42 +171,38 @@ class GetAzimuthTests(unittest.TestCase):
 
 
     def test_theta0(self):
-        """Test at latitude 90 degrees"""
+        """Test at latitude 0, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(0), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
 
     def test_theta45(self):
-        """Test at latitude 45 degrees"""
+        """Test at latitude 45, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(45), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
 
 
     def test_theta135(self):
-        """Test at latitude -45 degrees"""
+        """Test at latitude 135, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(90+45), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 
 
     def test_theta180(self):
-        """Test at latitude -90 degrees"""
+        """Test at latitude 180, longitude 45 degrees"""
 
         a_point = coords.spherical(1, coords.angle(180), coords.angle(45))
-        an_azimuth = utils.get_azimuth(a_point)
-        self.assertEqual(45, an_azimuth.degrees)
+        self.assertEqual(45, a_point.phi.degrees)
 
         return
 

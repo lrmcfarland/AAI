@@ -184,14 +184,14 @@ def RiseAndSetTimes(an_object, an_observer, a_datetime):
     # TODO error check for circumpolar situations
 
     cos_hour_angle = (math.sin(altitude) - \
-                      math.sin(Transforms.utils.get_latitude(an_observer).radians)*math.sin(Transforms.utils.get_declination(an_object).radians)) \
-        / math.cos(Transforms.utils.get_latitude(an_observer).radians)*math.cos(Transforms.utils.get_declination(an_object).radians)
+                      math.sin(Transforms.utils.get_latitude(an_observer).radians)*math.sin(an_object.theta.complement().radians)) \
+        / math.cos(Transforms.utils.get_latitude(an_observer).radians)*math.cos(an_object.theta.complement().radians)
 
 
     hour_angle = coords.angle(math.acos(cos_hour_angle))
     print('hour angle', hour_angle, 'for altitude', altitude)
 
-    object_ra = Transforms.utils.get_RA(an_object)
+    object_ra = an_object.phi.RA
     print('RA', object_ra)
 
 
@@ -286,10 +286,10 @@ if __name__ == '__main__':
         sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
         print('Sun in horizon coordinates:\n\t', sun_hz)
 
-        print('Azimuth (degrees):', Transforms.utils.get_azimuth(sun_hz),)
-        print(''.join(('(', str(Transforms.utils.get_azimuth(sun_hz).value), ')')))
-        print('Altitude (degrees):', Transforms.utils.get_altitude(sun_hz),)
-        print(''.join(('(', str(Transforms.utils.get_altitude(sun_hz).value), ')')))
+        print('Azimuth (degrees):', sun_hz.phi,)
+        print(''.join(('(', sun_hz.phi.degrees, ')')))
+        print('Altitude (degrees):', sun_hz.theta.complement(),)
+        print(''.join(('(', sun_hz.theta.complement().degrees, ')')))
 
     elif options.body.lower() == 'moon':
 
@@ -303,10 +303,10 @@ if __name__ == '__main__':
         moon_hz = Transforms.EquatorialHorizon.toHorizon(moon_eq, an_observer, a_datetime)
         print('Moon in horizon coordinates:\n\t', moon_hz)
 
-        print('Azimuth (degrees):', Transforms.utils.get_azimuth(moon_hz),)
-        print(''.join(('(', str(Transforms.utils.get_azimuth(moon_hz).value), ')')))
-        print('Altitude (degrees):', Transforms.utils.get_altitude(moon_hz),)
-        print(''.join(('(', str(Transforms.utils.get_altitude(moon_hz).value), ')')))
+        print('Azimuth (degrees):', moon_hz.phi,)
+        print(''.join(('(', moon_hz.phi.degrees, ')')))
+        print('Altitude (degrees):', moon_hz.theta.complement(),)
+        print(''.join(('(', moon_hz.theta.complement().degrees, ')')))
 
 
     elif options.body.lower() == 'tbd':
@@ -321,8 +321,8 @@ if __name__ == '__main__':
 
             print(0.01*d,)
             print(current_datetime,)
-            print(Transforms.utils.get_azimuth(moon).value,)
-            print(Transforms.utils.get_altitude(moon).value)
+            print(moon.phi.degrees)
+            print(moon.theta.complement().degrees)
 
 
     else:

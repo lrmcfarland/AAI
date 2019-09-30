@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-"""Utilities for transforms
-
-"""
+"""Utilities for transforms"""
 
 import math
 import re
@@ -57,93 +55,6 @@ def JulianCentury(a_datetime):
     Returns a double equal to the Julian century.
     """
     return (a_datetime.toJulianDate() - a_datetime.J2000)/36525.0
-
-
-def get_altitude(a_point):
-    """Spherical to altitude
-
-    Converts spherical coordinate theta (angle to +z axis) to
-    altitude (angle to the horizon).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns coords.angle, the angle to the longitude.
-    """
-
-    return a_point.theta.complement()
-
-
-def get_azimuth(a_point):
-    """Spherical to azimuth
-
-    Converts spherical coordinate phi (angle to +x axis of
-    projection in xy plane) to longitude (angle to the prime meridian).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns coords.angle, the angle to the azimuth.
-    """
-
-    return a_point.phi
-
-
-def get_latitude(a_point):
-    """Spherical to latitude
-
-    Converts spherical coordinate theta (angle to +z axis) to
-    latitude (angle to the equator).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns coords.angle, the angle to the latitude.
-    """
-
-    return a_point.theta.complement()
-
-
-def get_longitude(a_point):
-    """Spherical to longitude
-
-    Converts spherical coordinate phi (angle to +x axis of
-    projection in xy plane) to longitude (angle to the prime meridian).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns coords.angle, the angle to the longitude.
-    """
-
-    return a_point.phi
-
-
-def get_RA(a_point):
-    """Spherical to right ascension
-
-    Converts spherical coordinate phi (angle to +x axis of
-    projection in xy plane) to right ascension (/= 15).
-
-    Args:
-        a_point: coords.spherical
-
-    Returns an angle with a value equal to the Right Ascension.
-    """
-
-    return coords.angle(get_longitude(a_point)/15.0)
-
-
-def get_declination(a_point):
-    """Spherical to declination
-
-    Converts spherical coordinate theta (angle to +z axis) to
-    declination (angle to the ecliptic).
-
-    Returns an angle with a value equal to the declination.
-    """
-
-    return a_point.theta.complement()
 
 
 def azalt2spherical(an_azimuth, an_altitude, a_radius=1):

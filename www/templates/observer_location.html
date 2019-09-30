@@ -6,12 +6,43 @@
     margin:   2px;
     border:   1px solid navy;
     padding: 10px;
+
 }
+
+.observer_input {
+	text-align: right;
+	width: 140px;
+	font-size: 20px;
+	color:orangered;
+}
+
 
 table#observer_location {
     width: 90%;
     margin-left: 5%;
     margin-right: 5%;
+
+}
+
+.observerButtons {
+
+    text-align: center;
+    font-size: 20px;
+    color:green;
+
+    margin-left: 20px;
+    margin-right: 20px;
+
+}
+
+.timeShiftButtons {
+
+    text-align: center;
+    font-size: 40px;
+    color:green;
+
+    margin-left: 20px;
+    margin-right: 20px;
 
 }
 
@@ -147,14 +178,14 @@ table#observer_location {
 
     <tr>
 
-      <td>
-	<button type="button" id="set_location">Current Location</button>
+      <td rowspan="2" >
+	<button class="observerButtons" type="button" id="set_location"  >Current Location</button>
       </td>
 
       <th>Latitude</th>
 
       <td>
-	<input type="text" id="_latitude" name="latitude">
+	<input type="text" id="_latitude" name="latitude" class="observer_input">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -162,14 +193,11 @@ table#observer_location {
     </tr>
 
     <tr>
-
-      <td>
-      </td>
 
       <th>Longitude</th>
 
       <td>
-	<input type="text" id="_longitude" name="longitude">
+	<input type="text" id="_longitude" name="longitude" class="observer_input">
       </td>
 
       <td>deg[:min[:sec]]</td>
@@ -177,33 +205,33 @@ table#observer_location {
     </tr>
 
     <tr>
-      <td></td>
+      <td rowspan="2" >
+	<button  class="observerButtons" type="button" id="set_time">Current Time</button>
+      </td>
 
       <th>Date</th>
 
       <td>
-	<input type="text" id="_date" name="date"> {# id needed for date picker, name for form #}
+	<input type="text" id="_date" name="date" class="observer_input"> {# id needed for date picker, name for form #}
       </td>
       <td>year-mm-dd</td>
     </tr>
 
     <tr>
 
-      <td>
-	<button type="button" id="set_time">Current Time</button>
-      </td>
 
       <th>Local Time</th>
-      <td><input type="text" id="_time" name="time" value="12:00"></td>
+      <td><input type="text" id="_time" name="time" value="12:00" class="observer_input"></td>
       <td>hr[:min[:sec]]</td>
     </tr>
 
     <tr>
+
       <td></td>
 
       <th>Time Zone</th>
       <td>
-	<input type="text" id="_timezone" name="timezone" value="0">
+	<input type="text" id="_timezone" name="timezone" value="0" class="observer_input">
       </td>
       <td>hr[:mm]</td>
 
@@ -212,16 +240,52 @@ table#observer_location {
     <tr>
 
       <td>
-	<button type="button" id="show_help">Help</button>
       </td>
 
-      <th>Daylight Saving Time</th>
+      <th>DST</th>
 
       <td>
 	<input type="checkbox" id="_dst" name="dst">
       </td>
+
+      <td>
+	daylight saving time
+      </td>
+
     </tr>
 
   </table>
+
+  <hr>
+  <h2 align="center">Display Controls</h2>
+  <br>
+
+  <table id="time_table" align="center">
+
+    <tr>
+      <td>
+	<button class="timeShiftButtons" id="get_prev_day" title="Previous Day">&laquo;</button>
+      </td>
+
+      <td>
+	<button class="timeShiftButtons" id="get_prev_hour" title="Previous Hour">&lt;</button>
+      </td>
+
+      <td>
+	<button class="timeShiftButtons" id="get_current_time" title="Update Plot">&#x21BB;</button>
+      </td>
+
+      <td>
+	<button class="timeShiftButtons" id="get_next_hour" title="Next Hour">&gt;</button>
+      </td>
+
+      <td>
+	<button class="timeShiftButtons" id="get_next_day" title="Next Day">&raquo;</button>
+      </td>
+
+    </tr>
+
+  </table>
+
 
 </div>

@@ -158,10 +158,9 @@ class Meeus(object):
 
         eps = obliquity(a_datetime) # see above
 
-        a_RA = Transforms.utils.get_RA(an_object)
-        a_RA *= 15 # convert to degrees Meeus p. 91
+        a_RA = coords.angle(15.0 * an_object.phi.RA) # convert to degrees
 
-        a_dec = Transforms.utils.get_declination(an_object)
+        a_dec = an_object.theta.complement()
 
         # Meeus eqn. 13.1
         ecLon = coords.angle()
@@ -196,8 +195,8 @@ class Meeus(object):
 
         eps = obliquity(a_datetime) # see above
 
-        a_lat = Transforms.utils.get_latitude(an_object)
-        a_lon = Transforms.utils.get_longitude(an_object)
+        a_lat = an_object.theta.complement()
+        a_lon = an_object.phi
 
 
         # Meeus eqn. 13.3
@@ -261,8 +260,8 @@ if __name__ == '__main__':
 
     if options.toEcliptic is True:
         result = toEcliptic(an_object, a_datetime)
-        print('Ecliptic Latitude:', utils.get_latitude(result), ', Longitude:', utils.get_longitude(result))
+        print('Ecliptic Latitude:', result.theta.complement(), ', Longitude:', result.phi)
 
     else:
         result = toEquatorial(an_object, a_datetime)
-        print('RA:', utils.get_RA(result), ', Dec:', utils.get_declination(result))
+        print('RA:', result.phi.RA, ', Dec:', result.theta.complement().degrees)

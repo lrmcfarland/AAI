@@ -5,6 +5,7 @@ libary but too small for now.
 """
 
 import flask
+import math
 import re
 
 import coords
@@ -40,6 +41,21 @@ class Error(Exception):
 # =====================
 # ===== functions =====
 # =====================
+
+def dd2dms(a_degree):
+    """Converts decimal degress into dd:mm:ss notation
+
+    TODO use API instead?
+
+    """
+
+    deg = int(a_degree)
+    m = math.fabs(60.0 * (a_degree - deg))
+    minutes = int(m)
+    seconds = 60.0 * (m - minutes)
+
+    return '{:02}:{:02}:{:03.1f}'.format(deg, minutes, seconds)
+
 
 def request_float(a_float_str, a_flask_request):
     """Gets the float of string from the request args
