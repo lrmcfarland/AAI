@@ -46,18 +46,18 @@ def solar_daily_altitude_chart():
     return flask.render_template('solar_daily_altitude_chart.html')
 
 
-@home_page.route("/eqhz_transforms")
-def eqhz_transforms():
-    """Transform equatorial to horizontal coordinates at observer's location"""
+@home_page.route("/transform_observations")
+def transform_observations():
+    """Transform observation coordinates at observer's location"""
 
-    return flask.render_template('eqhz_transforms.html')
+    return flask.render_template('transform_observations.html')
 
 
-@home_page.route("/transforms")
-def transforms():
-    """Transform deg:min:sec to decimal degrees"""
+@home_page.route("/transform_times")
+def transform_times():
+    """Transform various time formats like deg:min:sec to decimal degrees"""
 
-    return flask.render_template('transforms.html')
+    return flask.render_template('transform_times.html')
 
 
 @home_page.route("/accuracy")

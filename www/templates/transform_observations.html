@@ -42,6 +42,8 @@ div.rot270 {
 
   $(document).ready(function() {
 
+    $("#time_controls").hide();
+
     $("#radec2azalt").click(function(e) {
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt",
@@ -130,11 +132,11 @@ div.rot270 {
 
 {% endblock %}
 
-{% block title %} Equatorial - Horizontal Transforms {% endblock %}
+{% block title %} Transform Observations {% endblock %}
 
 {% block content %}
 
-<h1>Equatorial - Horizontal transforms</h1>
+<h1>Transform Observation</h1>
 
 <br>
 

@@ -174,118 +174,125 @@ table#observer_location {
 
   <br>
 
-  <table id="observer_location">
+  <div id="observer_location">
 
-    <tr>
+    <table>
 
-      <td rowspan="2" >
-	<button class="observerButtons" type="button" id="set_location"  >Current Location</button>
-      </td>
+      <tr>
 
-      <th>Latitude</th>
+	<td rowspan="2" >
+	  <button class="observerButtons" type="button" id="set_location"  >Current Location</button>
+	</td>
 
-      <td>
-	<input type="text" id="_latitude" name="latitude" class="observer_input">
-      </td>
+	<th>Latitude</th>
 
-      <td>deg[:min[:sec]]</td>
+	<td>
+	  <input type="text" id="_latitude" name="latitude" class="observer_input">
+	</td>
 
-    </tr>
+	<td>deg[:min[:sec]]</td>
 
-    <tr>
+      </tr>
 
-      <th>Longitude</th>
+      <tr>
 
-      <td>
-	<input type="text" id="_longitude" name="longitude" class="observer_input">
-      </td>
+	<th>Longitude</th>
 
-      <td>deg[:min[:sec]]</td>
+	<td>
+	  <input type="text" id="_longitude" name="longitude" class="observer_input">
+	</td>
 
-    </tr>
+	<td>deg[:min[:sec]]</td>
 
-    <tr>
-      <td rowspan="2" >
-	<button  class="observerButtons" type="button" id="set_time">Current Time</button>
-      </td>
+      </tr>
 
-      <th>Date</th>
+      <tr>
+	<td rowspan="2" >
+	  <button  class="observerButtons" type="button" id="set_time">Current Time</button>
+	</td>
 
-      <td>
-	<input type="text" id="_date" name="date" class="observer_input"> {# id needed for date picker, name for form #}
-      </td>
-      <td>year-mm-dd</td>
-    </tr>
+	<th>Date</th>
 
-    <tr>
+	<td>
+	  <input type="text" id="_date" name="date" class="observer_input"> {# id needed for date picker, name for form #}
+	</td>
+	<td>year-mm-dd</td>
+      </tr>
+
+      <tr>
 
 
-      <th>Local Time</th>
-      <td><input type="text" id="_time" name="time" value="12:00" class="observer_input"></td>
-      <td>hr[:min[:sec]]</td>
-    </tr>
+	<th>Local Time</th>
+	<td><input type="text" id="_time" name="time" value="12:00" class="observer_input"></td>
+	<td>hr[:min[:sec]]</td>
+      </tr>
 
-    <tr>
+      <tr>
 
-      <td></td>
+	<td></td>
 
-      <th>Time Zone</th>
-      <td>
-	<input type="text" id="_timezone" name="timezone" value="0" class="observer_input">
-      </td>
-      <td>hr[:mm]</td>
+	<th>Time Zone</th>
+	<td>
+	  <input type="text" id="_timezone" name="timezone" value="0" class="observer_input">
+	</td>
+	<td>hr[:mm]</td>
 
-    </tr>
+      </tr>
 
-    <tr>
+      <tr>
 
-      <td>
-      </td>
+	<td>
+	</td>
 
-      <th>DST</th>
+	<th>DST</th>
 
-      <td>
-	<input type="checkbox" id="_dst" name="dst">
-      </td>
+	<td>
+	  <input type="checkbox" id="_dst" name="dst">
+	</td>
 
-      <td>
-	daylight saving time
-      </td>
+	<td>
+	  daylight saving time
+	</td>
 
-    </tr>
+      </tr>
 
-  </table>
+    </table>
+  </div>
 
-  <hr>
-  <h2 align="center">Display Controls</h2>
-  <br>
+  <div id="time_controls">
 
-  <table id="time_table" align="center">
+    <hr>
+    <h2 align="center">Time Controls</h2>
 
-    <tr>
-      <td>
-	<button class="timeShiftButtons" id="get_prev_day" title="Previous Day">&laquo;</button>
-      </td>
+    <br>
 
-      <td>
-	<button class="timeShiftButtons" id="get_prev_hour" title="Previous Hour">&lt;</button>
-      </td>
+    <table id="time_table" align="center">
 
-      <td>
-	<button class="timeShiftButtons" id="get_current_time" title="Update Plot">&#x21BB;</button>
-      </td>
+      <tr>
+	<td>
+	  <button class="timeShiftButtons" id="get_prev_day" title="Previous Day">&laquo;</button>
+	</td>
 
-      <td>
-	<button class="timeShiftButtons" id="get_next_hour" title="Next Hour">&gt;</button>
-      </td>
+	<td>
+	  <button class="timeShiftButtons" id="get_prev_hour" title="Previous Hour">&lt;</button>
+	</td>
 
-      <td>
-	<button class="timeShiftButtons" id="get_next_day" title="Next Day">&raquo;</button>
-      </td>
+	<td>
+	  <button class="timeShiftButtons" id="get_current_time" title="Update Plot">&#x21BB;</button>
+	</td>
 
-    </tr>
+	<td>
+	  <button class="timeShiftButtons" id="get_next_hour" title="Next Hour">&gt;</button>
+	</td>
 
-  </table>
+	<td>
+	  <button class="timeShiftButtons" id="get_next_day" title="Next Day">&raquo;</button>
+	</td>
 
+      </tr>
+
+    </table>
+
+  </div>
 
 </div>
