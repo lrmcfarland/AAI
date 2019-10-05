@@ -53,11 +53,11 @@ def eqhz_transforms():
     return flask.render_template('eqhz_transforms.html')
 
 
-@home_page.route("/dms_transforms")
-def dms_transforms():
+@home_page.route("/transforms")
+def transforms():
     """Transform deg:min:sec to decimal degrees"""
 
-    return flask.render_template('dms_transforms.html')
+    return flask.render_template('transforms.html')
 
 
 @home_page.route("/accuracy")
