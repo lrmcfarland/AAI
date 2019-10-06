@@ -1,21 +1,15 @@
 {# observer input data table and java scripts #}
 
+<script type="text/javascript" src="{{ url_for('static', filename='aai.js') }}"></script>
+
 <style>
 
-.observerbox {
+.observer_box {
     margin:   2px;
     border:   1px solid navy;
     padding: 10px;
 
 }
-
-.observer_input {
-	text-align: right;
-	width: 140px;
-	font-size: 20px;
-	color:orangered;
-}
-
 
 table#observer_location {
     width: 90%;
@@ -24,82 +18,21 @@ table#observer_location {
 
 }
 
-.observerButtons {
+.observer_input.obox {
+	width: 140px;
+	font-size: 20px;
+}
 
-    text-align: center;
+.observer_buttons.obox {
     font-size: 20px;
-    color:green;
-
     margin-left: 20px;
     margin-right: 20px;
-
 }
 
-.timeShiftButtons {
-
-    text-align: center;
+.observer_buttons.timeshift {
     font-size: 40px;
-    color:green;
-
     margin-left: 20px;
     margin-right: 20px;
-
-}
-
-/* ----------------------- */
-/* ----- date picker ----- */
-/* ----------------------- */
-
-.ui-datepicker {
-
-    background: #f7f7f7;
-    width: 216px;
-    height: auto;
-    margin: 5px auto 0;
-    font: 9pt Arial, sans-serif;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
-
-}
-
-.ui-datepicker-header {
-    color: #e0e0e0;
-    font-weight: bold;
-    -webkit-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, 2);
-    -moz-box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
-    box-shadow: inset 0px 1px 1px 0px rgba(250, 250, 250, .2);
-    text-shadow: 1px -1px 0px #000;
-    filter: dropshadow(color=#000, offx=1, offy=-1);
-    line-height: 30px;
-    border-width: 1px 0 0 0;
-    border-style: solid;
-    border-color: #111;
-}
-
-.ui-datepicker table {
-    width: 100%;
-}
-
-.ui-datepicker-title {
-    text-align: center;
-}
-
-.ui-datepicker-prev, .ui-datepicker-next {
-    display: inline-block;
-    text-align: center;
-    cursor: pointer;
-    background-repeat: no-repeat;
-
-}
-
-.ui-datepicker-prev {
-    float: left;
-    background-position: center -30px;
-}
-.ui-datepicker-next {
-    float: right;
-    background-position: center 0px;
 }
 
 </style>
@@ -123,22 +56,9 @@ table#observer_location {
     {# ----- set time ----- #}
 
     $("#set_time").click(function(e) {
-
-      var now = new Date();
-
-      var month_str = String(parseFloat(now.getMonth()) + 1);
-      var date_str  = String(parseFloat(now.getDate()));
-
-      var date_str = now.getFullYear() + "-" + month_str.padStart(2, "0") + "-" + date_str.padStart(2, "0");
-      $("#_date").val(date_str);
-
-      var hour_str = String(now.getHours());
-      var min_str = String(now.getMinutes());
-      var sec_str = String(now.getSeconds());
-
-      var time_str = hour_str.padStart(2, "0") + ":" + min_str.padStart(2, "0") + ":" + sec_str.padStart(2, "0");
-      $("#_time").val(time_str);
-
+      let now = aai.getCurrentDateTime()
+      $("#_date").val(now.date_str);
+      $("#_time").val(now.time_str);
     });
 
     {# ----- set timezone from longitude ----- #}
@@ -167,7 +87,7 @@ table#observer_location {
 
 </script>
 
-<div class="observerbox">
+<div class="observer_box">
 
 
   <h2 align="center">Observer's Location</h2>
@@ -181,13 +101,13 @@ table#observer_location {
       <tr>
 
 	<td rowspan="2" >
-	  <button class="observerButtons" type="button" id="set_location"  >Current Location</button>
+	  <button class="observer_buttons obox" type="button" id="set_location"  >Current Location</button>
 	</td>
 
 	<th>Latitude</th>
 
 	<td>
-	  <input type="text" id="_latitude" name="latitude" class="observer_input">
+	  <input type="text" id="_latitude" name="latitude" class="observer_input obox">
 	</td>
 
 	<td>deg[:min[:sec]]</td>
@@ -199,7 +119,7 @@ table#observer_location {
 	<th>Longitude</th>
 
 	<td>
-	  <input type="text" id="_longitude" name="longitude" class="observer_input">
+	  <input type="text" id="_longitude" name="longitude" class="observer_input obox">
 	</td>
 
 	<td>deg[:min[:sec]]</td>
@@ -208,13 +128,13 @@ table#observer_location {
 
       <tr>
 	<td rowspan="2" >
-	  <button  class="observerButtons" type="button" id="set_time">Current Time</button>
+	  <button  class="observer_buttons obox" type="button" id="set_time">Current Time</button>
 	</td>
 
 	<th>Date</th>
 
 	<td>
-	  <input type="text" id="_date" name="date" class="observer_input"> {# id needed for date picker, name for form #}
+	  <input type="text" id="_date" name="date" class="observer_input obox"> {# id needed for date picker, name for form #}
 	</td>
 	<td>year-mm-dd</td>
       </tr>
@@ -223,7 +143,7 @@ table#observer_location {
 
 
 	<th>Local Time</th>
-	<td><input type="text" id="_time" name="time" value="12:00" class="observer_input"></td>
+	<td><input type="text" id="_time" name="time" value="12:00" class="observer_input obox"></td>
 	<td>hr[:min[:sec]]</td>
       </tr>
 
@@ -233,7 +153,7 @@ table#observer_location {
 
 	<th>Time Zone</th>
 	<td>
-	  <input type="text" id="_timezone" name="timezone" value="0" class="observer_input">
+	  <input type="text" id="_timezone" name="timezone" value="0" class="observer_input obox">
 	</td>
 	<td>hr[:mm]</td>
 
@@ -270,23 +190,23 @@ table#observer_location {
 
       <tr>
 	<td>
-	  <button class="timeShiftButtons" id="get_prev_day" title="Previous Day">&laquo;</button>
+	  <button class="observer_buttons timeshift" id="get_prev_day" title="Previous Day">&laquo;</button>
 	</td>
 
 	<td>
-	  <button class="timeShiftButtons" id="get_prev_hour" title="Previous Hour">&lt;</button>
+	  <button class="observer_buttons timeshift" id="get_prev_hour" title="Previous Hour">&lt;</button>
 	</td>
 
 	<td>
-	  <button class="timeShiftButtons" id="get_current_time" title="Update Plot">&#x21BB;</button>
+	  <button class="observer_buttons timeshift" id="get_current_time" title="Update Plot">&#x21BB;</button>
 	</td>
 
 	<td>
-	  <button class="timeShiftButtons" id="get_next_hour" title="Next Hour">&gt;</button>
+	  <button class="observer_buttons timeshift" id="get_next_hour" title="Next Hour">&gt;</button>
 	</td>
 
 	<td>
-	  <button class="timeShiftButtons" id="get_next_day" title="Next Day">&raquo;</button>
+	  <button class="observer_buttons timeshift" id="get_next_day" title="Next Day">&raquo;</button>
 	</td>
 
       </tr>

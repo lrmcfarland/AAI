@@ -80,6 +80,67 @@ def dec2dms():
     return flask.jsonify(**result)
 
 
+@api.route("/datetime2juliandate")
+def datetime2juliandatec():
+
+    """Converts datetime to juliandate
+
+    Returns: JSON
+        result.iso8601
+        result.juliandate
+        result.errors = list()
+    """
+    result = {'errors': list()}
+    try:
+
+        std_datetime = utils.request_datetime('date', 'time', 'timezone', flask.request)
+
+        result['iso8601'] = str(std_datetime)
+        result['date'] = '{}-{:02}-{:02}'.format(std_datetime.year, std_datetime.month, std_datetime.day)
+        result['time'] = '{:02}:{:02}:{:05.2f}'.format(std_datetime.hour, std_datetime.minute, std_datetime.second)
+        result['timezone'] = utils.offset2timezone(std_datetime.offset())
+        result['juliandate'] = std_datetime.toJulianDate()
+
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+@api.route("/juliandate2datetime")
+def juliandatec2datetime():
+
+    """Converts juliandate to datetime
+
+    Returns: JSON
+        result.iso8601
+        result.juliandate
+        result.errors = list()
+    """
+    result = {'errors': list()}
+    try:
+
+        jdatetime = coords.datetime(utils.request_float('juliandate', flask.request))
+
+        result['iso8601'] = str(jdatetime)
+        result['date'] = '{}-{:02}-{:02}'.format(jdatetime.year, jdatetime.month, jdatetime.day)
+        result['time'] = '{:02}:{:02}:{:05.2f}'.format(jdatetime.hour, jdatetime.minute, jdatetime.second)
+
+
+        # TODO move to time zone
+
+
+        result['timezone'] = utils.offset2timezone(jdatetime.offset())
+        result['juliandate'] = jdatetime.toJulianDate()
+
+
+    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+
 @api.route("/standardize")
 def standardize():
 

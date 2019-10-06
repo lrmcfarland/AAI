@@ -57,6 +57,16 @@ def dd2dms(a_degree):
     return '{:02}:{:02}:{:03.1f}'.format(deg, minutes, seconds)
 
 
+def offset2timezone(an_offset):
+    """Convert float offset to timezone string"""
+
+    hrs = int(an_offset)
+    m = math.fabs(60.0 * (an_offset - hrs))
+    minutes = int(m)
+
+    return '{:02}:{:02}'.format(hrs, minutes)
+
+
 def request_float(a_float_str, a_flask_request):
     """Gets the float of string from the request args
 
