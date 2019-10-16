@@ -54,6 +54,9 @@ a:hover   {color:coral}
 .observer_input {
     text-align: right;
     color:orangered;
+
+    width: 140px;
+    font-size: 20px;
 }
 
 .observer_buttons {

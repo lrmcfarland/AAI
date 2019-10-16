@@ -7,29 +7,11 @@
 <style>
 
 
-table#coordinates_table {
+table#eq2hz_table {
     width: 80%;
     margin-left: 10%;
     margin-right: 10%;
 
-}
-
-div.rot90 {
-  -ms-transform: rotate(90deg); /* IE 9 */
-  -webkit-transform: rotate(90deg); /* Safari 3-8 */
-  transform: rotate(90deg);
-}
-
-div.rot180 {
-  -ms-transform: rotate(180deg); /* IE 9 */
-  -webkit-transform: rotate(180deg); /* Safari 3-8 */
-  transform: rotate(180deg);
-}
-
-div.rot270 {
-  -ms-transform: rotate(270deg); /* IE 9 */
-  -webkit-transform: rotate(270deg); /* Safari 3-8 */
-  transform: rotate(270deg);
 }
 
 
@@ -39,15 +21,16 @@ div.rot270 {
 
   $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
+  $(function() {
 
-  $(document).ready(function() {
+    {# ------------------- #}
+    {# ----- changes ----- #}
+    {# ------------------- #}
 
-    $("#time_controls").hide();
 
-    $("#radec2azalt").click(function(e) {
+    $("#_RA").change(function() {
 
-      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt",
-      {
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
 	latitude: $('input[name="latitude"]').val(),
 	longitude: $('input[name="longitude"]').val(),
 	date: $('input[name="date"]').val(),
@@ -57,7 +40,6 @@ div.rot270 {
 
 	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val()
-
 
       },
 
@@ -79,13 +61,47 @@ div.rot270 {
 
       });
 
-      return false;
-
-    }); {# end radec2azalt click #}
+    }); {# end _RA.change #}
 
 
+    $("#_dec").change(function() {
 
-    $("#azalt2radec").click(function(e) {
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val()
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  $("#_azimuth").val("TBD");
+	  $("#_altitude").val("TBD");
+
+	} else {
+
+	  $("#_azimuth").val(data.azimuth);
+	  $("#_altitude").val(data.altitude);
+
+	};
+
+      });
+
+    }); {# end _dec.change #}
+
+
+
+    $("#_azimuth").change(function() {
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec",
       {
@@ -120,10 +136,60 @@ div.rot270 {
 
       });
 
-      return false;
+    }); {# end _azimuth.change #}
 
-    }); {# end radec2azalt click #}
 
+    $("#_altitude").change(function() {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec",
+      {
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	azimuth: $('input[name="azimuth"]').val(),
+	altitude: $('input[name="altitude"]').val()
+
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  $("#_RA").val("TBD");
+	  $("#_dec").val("TBD");
+
+	} else {
+
+	  $("#_RA").val(data.ra);
+	  $("#_dec").val(data.dec);
+
+	};
+
+      });
+
+    }); {# end _altitude.change #}
+
+
+  }); {# end function #}
+
+
+
+  {# ----------------- #}
+  {# ----- ready ----- #}
+  {# ----------------- #}
+
+
+  $(document).ready(function() {
+
+
+    $("#time_controls").hide();
 
 
   }); {# end ready method #}
@@ -136,13 +202,26 @@ div.rot270 {
 
 {% block content %}
 
-<h1>Transform Observation</h1>
+<h1>Ecliptic to Equatorial</h1>
 
-<br>
 
 <div class="twocolumn">
 
-  This page transforms coordinates between
+  This transforms coordinates between
+  <a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">ecliptic</a>
+  and
+  <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
+  coordinate systems.
+
+</div>
+
+<br>
+
+<h1>Equatorial to Horizontal</h1>
+
+<div class="twocolumn">
+
+  This transforms coordinates between
   <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
   and
   <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">horizontal</a>
@@ -166,53 +245,27 @@ div.rot270 {
 
 </div>
 
-<br>
-
-{% include "observer_location.html" %}
 
 <br>
 
 
-<br>
+<div id="eq2hz_div">
 
-<div class="resultbox">
+  {% include "observer_location.html" %}
 
-  <table id="coordinates_table">
+  <br>
 
-
-    <tr>
-      <td></td>
-
-      <td align="center">
-	<div class="rot180"><i style="font-size:24px" class="fa">&#x2B90;</i>
-	</div>
-      </td>
-
-
-      <td></td>
-
-      <td> <button id="radec2azalt">to az/alt</button> </td>
-
-      <td></td>
-
-      <td align="center">
-	<div class="rot270"><i style="font-size:24px" class="fa">&#x2B90;</i>
-	</div>
-      </td>
-
-
-      <td></td>
-    </tr>
+  <table id="eq2hz_table">
 
     <tr>
       <th>Right Ascension</th>
-      <td><input type="text" name="RA" id="_RA" value="0"></td>
+      <td><input type="text" class="observer_input" name="RA" id="_RA" value="0"></td>
       <td>hours</td>
 
       <td></td>
 
       <th>Azimuth</th>
-      <td><input type="text" name="azimuth" id="_azimuth"></td>
+      <td><input type="text" class="observer_input" name="azimuth" id="_azimuth"></td>
       <td>degrees</td>
 
 
@@ -220,38 +273,16 @@ div.rot270 {
 
     <tr>
       <th>Declination</th>
-      <td><input type="text" name="dec" id="_dec" value="0"></td>
+      <td><input type="text" class="observer_input" name="dec" id="_dec" value="0"></td>
       <td>degrees</td>
 
       <td></td>
 
 
       <th>Altitude</th>
-      <td><input type="text" name="altitude" id="_altitude"></td>
+      <td><input type="text" class="observer_input" name="altitude" id="_altitude"></td>
       <td>degrees</td>
     </tr>
-
-    <tr>
-      <td></td>
-
-
-      <td align="center">
-	<div class="rot90"><i style="font-size:24px" class="fa">&#x2B90;</i>
-	</div>
-      </td>
-
-      <td></td>
-      <td> <button id="azalt2radec">to ra/dec</button> </td>
-      <td></td>
-
-      <td align="center">
-	<div><i style="font-size:24px" class="fa">&#x2B90;</i>
-	</div>
-      </td>
-
-
-    </tr>
-
 
   </table>
 

@@ -20,7 +20,6 @@ table {
 
   $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
-
   $(function() {
 
       {# -------------------------- #}
@@ -35,7 +34,7 @@ table {
 
 	  function(data) {
 
-	      if (data.errors.length) {
+	      if (data.errors.length > 0) {
 
 		  alert("Error: " + data.errors);
 
@@ -60,7 +59,7 @@ table {
 
 	  function(data) {
 
-	      if (data.errors.length) {
+	      if (data.errors.length > 0) {
 
 		  alert("Error: " + data.errors);
 
@@ -97,7 +96,7 @@ table {
 
 	  function(data) {
 
-	      if (data.errors.length) {
+	      if (data.errors.length > 0) {
 
 		  alert("Error: " + data.errors);
 
@@ -128,7 +127,7 @@ table {
 
 	  function(data) {
 
-	      if (data.errors.length) {
+	      if (data.errors.length > 0) {
 
 		  alert("Error: " + data.errors);
 
@@ -158,7 +157,7 @@ table {
 
 	  function(data) {
 
-	      if (data.errors.length) {
+	      if (data.errors.length > 0) {
 
 		  alert("Error: " + data.errors);
 
@@ -187,7 +186,7 @@ table {
 
 	  function(data) {
 
-	      if (data.errors.length) {
+	      if (data.errors.length > 0) {
 
 		  alert("Error: " + data.errors);
 
@@ -207,7 +206,7 @@ table {
 
 
 
-  }); {# end jquery init function #}
+  }); {# end function #}
 
 
   {# ----------------- #}
@@ -231,7 +230,7 @@ table {
 
       function(data) {
 
-	if (data.errors.length) {
+	if (data.errors.length > 0) {
 
 	  alert("Error: " + data.errors);
 
