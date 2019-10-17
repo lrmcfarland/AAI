@@ -51,18 +51,29 @@ a:hover   {color:coral}
 /* ----- observer ----- */
 /* -------------------- */
 
-.observer_input {
+.observer {
+    font-size: 20px;
+}
+
+.observer.input {
     text-align: right;
     color:orangered;
 
     width: 140px;
-    font-size: 20px;
 }
 
-.observer_buttons {
+.observer.buttons {
     text-align: center;
     color: lightseagreen;
+
+    margin-left: 20px;
+    margin-right: 20px;
 }
+
+.observer.buttons.timeshift {
+    font-size: 40px;
+}
+
 
 
 

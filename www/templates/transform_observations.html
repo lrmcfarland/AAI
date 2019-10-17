@@ -202,46 +202,17 @@ table#eq2hz_table {
 
 {% block content %}
 
-<h1>Ecliptic to Equatorial</h1>
-
+<h1>Observation Transforms</h1>
 
 <div class="twocolumn">
 
   This transforms coordinates between
+  <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">horizontal</a> (observer),
+  <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
+  and
   <a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">ecliptic</a>
-  and
-  <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
   coordinate systems.
 
-</div>
-
-<br>
-
-<h1>Equatorial to Horizontal</h1>
-
-<div class="twocolumn">
-
-  This transforms coordinates between
-  <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
-  and
-  <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">horizontal</a>
-  coordinate systems.
-
-  If you know the
-  <a href="https://en.wikipedia.org/wiki/Right_ascension">right ascension</a>
-  and
-  <a href="https://en.wikipedia.org/wiki/Declination">declination</a>
-  of your celestial object,
-  for example from
-  <a href="https://en.wikipedia.org/wiki/Sirius">Sirius' wikipedia page</a>,
-  this will calculate the
-  <a href="https://en.wikipedia.org/wiki/Azimuth">azimuth</a>
-  and
-  <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">altitude</a>
-  at the observer's location.
-
-  Conversely, given the azimuth and altitude, this will calculate the
-  right ascension and declination.
 
 </div>
 
@@ -255,34 +226,63 @@ table#eq2hz_table {
 
   <br>
 
+  <h2 align="center">Observation Direction</h2>
+
   <table id="eq2hz_table">
 
-    <tr>
+
+    <tr bgcolor="lightgreen">
+      <th><a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">Horizontal</a></th>
+      <th>Azimuth</th>
+      <td><input type="text" class="observer_input" name="azimuth" id="_azimuth" value="0"></td>
+      <td>degrees</td>
+    </tr>
+
+    <tr bgcolor="lightgreen">
+      <th></th>
+      <th>Altitude</th>
+      <td><input type="text" class="observer_input" name="altitude" id="_altitude" value="0"></td>
+      <td>degrees</td>
+
+    </tr>
+
+
+
+    <tr bgcolor="lightblue">
+      <th><a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">Equatorial</a></th>
       <th>Right Ascension</th>
       <td><input type="text" class="observer_input" name="RA" id="_RA" value="0"></td>
       <td>hours</td>
 
-      <td></td>
-
-      <th>Azimuth</th>
-      <td><input type="text" class="observer_input" name="azimuth" id="_azimuth"></td>
-      <td>degrees</td>
-
-
     </tr>
 
-    <tr>
+    <tr bgcolor="lightblue">
+      <th></th>
       <th>Declination</th>
       <td><input type="text" class="observer_input" name="dec" id="_dec" value="0"></td>
       <td>degrees</td>
 
-      <td></td>
-
-
-      <th>Altitude</th>
-      <td><input type="text" class="observer_input" name="altitude" id="_altitude"></td>
-      <td>degrees</td>
     </tr>
+
+
+    <tr bgcolor="azure">
+      <th><a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">Ecliptic</a></th>
+      <th>Longitude</th>
+      <td><input type="text" class="observer_input" name="longitude" id="_longitude" value="0"></td>
+      <td>degrees</td>
+
+    </tr>
+
+    <tr bgcolor="azure">
+      <th></th>
+      <th>Latitude</th>
+      <td><input type="text" class="observer_input" name="latitude" id="_latitude" value="0"></td>
+      <td>degrees</td>
+
+    </tr>
+
+
+
 
   </table>
 

@@ -9,31 +9,30 @@
     border:   1px solid navy;
     padding: 10px;
 
-}
-
-table#observer_location {
-    width: 90%;
-    margin-left: 5%;
-    margin-right: 5%;
+    background-color: black;
 
 }
 
-.observer_input.obox {
-	width: 140px;
-	font-size: 20px;
+.observer.location {
+    background-color: lightgreen;
 }
 
-.observer_buttons.obox {
-    font-size: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
+.observer.input.location {
+    background-color: lightgreen;
 }
 
-.observer_buttons.timeshift {
-    font-size: 40px;
-    margin-left: 20px;
-    margin-right: 20px;
+
+
+.observer.datetime {
+    background-color: khaki;
 }
+
+
+.observer.input.datetime {
+    background-color: khaki;
+}
+
+
 
 </style>
 
@@ -94,80 +93,74 @@ table#observer_location {
 
   <br>
 
-  <div id="observer_location">
+  <div align="center">
 
     <table>
 
-      <tr>
+      <tr class="observer location">
 
-	<td rowspan="2" >
-	  <button class="observer_buttons obox" type="button" id="set_location"  >Current Location</button>
+	<td rowspan="3" >
+	  <button type="button" class="observer buttons" id="set_location"  >Current Location</button>
 	</td>
 
 	<th>Latitude</th>
 
 	<td>
-	  <input type="text" id="_latitude" name="latitude" class="observer_input obox">
+	  <input type="text" class="observer input location" id="_latitude" name="latitude">
 	</td>
 
 	<td>deg[:min[:sec]]</td>
 
       </tr>
 
-      <tr>
+      <tr class="observer location">
 
 	<th>Longitude</th>
 
 	<td>
-	  <input type="text" id="_longitude" name="longitude" class="observer_input obox">
+	  <input type="text" class="observer input location" id="_longitude" name="longitude">
 	</td>
 
 	<td>deg[:min[:sec]]</td>
 
       </tr>
 
-      <tr>
-	<td rowspan="2" >
-	  <button  class="observer_buttons obox" type="button" id="set_time">Current Time</button>
-	</td>
-
-	<th>Date</th>
-
-	<td>
-	  <input type="text" id="_date" name="date" class="observer_input obox"> {# id needed for date picker, name for form #}
-	</td>
-	<td>year-mm-dd</td>
-      </tr>
-
-      <tr>
-
-
-	<th>Local Time</th>
-	<td><input type="text" id="_time" name="time" value="12:00" class="observer_input obox"></td>
-	<td>hr[:min[:sec]]</td>
-      </tr>
-
-      <tr>
-
-	<td></td>
+      <tr class="observer location">
 
 	<th>Time Zone</th>
 	<td>
-	  <input type="text" id="_timezone" name="timezone" value="0" class="observer_input obox">
+	  <input type="text" class="observer input location" id="_timezone" name="timezone" value="0">
 	</td>
 	<td>hr[:mm]</td>
 
       </tr>
 
-      <tr>
+      <tr class="observer datetime">
+	<td rowspan="3" >
+	  <button type="button" class="observer buttons" id="set_time">Current Time</button>
+	</td>
+
+	<th>Date</th>
 
 	<td>
+	  <input type="text" class="observer input datetime" id="_date" name="date"> {# id needed for date picker, name for form #}
 	</td>
+	<td>year-mm-dd</td>
+      </tr>
+
+      <tr class="observer datetime">
+
+	<th>Local Time</th>
+	<td><input type="text" class="observer input datetime" id="_time" name="time" value="12:00"></td>
+	<td>hr[:min[:sec]]</td>
+      </tr>
+
+      <tr class="observer datetime">
 
 	<th>DST</th>
 
-	<td>
-	  <input type="checkbox" id="_dst" name="dst">
+	<td align="center">
+	  <input type="checkbox" id="_dst" name="dst" >
 	</td>
 
 	<td>
@@ -179,9 +172,10 @@ table#observer_location {
     </table>
   </div>
 
+  <br>
+
   <div id="time_controls">
 
-    <hr>
     <h2 align="center">Time Controls</h2>
 
     <br>
@@ -190,23 +184,23 @@ table#observer_location {
 
       <tr>
 	<td>
-	  <button class="observer_buttons timeshift" id="get_prev_day" title="Previous Day">&laquo;</button>
+	  <button class="observer buttons timeshift" id="get_prev_day" title="Previous Day">&laquo;</button>
 	</td>
 
 	<td>
-	  <button class="observer_buttons timeshift" id="get_prev_hour" title="Previous Hour">&lt;</button>
+	  <button class="observer buttons timeshift" id="get_prev_hour" title="Previous Hour">&lt;</button>
 	</td>
 
 	<td>
-	  <button class="observer_buttons timeshift" id="get_current_time" title="Update Plot">&#x21BB;</button>
+	  <button class="observer buttons timeshift" id="get_current_time" title="Update Plot">&#x21BB;</button>
 	</td>
 
 	<td>
-	  <button class="observer_buttons timeshift" id="get_next_hour" title="Next Hour">&gt;</button>
+	  <button class="observer buttons timeshift" id="get_next_hour" title="Next Hour">&gt;</button>
 	</td>
 
 	<td>
-	  <button class="observer_buttons timeshift" id="get_next_day" title="Next Day">&raquo;</button>
+	  <button class="observer buttons timeshift" id="get_next_day" title="Next Day">&raquo;</button>
 	</td>
 
       </tr>
