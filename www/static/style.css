@@ -59,7 +59,6 @@ a:hover   {color:coral}
     text-align: right;
     color:orangered;
 
-    width: 140px;
 }
 
 .observer.buttons {
@@ -72,6 +71,22 @@ a:hover   {color:coral}
 
 .observer.buttons.timeshift {
     font-size: 40px;
+}
+
+.result {
+    font-size: 20px;
+}
+
+.result.horizontal {
+    background-color: lightgreen;
+}
+
+.result.equatorial {
+    background-color: lightblue;
+}
+
+.result.ecliptic {
+    background-color: azure;
 }
 
 
