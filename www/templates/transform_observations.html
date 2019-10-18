@@ -36,14 +36,15 @@
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec",
       {
-	latitude: $('input[name="latitude"]').val(),
-	longitude: $('input[name="longitude"]').val(),
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
 
-	azimuth: $('input[name="azimuth"]').val(),
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+
+        azimuth: $('input[name="azimuth"]').val(),
 	altitude: $('input[name="altitude"]').val()
 
 
@@ -68,12 +69,14 @@
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
-	ra: $('input[name="RA"]').val(),
-	dec: $('input[name="dec"]').val(),
-	date: $('input[name="date"]').val(),
+
+        date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+  	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
 
       },
 
@@ -103,13 +106,13 @@
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec",
       {
-	latitude: $('input[name="latitude"]').val(),
-	longitude: $('input[name="longitude"]').val(),
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
 
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
 	azimuth: $('input[name="azimuth"]').val(),
 	altitude: $('input[name="altitude"]').val()
 
@@ -136,13 +139,14 @@
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
-	ra: $('input[name="RA"]').val(),
-	dec: $('input[name="dec"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
 
+        ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
       },
 
       function(data) {
@@ -175,12 +179,14 @@
     $("#_RA").change(function() {
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
-	latitude: $('input[name="latitude"]').val(),
-	longitude: $('input[name="longitude"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
 
 	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val()
@@ -207,12 +213,14 @@
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
-	ra: $('input[name="RA"]').val(),
-	dec: $('input[name="dec"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
 
       },
 
@@ -222,7 +230,7 @@
 
 	  alert("Error: " + data.errors);
 
-          set2zero();
+	  set2zero();
 
 
 	} else {
@@ -241,12 +249,14 @@
     $("#_dec").change(function() {
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
-	latitude: $('input[name="latitude"]').val(),
-	longitude: $('input[name="longitude"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
 
 	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val()
@@ -273,13 +283,14 @@
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
-	ra: $('input[name="RA"]').val(),
-	dec: $('input[name="dec"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
 
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
       },
 
       function(data) {
@@ -312,12 +323,14 @@
     $("#_eclongitude").change(function() {
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/eclatlon2radec", {
-	eclatitude: $('input[name="eclatitude"]').val(),
-	eclongitude: $('input[name="eclongitude"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+	eclatitude: $('input[name="eclatitude"]').val(),
+	eclongitude: $('input[name="eclongitude"]').val(),
 
       },
 
@@ -340,12 +353,14 @@
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
-	latitude: $('input[name="latitude"]').val(),
-	longitude: $('input[name="longitude"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
 
 	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val()
@@ -378,13 +393,14 @@
     $("#_eclatitude").change(function() {
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/eclatlon2radec", {
-	eclatitude: $('input[name="eclatitude"]').val(),
-	eclongitude: $('input[name="eclongitude"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
 
+	eclatitude: $('input[name="eclatitude"]').val(),
+	eclongitude: $('input[name="eclongitude"]').val(),
       },
 
       function(data) {
@@ -406,12 +422,14 @@
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
-	latitude: $('input[name="latitude"]').val(),
-	longitude: $('input[name="longitude"]').val(),
+
 	date: $('input[name="date"]').val(),
 	time: $('input[name="time"]').val(),
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
 
 	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val()
@@ -479,6 +497,10 @@
   <a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">ecliptic</a>
   coordinate systems.
 
+  After a location and a time are entered for the observer's location,
+  changes to any one of Observation Direction fields will update the
+  others.
+
 
 </div>
 
@@ -486,66 +508,68 @@
 <br>
 
 
-<div align="center">
+<div align="result">
 
   {% include "observer_location.html" %}
 
   <br>
 
-  <h2 align="center">Observation Direction</h2>
+  <h1 align="center">Observation Direction</h1>
 
   <br>
 
-  <table id="eq2hz_table">
+  <div align="center">
 
-    <tr class="result horizontal">
-      <th><a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">Horizontal</a></th>
-      <th>Azimuth</th>
-      <td><input type="text" class="observer input" name="azimuth" id="_azimuth" value="0"></td>
-      <td>degrees</td>
-    </tr>
+    <table class="result table" id="eq2hz_table">
 
-    <tr class="result horizontal">
-      <th></th>
-      <th>Altitude</th>
-      <td><input type="text" class="observer input" name="altitude" id="_altitude" value="0"></td>
-      <td>degrees</td>
-    </tr>
+      <tr class="result ecliptic">
+	<th><a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">Ecliptic</a></th>
+	<th>Longitude</th>
+	<td><input type="text" class="result ecliptic entry" name="eclongitude" id="_eclongitude" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
 
-
-
-    <tr class="result equatorial">
-      <th class="result"><a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">Equatorial</a></th>
-      <th class="result">Right Ascension</th>
-      <td><input type="text" class="observer input" name="RA" id="_RA" value="0"></td>
-      <td class="result">hours</td>
-    </tr>
-
-    <tr class="result equatorial">
-      <th></th>
-      <th>Declination</th>
-      <td><input type="text" class="observer input" name="dec" id="_dec" value="0"></td>
-      <td>degrees</td>
-    </tr>
+      <tr class="result ecliptic">
+	<th></th>
+	<th>Latitude</th>
+	<td><input type="text" class="result ecliptic entry" name="eclatitude" id="_eclatitude" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
 
 
-    <tr class="result ecliptic">
-      <th><a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">Ecliptic</a></th>
-      <th>Longitude</th>
-      <td><input type="text" class="observer input" name="eclongitude" id="_eclongitude" value="0"></td>
-      <td>degrees</td>
-    </tr>
+      <tr class="result equatorial">
+	<th class="result"><a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">Equatorial</a></th>
+	<th class="result">Right Ascension</th>
+	<td><input type="text" class="result equatorial entry" name="RA" id="_RA" value="0"></td>
+	<td class="result">hr[:min]</td>
+      </tr>
 
-    <tr class="result ecliptic">
-      <th></th>
-      <th>Latitude</th>
-      <td><input type="text" class="observer input" name="eclatitude" id="_eclatitude" value="0"></td>
-      <td>degrees</td>
-    </tr>
+      <tr class="result equatorial">
+	<th></th>
+	<th>Declination</th>
+	<td><input type="text" class="result equatorial entry" name="dec" id="_dec" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
 
+
+      <tr class="result horizontal">
+	<th><a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">Horizontal</a></th>
+	<th>Azimuth</th>
+	<td><input type="text" class="result horizontal entry" name="azimuth" id="_azimuth" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
+
+      <tr class="result horizontal">
+	<th></th>
+	<th>Altitude</th>
+	<td><input type="text" class="result horizontal entry" name="altitude" id="_altitude" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
 
 
   </table>
+
+  </div>
 
 </div>
 

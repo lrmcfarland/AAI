@@ -2,39 +2,6 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='aai.js') }}"></script>
 
-<style>
-
-.observer_box {
-    margin:   2px;
-    border:   1px solid navy;
-    padding: 10px;
-
-    background-color: black;
-
-}
-
-.observer.location {
-    background-color: lightgreen;
-}
-
-.observer.input.location {
-    background-color: lightgreen;
-}
-
-
-
-.observer.datetime {
-    background-color: khaki;
-}
-
-
-.observer.input.datetime {
-    background-color: khaki;
-}
-
-
-
-</style>
 
 <script type="text/javascript">
 
@@ -86,8 +53,7 @@
 
 </script>
 
-<div class="observer_box">
-
+<div class="observer">
 
   <h2 align="center">Observer's Location</h2>
 
@@ -95,75 +61,75 @@
 
   <div align="center">
 
-    <table>
+    <table class="observer table">
 
-      <tr class="observer location">
+      <tr class="observer input location">
 
-	<td rowspan="3" >
-	  <button type="button" class="observer buttons" id="set_location"  >Current Location</button>
+	<td rowspan="3" align="center">
+	  <button type="button" class="observer buttons" id="set_location">Current Location</button>
 	</td>
 
-	<th>Latitude</th>
+	<th class="observer input location units">Latitude</th>
 
 	<td>
-	  <input type="text" class="observer input location" id="_latitude" name="latitude">
+	  <input type="text" class="observer input location entry" id="_latitude" name="latitude">
 	</td>
 
-	<td>deg[:min[:sec]]</td>
+	<td class="observer input location units">deg[:min[:sec]]</td>
 
       </tr>
 
-      <tr class="observer location">
+      <tr class="observer input location">
 
-	<th>Longitude</th>
+	<th class="observer input location units">Longitude</th>
 
 	<td>
-	  <input type="text" class="observer input location" id="_longitude" name="longitude">
+	  <input type="text" class="observer input location entry" id="_longitude" name="longitude">
 	</td>
 
-	<td>deg[:min[:sec]]</td>
+	<td class="observer input location units">deg[:min[:sec]]</td>
 
       </tr>
 
-      <tr class="observer location">
+      <tr class="observer input location">
 
-	<th>Time Zone</th>
+	<th class="observer input location units">Time Zone</th>
 	<td>
-	  <input type="text" class="observer input location" id="_timezone" name="timezone" value="0">
+	  <input type="text" class="observer input location entry" id="_timezone" name="timezone" value="0">
 	</td>
-	<td>hr[:mm]</td>
+	<td class="observer input location units">hr[:mm]</td>
 
       </tr>
 
-      <tr class="observer datetime">
-	<td rowspan="3" >
+      <tr class="observer input datetime">
+	<td rowspan="3" align="center">
 	  <button type="button" class="observer buttons" id="set_time">Current Time</button>
 	</td>
 
-	<th>Date</th>
+	<th class="observer input datetime units">Date</th>
 
 	<td>
-	  <input type="text" class="observer input datetime" id="_date" name="date"> {# id needed for date picker, name for form #}
+	  <input type="text" class="observer input datetime entry" id="_date" name="date"> {# id needed for date picker, name for form #}
 	</td>
-	<td>year-mm-dd</td>
+	<td class="observer input datetime units">year-mm-dd</td>
       </tr>
 
-      <tr class="observer datetime">
+      <tr class="observer input datetime">
 
-	<th>Local Time</th>
-	<td><input type="text" class="observer input datetime" id="_time" name="time" value="12:00"></td>
-	<td>hr[:min[:sec]]</td>
+	<th class="observer input datetime units">Local Time</th>
+	<td><input type="text" class="observer input datetime entry" id="_time" name="time" value="12:00"></td>
+	<td class="observer input datetime units">hr[:min[:sec]]</td>
       </tr>
 
-      <tr class="observer datetime">
+      <tr class="observer input datetime">
 
-	<th>DST</th>
+	<th class="observer input datetime units">DST</th>
 
 	<td align="center">
 	  <input type="checkbox" id="_dst" name="dst" >
 	</td>
 
-	<td>
+	<td class="observer input datetime units">
 	  daylight saving time
 	</td>
 
@@ -174,13 +140,13 @@
 
   <br>
 
-  <div id="time_controls">
+  <div id="time_controls" align="center">
 
     <h2 align="center">Time Controls</h2>
 
     <br>
 
-    <table id="time_table" align="center">
+    <table id="time_table">
 
       <tr>
 	<td>

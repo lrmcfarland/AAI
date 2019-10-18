@@ -53,40 +53,113 @@ a:hover   {color:coral}
 
 .observer {
     font-size: 20px;
+
+    margin:   2px;
+    padding:  2px  8px;
+
+    align: center;
 }
 
-.observer.input {
-    text-align: right;
-    color:orangered;
 
+.observer.table {
+    display: table;
+    border-spacing: 1px;
+    padding: 14px 16px;
 }
+
 
 .observer.buttons {
     text-align: center;
-    color: lightseagreen;
 
     margin-left: 20px;
     margin-right: 20px;
+
+    color: lightseagreen;
+    background-color: white;
 }
 
 .observer.buttons.timeshift {
     font-size: 40px;
 }
 
-.result {
-    font-size: 20px;
+
+.observer.input {
+    text-align: right;
+    width: 120px;
+    color: black;
 }
 
-.result.horizontal {
+.observer.input.location {
     background-color: lightgreen;
+}
+
+.observer.input.location.entry {
+    color: orangered;
+}
+
+.observer.input.location.units {
+    text-align: left;
+}
+
+
+.observer.input.datetime {
+    background-color: khaki;
+}
+
+.observer.input.datetime.entry {
+    color: orangered;
+}
+
+.observer.input.datetime.units {
+    text-align: left;
+}
+
+
+.result {
+    font-size: 20px;
+
+    margin:   2px;
+    padding:  2px  8px;
+
+    align: center;
+}
+
+.result.table {
+    display: table;
+    margin:   1px;
+    padding: 14px 16px;
+}
+
+
+
+.result.ecliptic {
+    background-color: azure;
+}
+
+.result.ecliptic.entry {
+    text-align: right;
+    width: 120px;
+    color: orangered;
 }
 
 .result.equatorial {
     background-color: lightblue;
 }
 
-.result.ecliptic {
-    background-color: azure;
+.result.equatorial.entry {
+    text-align: right;
+    width: 120px;
+    color: orangered;
+}
+
+.result.horizontal {
+    background-color: lightgreen;
+}
+
+.result.horizontal.entry {
+    text-align: right;
+    width: 120px;
+    color: orangered;
 }
 
 
@@ -147,4 +220,3 @@ a:hover   {color:coral}
     float: right;
     background-position: center 0px;
 }
-
