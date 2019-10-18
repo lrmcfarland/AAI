@@ -284,30 +284,29 @@
 
 	    try {
 
-		let current_time = aai.standardTime($('input[name="date"]').val(),
+		var current_time = aai.standardTime($('input[name="date"]').val(),
 						    $('input[name="time"]').val(),
 						    $('input[name="timezone"]').val(),
 						    $("#_dst").is(':checked'));
 
-		$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: current_time.date_str,
-		    time: current_time.time_str,
-		    timezone: current_time.timezone_str
-
-		}, function(sun_position) {
-
-		    drawSolarMap(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: current_time.date_str,
+		time: current_time.time_str,
+		timezone: current_time.timezone_str
+
+	    }, function(sun_position) {
+
+		drawSolarMap(sun_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_current_time click #}
 
@@ -317,19 +316,19 @@
 
 	    try {
 
-		let standard_time_nh = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_nh = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let next_hour = aai.changeTime(standard_time_nh.date_str,
+		var next_hour = aai.changeTime(standard_time_nh.date_str,
 					       standard_time_nh.time_str,
 					       standard_time_nh.timezone_str,
 					       60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_nh = aai.ST2DST(next_hour.date_str,
+		    var dst_nh = aai.ST2DST(next_hour.date_str,
 					    next_hour.time_str,
 					    next_hour.timezone_str);
 
@@ -345,25 +344,24 @@
 		}
 
 
-		$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    drawSolarMap(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+
+		drawSolarMap(sun_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_next_hour click #}
 
@@ -373,19 +371,19 @@
 
 	    try {
 
-		let standard_time_nd = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_nd = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let next_day = aai.changeTime(standard_time_nd.date_str,
+		var next_day = aai.changeTime(standard_time_nd.date_str,
 					       standard_time_nd.time_str,
 					       standard_time_nd.timezone_str,
 					       24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_nd = aai.ST2DST(next_day.date_str,
+		    var dst_nd = aai.ST2DST(next_day.date_str,
 					    next_day.time_str,
 					    next_day.timezone_str);
 
@@ -400,27 +398,25 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-
-		}, function(sun_position) {
-
-		    drawSolarMap(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+
+		drawSolarMap(sun_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_next_day click #}
 
@@ -430,19 +426,19 @@
 
 	    try {
 
-		let standard_time_ph = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_ph = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let prev_hour = aai.changeTime(standard_time_ph.date_str,
+		var prev_hour = aai.changeTime(standard_time_ph.date_str,
 					       standard_time_ph.time_str,
 					       standard_time_ph.timezone_str,
 					       -60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_ph = aai.ST2DST(prev_hour.date_str,
+		    var dst_ph = aai.ST2DST(prev_hour.date_str,
 					    prev_hour.time_str,
 					    prev_hour.timezone_str);
 
@@ -457,26 +453,25 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    drawSolarMap(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+
+		drawSolarMap(sun_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_prev_hour click #}
 
@@ -486,19 +481,19 @@
 
 	    try {
 
-		let standard_time_pd = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_pd = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let prev_day = aai.changeTime(standard_time_pd.date_str,
+		var prev_day = aai.changeTime(standard_time_pd.date_str,
 					      standard_time_pd.time_str,
 					      standard_time_pd.timezone_str,
 					      -24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_pd = aai.ST2DST(prev_day.date_str,
+		    var dst_pd = aai.ST2DST(prev_day.date_str,
 					    prev_day.time_str,
 					    prev_day.timezone_str);
 
@@ -513,26 +508,25 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    drawSolarMap(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
 	    }
 
 	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+
+		drawSolarMap(sun_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_prev_day click #}
 
@@ -553,28 +547,20 @@
 
 	    $('input[name="dst"]').removeAttr("checked"); {# TODO set? #}
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		{
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
 		    timezone: $('input[name="timezone"]').val()
-		},
-		function(sun_position) {
-		    drawSolarMap(sun_position);
-
+	    }, function(sun_position) {
+		drawSolarMap(sun_position);
 	    }); {# end getJSON #}
-
-	    return false;
-
 
 	}); {# end get_stonehenge_summer_azimuth_map click #}
 
 
-
 	$("#get_stonehenge_winter_azimuth_map").click(function(e) {
-
 
 	    $('input[name="latitude"]').val('51:10:50');
 	    $('input[name="longitude"]').val('-1:49:34');
@@ -585,21 +571,15 @@
 
 	    $('input[name="dst"]').removeAttr("checked");
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		{
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-		},
-		function(sun_position) {
-		    drawSolarMap(sun_position);
-
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+	    }, function(sun_position) {
+		drawSolarMap(sun_position);
 	    }); {# end getJSON #}
-
-	    return false;
-
 
 	}); {# end get_stonehenge_summer_azimuth_map click #}
 
@@ -615,21 +595,15 @@
 
 	    $('input[name="dst"]').removeAttr("checked"); {# TODO set? #}
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		      {
-			  latitude: $('input[name="latitude"]').val(),
-			  longitude: $('input[name="longitude"]').val(),
-			  date: $('input[name="date"]').val(),
-			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val()
-		      },
-		      function(sun_position) {
-
-			  drawSolarMap(sun_position);
-
-		      }); {# end getJSON #}
-
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+	    }, function(sun_position) {
+		drawSolarMap(sun_position);
+	    }); {# end getJSON #}
 
 	}); {# end get_manhattenhenge_summer1_azimuth_map click #}
 
@@ -645,24 +619,17 @@
 
 	    $('input[name="dst"]').removeAttr("checked"); {# TODO set? #}
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		      {
-			  latitude: $('input[name="latitude"]').val(),
-			  longitude: $('input[name="longitude"]').val(),
-			  date: $('input[name="date"]').val(),
-			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val()
-		      },
-		      function(sun_position) {
-
-			  drawSolarMap(sun_position);
-
-		      }); {# end getJSON #}
-
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+	    }, function(sun_position) {
+		drawSolarMap(sun_position);
+	    }); {# end getJSON #}
 
 	}); {# end get_manhattenhenge_summer2_azimuth_map click #}
-
 
 
 	$("#get_manhattenhenge_winter1_azimuth_map").click(function(e) {
@@ -676,25 +643,17 @@
 
 	    $('input[name="dst"]').removeAttr("checked");
 
-
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		      {
-			  latitude: $('input[name="latitude"]').val(),
-			  longitude: $('input[name="longitude"]').val(),
-			  date: $('input[name="date"]').val(),
-			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val()
-		      },
-		      function(sun_position) {
-
-			  drawSolarMap(sun_position);
-
-		      }); {# end getJSON #}
-
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+	    }, function(sun_position) {
+		drawSolarMap(sun_position);
+	    }); {# end getJSON #}
 
 	}); {# end get_manhattenhenge_winter1_azimuth_map click #}
-
 
 
 	$("#get_manhattenhenge_winter2_azimuth_map").click(function(e) {
@@ -708,21 +667,15 @@
 
 	    $('input[name="dst"]').removeAttr("checked");
 
-	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths",
-		      {
-			  latitude: $('input[name="latitude"]').val(),
-			  longitude: $('input[name="longitude"]').val(),
-			  date: $('input[name="date"]').val(),
-			  time: $('input[name="time"]').val(),
-			  timezone: $('input[name="timezone"]').val()
-		      },
-		      function(sun_position) {
-
-			  drawSolarMap(sun_position);
-
-		      }); {# end getJSON #}
-
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/sun_rise_set_azimuths", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+	    }, function(sun_position) {
+		drawSolarMap(sun_position);
+	    }); {# end getJSON #}
 
 	}); {# end get_manhattenhenge_winter2_azimuth_map click #}
 
@@ -730,12 +683,9 @@
     }); {# end ready method #}
 
 
-
-
   </script>
 
   <script src="https://maps.googleapis.com/maps/api/js?key={{config['GOOGLEMAPS_KEY']}}&callback=initSolarMap" async defer></script>
-
 
 
 

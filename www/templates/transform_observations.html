@@ -34,28 +34,33 @@
 
     $("#_azimuth").change(function() {
 
-      $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec",
-      {
-	date: $('input[name="date"]').val(),
-	time: $('input[name="time"]').val(),
-	timezone: $('input[name="timezone"]').val(),
-	dst: $("#_dst").is(':checked'),
+      try {
+
+	var standard_time = aai.standardTime($('input[name="date"]').val(),
+					    $('input[name="time"]').val(),
+					    $('input[name="timezone"]').val(),
+					    $("#_dst").is(':checked'));
+      } catch (err) {
+	  alert(err);
+	  set2zero();
+	return false;
+      }
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec", {
+	date: standard_time.date_str,
+	time: standard_time.time_str,
+	timezone: standard_time.timezone_str,
 
 	latitude: $('input[name="latitude"]').val(),
 	longitude: $('input[name="longitude"]').val(),
 
-        azimuth: $('input[name="azimuth"]').val(),
+	azimuth: $('input[name="azimuth"]').val(),
 	altitude: $('input[name="altitude"]').val()
 
-
-      },
-
-      function(data) {
+      }, function(data) {
 
 	if (data.errors.length > 0) {
-
 	  alert("Error: " + data.errors);
-
 	  set2zero();
 
 	} else {
@@ -63,39 +68,33 @@
 	  $("#_RA").val(aai.dd2dms(data.ra));
 	  $("#_dec").val(aai.dd2dms(data.dec));
 
-	};
+	}
 
-      });
+      }); {# end getJSON #}
 
 
       $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
 
-        date: $('input[name="date"]').val(),
-	time: $('input[name="time"]').val(),
-	timezone: $('input[name="timezone"]').val(),
-	dst: $("#_dst").is(':checked'),
+	date: standard_time.date_str,
+	time: standard_time.time_str,
+	timezone: standard_time.timezone_str,
 
-  	ra: $('input[name="RA"]').val(),
+	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val(),
 
-      },
-
-      function(data) {
+      }, function(data) {
 
 	if (data.errors.length > 0) {
-
 	  alert("Error: " + data.errors);
-
 	  set2zero();
 
 	} else {
 
 	  $("#_eclatitude").val(aai.dd2dms(data.longitude));
 	  $("#_eclongitude").val(aai.dd2dms(data.latitude));
+	}
 
-	};
-
-      });
+      });  {# end getJSON #}
 
 
     }); {# end _azimuth.change #}
@@ -145,7 +144,7 @@
 	timezone: $('input[name="timezone"]').val(),
 	dst: $("#_dst").is(':checked'),
 
-        ra: $('input[name="RA"]').val(),
+	ra: $('input[name="RA"]').val(),
 	dec: $('input[name="dec"]').val(),
       },
 
