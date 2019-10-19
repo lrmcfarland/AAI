@@ -757,47 +757,45 @@ button#get_solar_daily_altitude {
 
   </tr>
 
-  <tr>
-    <td colspan="2">
-
-      <table id="results_table" align="center">
-
-	<tr>
-	  <th>Azimuth</th>
-	  <td id="azimuth" align="right">TBD</td>
-	  <td>deg:min:sec</td>
-	</tr>
-
-	<tr>
-	  <th>Altitude</th>
-	  <td id="altitude" align="right">TBD</td>
-	  <td>deg:min:sec</td>
-	</tr>
-
-	<tr>
-	  <th>Rising</th>
-	  <td id="rising" align="right">TBD</td>
-	  <td id="rising_dst">ST</td>
-	</tr>
-
-
-	<tr>
-	  <th>Transit</th>
-	  <td id="transit" align="right">TBD</td>
-	  <td id="transit_dst">ST</td>
-	</tr>
-
-	<tr>
-	  <th>Setting</th>
-	  <td id="setting" align="right">TBD</td>
-	  <td id="setting_dst">ST</td>
-	</tr>
-
-      </table>
-
-    </td>
-  </tr>
-
 </table>
+
+<div class="result" align="center">
+
+  <table class="result table">
+
+    <tr class="result horizontal">
+      <th>Azimuth</th>
+      <td class="result horizontal entry" id="azimuth" align="right">TBD</td>
+      <td>deg:min:sec</td>
+    </tr>
+
+    <tr class="result horizontal">
+      <th>Altitude</th>
+      <td class="result horizontal entry" id="altitude" align="right">TBD</td>
+      <td>deg:min:sec</td>
+    </tr>
+
+    <tr class="result rising">
+      <th>Rising</th>
+      <td class="result rising entry" id="rising" align="right">TBD</td>
+      <td id="rising_dst">ST</td>
+    </tr>
+
+
+    <tr class="result rising">
+      <th>Transit</th>
+      <td class="result rising entry" id="transit" align="right">TBD</td>
+      <td id="transit_dst">ST</td>
+    </tr>
+
+    <tr class="result rising">
+      <th>Setting</th>
+      <td class="result rising entry" id="setting" align="right">TBD</td>
+      <td id="setting_dst">ST</td>
+    </tr>
+
+  </table>
+
+</div>
 
 {% endblock %}
