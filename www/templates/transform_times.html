@@ -1,0 +1,355 @@
+{# flask ajax example #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+<style>
+
+
+table {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+
+}
+
+</style>
+
+<script type="text/javascript">
+
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+  $(function() {
+
+      {# -------------------------- #}
+      {# ----- dms to decimal ----- #}
+      {# -------------------------- #}
+
+      $("#_dms").change(function() {
+
+	  $.getJSON($SCRIPT_ROOT + "/api/v1/dms2dec", {
+	      dms: $('input[name="dms"]').val(),
+	  },
+
+	  function(data) {
+
+	      if (data.errors.length > 0) {
+
+		  alert("Error: " + data.errors);
+
+		  $("#_dec").val("TBD");
+
+	      } else {
+
+		  $("#_dec").val(data.dec);
+
+	      };
+
+	  });
+
+      }); {# end _dms.change #}
+
+
+      $("#_dec").change(function() {
+
+	  $.getJSON($SCRIPT_ROOT + "/api/v1/dec2dms", {
+	      dec: $('input[name="dec"]').val(),
+	  },
+
+	  function(data) {
+
+	      if (data.errors.length > 0) {
+
+		  alert("Error: " + data.errors);
+
+		  $("#_dms").val("TBD");
+
+	      } else {
+
+		  $("#_dms").val(data.dms);
+
+	      };
+
+	  });
+
+      }); {# end _dec.change #}
+
+
+      {# ---------------------- #}
+      {# ----- juliandate ----- #}
+      {# ---------------------- #}
+
+
+      {# ----- set date ----- #}
+
+      $( "#_date" ).datepicker({ dateFormat: $.datepicker.ISO_8601 });
+
+      $("#_date").change(function() {
+
+	  $.getJSON($SCRIPT_ROOT + "/api/v1/datetime2juliandate", {
+	      date: $('input[name="date"]').val(),
+	      time: $('input[name="time"]').val(),
+	      timezone: $('input[name="timezone"]').val()
+
+	  },
+
+	  function(data) {
+
+	      if (data.errors.length > 0) {
+
+		  alert("Error: " + data.errors);
+
+		  $("#_juliandate").val("TBD");
+
+	      } else {
+
+		  $("#_juliandate").val(data.juliandate);
+
+	      };
+
+	  });
+
+      }); {# end _date.change #}
+
+
+
+      {# ----- set time ----- #}
+
+      $("#_time").change(function() {
+
+	  $.getJSON($SCRIPT_ROOT + "/api/v1/datetime2juliandate", {
+	      date: $('input[name="date"]').val(),
+	      time: $('input[name="time"]').val(),
+	      timezone: $('input[name="timezone"]').val()
+
+	  },
+
+	  function(data) {
+
+	      if (data.errors.length > 0) {
+
+		  alert("Error: " + data.errors);
+
+		  $("#_juliadate").val("TBD");
+
+	      } else {
+
+		  $("#_juliandate").val(data.juliandate);
+
+	      };
+
+	  });
+
+      }); {# end _time.change #}
+
+
+      {# ----- set timezone ----- #}
+
+      $("#_timezone").change(function() {
+
+	  $.getJSON($SCRIPT_ROOT + "/api/v1/datetime2juliandate", {
+	      date: $('input[name="date"]').val(),
+	      time: $('input[name="time"]').val(),
+	      timezone: $('input[name="timezone"]').val()
+
+	  },
+
+	  function(data) {
+
+	      if (data.errors.length > 0) {
+
+		  alert("Error: " + data.errors);
+
+		  $("#_juliandate").val("TBD");
+
+	      } else {
+
+		  $("#_juliandate").val(data.juliandate);
+
+	      };
+
+	  });
+
+      }); {# end _timezone.change #}
+
+
+      {# ----- set juliandate ----- #}
+
+
+      $("#_juliandate").change(function() {
+
+	  $.getJSON($SCRIPT_ROOT + "/api/v1/juliandate2datetime", {
+	      juliandate: $('input[name="juliandate"]').val(),
+
+	  },
+
+	  function(data) {
+
+	      if (data.errors.length > 0) {
+
+		  alert("Error: " + data.errors);
+
+		  $("#_juliandate").val("TBD");
+
+	      } else {
+
+		  $("#_date").val(data.date);
+		  $("#_time").val(data.time);
+		  $("#_timezone").val(data.timezone);
+
+	      };
+
+	  });
+
+      }); {# end _date.change #}
+
+
+
+  }); {# end function #}
+
+
+  {# ----------------- #}
+  {# ----- ready ----- #}
+  {# ----------------- #}
+
+  $(document).ready(function() {
+
+
+    let now = aai.getCurrentDateTime()
+    $("#_date").val(now.date_str);
+    $("#_time").val(now.time_str);
+
+
+    $.getJSON($SCRIPT_ROOT + "/api/v1/datetime2juliandate", {
+      date: $('input[name="date"]').val(),
+      time: $('input[name="time"]').val(),
+      timezone: $('input[name="timezone"]').val()
+
+    },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	    $("#_juliandate").val("TBD");
+
+	} else {
+
+	  $("#_juliandate").val(data.juliandate);
+
+	};
+
+    });
+
+
+
+  }); {# end ready method #}
+
+
+</script>
+
+{% endblock %}
+
+{% block title %} Deg:Min:Sec to Decimal degree Transforms {% endblock %}
+
+{% block content %}
+
+
+<div id="jdate">
+
+  <h2>Julian Date</h2>
+  <p>
+    <a href="https://en.wikipedia.org/wiki/Julian_day">Julian Date</a>
+  </p>
+
+  <table>
+
+    <tr>
+
+      <th>Date</th>
+
+      <td>
+	<input type="text" class="observer_input" id="_date" name="date"> {# id needed for date picker, name for form #}
+      </td>
+
+      <td>year-mm-dd</td>
+
+
+      <td></td>
+
+
+      <th align="center"><a href="https://en.wikipedia.org/wiki/Julian_day">Julian Date</a></th>
+
+      <td>
+	<input type="text" class="observer_input" id="_juliandate" name="juliandate">
+      </td>
+
+      <td title=" since January 1, 4713 BC">days</td>
+
+    </tr>
+
+    <tr>
+
+      <th>Local Time</th>
+      <td>
+	<input type="text" class="observer_input" id="_time" name="time" value="12:00">
+      </td>
+      <td>hr[:min[:sec]]</td>
+    </tr>
+
+
+    <tr>
+
+      <th>Time Zone</th>
+      <td>
+	<input type="text" class="observer_input" id="_timezone" name="timezone" value="0">
+      </td>
+      <td>hr[:mm]</td>
+
+    </tr>
+
+
+
+  </table>
+
+</div>
+
+
+<hr>
+
+
+<div id="dms2dec">
+
+  <h2>Deg:Min:Sec (DMS) to Decimal</h2>
+  <p>
+    Transform between degree/hour:minute:second notation and decimal.
+  </p>
+
+  <table>
+
+    <tr>
+
+      <th align="center">Deg:Min:Sec</th>
+      <td></td>
+      <th align="center">Decimal Degrees</th>
+
+    </tr>
+
+    <tr>
+
+      <td align="center"><input type="text" class="observer_input" name="dms" id="_dms" value="0"></td>
+      <td></td>
+      <td align="center"><input type="text" class="observer_input" name="dec" id="_dec" value="0"></td>
+
+    </tr>
+
+
+  </table>
+
+</div>
+
+
+{% endblock %}

@@ -53,7 +53,7 @@ def dms2dec():
     try:
         dms = utils.request_angle('dms', flask.request)
         result['dec'] = str(dms.getDegrees())
-    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+    except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -74,10 +74,71 @@ def dec2dms():
     try:
         dec = utils.request_angle('dec', flask.request)
         result['dms'] = str(dec)
-    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+    except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
+
+
+@api.route("/datetime2juliandate")
+def datetime2juliandate():
+
+    """Converts datetime to juliandate
+
+    Returns: JSON
+        result.iso8601
+        result.juliandate
+        result.errors = list()
+    """
+    result = {'errors': list()}
+    try:
+
+        std_datetime = utils.request_datetime('date', 'time', 'timezone', flask.request)
+
+        result['iso8601'] = str(std_datetime)
+        result['date'] = '{}-{:02}-{:02}'.format(std_datetime.year, std_datetime.month, std_datetime.day)
+        result['time'] = '{:02}:{:02}:{:05.2f}'.format(std_datetime.hour, std_datetime.minute, std_datetime.second)
+        result['timezone'] = utils.offset2timezone(std_datetime.offset())
+        result['juliandate'] = std_datetime.toJulianDate()
+
+    except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+@api.route("/juliandate2datetime")
+def juliandatec2datetime():
+
+    """Converts juliandate to datetime
+
+    Returns: JSON
+        result.iso8601
+        result.juliandate
+        result.errors = list()
+    """
+    result = {'errors': list()}
+    try:
+
+        jdatetime = coords.datetime(utils.request_float('juliandate', flask.request))
+
+        result['iso8601'] = str(jdatetime)
+        result['date'] = '{}-{:02}-{:02}'.format(jdatetime.year, jdatetime.month, jdatetime.day)
+        result['time'] = '{:02}:{:02}:{:05.2f}'.format(jdatetime.hour, jdatetime.minute, jdatetime.second)
+
+
+        # TODO move to time zone
+
+
+        result['timezone'] = utils.offset2timezone(jdatetime.offset())
+        result['juliandate'] = jdatetime.toJulianDate()
+
+
+    except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
 
 
 @api.route("/standardize")
@@ -118,7 +179,7 @@ def standardize():
             std_datetime = utils.request_datetime('date', 'time', 'timezone', flask.request)
             result['params']['iso8601'] = str(std_datetime)
 
-        except (utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
+        except (utils.Error, Transforms.utils.Error, TypeError, KeyError, ValueError, RuntimeError) as err:
             result['errors'].append(str(err))
 
     else:
@@ -146,7 +207,7 @@ def standardize():
                 result['params']['ra'] = str(body_eq.phi.RA)
                 result['params']['dec'] = str(body_eq.theta.complement().degrees)
 
-            except (utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
+            except (utils.Error, Transforms.utils.Error, TypeError, KeyError, ValueError, AttributeError) as err:
                 result['errors'].append(str(err))
 
         else:
@@ -173,7 +234,7 @@ def standardize():
             else:
                 result['warnings'].append('Unsupported standard type {}: {}'.format(key, val))
 
-        except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+        except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
             result['errors'].append(str(err))
             continue
 
@@ -182,7 +243,24 @@ def standardize():
 
 @api.route("/azalt2radec")
 def azalt2radec():
-    """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates"""
+    """Transform Azimuth, Altitude to Right Ascension, Declination Coordinates
+
+    Args:
+        latitude (degrees[:minutes[:seconds]])
+        longitude (degrees[:minutes[:seconds]])
+        date (year-mm-dd)
+        time (hr:min:sec)
+        timezone (hr:min)
+        azimuth (degrees[:minutes[:seconds]])
+        altitude (degrees[:minutes[:seconds]])
+
+    Returns:
+        observer location (str)
+        observer datetime (ISO8601 str)
+        Right Ascension (decimal degrees)
+        Declination (decimal degrees)
+        errors (list)
+    """
 
     result = {'errors': list()}
 
@@ -203,10 +281,10 @@ def azalt2radec():
 
         body_eq = Transforms.EquatorialHorizon.toEquatorial(body_hz, an_observer, a_datetime)
 
-        result['ra'] = str(body_eq.phi.RA)
-        result['dec'] = str(body_eq.theta.complement().degrees)
+        result['ra'] = body_eq.phi.RA
+        result['dec'] = body_eq.theta.complement().degrees
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -214,7 +292,24 @@ def azalt2radec():
 
 @api.route("/radec2azalt")
 def radec2azalt():
-    """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates"""
+    """Transform Right Ascension, Declination to Azimuth, Altitude Coordinates
+
+    Args:
+        latitude (degrees[:minutes[:seconds]])
+        longitude (degrees[:minutes[:seconds]])
+        date (year-mm-dd)
+        time (hr:min:sec)
+        timezone (hr:min)
+        ra (hr:mn)
+        dec (degrees[:minutes[:seconds]])
+
+    Returns:
+        observer location (str)
+        observer datetime (ISO8601 str)
+        Azimuth (decimal degrees)
+        Altitude (decimal degrees)
+        errors (list)
+    """
 
     result = {'errors': list()}
 
@@ -233,15 +328,93 @@ def radec2azalt():
 
         body_hz = Transforms.EquatorialHorizon.toHorizon(body_eq, an_observer, a_datetime)
 
-        # TODO no str?
         result['azimuth']  = body_hz.phi.degrees
         result['altitude'] = body_hz.theta.complement().degrees
 
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
+
+
+@api.route("/radec2eclatlon")
+def radec2eclatlon():
+    """Transform Right Ascension, Declination to Ecliptic Latitude, Longitude Coordinates
+
+    Args:
+        date (year-mm-dd)
+        time (hr:min:sec)
+        timezone (hr:min)
+        ra (hr:mn)
+        dec (degrees[:minutes[:seconds]])
+
+    Returns:
+        Ecliptic Latitude (decimal degrees)
+        Ecliptic Longitude (decimal degrees)
+        errors (list)
+    """
+
+    result = {'errors': list()}
+
+    try:
+
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
+        result['datetime'] = str(a_datetime)
+
+        body_eq = Transforms.utils.radec2spherical(utils.request_angle('ra', flask.request),
+                                                   utils.request_angle('dec', flask.request))
+
+        body_ec = Transforms.EclipticEquatorial.toEcliptic(body_eq, a_datetime)
+
+        result['longitude'] = body_ec.phi.degrees
+        result['latitude']  = body_ec.theta.complement().degrees
+
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
+
+
+@api.route("eclatlon2radec")
+def eclatlon2radec():
+    """Transform Ecliptic Latitude, Longitude to Right Ascension, Declination  Coordinates
+
+    Args:
+        date (year-mm-dd)
+        time (hr:min:sec)
+        timezone (hr:min)
+        Ecliptic Latitude (decimal degrees)
+        Ecliptic Longitude (decimal degrees)
+
+    Returns:
+        ra (hr:mn)
+        dec (degrees[:minutes[:seconds]])
+        errors (list)
+    """
+
+    result = {'errors': list()}
+
+    try:
+
+        a_datetime = utils.request_datetime('date','time', 'timezone', flask.request)
+        result['datetime'] = str(a_datetime)
+
+        body_ec = Transforms.utils.radec2spherical(utils.request_angle('eclongitude', flask.request),
+                                                   utils.request_angle('eclatitude', flask.request))
+
+        body_eq = Transforms.EclipticEquatorial.toEquatorial(body_ec, a_datetime)
+
+        result['ra']  = body_eq.phi.RA
+        result['dec'] = body_eq.theta.complement().degrees
+
+
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
+        result['errors'].append(str(err))
+
+    return flask.jsonify(**result)
+
 
 
 
@@ -264,7 +437,7 @@ def solar_ecliptic_coords():
         result['longitude'] = str(sun_ec.phi.degrees)
         result['latitude'] =  str(sun_ec.theta.complement().degrees)
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -283,10 +456,10 @@ def solar_equatorial_coords(an_observer, a_datetime):
 
         sun_eq = Bodies.SunPosition.EquatorialCoords(a_datetime)
 
-        result['RA'] = str(sun_eq.phi.RA)
-        result['declination'] = str(sun_eq.theta.complement().degrees)
+        result['RA'] = sun_eq.phi.RA
+        result['declination'] = sun_eq.theta.complement().degrees
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -315,7 +488,7 @@ def solar_horizontal_coords(an_observer, a_datetime):
         result['azimuth'] = str(sun_hz.phi.degrees)
         result['altitude'] = str(sun_hz.theta.complement().degrees)
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -446,7 +619,7 @@ def solar_daily_altitude():
         result['transit']  = str(err)
         result['setting']  = str(err)
 
-    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+    except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -509,7 +682,7 @@ def get_sun_azalt(an_observer, a_datetime):
     sun_eq = Transforms.EclipticEquatorial.toEquatorial(sun_ec, a_datetime)
     sun_hz = Transforms.EquatorialHorizon.toHorizon(sun_eq, an_observer, a_datetime)
 
-    result['dec'] = str(coords.angle(90) - sun_eq.theta)
+    result['dec'] = sun_eq.theta.complement()
 
     result['R'] = R
     result['ecliptic_longitude'] = str(ecliptic_longitude)
@@ -600,7 +773,7 @@ def sun_rise_set_azimuths():
         result['setting_time_str'] = str(rts['setting'])
 
 
-    except (utils.Error, TypeError, ValueError, RuntimeError) as err:
+    except (utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -626,7 +799,7 @@ def lunar_ecliptic_coords():
         result['longitude'] = str(moon_ec.phi.degrees)
         result['latitude'] =  str(moon_ec.theta.complement().degrees)
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -645,10 +818,10 @@ def lunar_equatorial_coords(an_observer, a_datetime):
 
         moon_eq = Bodies.MoonPosition.EquatorialCoords(a_datetime)
 
-        result['RA'] = str(moon_eq.phi.RA)
-        result['declination'] = str(moon_eq.theta.complement().degrees)
+        result['RA'] = moon_eq.phi.RA
+        result['declination'] = moon_eq.theta.complement().degrees
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -678,7 +851,7 @@ def lunar_horizontal_coords(an_observer, a_datetime):
         result['altitude'] = str(moon_hz.theta.complement().degrees)
 
 
-    except (TypeError, ValueError, RuntimeError, utils.Error) as err:
+    except (TypeError, ValueError, RuntimeError, utils.Error, Transforms.utils.Error) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)
@@ -895,7 +1068,7 @@ def lunar_daily_altitude():
         result['moon_setting']  = moon_rts['setting']
 
 
-    except (Bodies.SunPosition.Error, utils.Error, TypeError, ValueError, RuntimeError) as err:
+    except (Bodies.SunPosition.Error, utils.Error, Transforms.utils.Error, TypeError, ValueError, RuntimeError) as err:
         result['errors'].append(str(err))
 
     return flask.jsonify(**result)

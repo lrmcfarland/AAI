@@ -27,6 +27,26 @@ aai.dd2dms = function () {
 }
 
 
+aai.getCurrentDateTime = function () {
+
+    var now = new Date();
+
+    var month_str = String(parseFloat(now.getMonth()) + 1);
+    var date_str  = String(parseFloat(now.getDate()));
+
+    var date_str = now.getFullYear() + "-" + month_str.padStart(2, "0") + "-" + date_str.padStart(2, "0");
+
+    var hour_str = String(now.getHours());
+    var min_str = String(now.getMinutes());
+    var sec_str = String(now.getSeconds());
+
+    var time_str = hour_str.padStart(2, "0") + ":" + min_str.padStart(2, "0") + ":" + sec_str.padStart(2, "0");
+
+    return {date_str, time_str}
+
+}
+
+
 aai.setLocation = function() {
 
     // sets latitude and longitude values on ui using browser geolocation

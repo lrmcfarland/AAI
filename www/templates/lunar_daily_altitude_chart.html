@@ -2,6 +2,8 @@
 
 {% extends "base.html" %}
 
+{% block title %}Daily Lunar Altitude{% endblock %}
+
 {% block scripts %}
 
   <script type="text/javascript">
@@ -252,31 +254,46 @@
 	$("#get_current_time").click(function(e) {
 
 	    try {
-
-		let current_time = aai.standardTime($('input[name="date"]').val(),
+		var current_time = aai.standardTime($('input[name="date"]').val(),
 						    $('input[name="time"]').val(),
 						    $('input[name="timezone"]').val(),
 						    $("#_dst").is(':checked'));
 
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: current_time.date_str,
-		    time: current_time.time_str,
-		    timezone: current_time.timezone_str
+		if ($("#_dst").is(':checked')) {
 
-		}, function(moon_position) {
+		    var st2dst = aai.ST2DST(current_time.date_str,
+					    current_time.time_str,
+					    current_time.timezone_str);
 
-		    updateMoonChart(moon_position);
+		    $('input[name="date"]').val(st2dst.date_str);
+		    $('input[name="time"]').val(st2dst.time_str);
 
-		}); {# end getJSON #}
 
+		} else {
+
+		    $('input[name="date"]').val(current_time.date_str);
+		    $('input[name="time"]').val(current_time.time_str);
+
+		}
 
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: current_time.date_str,
+		time: current_time.time_str,
+		timezone: current_time.timezone_str
+
+	     }, function(moon_position) {
+
+		 updateMoonChart(moon_position);
+
+	     }); {# end getJSON #}
+
 
 	}); {# end get_current_time click #}
 
@@ -286,19 +303,19 @@
 
 	    try {
 
-		let standard_time_nh = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_nh = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let next_hour = aai.changeTime(standard_time_nh.date_str,
+		var next_hour = aai.changeTime(standard_time_nh.date_str,
 					       standard_time_nh.time_str,
 					       standard_time_nh.timezone_str,
 					       60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_nh = aai.ST2DST(next_hour.date_str,
+		    var dst_nh = aai.ST2DST(next_hour.date_str,
 					    next_hour.time_str,
 					    next_hour.timezone_str);
 
@@ -313,26 +330,25 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_next_hour click #}
 
@@ -342,19 +358,19 @@
 	    try {
 
 
-		let standard_time_nd = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_nd = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let next_day = aai.changeTime(standard_time_nd.date_str,
+		var next_day = aai.changeTime(standard_time_nd.date_str,
 					      standard_time_nd.time_str,
 					      standard_time_nd.timezone_str,
 					      24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_nd = aai.ST2DST(next_day.date_str,
+		    var dst_nd = aai.ST2DST(next_day.date_str,
 					    next_day.time_str,
 					    next_day.timezone_str);
 
@@ -369,26 +385,25 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_next_day click #}
 
@@ -399,19 +414,19 @@
 	    try {
 
 
-		let standard_time_ph = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_ph = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let prev_hour = aai.changeTime(standard_time_ph.date_str,
+		var prev_hour = aai.changeTime(standard_time_ph.date_str,
 					       standard_time_ph.time_str,
 					       standard_time_ph.timezone_str,
 					       -60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_ph = aai.ST2DST(prev_hour.date_str,
+		    var dst_ph = aai.ST2DST(prev_hour.date_str,
 					    prev_hour.time_str,
 					    prev_hour.timezone_str);
 
@@ -427,25 +442,24 @@
 		}
 
 
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_prev_hour click #}
 
@@ -456,19 +470,19 @@
 	    try {
 
 
-		let standard_time_pd = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_pd = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let prev_day = aai.changeTime(standard_time_pd.date_str,
+		var prev_day = aai.changeTime(standard_time_pd.date_str,
 					      standard_time_pd.time_str,
 					      standard_time_pd.timezone_str,
 					      -24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_pd = aai.ST2DST(prev_day.date_str,
+		    var dst_pd = aai.ST2DST(prev_day.date_str,
 					    prev_day.time_str,
 					    prev_day.timezone_str);
 
@@ -484,25 +498,25 @@
 		}
 
 
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_prev_day click #}
 
@@ -525,31 +539,29 @@
 		$('input[name="timezone"]').val('-08:00');
 		$('input[name="dst"]').prop('checked', true);
 
-		let standard_time = aai.standardTime($('input[name="date"]').val(),
+		var standard_time = aai.standardTime($('input[name="date"]').val(),
 						     $('input[name="time"]').val(),
 						     $('input[name="timezone"]').val(),
 						     $("#_dst").is(':checked'));
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end eclipse_2017_aug_21 click #}
 
@@ -567,31 +579,28 @@
 		$('input[name="timezone"]').val('+07:00');
 		$('input[name="dst"]').prop('checked', false);
 
-		let standard_time = aai.standardTime($('input[name="date"]').val(),
+		var standard_time = aai.standardTime($('input[name="date"]').val(),
 						     $('input[name="time"]').val(),
 						     $('input[name="timezone"]').val(),
 						     $("#_dst").is(':checked'));
-
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end eclipse_2019_dec_26_Lat24 click #}
 
@@ -609,34 +618,31 @@
 		$('input[name="timezone"]').val('+07:00');
 		$('input[name="dst"]').prop('checked', false);
 
-		let standard_time = aai.standardTime($('input[name="date"]').val(),
+		var standard_time = aai.standardTime($('input[name="date"]').val(),
 						     $('input[name="time"]').val(),
 						     $('input[name="timezone"]').val(),
 						     $("#_dst").is(':checked'));
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(moon_position) {
-
-		    updateMoonChart(moon_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(moon_position) {
+
+		updateMoonChart(moon_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end eclipse_2019_dec_26_Lat20 click #}
-
 
 
     }); {# end ready method #}
@@ -646,7 +652,6 @@
 
 {% endblock %}
 
-{% block title %}Daily Lunar Altitude{% endblock %}
 
 {% block content %}
 
@@ -701,138 +706,136 @@
 
 <br>
 
-
-<table>
-
-
-  <tr>
-
-    <td>
-      <div id="altitudeVtime" class="linechart"></div>
-    </td>
+<div id="altitudeVtime" class="linechart"></div>
 
 
-  </tr>
-
-  <tr>
-    <td colspan="2">
-
-      <table id="results_table" align="center">
-
-	<tr>
-	  <td></td>
-	  <th>Sun</th>
-	  <th>Moon</th>
-	  <td></td>
-	</tr>
+<div class="result" align="center">
 
 
-	<tr>
-	  <th>Range</th>
+  <table id="results_table" class="result table">
 
-	  <td id="sun_range" align="right">TBD</td>
-	  <td id="moon_range" align="right">TBD</td>
-
-	  <td><i>light-seconds</i></td>
-	</tr>
-
-	<tr><td></td></tr>
-
-	<tr>
-	  <th>Ecliptic Longitude</th>
-
-	  <td id="sun_ec_longitude" align="right">TBD</td>
-	  <td id="moon_ec_longitude" align="right">TBD</td>
-
-	  <td><i>deg:min:sec</i></td>
-	</tr>
-
-	<tr>
-	  <th>Ecliptic Latitude</th>
-
-	  <td id="sun_ec_latitude" align="right">TBD</td>
-	  <td id="moon_ec_latitude" align="right">TBD</td>
-
-	  <td><i>deg:min:sec</i></td>
-	</tr>
-
-	<tr><td></td></tr>
-
-	<tr>
-	  <th>Right Ascension</th>
-
-	  <td id="sun_eq_ra" align="right">TBD</td>
-	  <td id="moon_eq_ra" align="right">TBD</td>
-
-	  <td><i>hr:min:sec</i></td>
-	</tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <th>Sun</th>
+      <th>Moon</th>
+      <td></td>
+    </tr>
 
 
-	<tr>
-	  <th>Declination</th>
+    <tr>
+      <th></th>
+      <th>Range</th>
 
-	  <td id="sun_eq_dec" align="right">TBD</td>
-	  <td id="moon_eq_dec" align="right">TBD</td>
+      <td id="sun_range" align="right">TBD</td>
+      <td id="moon_range" align="right">TBD</td>
 
-	  <td><i>deg:min:sec</i></td>
+      <td><i>light-seconds</i></td>
+    </tr>
 
-	</tr>
+    <tr><td></td></tr>
 
-	<tr><td></td></tr>
+    <tr class="result ecliptic">
+      <th><a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">Ecliptic</a></th>
+      <th>Longitude</th>
 
-	<tr>
-	  <th>Azimuth</th>
+      <td class="result ecliptic entry" id="sun_ec_longitude" align="right">TBD</td>
+      <td class="result ecliptic entry" id="moon_ec_longitude" align="right">TBD</td>
 
-	  <td id="sun_azimuth" align="right">TBD</td>
-	  <td id="moon_azimuth" align="right">TBD</td>
+      <td><i>deg:min:sec</i></td>
+    </tr>
 
-	  <td><i>deg:min:sec</i></td>
-	</tr>
+    <tr class="result ecliptic">
+      <th></th>
+      <th>Latitude</th>
 
-	<tr>
-	  <th>Altitude</th>
+      <td class="result ecliptic entry" id="sun_ec_latitude" align="right">TBD</td>
+      <td class="result ecliptic entry" id="moon_ec_latitude" align="right">TBD</td>
 
-	  <td id="sun_altitude" align="right">TBD</td>
-	  <td id="moon_altitude" align="right">TBD</td>
+      <td><i>deg:min:sec</i></td>
+    </tr>
 
-	  <td><i>deg:min:sec</i></td>
-	</tr>
+    <tr><td></td></tr>
 
-	<tr><td></td></tr>
+    <tr class="result equatorial">
+      <th class="result"><a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">Equatorial</a></th>
+      <th>Right Ascension</th>
 
-	<tr>
-	  <th>Rising</th>
+      <td class="result equatorial entry" id="sun_eq_ra" align="right">TBD</td>
+      <td class="result equatorial entry" id="moon_eq_ra" align="right">TBD</td>
 
-	  <td id="sun_rising" align="right">TBD</td>
-	  <td id="moon_rising" align="right">TBD</td>
-	  <td id="rising_dst"><i>ST</i></td>
-	</tr>
-
-
-	<tr>
-	  <th>Transit</th>
-
-	  <td id="sun_transit" align="right">TBD</td>
-	  <td id="moon_transit" align="right">TBD</td>
-	  <td id="transit_dst"><i>ST</i></td>
-
-	</tr>
-
-	<tr>
-	  <th>Setting</th>
-
-	  <td id="sun_setting" align="right">TBD</td>
-	  <td id="moon_setting" align="right">TBD</td>
-	  <td id="setting_dst"><i>ST</i></td>
-
-	</tr>
+      <td><i>hr:min:sec</i></td>
+    </tr>
 
 
-      </table>
+    <tr class="result equatorial">
+      <th></th>
+      <th>Declination</th>
 
-    </td>
-  </tr>
+      <td class="result equatorial entry" id="sun_eq_dec" align="right">TBD</td>
+      <td class="result equatorial entry" id="moon_eq_dec" align="right">TBD</td>
 
-</table>
+      <td><i>deg:min:sec</i></td>
+
+    </tr>
+
+    <tr><td></td></tr>
+
+    <tr class="result horizontal">
+      <th><a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">Horizontal</a></th>
+      <th>Azimuth</th>
+
+      <td class="result horizontal entry" id="sun_azimuth" align="right">TBD</td>
+      <td class="result horizontal entry" id="moon_azimuth" align="right">TBD</td>
+
+      <td><i>deg:min:sec</i></td>
+    </tr>
+
+    <tr class="result horizontal">
+      <th></th>
+      <th>Altitude</th>
+
+      <td class="result horizontal entry" id="sun_altitude" align="right">TBD</td>
+      <td class="result horizontal entry" id="moon_altitude" align="right">TBD</td>
+
+      <td><i>deg:min:sec</i></td>
+    </tr>
+
+    <tr><td></td></tr>
+
+    <tr class="result rising">
+      <th></th>
+      <th>Rising</th>
+
+      <td class="result rising entry" id="sun_rising" align="right">TBD</td>
+      <td class="result rising entry" id="moon_rising" align="right">TBD</td>
+      <td id="rising_dst">ST</td>
+    </tr>
+
+
+    <tr class="result rising">
+      <th></th>
+      <th>Transit</th>
+
+      <td class="result rising entry" id="sun_transit" align="right">TBD</td>
+      <td class="result rising entry" id="moon_transit" align="right">TBD</td>
+      <td id="transit_dst">ST</td>
+
+    </tr>
+
+    <tr class="result rising">
+      <th></th>
+      <th>Setting</th>
+
+      <td class="result rising entry" id="sun_setting" align="right">TBD</td>
+      <td class="result rising entry" id="moon_setting" align="right">TBD</td>
+      <td id="setting_dst">ST</td>
+
+    </tr>
+
+  </table>
+
+
+</div>
 
 {% endblock %}

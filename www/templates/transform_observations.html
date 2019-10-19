@@ -1,0 +1,578 @@
+{# flask ajax example #}
+
+{% extends "base.html" %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+
+  {# TODO anonymous or immediately invoking function? #}
+
+  $(function() {
+
+
+    {# =================== #}
+    {# ===== changes ===== #}
+    {# =================== #}
+
+      function set2zero() {
+	$("#_azimuth").val("0");
+	$("#_altitude").val("0");
+	$("#_RA").val("0");
+	$("#_dec").val("0");
+	$("#_eclatitude").val("0");
+	$("#_eclongitude").val("0");
+      }
+
+    {# ---------------------- #}
+    {# ----- horizontal ----- #}
+    {# ---------------------- #}
+
+
+    $("#_azimuth").change(function() {
+
+      try {
+
+	var standard_time = aai.standardTime($('input[name="date"]').val(),
+					    $('input[name="time"]').val(),
+					    $('input[name="timezone"]').val(),
+					    $("#_dst").is(':checked'));
+      } catch (err) {
+	  alert(err);
+	  set2zero();
+	return false;
+      }
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec", {
+	date: standard_time.date_str,
+	time: standard_time.time_str,
+	timezone: standard_time.timezone_str,
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+
+	azimuth: $('input[name="azimuth"]').val(),
+	altitude: $('input[name="altitude"]').val()
+
+      }, function(data) {
+
+	if (data.errors.length > 0) {
+	  alert("Error: " + data.errors);
+	  set2zero();
+
+	} else {
+
+	  $("#_RA").val(aai.dd2dms(data.ra));
+	  $("#_dec").val(aai.dd2dms(data.dec));
+
+	}
+
+      }); {# end getJSON #}
+
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
+
+	date: standard_time.date_str,
+	time: standard_time.time_str,
+	timezone: standard_time.timezone_str,
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
+
+      }, function(data) {
+
+	if (data.errors.length > 0) {
+	  alert("Error: " + data.errors);
+	  set2zero();
+
+	} else {
+
+	  $("#_eclatitude").val(aai.dd2dms(data.longitude));
+	  $("#_eclongitude").val(aai.dd2dms(data.latitude));
+	}
+
+      });  {# end getJSON #}
+
+
+    }); {# end _azimuth.change #}
+
+
+
+    $("#_altitude").change(function() {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/azalt2radec",
+      {
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+	azimuth: $('input[name="azimuth"]').val(),
+	altitude: $('input[name="altitude"]').val()
+
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+	} else {
+
+	  $("#_RA").val(aai.dd2dms(data.ra));
+	  $("#_dec").val(aai.dd2dms(data.dec));
+
+	};
+
+      });
+
+
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+
+	} else {
+
+	  $("#_eclatitude").val(aai.dd2dms(data.longitude));
+	  $("#_eclongitude").val(aai.dd2dms(data.latitude));
+
+	};
+
+      });
+
+
+    }); {# end _altitude.change #}
+
+
+    {# ---------------------- #}
+    {# ----- equatorial ----- #}
+    {# ---------------------- #}
+
+
+    $("#_RA").change(function() {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val()
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+
+	} else {
+
+	  $("#_azimuth").val(aai.dd2dms(data.azimuth));
+	  $("#_altitude").val(aai.dd2dms(data.altitude));
+
+	};
+
+      });
+
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+
+	} else {
+
+	  $("#_eclatitude").val(aai.dd2dms(data.longitude));
+	  $("#_eclongitude").val(aai.dd2dms(data.latitude));
+
+	};
+
+      });
+
+
+    }); {# end _RA.change #}
+
+
+    $("#_dec").change(function() {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val()
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+
+	} else {
+
+	  $("#_azimuth").val(aai.dd2dms(data.azimuth));
+	  $("#_altitude").val(aai.dd2dms(data.altitude));
+
+	};
+
+      });
+
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2eclatlon", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val(),
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+
+	} else {
+
+	  $("#_eclatitude").val(aai.dd2dms(data.longitude));
+	  $("#_eclongitude").val(aai.dd2dms(data.latitude));
+
+	};
+
+      });
+
+
+    }); {# end _dec.change #}
+
+
+    {# -------------------- #}
+    {# ----- ecliptic ----- #}
+    {# -------------------- #}
+
+
+    $("#_eclongitude").change(function() {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/eclatlon2radec", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	eclatitude: $('input[name="eclatitude"]').val(),
+	eclongitude: $('input[name="eclongitude"]').val(),
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+	} else {
+
+	  $("#_RA").val(aai.dd2dms(data.ra));
+	  $("#_dec").val(aai.dd2dms(data.dec));
+
+	};
+
+      });
+
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val()
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+	} else {
+
+	  $("#_azimuth").val(aai.dd2dms(data.azimuth));
+	  $("#_altitude").val(aai.dd2dms(data.altitude));
+
+	};
+
+      });
+
+
+    }); {# end _eclongitude.change #}
+
+
+
+
+    $("#_eclatitude").change(function() {
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/eclatlon2radec", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	eclatitude: $('input[name="eclatitude"]').val(),
+	eclongitude: $('input[name="eclongitude"]').val(),
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+	} else {
+
+	  $("#_RA").val(aai.dd2dms(data.ra));
+	  $("#_dec").val(aai.dd2dms(data.dec));
+
+	};
+
+      });
+
+
+      $.getJSON($SCRIPT_ROOT + "/api/v1/radec2azalt", {
+
+	date: $('input[name="date"]').val(),
+	time: $('input[name="time"]').val(),
+	timezone: $('input[name="timezone"]').val(),
+	dst: $("#_dst").is(':checked'),
+
+	latitude: $('input[name="latitude"]').val(),
+	longitude: $('input[name="longitude"]').val(),
+
+	ra: $('input[name="RA"]').val(),
+	dec: $('input[name="dec"]').val()
+
+      },
+
+      function(data) {
+
+	if (data.errors.length > 0) {
+
+	  alert("Error: " + data.errors);
+
+	  set2zero();
+
+	} else {
+
+	  $("#_azimuth").val(aai.dd2dms(data.azimuth));
+	  $("#_altitude").val(aai.dd2dms(data.altitude));
+
+	};
+
+      });
+
+
+
+    }); {# end _eclatitude.change #}
+
+
+
+
+
+  }); {# end function, TODO missing ()? #}
+
+
+
+  {# ----------------- #}
+  {# ----- ready ----- #}
+  {# ----------------- #}
+
+
+  $(document).ready(function() {
+
+
+    $("#time_controls").hide();
+
+
+  }); {# end ready method #}
+
+</script>
+
+{% endblock %}
+
+{% block title %} Transform Observations {% endblock %}
+
+{% block content %}
+
+<h1>Observation Transforms</h1>
+
+<div class="twocolumn">
+
+  This transforms coordinates between
+  <a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">horizontal</a> (observer),
+  <a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">equatorial</a>
+  and
+  <a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">ecliptic</a>
+  coordinate systems.
+
+  After a location and a time are entered for the observer's location,
+  changes to any one of Observation Direction fields will update the
+  others.
+
+  For example,
+  enter <a href="https://en.wikipedia.org/wiki/Sirius">Sirius'</a> RA
+  6:45:08.9 and Declination -16:42:59 in the equatorial coordinates
+  and the ecliptic and horizontal values will update to match.
+
+</div>
+
+
+<br>
+
+{% include "observer_location.html" %}
+
+<br>
+
+<div class="result">
+
+
+  <h2 align="center">Observation Direction</h2>
+
+  <br>
+
+  <div align="center">
+
+    <table class="result table" id="_result_table">
+
+      <tr class="result ecliptic">
+	<th><a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">Ecliptic</a></th>
+	<th>Longitude</th>
+	<td><input type="text" class="result ecliptic entry" name="eclongitude" id="_eclongitude" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
+
+      <tr class="result ecliptic">
+	<th></th>
+	<th>Latitude</th>
+	<td><input type="text" class="result ecliptic entry" name="eclatitude" id="_eclatitude" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
+
+
+      <tr class="result equatorial">
+	<th class="result"><a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">Equatorial</a></th>
+	<th class="result">Right Ascension</th>
+	<td><input type="text" class="result equatorial entry" name="RA" id="_RA" value="0"></td>
+	<td class="result">hr[:min]</td>
+      </tr>
+
+      <tr class="result equatorial">
+	<th></th>
+	<th>Declination</th>
+	<td><input type="text" class="result equatorial entry" name="dec" id="_dec" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
+
+
+      <tr class="result horizontal">
+	<th><a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">Horizontal</a></th>
+	<th>Azimuth</th>
+	<td><input type="text" class="result horizontal entry" name="azimuth" id="_azimuth" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
+
+      <tr class="result horizontal">
+	<th></th>
+	<th>Altitude</th>
+	<td><input type="text" class="result horizontal entry" name="altitude" id="_altitude" value="0"></td>
+	<td>deg[:min[:sec]]</td>
+      </tr>
+
+    </table>
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -267,60 +267,50 @@
 	$("#get_current_time").click(function(e) {
 
 	    try {
-
-		let current_time = aai.standardTime($('input[name="date"]').val(),
+		var current_time = aai.standardTime($('input[name="date"]').val(),
 						    $('input[name="time"]').val(),
 						    $('input[name="timezone"]').val(),
 						    $("#_dst").is(':checked'));
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: current_time.date_str,
-		    time: current_time.time_str,
-		    timezone: current_time.timezone_str
-
-		}, function(sun_position) {
-
-		    updateSunChart(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: current_time.date_str,
+		time: current_time.time_str,
+		timezone: current_time.timezone_str
+
+	    }, function(sun_position) {
+		updateSunChart(sun_position);
+	    }); {# end getJSON #}
+
 
 	}); {# end get_current_time click #}
 
 
-
 	$("#get_next_hour").click(function(e) {
 
-
 	    try {
-
-		let standard_time_nh = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_nh = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
-
-		let next_hour = aai.changeTime(standard_time_nh.date_str,
+		var next_hour = aai.changeTime(standard_time_nh.date_str,
 					       standard_time_nh.time_str,
 					       standard_time_nh.timezone_str,
 					       60*60);
 
 		if ($("#_dst").is(':checked')) {
-
-		    let dst_nh = aai.ST2DST(next_hour.date_str,
+		    var dst_nh = aai.ST2DST(next_hour.date_str,
 					    next_hour.time_str,
 					    next_hour.timezone_str);
 
 		    $('input[name="date"]').val(dst_nh.date_str);
 		    $('input[name="time"]').val(dst_nh.time_str);
-
 
 		} else {
 
@@ -329,26 +319,24 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    updateSunChart(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+		updateSunChart(sun_position);
+
+	    }); {# end getJSON #}
+
 
 	}); {# end get_next_hour click #}
 
@@ -356,21 +344,19 @@
 	$("#get_next_day").click(function(e) {
 
 	    try {
-
-
-		let standard_time_nd = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_nd = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let next_day = aai.changeTime(standard_time_nd.date_str,
+		var next_day = aai.changeTime(standard_time_nd.date_str,
 					      standard_time_nd.time_str,
 					      standard_time_nd.timezone_str,
 					      24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_nd = aai.ST2DST(next_day.date_str,
+		    var dst_nd = aai.ST2DST(next_day.date_str,
 					    next_day.time_str,
 					    next_day.timezone_str);
 
@@ -385,49 +371,43 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    updateSunChart(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+		updateSunChart(sun_position);
+	    }); {# end getJSON #}
+
 
 	}); {# end get_next_day click #}
 
 
 	$("#get_prev_hour").click(function(e) {
 
-
 	    try {
-
-
-		let standard_time_ph = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_ph = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let prev_hour = aai.changeTime(standard_time_ph.date_str,
+		var prev_hour = aai.changeTime(standard_time_ph.date_str,
 					       standard_time_ph.time_str,
 					       standard_time_ph.timezone_str,
 					       -60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_ph = aai.ST2DST(prev_hour.date_str,
+		    var dst_ph = aai.ST2DST(prev_hour.date_str,
 					    prev_hour.time_str,
 					    prev_hour.timezone_str);
 
@@ -442,49 +422,43 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    updateSunChart(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+		updateSunChart(sun_position);
+	    }); {# end getJSON #}
+
 
 	}); {# end get_prev_hour click #}
 
 
 	$("#get_prev_day").click(function(e) {
 
-
 	    try {
-
-
-		let standard_time_pd = aai.standardTime($('input[name="date"]').val(),
+		var standard_time_pd = aai.standardTime($('input[name="date"]').val(),
 							$('input[name="time"]').val(),
 							$('input[name="timezone"]').val(),
 							$("#_dst").is(':checked'));
 
-		let prev_day = aai.changeTime(standard_time_pd.date_str,
+		var prev_day = aai.changeTime(standard_time_pd.date_str,
 					      standard_time_pd.time_str,
 					      standard_time_pd.timezone_str,
 					      -24*60*60);
 
 		if ($("#_dst").is(':checked')) {
 
-		    let dst_pd = aai.ST2DST(prev_day.date_str,
+		    var dst_pd = aai.ST2DST(prev_day.date_str,
 					    prev_day.time_str,
 					    prev_day.timezone_str);
 
@@ -499,26 +473,22 @@
 
 		}
 
-
-		$.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
-		    latitude: $('input[name="latitude"]').val(),
-		    longitude: $('input[name="longitude"]').val(),
-		    date: $('input[name="date"]').val(),
-		    time: $('input[name="time"]').val(),
-		    timezone: $('input[name="timezone"]').val()
-
-		}, function(sun_position) {
-
-		    updateSunChart(sun_position);
-
-		}); {# end getJSON #}
-
-
 	    } catch (err) {
 		alert(err);
+		return false;
 	    }
 
-	    return false;
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/solar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
+		longitude: $('input[name="longitude"]').val(),
+		date: $('input[name="date"]').val(),
+		time: $('input[name="time"]').val(),
+		timezone: $('input[name="timezone"]').val()
+
+	    }, function(sun_position) {
+		updateSunChart(sun_position);
+	    }); {# end getJSON #}
+
 
 	}); {# end get_prev_day click #}
 
@@ -787,47 +757,45 @@ button#get_solar_daily_altitude {
 
   </tr>
 
-  <tr>
-    <td colspan="2">
-
-      <table id="results_table" align="center">
-
-	<tr>
-	  <th>Azimuth</th>
-	  <td id="azimuth" align="right">TBD</td>
-	  <td>deg:min:sec</td>
-	</tr>
-
-	<tr>
-	  <th>Altitude</th>
-	  <td id="altitude" align="right">TBD</td>
-	  <td>deg:min:sec</td>
-	</tr>
-
-	<tr>
-	  <th>Rising</th>
-	  <td id="rising" align="right">TBD</td>
-	  <td id="rising_dst">ST</td>
-	</tr>
-
-
-	<tr>
-	  <th>Transit</th>
-	  <td id="transit" align="right">TBD</td>
-	  <td id="transit_dst">ST</td>
-	</tr>
-
-	<tr>
-	  <th>Setting</th>
-	  <td id="setting" align="right">TBD</td>
-	  <td id="setting_dst">ST</td>
-	</tr>
-
-      </table>
-
-    </td>
-  </tr>
-
 </table>
+
+<div class="result" align="center">
+
+  <table class="result table">
+
+    <tr class="result horizontal">
+      <th>Azimuth</th>
+      <td class="result horizontal entry" id="azimuth" align="right">TBD</td>
+      <td>deg:min:sec</td>
+    </tr>
+
+    <tr class="result horizontal">
+      <th>Altitude</th>
+      <td class="result horizontal entry" id="altitude" align="right">TBD</td>
+      <td>deg:min:sec</td>
+    </tr>
+
+    <tr class="result rising">
+      <th>Rising</th>
+      <td class="result rising entry" id="rising" align="right">TBD</td>
+      <td id="rising_dst">ST</td>
+    </tr>
+
+
+    <tr class="result rising">
+      <th>Transit</th>
+      <td class="result rising entry" id="transit" align="right">TBD</td>
+      <td id="transit_dst">ST</td>
+    </tr>
+
+    <tr class="result rising">
+      <th>Setting</th>
+      <td class="result rising entry" id="setting" align="right">TBD</td>
+      <td id="setting_dst">ST</td>
+    </tr>
+
+  </table>
+
+</div>
 
 {% endblock %}
