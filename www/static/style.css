@@ -90,7 +90,7 @@ a:hover   {color:coral}
 }
 
 .observer.input.location {
-    background-color: lightgreen;
+    background-color: powderblue;
 }
 
 .observer.input.location.entry {
@@ -103,7 +103,7 @@ a:hover   {color:coral}
 
 
 .observer.input.datetime {
-    background-color: khaki;
+    background-color: palegreen;
 }
 
 .observer.input.datetime.entry {
@@ -126,14 +126,14 @@ a:hover   {color:coral}
 
 .result.table {
     display: table;
-    margin:   1px;
+    border-spacing: 1px;
     padding: 14px 16px;
 }
 
 
 
 .result.ecliptic {
-    background-color: azure;
+    background-color: lightcyan;
 }
 
 .result.ecliptic.entry {
@@ -157,6 +157,17 @@ a:hover   {color:coral}
 }
 
 .result.horizontal.entry {
+    text-align: right;
+    width: 120px;
+    color: orangered;
+}
+
+
+.result.rising {
+    background-color: lightgoldenrodyellow;
+}
+
+.result.rising.entry {
     text-align: right;
     width: 120px;
     color: orangered;

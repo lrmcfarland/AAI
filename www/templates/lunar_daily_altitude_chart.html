@@ -526,21 +526,21 @@
 
 	    } catch (err) {
 		alert(err);
-                return false;
+		return false;
 	    }
 
-            $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-                latitude: $('input[name="latitude"]').val(),
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
 		longitude: $('input[name="longitude"]').val(),
 		date: $('input[name="date"]').val(),
 		time: $('input[name="time"]').val(),
 		timezone: $('input[name="timezone"]').val()
 
-            }, function(moon_position) {
+	    }, function(moon_position) {
 
-                updateMoonChart(moon_position);
+		updateMoonChart(moon_position);
 
-            }); {# end getJSON #}
+	    }); {# end getJSON #}
 
 
 	}); {# end eclipse_2017_aug_21 click #}
@@ -565,21 +565,21 @@
 						     $("#_dst").is(':checked'));
 	    } catch (err) {
 		alert(err);
-                return false;
+		return false;
 	    }
 
-            $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-                latitude: $('input[name="latitude"]').val(),
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
 		longitude: $('input[name="longitude"]').val(),
 		date: $('input[name="date"]').val(),
 		time: $('input[name="time"]').val(),
 		timezone: $('input[name="timezone"]').val()
 
-            }, function(moon_position) {
+	    }, function(moon_position) {
 
-                updateMoonChart(moon_position);
+		updateMoonChart(moon_position);
 
-            }); {# end getJSON #}
+	    }); {# end getJSON #}
 
 
 	}); {# end eclipse_2019_dec_26_Lat24 click #}
@@ -605,24 +605,24 @@
 
 	    } catch (err) {
 		alert(err);
-                return false;
+		return false;
 	    }
 
-            $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
-                latitude: $('input[name="latitude"]').val(),
+	    $.getJSON($SCRIPT_ROOT + "/api/v1/lunar_daily_altitude", {
+		latitude: $('input[name="latitude"]').val(),
 		longitude: $('input[name="longitude"]').val(),
 		date: $('input[name="date"]').val(),
 		time: $('input[name="time"]').val(),
 		timezone: $('input[name="timezone"]').val()
 
-            }, function(moon_position) {
+	    }, function(moon_position) {
 
-                updateMoonChart(moon_position);
+		updateMoonChart(moon_position);
 
-            }); {# end getJSON #}
+	    }); {# end getJSON #}
 
 
-        }); {# end eclipse_2019_dec_26_Lat20 click #}
+	}); {# end eclipse_2019_dec_26_Lat20 click #}
 
 
     }); {# end ready method #}
@@ -687,138 +687,136 @@
 
 <br>
 
-
-<table>
-
-
-  <tr>
-
-    <td>
-      <div id="altitudeVtime" class="linechart"></div>
-    </td>
+<div id="altitudeVtime" class="linechart"></div>
 
 
-  </tr>
-
-  <tr>
-    <td colspan="2">
-
-      <table id="results_table" align="center">
-
-	<tr>
-	  <td></td>
-	  <th>Sun</th>
-	  <th>Moon</th>
-	  <td></td>
-	</tr>
+<div class="result" align="center">
 
 
-	<tr>
-	  <th>Range</th>
+  <table id="results_table" class="result table">
 
-	  <td id="sun_range" align="right">TBD</td>
-	  <td id="moon_range" align="right">TBD</td>
-
-	  <td><i>light-seconds</i></td>
-	</tr>
-
-	<tr><td></td></tr>
-
-	<tr>
-	  <th>Ecliptic Longitude</th>
-
-	  <td id="sun_ec_longitude" align="right">TBD</td>
-	  <td id="moon_ec_longitude" align="right">TBD</td>
-
-	  <td><i>deg:min:sec</i></td>
-	</tr>
-
-	<tr>
-	  <th>Ecliptic Latitude</th>
-
-	  <td id="sun_ec_latitude" align="right">TBD</td>
-	  <td id="moon_ec_latitude" align="right">TBD</td>
-
-	  <td><i>deg:min:sec</i></td>
-	</tr>
-
-	<tr><td></td></tr>
-
-	<tr>
-	  <th>Right Ascension</th>
-
-	  <td id="sun_eq_ra" align="right">TBD</td>
-	  <td id="moon_eq_ra" align="right">TBD</td>
-
-	  <td><i>hr:min:sec</i></td>
-	</tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <th>Sun</th>
+      <th>Moon</th>
+      <td></td>
+    </tr>
 
 
-	<tr>
-	  <th>Declination</th>
+    <tr>
+      <th></th>
+      <th>Range</th>
 
-	  <td id="sun_eq_dec" align="right">TBD</td>
-	  <td id="moon_eq_dec" align="right">TBD</td>
+      <td id="sun_range" align="right">TBD</td>
+      <td id="moon_range" align="right">TBD</td>
 
-	  <td><i>deg:min:sec</i></td>
+      <td><i>light-seconds</i></td>
+    </tr>
 
-	</tr>
+    <tr><td></td></tr>
 
-	<tr><td></td></tr>
+    <tr class="result ecliptic">
+      <th><a href="https://en.wikipedia.org/wiki/Ecliptic_coordinate_system">Ecliptic</a></th>
+      <th>Longitude</th>
 
-	<tr>
-	  <th>Azimuth</th>
+      <td class="result ecliptic entry" id="sun_ec_longitude" align="right">TBD</td>
+      <td class="result ecliptic entry" id="moon_ec_longitude" align="right">TBD</td>
 
-	  <td id="sun_azimuth" align="right">TBD</td>
-	  <td id="moon_azimuth" align="right">TBD</td>
+      <td><i>deg:min:sec</i></td>
+    </tr>
 
-	  <td><i>deg:min:sec</i></td>
-	</tr>
+    <tr class="result ecliptic">
+      <th></th>
+      <th>Latitude</th>
 
-	<tr>
-	  <th>Altitude</th>
+      <td class="result ecliptic entry" id="sun_ec_latitude" align="right">TBD</td>
+      <td class="result ecliptic entry" id="moon_ec_latitude" align="right">TBD</td>
 
-	  <td id="sun_altitude" align="right">TBD</td>
-	  <td id="moon_altitude" align="right">TBD</td>
+      <td><i>deg:min:sec</i></td>
+    </tr>
 
-	  <td><i>deg:min:sec</i></td>
-	</tr>
+    <tr><td></td></tr>
 
-	<tr><td></td></tr>
+    <tr class="result equatorial">
+      <th class="result"><a href="https://en.wikipedia.org/wiki/Equatorial_coordinate_system">Equatorial</a></th>
+      <th>Right Ascension</th>
 
-	<tr>
-	  <th>Rising</th>
+      <td class="result equatorial entry" id="sun_eq_ra" align="right">TBD</td>
+      <td class="result equatorial entry" id="moon_eq_ra" align="right">TBD</td>
 
-	  <td id="sun_rising" align="right">TBD</td>
-	  <td id="moon_rising" align="right">TBD</td>
-	  <td id="rising_dst"><i>ST</i></td>
-	</tr>
-
-
-	<tr>
-	  <th>Transit</th>
-
-	  <td id="sun_transit" align="right">TBD</td>
-	  <td id="moon_transit" align="right">TBD</td>
-	  <td id="transit_dst"><i>ST</i></td>
-
-	</tr>
-
-	<tr>
-	  <th>Setting</th>
-
-	  <td id="sun_setting" align="right">TBD</td>
-	  <td id="moon_setting" align="right">TBD</td>
-	  <td id="setting_dst"><i>ST</i></td>
-
-	</tr>
+      <td><i>hr:min:sec</i></td>
+    </tr>
 
 
-      </table>
+    <tr class="result equatorial">
+      <th></th>
+      <th>Declination</th>
 
-    </td>
-  </tr>
+      <td class="result equatorial entry" id="sun_eq_dec" align="right">TBD</td>
+      <td class="result equatorial entry" id="moon_eq_dec" align="right">TBD</td>
 
-</table>
+      <td><i>deg:min:sec</i></td>
+
+    </tr>
+
+    <tr><td></td></tr>
+
+    <tr class="result horizontal">
+      <th><a href="https://en.wikipedia.org/wiki/Horizontal_coordinate_system">Horizontal</a></th>
+      <th>Azimuth</th>
+
+      <td class="result horizontal entry" id="sun_azimuth" align="right">TBD</td>
+      <td class="result horizontal entry" id="moon_azimuth" align="right">TBD</td>
+
+      <td><i>deg:min:sec</i></td>
+    </tr>
+
+    <tr class="result horizontal">
+      <th></th>
+      <th>Altitude</th>
+
+      <td class="result horizontal entry" id="sun_altitude" align="right">TBD</td>
+      <td class="result horizontal entry" id="moon_altitude" align="right">TBD</td>
+
+      <td><i>deg:min:sec</i></td>
+    </tr>
+
+    <tr><td></td></tr>
+
+    <tr class="result rising">
+      <th></th>
+      <th>Rising</th>
+
+      <td class="result rising entry" id="sun_rising" align="right">TBD</td>
+      <td class="result rising entry" id="moon_rising" align="right">TBD</td>
+      <td id="rising_dst">ST</td>
+    </tr>
+
+
+    <tr class="result rising">
+      <th></th>
+      <th>Transit</th>
+
+      <td class="result rising entry" id="sun_transit" align="right">TBD</td>
+      <td class="result rising entry" id="moon_transit" align="right">TBD</td>
+      <td id="transit_dst">ST</td>
+
+    </tr>
+
+    <tr class="result rising">
+      <th></th>
+      <th>Setting</th>
+
+      <td class="result rising entry" id="sun_setting" align="right">TBD</td>
+      <td class="result rising entry" id="moon_setting" align="right">TBD</td>
+      <td id="setting_dst">ST</td>
+
+    </tr>
+
+  </table>
+
+
+</div>
 
 {% endblock %}
