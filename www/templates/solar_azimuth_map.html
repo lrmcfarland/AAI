@@ -104,7 +104,6 @@
 
 	    if ($("#_dst").is(':checked')) {
 
-		current_datetime = aai.ST2DST(current_datetime.date_str, current_datetime.time_str, current_datetime.timezone_str);
 		rising_datetime = aai.ST2DST(rising_datetime.date_str, rising_datetime.time_str, rising_datetime.timezone_str);
 		transit_datetime = aai.ST2DST(transit_datetime.date_str, transit_datetime.time_str, transit_datetime.timezone_str);
 		setting_datetime = aai.ST2DST(setting_datetime.date_str, setting_datetime.time_str, setting_datetime.timezone_str);
@@ -156,6 +155,23 @@
 						    $('input[name="time"]').val(),
 						    $('input[name="timezone"]').val(),
 						    $("#_dst").is(':checked'));
+
+		if ($("#_dst").is(':checked')) {
+
+		    var st2dst = aai.ST2DST(current_time.date_str,
+					    current_time.time_str,
+					    current_time.timezone_str);
+
+		    $('input[name="date"]').val(st2dst.date_str);
+		    $('input[name="time"]').val(st2dst.time_str);
+
+
+		} else {
+
+		    $('input[name="date"]').val(current_time.date_str);
+		    $('input[name="time"]').val(current_time.time_str);
+
+		}
 
 	    } catch (err) {
 		alert(err);

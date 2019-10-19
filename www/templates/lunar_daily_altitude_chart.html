@@ -258,6 +258,24 @@
 						    $('input[name="time"]').val(),
 						    $('input[name="timezone"]').val(),
 						    $("#_dst").is(':checked'));
+
+		if ($("#_dst").is(':checked')) {
+
+		    var st2dst = aai.ST2DST(current_time.date_str,
+					    current_time.time_str,
+					    current_time.timezone_str);
+
+		    $('input[name="date"]').val(st2dst.date_str);
+		    $('input[name="time"]').val(st2dst.time_str);
+
+
+		} else {
+
+		    $('input[name="date"]').val(current_time.date_str);
+		    $('input[name="time"]').val(current_time.time_str);
+
+		}
+
 	    } catch (err) {
 		alert(err);
 		return false;
